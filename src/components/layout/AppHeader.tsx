@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { BookOpen, Heart, TrendingUp, GraduationCap, HelpCircle, Wrench, User, Menu, X, Sparkles } from 'lucide-react';
+import { BookOpen, Heart, TrendingUp, GraduationCap, HelpCircle, Wrench, User, Menu, X, Sparkles, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeSelector } from '@/components/ThemeSelector';
@@ -17,7 +17,7 @@ interface NavItem {
 
 const AppHeader = () => {
   const { t } = useLanguage();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isAdmin } = useAuth();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -112,6 +112,25 @@ const AppHeader = () => {
               </Link>
             )}
 
+            {/* Admin Link */}
+            {isAdmin && (
+              <Link to="/admin">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "h-9 px-3 gap-2 font-raleway text-sm",
+                    isActive('/admin')
+                      ? "bg-primary/10 text-primary"
+                      : "text-foreground/90 hover:text-primary hover:bg-primary/5"
+                  )}
+                >
+                  <Shield className="h-4 w-4" />
+                  <span className="hidden sm:inline">Admin</span>
+                </Button>
+              </Link>
+            )}
+
             {/* Theme Selector */}
             <ThemeSelector />
 
@@ -162,6 +181,26 @@ const AppHeader = () => {
                   </Link>
                 );
               })}
+              {/* Admin Link in Mobile Menu */}
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      "w-full justify-start h-10 px-4 gap-3 font-raleway text-sm",
+                      isActive('/admin')
+                        ? "bg-primary/10 text-primary"
+                        : "text-foreground/90 hover:text-primary hover:bg-primary/5"
+                    )}
+                  >
+                    <Shield className="h-4 w-4" />
+                    <span>Admin</span>
+                  </Button>
+                </Link>
+              )}
             </nav>
           </div>
         )}

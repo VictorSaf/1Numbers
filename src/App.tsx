@@ -8,6 +8,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ProtectedAdminRoute } from "@/components/ProtectedAdminRoute";
 
 // Eager load - main page
 import Index from "./pages/Index";
@@ -31,6 +32,7 @@ const ChaldeanAnalysis = lazy(() => import("./pages/ChaldeanAnalysis"));
 const Remedies = lazy(() => import("./pages/Remedies"));
 const WhiteLabelSettings = lazy(() => import("./pages/WhiteLabelSettings"));
 const DesignSystemShowcase = lazy(() => import("./pages/DesignSystemShowcase"));
+const Admin = lazy(() => import("./pages/Admin"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -86,6 +88,14 @@ const App = () => (
                   <Route path="/remedies" element={<Remedies />} />
                   <Route path="/white-label" element={<WhiteLabelSettings />} />
                   <Route path="/design-system" element={<DesignSystemShowcase />} />
+                  <Route
+                    path="/admin"
+                    element={
+                      <ProtectedAdminRoute>
+                        <Admin />
+                      </ProtectedAdminRoute>
+                    }
+                  />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>

@@ -9,6 +9,7 @@ import gamificationRoutes from './routes/gamification';
 import aiRoutes from './routes/ai';
 import notificationRoutes from './routes/notifications';
 import friendsRoutes from './routes/friends';
+import adminRoutes from './routes/admin';
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ app.use('/api/gamification', gamificationRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/friends', friendsRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
