@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { getDelayClass } from "@/components/design-system";
 import {
   generateLoShuGrid,
   LO_SHU_GRID_LAYOUT,
@@ -133,8 +134,10 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
 
   return (
     <div
-      className="space-y-6 opacity-0 animate-fade-in"
-      style={{ animationDelay: `${delay}ms` }}
+      className={cn(
+        "space-y-6 opacity-0 animate-fade-in",
+        getDelayClass(delay)
+      )}
     >
       {/* Header */}
       <div className="text-center space-y-2">

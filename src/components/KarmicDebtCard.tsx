@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { KarmicDebtInfo, KARMIC_DEBT_MEANINGS } from "@/lib/karmic";
 import { cn } from "@/lib/utils";
+import { getDelayClass } from "@/components/design-system";
 
 interface KarmicDebtCardProps {
   debt: KarmicDebtInfo;
@@ -25,9 +26,11 @@ export const KarmicDebtCard = ({ debt, delay = 0 }: KarmicDebtCardProps) => {
   };
 
   return (
-    <div 
-      className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 backdrop-blur-sm opacity-0 animate-fade-in"
-      style={{ animationDelay: `${delay}ms` }}
+    <div
+      className={cn(
+        "p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 backdrop-blur-sm opacity-0 animate-fade-in",
+        getDelayClass(delay)
+      )}
     >
       <div className="flex items-start gap-3">
         <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center">

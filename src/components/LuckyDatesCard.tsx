@@ -6,6 +6,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { findLuckyDates, getNextLuckyDate, LuckyDate } from "@/lib/luckyDates";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { getDelayClass } from "@/components/design-system";
 
 interface LuckyDatesCardProps {
   birthDate: Date;
@@ -152,8 +153,10 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
 
   return (
     <div
-      className="p-6 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm opacity-0 animate-fade-in"
-      style={{ animationDelay: `${delay}ms` }}
+      className={cn(
+        "p-6 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm opacity-0 animate-fade-in",
+        getDelayClass(delay)
+      )}
     >
       <div className="flex items-center gap-2 mb-2">
         <Sparkles className="h-5 w-5 text-primary" />

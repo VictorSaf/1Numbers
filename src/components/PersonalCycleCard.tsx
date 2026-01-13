@@ -1,13 +1,14 @@
 import { Calendar, Sun, Moon } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { 
-  calculatePersonalDayNumber, 
-  calculatePersonalMonthNumber, 
+import {
+  calculatePersonalDayNumber,
+  calculatePersonalMonthNumber,
   calculateUniversalDay,
   calculateUniversalMonth,
-  PERSONAL_CYCLE_MEANINGS 
+  PERSONAL_CYCLE_MEANINGS
 } from "@/lib/personalCycles";
 import { cn } from "@/lib/utils";
+import { getDelayClass } from "@/components/design-system";
 
 interface PersonalCycleCardProps {
   birthDate: Date;
@@ -37,9 +38,11 @@ export const PersonalCycleCard = ({ birthDate, delay = 0 }: PersonalCycleCardPro
   };
 
   return (
-    <div 
-      className="p-6 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm opacity-0 animate-fade-in"
-      style={{ animationDelay: `${delay}ms` }}
+    <div
+      className={cn(
+        "p-6 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm opacity-0 animate-fade-in",
+        getDelayClass(delay)
+      )}
     >
       <div className="flex items-center gap-2 mb-4">
         <Calendar className="h-5 w-5 text-primary" />

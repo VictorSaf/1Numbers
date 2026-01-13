@@ -4,6 +4,7 @@
 import { ReactNode, forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 import { LucideIcon } from 'lucide-react';
+import { getDelayClass } from '@/components/design-system';
 
 export interface BentoCardProps {
   children: ReactNode;
@@ -66,10 +67,10 @@ export const BentoCard = forwardRef<HTMLDivElement, BentoCardProps>(
           spanClasses.col[colSpan],
           spanClasses.row[rowSpan],
           interactive && 'cursor-pointer',
-          'animate-fade-in opacity-0',
+          'animate-fade-in opacity-0 [animation-fill-mode:forwards]',
+          getDelayClass(animationDelay),
           className
         )}
-        style={{ animationDelay: `${animationDelay}ms`, animationFillMode: 'forwards' }}
         onClick={onClick}
         role={interactive ? 'button' : undefined}
         tabIndex={interactive ? 0 : undefined}

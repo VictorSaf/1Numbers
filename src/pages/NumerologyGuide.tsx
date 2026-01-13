@@ -4,6 +4,7 @@ import { PageLayout } from "@/components/layout/PageLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
+import { getDelayClass } from "@/components/design-system";
 
 const NumerologyGuide = () => {
   const { t } = useLanguage();
@@ -144,9 +145,9 @@ const NumerologyGuide = () => {
                     className={cn(
                       "card-mystic rounded-xl p-5 opacity-0 animate-fade-in cursor-pointer",
                       "hover:glow-gold-subtle transition-all duration-300 hover:scale-[1.02]",
-                      isMaster && "border-primary/40"
+                      isMaster && "border-primary/40",
+                      getDelayClass(index * 50)
                     )}
-                    style={{ animationDelay: `${index * 50}ms` }}
                     onClick={() => setSelectedNumber(num)}
                   >
                     <div className="flex items-center gap-4">

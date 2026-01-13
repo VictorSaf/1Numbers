@@ -8,6 +8,7 @@ import { PersonalCycleCard } from "./PersonalCycleCard";
 import { LuckyDatesCard } from "./LuckyDatesCard";
 import { NameAnalysisCard } from "./NameAnalysisCard";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { cn } from "@/lib/utils";
 import {
   calculateLifePathNumber,
   calculateDestinyNumber,
@@ -116,7 +117,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
       <PersonalCycleCard birthDate={birthDate} delay={550} />
 
       {/* Pinnacles & Challenges */}
-      <div className="opacity-0 animate-fade-in" style={{ animationDelay: "600ms" }}>
+      <div className="opacity-0 animate-fade-in ds-delay-600">
         <div className="flex items-center gap-2 mb-4">
           <Mountain className="h-5 w-5 text-primary" />
           <h3 className="font-cinzel text-lg text-foreground">{sectionLabels.pinnacles[language]}</h3>
@@ -135,7 +136,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
       </div>
 
       {/* Karmic Debts */}
-      <div className="opacity-0 animate-fade-in" style={{ animationDelay: "850ms" }}>
+      <div className="opacity-0 animate-fade-in ds-delay-900">
         <div className="flex items-center gap-2 mb-4">
           <AlertTriangle className="h-5 w-5 text-amber-500" />
           <h3 className="font-cinzel text-lg text-foreground">{sectionLabels.karmic[language]}</h3>
@@ -155,7 +156,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
 
       {/* Karmic Lessons */}
       {karmicLessons.length > 0 && (
-        <div className="opacity-0 animate-fade-in" style={{ animationDelay: "950ms" }}>
+        <div className="opacity-0 animate-fade-in ds-delay-1000">
           <h4 className="font-cinzel text-md text-foreground mb-3">{sectionLabels.lessons[language]}</h4>
           <div className="flex flex-wrap gap-2">
             {karmicLessons.map((num) => (
@@ -172,12 +173,12 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
       <LuckyDatesCard birthDate={birthDate} fullName={fullName} delay={1000} />
 
       {/* Name Analysis */}
-      <div className="opacity-0 animate-fade-in" style={{ animationDelay: "1050ms" }}>
+      <div className="opacity-0 animate-fade-in ds-delay-1100">
         <NameAnalysisCard fullName={fullName} />
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 opacity-0 animate-fade-in" style={{ animationDelay: "1100ms" }}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 opacity-0 animate-fade-in ds-delay-1100">
         <div className="p-6 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm">
           <div className="flex items-center gap-2 mb-4">
             <Target className="h-5 w-5 text-primary" />
@@ -202,7 +203,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
         </div>
       </div>
 
-      <div className="flex justify-center pt-4 opacity-0 animate-fade-in" style={{ animationDelay: "1200ms" }}>
+      <div className="flex justify-center pt-4 opacity-0 animate-fade-in ds-delay-1200">
         <Button onClick={onReset} variant="outline" className="border-primary/30 text-primary hover:bg-primary/10">
           <ArrowLeft className="mr-2 h-4 w-4" />
           {t.calculateAgain}

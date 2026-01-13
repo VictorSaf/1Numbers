@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { PinnacleData, ChallengeData, PINNACLE_MEANINGS, CHALLENGE_MEANINGS } from "@/lib/pinnacles";
 import { cn } from "@/lib/utils";
+import { getDelayClass } from "@/components/design-system";
 
 interface PinnacleCardProps {
   pinnacle: PinnacleData;
@@ -29,14 +30,14 @@ export const PinnacleCard = ({ pinnacle, challenge, isCurrentPeriod, delay = 0 }
     : `${pinnacle.startAge} - ${pinnacle.endAge}`;
 
   return (
-    <div 
+    <div
       className={cn(
         "p-4 rounded-xl border backdrop-blur-sm transition-all duration-300 opacity-0 animate-fade-in",
-        isCurrentPeriod 
-          ? "bg-primary/10 border-primary/30 ring-2 ring-primary/20" 
-          : "bg-card/50 border-border/50 hover:bg-card/70"
+        isCurrentPeriod
+          ? "bg-primary/10 border-primary/30 ring-2 ring-primary/20"
+          : "bg-card/50 border-border/50 hover:bg-card/70",
+        getDelayClass(delay)
       )}
-      style={{ animationDelay: `${delay}ms` }}
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">

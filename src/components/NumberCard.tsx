@@ -4,6 +4,7 @@ import { reduceToSingleDigit } from "@/lib/numerology";
 import { useState } from "react";
 import { ChevronDown, ChevronUp, Briefcase, Heart, Lightbulb, Shield, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getDelayClass } from "@/components/design-system";
 
 interface NumberCardProps {
   title: string;
@@ -24,12 +25,12 @@ export const NumberCard = ({ title, number, description, delay = 0, isMain = fal
   const hasDetailedInfo = meaning && 'strengths' in meaning;
   
   return (
-    <div 
+    <div
       className={cn(
         "card-mystic rounded-xl p-6 opacity-0 animate-fade-in",
-        isMain && "col-span-full lg:col-span-2"
+        isMain && "col-span-full lg:col-span-2",
+        getDelayClass(delay)
       )}
-      style={{ animationDelay: `${delay}ms` }}
     >
       <div className="flex flex-col items-center text-center space-y-4">
         <span className="text-xs uppercase tracking-[0.2em] text-primary/70 font-raleway">
