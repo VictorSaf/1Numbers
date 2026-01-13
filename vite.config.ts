@@ -34,10 +34,35 @@ export default defineConfig(() => ({
           "vendor-forms": ["react-hook-form", "@hookform/resolvers", "zod"],
           "vendor-query": ["@tanstack/react-query"],
           "vendor-utils": ["date-fns", "clsx", "tailwind-merge", "class-variance-authority"],
+          // App-specific chunks
+          "numerology-core": [
+            "./src/lib/numerology.ts",
+            "./src/lib/compatibility.ts",
+            "./src/lib/karmic.ts",
+            "./src/lib/predictions.ts",
+          ],
         },
       },
     },
     chunkSizeWarningLimit: 500,
+    // Performance optimizations
+    target: "esnext",
+    minify: "esbuild",
+    cssCodeSplit: true,
+    sourcemap: false,
+    // Asset handling
+    assetsInlineLimit: 4096,
+  },
+  // Optimize dependency pre-bundling
+  optimizeDeps: {
+    include: [
+      "react",
+      "react-dom",
+      "react-router-dom",
+      "@tanstack/react-query",
+      "lucide-react",
+    ],
+    exclude: ["@vite/client", "@vite/env"],
   },
   test: {
     globals: true,

@@ -124,35 +124,64 @@
   /* === THEME: DAWN === */
   .theme-dawn {
     /* Primary - Warm Gold */
-    --primary: 35 90% 55%;
+    --primary: 35 90% 50%;
     --primary-foreground: 240 20% 6%;
-    --primary-hover: 35 90% 50%;
-    --primary-light: 35 90% 65%;
-    --primary-dark: 35 90% 45%;
-    
+    --primary-hover: 35 90% 45%;
+    --primary-light: 35 90% 60%;
+    --primary-dark: 35 90% 40%;
+
     /* Secondary - Soft Rose */
-    --secondary: 350 60% 40%;
-    --secondary-foreground: 45 30% 95%;
-    --secondary-hover: 350 60% 35%;
-    --secondary-light: 350 60% 50%;
-    
+    --secondary: 350 60% 45%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-hover: 350 60% 40%;
+    --secondary-light: 350 60% 55%;
+
     /* Accent - Peach */
-    --accent: 25 80% 55%;
+    --accent: 25 80% 50%;
     --accent-foreground: 240 20% 6%;
-    --accent-hover: 25 80% 50%;
-    
+    --accent-hover: 25 80% 45%;
+
     /* Background System - Light Warm */
-    --background: 45 30% 95%;
-    --background-elevated: 45 25% 98%;
-    --background-overlay: 45 30% 92%;
-    --foreground: 240 20% 10%;
-    --foreground-muted: 240 15% 40%;
-    
+    --background: 40 40% 97%;
+    --background-elevated: 40 30% 99%;
+    --background-overlay: 40 35% 94%;
+    --foreground: 240 20% 15%;
+    --foreground-muted: 240 10% 45%;
+
     /* Surface/Card System */
-    --card: 45 25% 98%;
-    --card-foreground: 240 20% 10%;
-    --card-hover: 45 20% 96%;
-    --card-border: 25 30% 85%;
+    --card: 40 30% 99%;
+    --card-foreground: 240 20% 15%;
+    --card-hover: 40 25% 97%;
+    --card-border: 35 30% 88%;
+
+    /* Neutral Scale */
+    --muted: 40 20% 92%;
+    --muted-foreground: 240 10% 50%;
+    --muted-border: 40 25% 88%;
+
+    /* Border & Input */
+    --border: 35 25% 85%;
+    --border-hover: 35 30% 80%;
+    --input: 40 25% 96%;
+    --input-focus: 35 40% 90%;
+    --ring: 35 90% 50%;
+
+    /* Popover & Dropdown */
+    --popover: 40 30% 99%;
+    --popover-foreground: 240 20% 15%;
+    --popover-border: 35 25% 88%;
+
+    /* Sidebar */
+    --sidebar-background: 40 35% 95%;
+    --sidebar-foreground: 240 20% 15%;
+    --sidebar-border: 35 25% 88%;
+
+    /* Theme-specific effects */
+    --glow-primary: 0 4px 20px hsl(35 90% 50% / 0.25), 0 0 40px hsl(35 90% 50% / 0.1);
+    --glow-primary-subtle: 0 2px 15px hsl(35 90% 50% / 0.15);
+    --gradient-primary: linear-gradient(135deg, hsl(35 90% 55%) 0%, hsl(25 85% 50%) 100%);
+    --gradient-background: linear-gradient(135deg, hsl(40 40% 97%) 0%, hsl(45 35% 96%) 50%, hsl(40 40% 97%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(40 30% 99%) 0%, hsl(40 25% 97%) 100%);
   }
 
   /* === THEME: MIDNIGHT === */
@@ -163,30 +192,61 @@
     --primary-hover: 220 80% 50%;
     --primary-light: 220 80% 65%;
     --primary-dark: 220 80% 45%;
-    
+
     /* Secondary - Indigo */
     --secondary: 250 60% 40%;
     --secondary-foreground: 0 0% 100%;
     --secondary-hover: 250 60% 35%;
     --secondary-light: 250 60% 50%;
-    
+
     /* Accent - Cyan */
     --accent: 190 80% 50%;
     --accent-foreground: 240 20% 6%;
     --accent-hover: 190 80% 45%;
-    
+
     /* Background System - Deep Dark */
-    --background: 240 25% 4%;
-    --background-elevated: 240 22% 8%;
-    --background-overlay: 240 25% 2%;
+    --background: 230 25% 6%;
+    --background-elevated: 230 22% 10%;
+    --background-overlay: 230 25% 4%;
     --foreground: 220 30% 95%;
     --foreground-muted: 220 20% 70%;
-    
+
     /* Surface/Card System */
-    --card: 240 22% 8%;
+    --card: 230 22% 10%;
     --card-foreground: 220 30% 95%;
-    --card-hover: 240 22% 10%;
-    --card-border: 220 30% 25%;
+    --card-hover: 230 22% 12%;
+    --card-border: 220 35% 22%;
+
+    /* Neutral Scale */
+    --muted: 230 20% 14%;
+    --muted-foreground: 220 15% 70%;
+    --muted-border: 230 20% 18%;
+
+    /* Border & Input */
+    --border: 220 30% 20%;
+    --border-hover: 220 35% 28%;
+    --input: 230 22% 12%;
+    --input-focus: 220 35% 25%;
+    --ring: 220 80% 55%;
+
+    /* Popover & Dropdown */
+    --popover: 230 22% 12%;
+    --popover-foreground: 220 30% 95%;
+    --popover-border: 220 30% 22%;
+
+    /* Sidebar */
+    --sidebar-background: 230 24% 8%;
+    --sidebar-foreground: 220 30% 95%;
+    --sidebar-border: 220 30% 20%;
+
+    /* Theme-specific effects */
+    --glow-primary: 0 0 20px hsl(220 80% 55% / 0.4), 0 0 40px hsl(220 80% 55% / 0.2);
+    --glow-primary-subtle: 0 0 15px hsl(220 80% 55% / 0.25);
+    --glow-accent: 0 0 20px hsl(190 80% 50% / 0.4), 0 0 40px hsl(190 80% 50% / 0.2);
+    --gradient-primary: linear-gradient(135deg, hsl(220 80% 55%) 0%, hsl(200 75% 50%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(250 60% 40%) 0%, hsl(220 70% 50%) 100%);
+    --gradient-background: linear-gradient(135deg, hsl(230 25% 6%) 0%, hsl(240 28% 8%) 50%, hsl(230 25% 6%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(230 22% 10%) 0%, hsl(230 22% 12%) 100%);
   }
 
   /* === THEME: CELESTIAL === */
@@ -197,30 +257,62 @@
     --primary-hover: 50 95% 55%;
     --primary-light: 50 95% 70%;
     --primary-dark: 50 95% 50%;
-    
+
     /* Secondary - Cosmic Purple */
-    --secondary: 270 70% 45%;
+    --secondary: 270 70% 50%;
     --secondary-foreground: 50 30% 95%;
-    --secondary-hover: 270 70% 40%;
-    --secondary-light: 270 70% 55%;
-    
+    --secondary-hover: 270 70% 45%;
+    --secondary-light: 270 70% 60%;
+
     /* Accent - Nebula Pink */
     --accent: 320 70% 55%;
     --accent-foreground: 0 0% 100%;
     --accent-hover: 320 70% 50%;
-    
+
     /* Background System - Deep Space */
-    --background: 260 30% 8%;
-    --background-elevated: 260 28% 12%;
-    --background-overlay: 260 30% 6%;
+    --background: 265 35% 8%;
+    --background-elevated: 265 32% 12%;
+    --background-overlay: 265 35% 5%;
     --foreground: 50 30% 96%;
-    --foreground-muted: 50 20% 75%;
-    
+    --foreground-muted: 50 20% 72%;
+
     /* Surface/Card System */
-    --card: 260 28% 12%;
+    --card: 265 32% 12%;
     --card-foreground: 50 30% 96%;
-    --card-hover: 260 28% 14%;
-    --card-border: 270 40% 30%;
+    --card-hover: 265 32% 14%;
+    --card-border: 270 45% 28%;
+
+    /* Neutral Scale */
+    --muted: 265 25% 16%;
+    --muted-foreground: 50 15% 70%;
+    --muted-border: 265 25% 20%;
+
+    /* Border & Input */
+    --border: 270 35% 24%;
+    --border-hover: 270 40% 32%;
+    --input: 265 30% 14%;
+    --input-focus: 270 40% 28%;
+    --ring: 50 95% 60%;
+
+    /* Popover & Dropdown */
+    --popover: 265 32% 14%;
+    --popover-foreground: 50 30% 96%;
+    --popover-border: 270 40% 26%;
+
+    /* Sidebar */
+    --sidebar-background: 265 34% 10%;
+    --sidebar-foreground: 50 30% 96%;
+    --sidebar-border: 270 35% 24%;
+
+    /* Theme-specific cosmic effects */
+    --glow-primary: 0 0 25px hsl(50 95% 60% / 0.4), 0 0 50px hsl(50 95% 60% / 0.2), 0 0 75px hsl(50 95% 60% / 0.1);
+    --glow-primary-subtle: 0 0 18px hsl(50 95% 60% / 0.3);
+    --glow-accent: 0 0 25px hsl(320 70% 55% / 0.4), 0 0 50px hsl(320 70% 55% / 0.2);
+    --glow-secondary: 0 0 25px hsl(270 70% 50% / 0.4), 0 0 50px hsl(270 70% 50% / 0.2);
+    --gradient-primary: linear-gradient(135deg, hsl(50 95% 60%) 0%, hsl(40 90% 55%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(270 70% 50%) 0%, hsl(320 70% 55%) 100%);
+    --gradient-background: linear-gradient(135deg, hsl(265 35% 8%) 0%, hsl(280 38% 10%) 50%, hsl(265 35% 8%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(265 32% 12%) 0%, hsl(270 35% 14%) 100%);
   }
 
   /* === DISPLAY SETTINGS === */
@@ -658,6 +750,214 @@
 .animate-delay-500 { animation-delay: 500ms; }
 
 /* ============================================
+   MICRO-INTERACTIONS & NUMBER ANIMATIONS
+   ============================================ */
+@keyframes number-reveal {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) rotateY(180deg);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2) rotateY(90deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotateY(0deg);
+  }
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100%) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes wiggle {
+  0%, 100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary), 0 0 15px var(--primary);
+  }
+  50% {
+    box-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary), 0 0 30px var(--primary);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes card-flip {
+  0% {
+    transform: perspective(1000px) rotateY(0deg);
+  }
+  100% {
+    transform: perspective(1000px) rotateY(180deg);
+  }
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-number-reveal {
+  animation: number-reveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-wiggle {
+  animation: wiggle 0.5s ease-in-out;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out forwards;
+}
+
+.animate-sparkle {
+  animation: sparkle 1s ease-in-out infinite;
+}
+
+/* Hover micro-interactions */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.hover-scale {
+  transition: transform 0.2s ease;
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+.hover-glow {
+  transition: box-shadow 0.3s ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
+}
+
+/* Button press effect */
+.press-effect {
+  transition: transform 0.1s ease;
+}
+
+.press-effect:active {
+  transform: scale(0.98);
+}
+
+/* Number display animations */
+.number-pop {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.number-pop:hover {
+  transform: scale(1.1);
+}
+
+/* Card entrance animations */
+.card-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.card-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Stagger children */
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 50ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 100ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 150ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 200ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 250ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 300ms; }
+.stagger-children > *:nth-child(8) { animation-delay: 350ms; }
+.stagger-children > *:nth-child(9) { animation-delay: 400ms; }
+
+/* Skeleton loading animation */
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 0%,
+    hsl(var(--muted-foreground) / 0.1) 50%,
+    hsl(var(--muted)) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+/* ============================================
    RESPONSIVE UTILITIES
    ============================================ */
 @media (max-width: 640px) {
@@ -696,4 +996,248 @@
 .skip-link {
   @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4;
   @apply z-50 px-4 py-2 bg-primary text-primary-foreground rounded-lg;
+}
+
+/* ============================================
+   THEME TRANSITIONS & POLISH
+   ============================================ */
+
+/* Smooth theme transition */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html * {
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Theme-specific star patterns */
+.theme-twilight .star-pattern,
+:root .star-pattern {
+  background-image:
+    radial-gradient(circle at 20% 30%, hsl(45 85% 70% / 0.04) 1px, transparent 1px),
+    radial-gradient(circle at 80% 20%, hsl(280 50% 60% / 0.05) 1px, transparent 1px),
+    radial-gradient(circle at 40% 70%, hsl(45 85% 70% / 0.05) 1px, transparent 1px),
+    radial-gradient(circle at 90% 80%, hsl(260 55% 50% / 0.04) 1px, transparent 1px),
+    radial-gradient(circle at 10% 90%, hsl(45 85% 70% / 0.06) 1px, transparent 1px);
+}
+
+.theme-dawn .star-pattern {
+  background-image:
+    radial-gradient(circle at 20% 30%, hsl(35 90% 50% / 0.08) 1px, transparent 1px),
+    radial-gradient(circle at 80% 20%, hsl(350 60% 50% / 0.06) 1px, transparent 1px),
+    radial-gradient(circle at 40% 70%, hsl(25 80% 55% / 0.07) 1px, transparent 1px),
+    radial-gradient(circle at 90% 80%, hsl(35 90% 50% / 0.05) 1px, transparent 1px),
+    radial-gradient(circle at 10% 90%, hsl(350 60% 50% / 0.08) 1px, transparent 1px);
+}
+
+.theme-midnight .star-pattern {
+  background-image:
+    radial-gradient(circle at 20% 30%, hsl(220 80% 70% / 0.06) 1px, transparent 1px),
+    radial-gradient(circle at 80% 20%, hsl(190 80% 60% / 0.08) 1px, transparent 1px),
+    radial-gradient(circle at 40% 70%, hsl(220 80% 70% / 0.07) 1px, transparent 1px),
+    radial-gradient(circle at 90% 80%, hsl(250 60% 60% / 0.05) 1px, transparent 1px),
+    radial-gradient(circle at 10% 90%, hsl(190 80% 60% / 0.09) 1px, transparent 1px);
+}
+
+.theme-celestial .star-pattern {
+  background-image:
+    radial-gradient(circle at 20% 30%, hsl(50 95% 70% / 0.08) 1px, transparent 1px),
+    radial-gradient(circle at 80% 20%, hsl(320 70% 65% / 0.09) 1px, transparent 1px),
+    radial-gradient(circle at 40% 70%, hsl(270 70% 60% / 0.07) 1px, transparent 1px),
+    radial-gradient(circle at 90% 80%, hsl(50 95% 70% / 0.06) 1px, transparent 1px),
+    radial-gradient(circle at 10% 90%, hsl(320 70% 65% / 0.1) 1px, transparent 1px),
+    radial-gradient(circle at 60% 50%, hsl(270 70% 60% / 0.05) 2px, transparent 2px);
+}
+
+/* Theme-specific glow effects for cards */
+.theme-dawn .glow-primary {
+  box-shadow: 0 4px 20px hsl(35 90% 50% / 0.2), 0 0 40px hsl(35 90% 50% / 0.08);
+}
+
+.theme-midnight .glow-primary {
+  box-shadow: 0 0 20px hsl(220 80% 55% / 0.35), 0 0 40px hsl(220 80% 55% / 0.15);
+}
+
+.theme-celestial .glow-primary {
+  box-shadow: 0 0 25px hsl(50 95% 60% / 0.35), 0 0 50px hsl(50 95% 60% / 0.15), 0 0 75px hsl(50 95% 60% / 0.08);
+}
+
+/* Theme-specific number display enhancements */
+.theme-dawn .number-display {
+  @apply bg-gradient-to-br from-amber-100/80 via-amber-50/60 to-orange-100/50;
+  @apply border-amber-400/60;
+  @apply text-amber-700;
+}
+
+.theme-midnight .number-display {
+  @apply bg-gradient-to-br from-blue-500/25 via-blue-400/20 to-cyan-500/25;
+  @apply border-blue-400/50;
+  @apply text-blue-300;
+}
+
+.theme-celestial .number-display {
+  @apply bg-gradient-to-br from-yellow-400/25 via-amber-400/20 to-purple-500/20;
+  @apply border-yellow-400/60;
+  @apply text-yellow-300;
+}
+
+/* Theme-specific card enhancements */
+.theme-dawn .card-mystic {
+  @apply bg-gradient-to-br from-amber-50/90 via-white to-orange-50/80;
+  @apply border-amber-200/60;
+  box-shadow: 0 4px 20px hsl(35 90% 50% / 0.1), 0 1px 3px hsl(0 0% 0% / 0.05);
+}
+
+.theme-midnight .card-mystic {
+  @apply bg-gradient-to-br from-slate-900/95 via-slate-900/90 to-blue-950/95;
+  @apply border-blue-500/30;
+  box-shadow: 0 0 20px hsl(220 80% 55% / 0.15), 0 4px 12px hsl(0 0% 0% / 0.3);
+}
+
+.theme-celestial .card-mystic {
+  @apply bg-gradient-to-br from-purple-950/90 via-purple-900/85 to-violet-950/90;
+  @apply border-purple-500/30;
+  box-shadow: 0 0 25px hsl(270 70% 50% / 0.15), 0 4px 12px hsl(0 0% 0% / 0.3);
+}
+
+/* Theme-specific button enhancements */
+.theme-dawn .btn-primary {
+  @apply bg-gradient-to-r from-amber-500 to-orange-500;
+  @apply shadow-amber-500/25;
+}
+
+.theme-midnight .btn-primary {
+  @apply bg-gradient-to-r from-blue-500 to-cyan-500;
+  @apply shadow-blue-500/25;
+}
+
+.theme-celestial .btn-primary {
+  @apply bg-gradient-to-r from-yellow-400 to-amber-500;
+  @apply shadow-yellow-500/30;
+}
+
+/* Badge enhancements per theme */
+.theme-dawn .badge-primary {
+  @apply bg-amber-100 text-amber-800 border-amber-300;
+}
+
+.theme-midnight .badge-primary {
+  @apply bg-blue-900/50 text-blue-300 border-blue-500/40;
+}
+
+.theme-celestial .badge-primary {
+  @apply bg-yellow-900/30 text-yellow-300 border-yellow-500/40;
+}
+
+/* Master number special styling per theme */
+.theme-twilight .number-display-master,
+:root .number-display-master {
+  animation: master-pulse-twilight 3s ease-in-out infinite;
+}
+
+.theme-dawn .number-display-master {
+  animation: master-pulse-dawn 3s ease-in-out infinite;
+  @apply border-amber-500;
+}
+
+.theme-midnight .number-display-master {
+  animation: master-pulse-midnight 3s ease-in-out infinite;
+  @apply border-blue-400;
+}
+
+.theme-celestial .number-display-master {
+  animation: master-pulse-celestial 3s ease-in-out infinite;
+  @apply border-yellow-400;
+}
+
+@keyframes master-pulse-twilight {
+  0%, 100% {
+    box-shadow: 0 0 15px hsl(45 85% 58% / 0.4), 0 0 30px hsl(45 85% 58% / 0.2);
+  }
+  50% {
+    box-shadow: 0 0 25px hsl(45 85% 58% / 0.6), 0 0 50px hsl(45 85% 58% / 0.3);
+  }
+}
+
+@keyframes master-pulse-dawn {
+  0%, 100% {
+    box-shadow: 0 4px 15px hsl(35 90% 50% / 0.3), 0 0 20px hsl(35 90% 50% / 0.15);
+  }
+  50% {
+    box-shadow: 0 4px 25px hsl(35 90% 50% / 0.5), 0 0 35px hsl(35 90% 50% / 0.25);
+  }
+}
+
+@keyframes master-pulse-midnight {
+  0%, 100% {
+    box-shadow: 0 0 15px hsl(220 80% 55% / 0.5), 0 0 30px hsl(220 80% 55% / 0.25);
+  }
+  50% {
+    box-shadow: 0 0 25px hsl(220 80% 55% / 0.7), 0 0 50px hsl(220 80% 55% / 0.35);
+  }
+}
+
+@keyframes master-pulse-celestial {
+  0%, 100% {
+    box-shadow: 0 0 20px hsl(50 95% 60% / 0.5), 0 0 40px hsl(50 95% 60% / 0.25), 0 0 60px hsl(270 70% 50% / 0.15);
+  }
+  50% {
+    box-shadow: 0 0 30px hsl(50 95% 60% / 0.7), 0 0 60px hsl(50 95% 60% / 0.35), 0 0 80px hsl(270 70% 50% / 0.2);
+  }
+}
+
+/* Success/celebration animations */
+@keyframes celebration-burst {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.animate-celebration {
+  animation: celebration-burst 0.6s ease-out forwards;
+}
+
+/* Streak fire animation */
+@keyframes fire-flicker {
+  0%, 100% {
+    transform: scaleY(1) translateY(0);
+    opacity: 1;
+  }
+  25% {
+    transform: scaleY(1.1) translateY(-2px);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scaleY(0.95) translateY(1px);
+    opacity: 1;
+  }
+  75% {
+    transform: scaleY(1.05) translateY(-1px);
+    opacity: 0.95;
+  }
+}
+
+.animate-fire {
+  animation: fire-flicker 0.5s ease-in-out infinite;
+}
+
+/* Smooth scroll behavior for all themes */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

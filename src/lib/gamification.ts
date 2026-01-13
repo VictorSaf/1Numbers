@@ -604,9 +604,10 @@ export const calculateAchievementProgress = (
     case 'xp':
       return Math.min((state.xp / count) * 100, 100);
 
-    case 'action_count':
+    case 'action_count': {
       const actionCount = state.actionCounts[action || ''] || 0;
       return Math.min((actionCount / count) * 100, 100);
+    }
 
     case 'level':
       return Math.min((state.level / count) * 100, 100);

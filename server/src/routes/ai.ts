@@ -196,7 +196,7 @@ router.post('/consult', authenticateToken, async (req: AuthRequest, res: Respons
         answer = await callAnthropic({ messages });
         break;
       case 'mock':
-      default:
+      default: {
         // Use mock response for development
         const mockResponse = generateMockResponse(userPrompt, language);
         return res.json({
@@ -204,6 +204,7 @@ router.post('/consult', authenticateToken, async (req: AuthRequest, res: Respons
           ...mockResponse,
           provider: 'mock',
         });
+      }
     }
 
     // Parse AI response for structured data
