@@ -322,6 +322,16 @@ class ApiService {
     return this.request<{ success: boolean; stats: unknown }>('/gamification/stats');
   }
 
+  async getStreak() {
+    try {
+      const response = await this.getGamificationStats();
+      const stats = response.stats as { currentStreak?: number } | null;
+      return { success: true, streak: stats?.currentStreak || 0 };
+    } catch {
+      return { success: false, streak: 0 };
+    }
+  }
+
   async getAchievements() {
     return this.request<{ success: boolean; achievements: unknown[] }>('/gamification/achievements');
   }

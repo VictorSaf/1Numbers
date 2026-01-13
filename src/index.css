@@ -1241,3 +1241,418 @@ html {
     scroll-behavior: auto;
   }
 }
+
+/* ============================================
+   BENTO GRID SYSTEM
+   ============================================ */
+
+.bento-grid {
+  display: grid;
+  width: 100%;
+}
+
+/* Bento Card Base */
+.bento-card {
+  @apply relative overflow-hidden;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bento-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.3);
+}
+
+/* Bento Card Variants */
+.bento-card-gradient {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(var(--primary), 0.08) 100%
+  );
+}
+
+.bento-card-accent {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--accent), 0.1) 0%,
+    rgba(var(--secondary), 0.08) 100%
+  );
+  border-color: rgba(var(--accent), 0.2);
+}
+
+.bento-card-highlight {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary) / 0.15) 0%,
+    hsl(var(--primary) / 0.05) 100%
+  );
+  border-color: hsl(var(--primary) / 0.3);
+  box-shadow: 0 0 30px hsl(var(--primary) / 0.1);
+}
+
+.bento-card-highlight:hover {
+  box-shadow: 0 0 40px hsl(var(--primary) / 0.2), 0 20px 40px -12px rgba(0, 0, 0, 0.3);
+}
+
+/* Bento Card Header */
+.bento-card-header {
+  @apply flex items-start gap-3 mb-4;
+}
+
+.bento-card-icon {
+  @apply flex items-center justify-center;
+  @apply w-10 h-10 rounded-xl;
+  background: hsl(var(--primary) / 0.15);
+  flex-shrink: 0;
+}
+
+.bento-card-title {
+  @apply font-cinzel text-lg font-semibold text-foreground;
+  @apply leading-tight;
+}
+
+.bento-card-subtitle {
+  @apply text-sm text-muted-foreground mt-0.5;
+}
+
+/* Bento Card Content */
+.bento-card-content {
+  @apply relative;
+}
+
+/* Theme-specific Bento Cards */
+.theme-dawn .bento-card {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.theme-dawn .bento-card:hover {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.1);
+}
+
+.theme-dawn .bento-card-icon {
+  background: hsl(var(--primary) / 0.12);
+}
+
+.theme-midnight .bento-card {
+  background: rgba(100, 150, 255, 0.03);
+  border-color: rgba(100, 150, 255, 0.1);
+}
+
+.theme-midnight .bento-card:hover {
+  background: rgba(100, 150, 255, 0.06);
+  border-color: rgba(100, 150, 255, 0.15);
+}
+
+.theme-celestial .bento-card {
+  background: rgba(200, 150, 255, 0.04);
+  border-color: rgba(200, 150, 255, 0.1);
+}
+
+.theme-celestial .bento-card:hover {
+  background: rgba(200, 150, 255, 0.07);
+  border-color: rgba(200, 150, 255, 0.15);
+}
+
+/* Number Spotlight */
+.number-spotlight {
+  @apply relative flex flex-col items-center justify-center;
+  @apply py-4;
+}
+
+.number-spotlight-value {
+  @apply font-cinzel font-bold;
+  font-size: 3.5rem;
+  line-height: 1;
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-light)) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 20px hsl(var(--primary) / 0.3));
+}
+
+.number-spotlight-value.master {
+  font-size: 3rem;
+  animation: master-glow 3s ease-in-out infinite;
+}
+
+@keyframes master-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 20px hsl(var(--primary) / 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 35px hsl(var(--primary) / 0.6));
+  }
+}
+
+.number-spotlight-label {
+  @apply text-sm font-medium text-muted-foreground mt-2;
+  @apply uppercase tracking-wider;
+}
+
+.number-spotlight-theme {
+  @apply text-xs text-primary mt-1;
+  @apply px-3 py-1 rounded-full;
+  background: hsl(var(--primary) / 0.1);
+}
+
+/* Insight Card */
+.insight-card {
+  @apply relative;
+}
+
+.insight-card-theme {
+  @apply text-xs font-medium uppercase tracking-wider;
+  @apply text-primary mb-2;
+}
+
+.insight-card-message {
+  @apply text-lg font-medium text-foreground leading-relaxed;
+}
+
+.insight-card-detail {
+  @apply text-sm text-muted-foreground mt-3;
+  @apply line-clamp-3;
+}
+
+.insight-card-expand {
+  @apply text-xs text-primary mt-3 cursor-pointer;
+  @apply hover:underline;
+}
+
+/* Mini Lo Shu Grid */
+.mini-loshu {
+  @apply grid grid-cols-3 gap-1;
+  @apply w-full max-w-[180px] mx-auto;
+}
+
+.mini-loshu-cell {
+  @apply flex items-center justify-center;
+  @apply aspect-square rounded-lg;
+  @apply text-lg font-cinzel font-bold;
+  @apply transition-all duration-200;
+  background: hsl(var(--muted) / 0.5);
+}
+
+.mini-loshu-cell.present {
+  background: hsl(var(--primary) / 0.2);
+  color: hsl(var(--primary));
+}
+
+.mini-loshu-cell.missing {
+  background: hsl(var(--muted) / 0.3);
+  color: hsl(var(--muted-foreground) / 0.5);
+}
+
+.mini-loshu-cell.repeated {
+  background: hsl(var(--primary) / 0.3);
+  color: hsl(var(--primary));
+  box-shadow: 0 0 10px hsl(var(--primary) / 0.3);
+}
+
+/* Mini Calendar */
+.mini-calendar {
+  @apply w-full;
+}
+
+.mini-calendar-header {
+  @apply flex justify-between items-center mb-3;
+}
+
+.mini-calendar-month {
+  @apply text-sm font-medium text-foreground;
+}
+
+.mini-calendar-grid {
+  @apply grid grid-cols-7 gap-1;
+}
+
+.mini-calendar-day {
+  @apply flex items-center justify-center;
+  @apply w-8 h-8 text-xs rounded-full;
+  @apply transition-all duration-200;
+}
+
+.mini-calendar-day.today {
+  @apply bg-primary text-primary-foreground font-bold;
+}
+
+.mini-calendar-day.favorable {
+  background: hsl(142 71% 45% / 0.2);
+  color: hsl(142 71% 45%);
+}
+
+.mini-calendar-day.challenging {
+  background: hsl(0 84% 60% / 0.15);
+  color: hsl(0 84% 60%);
+}
+
+.mini-calendar-day.special {
+  background: hsl(var(--primary) / 0.2);
+  color: hsl(var(--primary));
+}
+
+/* Cycle Progress */
+.cycle-progress {
+  @apply relative flex items-center justify-center;
+}
+
+.cycle-progress-ring {
+  @apply transform -rotate-90;
+}
+
+.cycle-progress-bg {
+  stroke: hsl(var(--muted));
+  fill: none;
+}
+
+.cycle-progress-value {
+  stroke: hsl(var(--primary));
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+.cycle-progress-center {
+  @apply absolute flex flex-col items-center justify-center;
+}
+
+.cycle-progress-number {
+  @apply font-cinzel text-2xl font-bold text-primary;
+}
+
+.cycle-progress-label {
+  @apply text-xs text-muted-foreground;
+}
+
+/* Quick Actions Grid */
+.quick-actions-grid {
+  @apply grid grid-cols-4 gap-2;
+}
+
+.quick-action {
+  @apply flex flex-col items-center justify-center;
+  @apply p-3 rounded-xl;
+  @apply transition-all duration-200;
+  @apply cursor-pointer;
+  background: hsl(var(--muted) / 0.3);
+}
+
+.quick-action:hover {
+  background: hsl(var(--primary) / 0.15);
+  transform: scale(1.05);
+}
+
+.quick-action-icon {
+  @apply w-8 h-8 flex items-center justify-center;
+  @apply rounded-lg mb-2;
+}
+
+.quick-action-label {
+  @apply text-xs text-muted-foreground text-center;
+  @apply leading-tight;
+}
+
+/* Streak Display for Dashboard */
+.streak-mini {
+  @apply flex items-center gap-2;
+  @apply text-orange-500;
+}
+
+.streak-mini-icon {
+  @apply w-6 h-6;
+}
+
+.streak-mini-value {
+  @apply font-bold text-2xl;
+}
+
+.streak-mini-label {
+  @apply text-xs text-muted-foreground;
+}
+
+/* Connection Lines (SVG) */
+.connection-overlay {
+  @apply absolute inset-0 pointer-events-none;
+  @apply z-10;
+}
+
+.connection-line {
+  fill: none;
+  stroke: hsl(var(--primary) / 0.3);
+  stroke-width: 2;
+  stroke-dasharray: 5, 5;
+  animation: connection-dash 20s linear infinite;
+}
+
+@keyframes connection-dash {
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+
+/* Dashboard Skeleton */
+.bento-skeleton {
+  @apply animate-pulse rounded-3xl;
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 0%,
+    hsl(var(--muted-foreground) / 0.1) 50%,
+    hsl(var(--muted)) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+/* Responsive adjustments for Bento */
+@media (max-width: 768px) {
+  .bento-card {
+    padding: 1.25rem;
+    border-radius: 20px;
+  }
+
+  .number-spotlight-value {
+    font-size: 2.5rem;
+  }
+
+  .quick-actions-grid {
+    @apply grid-cols-4;
+  }
+}
+
+@media (max-width: 640px) {
+  .bento-card {
+    padding: 1rem;
+    border-radius: 16px;
+  }
+
+  .bento-card-header {
+    @apply mb-3;
+  }
+
+  .bento-card-icon {
+    @apply w-8 h-8;
+  }
+
+  .bento-card-title {
+    @apply text-base;
+  }
+
+  .number-spotlight-value {
+    font-size: 2rem;
+  }
+
+  .mini-calendar-day {
+    @apply w-6 h-6 text-[10px];
+  }
+}
