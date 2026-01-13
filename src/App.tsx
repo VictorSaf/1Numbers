@@ -27,6 +27,8 @@ const Journal = lazy(() => import("./pages/Journal"));
 const Premium = lazy(() => import("./pages/Premium"));
 const AngelNumbers = lazy(() => import("./pages/AngelNumbers"));
 const Friends = lazy(() => import("./pages/Friends"));
+const ChaldeanAnalysis = lazy(() => import("./pages/ChaldeanAnalysis"));
+const Remedies = lazy(() => import("./pages/Remedies"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -69,6 +71,8 @@ const App = () => (
                   <Route path="/angel-numbers" element={<AngelNumbers />} />
                   <Route path="/friends" element={<Friends />} />
                   <Route path="/invite/:code" element={<Friends />} />
+                  <Route path="/chaldean" element={<ChaldeanAnalysis />} />
+                  <Route path="/remedies" element={<Remedies />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
