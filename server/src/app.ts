@@ -6,6 +6,7 @@ import profileRoutes from './routes/profiles';
 import journalRoutes from './routes/journal';
 import subscriptionRoutes from './routes/subscriptions';
 import gamificationRoutes from './routes/gamification';
+import aiRoutes from './routes/ai';
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use('/api/profiles', profileRoutes);
 app.use('/api/journal', journalRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/gamification', gamificationRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
