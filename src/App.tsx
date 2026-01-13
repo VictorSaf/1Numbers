@@ -30,6 +30,7 @@ const Friends = lazy(() => import("./pages/Friends"));
 const ChaldeanAnalysis = lazy(() => import("./pages/ChaldeanAnalysis"));
 const Remedies = lazy(() => import("./pages/Remedies"));
 const WhiteLabelSettings = lazy(() => import("./pages/WhiteLabelSettings"));
+const DesignSystemShowcase = lazy(() => import("./pages/DesignSystemShowcase"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -84,6 +85,7 @@ const App = () => (
                   <Route path="/chaldean" element={<ChaldeanAnalysis />} />
                   <Route path="/remedies" element={<Remedies />} />
                   <Route path="/white-label" element={<WhiteLabelSettings />} />
+                  <Route path="/design-system" element={<DesignSystemShowcase />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
