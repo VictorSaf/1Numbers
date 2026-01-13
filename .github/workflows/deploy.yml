@@ -1,0 +1,389 @@
+name: Continuous Deployment
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  REGISTRY: ghcr.io
+  BACKEND_IMAGE: ${{ github.repository }}/backend
+  FRONTEND_IMAGE: ${{ github.repository }}/frontend
+
+jobs:
+  # Determine environment
+  setup:
+    name: Setup Environment
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.set-env.outputs.environment }}
+      version: ${{ steps.version.outputs.version }}
+      deploy: ${{ steps.deploy-check.outputs.deploy }}
+    steps:
+      - name: Determine environment
+        id: set-env
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/tags/v"* ]]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+          else
+            echo "environment=staging" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get version
+        id: version
+        run: |
+          if [[ "${{ github.ref }}" == "refs/tags/v"* ]]; then
+            echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            echo "version=$(date +'%Y%m%d-%H%M%S')-${{ github.sha }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check if should deploy
+        id: deploy-check
+        run: |
+          if [[ "${{ github.event_name }}" == "push" ]] && [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "deploy=true" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "deploy=true" >> $GITHUB_OUTPUT
+          else
+            echo "deploy=false" >> $GITHUB_OUTPUT
+          fi
+
+  # Run tests before deployment
+  pre-deploy-tests:
+    name: Pre-Deployment Tests
+    runs-on: ubuntu-latest
+    if: needs.setup.outputs.deploy == 'true'
+    needs: setup
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Run tests
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
+          REDIS_URL: redis://localhost:6379/0
+          JWT_SECRET_KEY: test-secret-key
+        run: |
+          cd backend
+          pytest tests/ -v --tb=short
+
+  # Build and push images
+  build-images:
+    name: Build Images
+    runs-on: ubuntu-latest
+    if: needs.setup.outputs.deploy == 'true'
+    needs: [setup, pre-deploy-tests]
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      backend-image: ${{ steps.backend-image.outputs.image }}
+      frontend-image: ${{ steps.frontend-image.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Backend image
+      - name: Build backend image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ needs.setup.outputs.version }}
+            ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Set backend image output
+        id: backend-image
+        run: echo "image=${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ needs.setup.outputs.version }}" >> $GITHUB_OUTPUT
+
+      # Frontend image
+      - name: Build frontend image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ needs.setup.outputs.version }}
+            ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Set frontend image output
+        id: frontend-image
+        run: echo "image=${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ needs.setup.outputs.version }}" >> $GITHUB_OUTPUT
+
+  # Deploy to staging
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    if: needs.setup.outputs.environment == 'staging' && needs.setup.outputs.deploy == 'true'
+    needs: [setup, build-images]
+    environment:
+      name: staging
+      url: https://staging.1numbers.com
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_STAGING }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Update ECS service (staging)
+        run: |
+          aws ecs update-service \
+            --cluster 1numbers-staging \
+            --service 1numbers-app \
+            --force-new-deployment \
+            --region ${{ secrets.AWS_REGION }}
+
+      - name: Wait for deployment
+        run: |
+          aws ecs wait services-stable \
+            --cluster 1numbers-staging \
+            --services 1numbers-app \
+            --region ${{ secrets.AWS_REGION }}
+
+      - name: Run smoke tests
+        run: |
+          echo "Running smoke tests against staging..."
+          # Add your smoke test commands here
+          curl -f https://staging.1numbers.com/health || exit 1
+
+      - name: Notify deployment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ Deployed to staging at https://staging.1numbers.com'
+            })
+
+  # Deploy to production
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: needs.setup.outputs.environment == 'production' && needs.setup.outputs.deploy == 'true'
+    needs: [setup, build-images]
+    environment:
+      name: production
+      url: https://api.1numbers.com
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create backup
+        run: |
+          echo "Creating database backup before production deployment..."
+          # Add your backup script here
+          # ./scripts/backup.sh
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_PRODUCTION }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Update ECS service (production)
+        run: |
+          aws ecs update-service \
+            --cluster 1numbers-production \
+            --service 1numbers-app \
+            --force-new-deployment \
+            --region ${{ secrets.AWS_REGION }}
+
+      - name: Wait for deployment
+        run: |
+          aws ecs wait services-stable \
+            --cluster 1numbers-production \
+            --services 1numbers-app \
+            --region ${{ secrets.AWS_REGION }}
+
+      - name: Run production smoke tests
+        run: |
+          echo "Running smoke tests against production..."
+          curl -f https://api.1numbers.com/health || exit 1
+
+      - name: Verify deployment
+        run: |
+          echo "Verifying production deployment..."
+          curl -s https://api.1numbers.com/health | jq .
+
+      - name: Create release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: release-${{ needs.setup.outputs.version }}
+          release_name: Production Release ${{ needs.setup.outputs.version }}
+          body: |
+            Deployed to production on ${{ github.event.head_commit.timestamp }}
+            Commit: ${{ github.event.head_commit.id }}
+            Author: ${{ github.event.head_commit.author.name }}
+          draft: false
+          prerelease: false
+
+      - name: Notify team
+        uses: slackapi/slack-github-action@v1.24.0
+        if: success()
+        with:
+          payload: |
+            {
+              "text": "✅ Production Deployment Successful",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*1Numbers Production Deployment*\n✅ Version: ${{ needs.setup.outputs.version }}\n📦 Backend Image: ${{ needs.build-images.outputs.backend-image }}\n📦 Frontend Image: ${{ needs.build-images.outputs.frontend-image }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+      - name: Notify on failure
+        uses: slackapi/slack-github-action@v1.24.0
+        if: failure()
+        with:
+          payload: |
+            {
+              "text": "❌ Production Deployment Failed",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Deployment Failed*\n❌ Version: ${{ needs.setup.outputs.version }}\n🔗 <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Logs>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+  # Rollback on failure
+  rollback:
+    name: Rollback on Failure
+    runs-on: ubuntu-latest
+    if: failure() && needs.setup.outputs.environment == 'production'
+    needs: [setup, deploy-production]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_PRODUCTION }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Rollback to previous version
+        run: |
+          echo "Rolling back to previous deployment..."
+          # Get the previous task definition
+          PREVIOUS_TASK=$(aws ecs describe-services \
+            --cluster 1numbers-production \
+            --services 1numbers-app \
+            --region ${{ secrets.AWS_REGION }} \
+            --query 'services[0].taskDefinition' --output text)
+          
+          # Update service with previous task
+          aws ecs update-service \
+            --cluster 1numbers-production \
+            --service 1numbers-app \
+            --task-definition $PREVIOUS_TASK \
+            --region ${{ secrets.AWS_REGION }}
+
+      - name: Wait for rollback
+        run: |
+          aws ecs wait services-stable \
+            --cluster 1numbers-production \
+            --services 1numbers-app \
+            --region ${{ secrets.AWS_REGION }}
+
+      - name: Notify rollback
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "⚠️ Deployment Rolled Back",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Automatic Rollback Executed*\n⚠️ Version: ${{ needs.setup.outputs.version }}\n🔄 Rolled back to previous version\n🔗 <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Logs>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
