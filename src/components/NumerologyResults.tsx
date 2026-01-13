@@ -18,6 +18,7 @@ import {
 import { calculatePinnacles, calculateChallenges } from "@/lib/pinnacles";
 import { calculateKarmicDebts, calculateKarmicLessons, KARMIC_LESSON_MEANINGS } from "@/lib/karmic";
 import { generateShareableLink } from "@/lib/sharing";
+import { ExportMenu } from "./ExportMenu";
 
 // Lazy load heavy chart components (Recharts)
 const NumerologyRadarChart = lazy(() => import("./charts/NumerologyRadarChart").then(m => ({ default: m.NumerologyRadarChart })));
