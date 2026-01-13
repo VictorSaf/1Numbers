@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { api } from '@/services/api';
 
 interface Skill {
   name: string;
@@ -26,17 +27,8 @@ export const SkillsSection = () => {
   useEffect(() => {
     const fetchSkills = async () => {
       try {
-        const token = localStorage.getItem('auth_token');
-        const response = await fetch('http://localhost:3001/api/admin/skills', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setSkills(data.skills || []);
-        }
+        const data = await api.getAdminSkills();
+        setSkills(data.skills || []);
       } catch (error) {
         console.error('Failed to fetch skills:', error);
       } finally {

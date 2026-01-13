@@ -3,6 +3,7 @@ import { Server, AlertCircle, CheckCircle, Settings } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { api } from '@/services/api';
 
 interface MCPServer {
   name: string;
@@ -24,18 +25,9 @@ export const MCPServersSection = () => {
   useEffect(() => {
     const fetchMCPConfig = async () => {
       try {
-        const token = localStorage.getItem('auth_token');
-        const response = await fetch('http://localhost:3001/api/admin/mcp', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setConfigured(data.configured);
-          setConfig(data.config);
-        }
+        const data = await api.getAdminMCP();
+        setConfigured(data.configured);
+        setConfig(data.config as MCPConfig);
       } catch (error) {
         console.error('Failed to fetch MCP config:', error);
       } finally {

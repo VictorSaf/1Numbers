@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { api } from '@/services/api';
 
 interface ResearchDocument {
   name: string;
@@ -26,17 +27,8 @@ export const ResearchSection = () => {
   useEffect(() => {
     const fetchResearch = async () => {
       try {
-        const token = localStorage.getItem('auth_token');
-        const response = await fetch('http://localhost:3001/api/admin/research', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setDocuments(data.documents || []);
-        }
+        const data = await api.getAdminResearch();
+        setDocuments(data.documents || []);
       } catch (error) {
         console.error('Failed to fetch research:', error);
       } finally {

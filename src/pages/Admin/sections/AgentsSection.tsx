@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Bot, FileCode, Eye, X } from 'lucide-react';
+import { Bot, FileCode, Eye } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { api } from '@/services/api';
 
 interface Agent {
   name: string;
@@ -25,17 +26,8 @@ export const AgentsSection = () => {
   useEffect(() => {
     const fetchAgents = async () => {
       try {
-        const token = localStorage.getItem('auth_token');
-        const response = await fetch('http://localhost:3001/api/admin/agents', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setAgents(data.agents || []);
-        }
+        const data = await api.getAdminAgents();
+        setAgents(data.agents || []);
       } catch (error) {
         console.error('Failed to fetch agents:', error);
       } finally {

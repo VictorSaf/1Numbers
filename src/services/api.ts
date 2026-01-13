@@ -406,6 +406,53 @@ class ApiService {
       method: 'POST',
     });
   }
+
+  // Admin endpoints
+  async getAdminDashboard() {
+    return this.request<{ totalUsers: number; activeUsers: number; premiumUsers: number; newUsersThisWeek: number }>('/admin/dashboard');
+  }
+
+  async getAdminUsers() {
+    return this.request<{ users: Array<{ id: number; email: string; name: string; role: string; createdAt: string }> }>('/admin/users');
+  }
+
+  async updateAdminUser(userId: number, data: { role?: string; status?: string }) {
+    return this.request<{ user: unknown }>(`/admin/users/${userId}`, {
+      method: 'PATCH',
+      body: data,
+    });
+  }
+
+  async getAdminSettings() {
+    return this.request<{ settings: unknown }>('/admin/settings');
+  }
+
+  async updateAdminSettings(settings: Record<string, unknown>) {
+    return this.request<{ success: boolean; message: string }>('/admin/settings', {
+      method: 'PUT',
+      body: settings,
+    });
+  }
+
+  async getAdminAnalytics() {
+    return this.request<{ analytics: unknown }>('/admin/analytics');
+  }
+
+  async getAdminAgents() {
+    return this.request<{ agents: Array<{ name: string; filename: string; description: string; content: string }>; count: number }>('/admin/agents');
+  }
+
+  async getAdminSkills() {
+    return this.request<{ skills: Array<{ name: string; command: string; filename: string; description: string; content: string }>; count: number }>('/admin/skills');
+  }
+
+  async getAdminMCP() {
+    return this.request<{ configured: boolean; config: unknown; message?: string }>('/admin/mcp');
+  }
+
+  async getAdminResearch() {
+    return this.request<{ documents: Array<{ name: string; filename: string; summary: string; content: string; modifiedAt: string }>; count: number }>('/admin/research');
+  }
 }
 
 export const api = new ApiService(API_BASE_URL);

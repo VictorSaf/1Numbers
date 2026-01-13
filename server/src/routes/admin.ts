@@ -1,10 +1,76 @@
 import { Router, Response } from 'express';
 import pool from '../db';
 import { authenticateToken, requireAdmin, AuthRequest } from '../middleware/auth';
-import * as fs from 'fs';
+import { promises as fs } from 'fs';
 import * as path from 'path';
 
 const router = Router();
+
+// Project root - resolved once at startup for security
+const PROJECT_ROOT = path.resolve(__dirname, '../../../..');
+
+// Constants for file reading safety
+const MAX_FILE_SIZE = 1024 * 1024; // 1MB max file size
+const CACHE_MAX_AGE = 300; // 5 minutes cache
+
+// Helper: Validate path is within allowed directory
+const isPathSafe = (filePath: string, allowedDir: string): boolean => {
+  const resolvedPath = path.resolve(filePath);
+  const resolvedAllowed = path.resolve(allowedDir);
+  return resolvedPath.startsWith(resolvedAllowed + path.sep) || resolvedPath === resolvedAllowed;
+};
+
+// Helper: Check if file is a regular file (not symlink, directory, etc.)
+const isRegularFile = async (filePath: string): Promise<boolean> => {
+  try {
+    const stats = await fs.lstat(filePath); // lstat doesn't follow symlinks
+    return stats.isFile() && !stats.isSymbolicLink();
+  } catch {
+    return false;
+  }
+};
+
+// Helper: Safely read file with size limit
+const safeReadFile = async (filePath: string, maxSize: number = MAX_FILE_SIZE): Promise<string | null> => {
+  try {
+    const stats = await fs.stat(filePath);
+    if (stats.size > maxSize) {
+      console.warn(`File ${filePath} exceeds size limit (${stats.size} > ${maxSize})`);
+      return null;
+    }
+    return await fs.readFile(filePath, 'utf-8');
+  } catch {
+    return null;
+  }
+};
+
+// Helper: Set cache headers for static content
+const setCacheHeaders = (res: Response, maxAge: number = CACHE_MAX_AGE): void => {
+  res.set('Cache-Control', `private, max-age=${maxAge}`);
+};
+
+// Helper: Handle file system errors with specific messages
+interface FSError extends Error {
+  code?: string;
+}
+
+const handleFSError = (error: unknown, resource: string, res: Response): void => {
+  const fsError = error as FSError;
+  console.error(`${resource} error:`, error);
+
+  if (fsError.code === 'ENOENT') {
+    res.status(404).json({ error: `${resource} directory not found` });
+  } else if (fsError.code === 'EACCES') {
+    res.status(403).json({ error: `Permission denied reading ${resource.toLowerCase()}` });
+  } else if (fsError.code === 'ENOTDIR') {
+    res.status(400).json({ error: `Invalid ${resource.toLowerCase()} path` });
+  } else {
+    res.status(500).json({
+      error: `Failed to fetch ${resource.toLowerCase()}`,
+      details: fsError.message
+    });
+  }
+};
 
 // All admin routes require authentication and admin role
 router.use(authenticateToken);
@@ -238,162 +304,243 @@ router.get('/analytics', async (req: AuthRequest, res: Response) => {
 // GET /api/admin/agents - List all Claude agents
 router.get('/agents', async (req: AuthRequest, res: Response) => {
   try {
-    const agentsDir = path.join(__dirname, '../../../..', '.claude', 'agents');
-    const agents: { name: string; filename: string; description: string; content: string }[] = [];
+    const agentsDir = path.join(PROJECT_ROOT, '.claude', 'agents');
 
-    if (fs.existsSync(agentsDir)) {
-      const files = fs.readdirSync(agentsDir).filter(f => f.endsWith('.md'));
-
-      for (const file of files) {
-        const content = fs.readFileSync(path.join(agentsDir, file), 'utf-8');
-        const name = file.replace('.md', '');
-
-        // Extract description from first paragraph after title
-        const lines = content.split('\n');
-        let description = '';
-        let inDescription = false;
-
-        for (const line of lines) {
-          if (line.startsWith('# ')) {
-            inDescription = true;
-            continue;
-          }
-          if (inDescription && line.trim() && !line.startsWith('#')) {
-            description = line.trim();
-            break;
-          }
-        }
-
-        agents.push({
-          name: name.charAt(0).toUpperCase() + name.slice(1),
-          filename: file,
-          description: description || 'No description available',
-          content,
-        });
-      }
+    // Validate directory is within project root
+    if (!isPathSafe(agentsDir, PROJECT_ROOT)) {
+      return res.status(400).json({ error: 'Invalid agents directory path' });
     }
 
+    const agents: { name: string; filename: string; description: string; content: string }[] = [];
+
+    let files: string[];
+    try {
+      files = await fs.readdir(agentsDir);
+    } catch (error) {
+      // Directory doesn't exist - return empty list
+      setCacheHeaders(res);
+      return res.json({ agents: [], count: 0 });
+    }
+
+    const mdFiles = files.filter(f => f.endsWith('.md') && !f.startsWith('.'));
+
+    for (const file of mdFiles) {
+      const filePath = path.join(agentsDir, file);
+
+      // Validate file path and check it's a regular file (not symlink)
+      if (!isPathSafe(filePath, agentsDir) || !(await isRegularFile(filePath))) {
+        continue;
+      }
+
+      const content = await safeReadFile(filePath);
+      if (!content) continue;
+
+      const name = file.replace('.md', '');
+
+      // Extract description from first paragraph after title
+      const lines = content.split('\n');
+      let description = '';
+      let inDescription = false;
+
+      for (const line of lines) {
+        if (line.startsWith('# ')) {
+          inDescription = true;
+          continue;
+        }
+        if (inDescription && line.trim() && !line.startsWith('#')) {
+          description = line.trim();
+          break;
+        }
+      }
+
+      agents.push({
+        name: name.charAt(0).toUpperCase() + name.slice(1),
+        filename: file,
+        description: description || 'No description available',
+        content,
+      });
+    }
+
+    setCacheHeaders(res);
     res.json({ agents, count: agents.length });
   } catch (error) {
-    console.error('Get agents error:', error);
-    res.status(500).json({ error: 'Failed to fetch agents' });
+    handleFSError(error, 'Agents', res);
   }
 });
 
 // GET /api/admin/skills - List all custom skills
 router.get('/skills', async (req: AuthRequest, res: Response) => {
   try {
-    const skillsDir = path.join(__dirname, '../../../..', '.claude', 'skills');
-    const skills: { name: string; command: string; filename: string; description: string; content: string }[] = [];
+    const skillsDir = path.join(PROJECT_ROOT, '.claude', 'skills');
 
-    if (fs.existsSync(skillsDir)) {
-      const files = fs.readdirSync(skillsDir).filter(f => f.endsWith('.md'));
-
-      for (const file of files) {
-        const content = fs.readFileSync(path.join(skillsDir, file), 'utf-8');
-        const name = file.replace('.md', '');
-
-        // Extract command name from title (e.g., "# /build-check")
-        const titleMatch = content.match(/^#\s+(\/[\w-]+)/m);
-        const command = titleMatch ? titleMatch[1] : `/${name}`;
-
-        // Extract description from first paragraph after title
-        const lines = content.split('\n');
-        let description = '';
-        let inDescription = false;
-
-        for (const line of lines) {
-          if (line.startsWith('# ')) {
-            inDescription = true;
-            continue;
-          }
-          if (inDescription && line.trim() && !line.startsWith('#')) {
-            description = line.trim();
-            break;
-          }
-        }
-
-        skills.push({
-          name: name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
-          command,
-          filename: file,
-          description: description || 'No description available',
-          content,
-        });
-      }
+    // Validate directory is within project root
+    if (!isPathSafe(skillsDir, PROJECT_ROOT)) {
+      return res.status(400).json({ error: 'Invalid skills directory path' });
     }
 
+    const skills: { name: string; command: string; filename: string; description: string; content: string }[] = [];
+
+    let files: string[];
+    try {
+      files = await fs.readdir(skillsDir);
+    } catch (error) {
+      // Directory doesn't exist - return empty list
+      setCacheHeaders(res);
+      return res.json({ skills: [], count: 0 });
+    }
+
+    const mdFiles = files.filter(f => f.endsWith('.md') && !f.startsWith('.'));
+
+    for (const file of mdFiles) {
+      const filePath = path.join(skillsDir, file);
+
+      // Validate file path and check it's a regular file (not symlink)
+      if (!isPathSafe(filePath, skillsDir) || !(await isRegularFile(filePath))) {
+        continue;
+      }
+
+      const content = await safeReadFile(filePath);
+      if (!content) continue;
+
+      const name = file.replace('.md', '');
+
+      // Extract command name from title (e.g., "# /build-check")
+      const titleMatch = content.match(/^#\s+(\/[\w-]+)/m);
+      const command = titleMatch ? titleMatch[1] : `/${name}`;
+
+      // Extract description from first paragraph after title
+      const lines = content.split('\n');
+      let description = '';
+      let inDescription = false;
+
+      for (const line of lines) {
+        if (line.startsWith('# ')) {
+          inDescription = true;
+          continue;
+        }
+        if (inDescription && line.trim() && !line.startsWith('#')) {
+          description = line.trim();
+          break;
+        }
+      }
+
+      skills.push({
+        name: name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+        command,
+        filename: file,
+        description: description || 'No description available',
+        content,
+      });
+    }
+
+    setCacheHeaders(res);
     res.json({ skills, count: skills.length });
   } catch (error) {
-    console.error('Get skills error:', error);
-    res.status(500).json({ error: 'Failed to fetch skills' });
+    handleFSError(error, 'Skills', res);
   }
 });
 
 // GET /api/admin/mcp - Get MCP server configuration
 router.get('/mcp', async (req: AuthRequest, res: Response) => {
   try {
-    const mcpPath = path.join(__dirname, '../../../..', '.mcp.json');
+    const mcpPath = path.join(PROJECT_ROOT, '.mcp.json');
 
-    if (fs.existsSync(mcpPath)) {
-      const content = fs.readFileSync(mcpPath, 'utf-8');
+    // Validate path is within project root
+    if (!isPathSafe(mcpPath, PROJECT_ROOT)) {
+      return res.status(400).json({ error: 'Invalid MCP config path' });
+    }
+
+    // Check if file exists and is a regular file
+    if (!(await isRegularFile(mcpPath))) {
+      setCacheHeaders(res);
+      return res.json({ configured: false, config: null, message: 'No MCP configuration found' });
+    }
+
+    const content = await safeReadFile(mcpPath);
+    if (!content) {
+      return res.status(500).json({ error: 'Failed to read MCP configuration (file too large or unreadable)' });
+    }
+
+    try {
       const config = JSON.parse(content);
+      setCacheHeaders(res);
       res.json({ configured: true, config });
-    } else {
-      res.json({ configured: false, config: null, message: 'No MCP configuration found' });
+    } catch (parseError) {
+      console.error('MCP JSON parse error:', parseError);
+      res.status(400).json({ error: 'Invalid JSON in MCP configuration file' });
     }
   } catch (error) {
-    console.error('Get MCP config error:', error);
-    res.status(500).json({ error: 'Failed to fetch MCP configuration' });
+    handleFSError(error, 'MCP', res);
   }
 });
 
 // GET /api/admin/research - List research documents
 router.get('/research', async (req: AuthRequest, res: Response) => {
   try {
-    const researchDir = path.join(__dirname, '../../../..', 'docs', 'research');
-    const documents: { name: string; filename: string; summary: string; content: string; modifiedAt: Date }[] = [];
+    const researchDir = path.join(PROJECT_ROOT, 'docs', 'research');
 
-    if (fs.existsSync(researchDir)) {
-      const files = fs.readdirSync(researchDir).filter(f => f.endsWith('.md'));
-
-      for (const file of files) {
-        const filePath = path.join(researchDir, file);
-        const content = fs.readFileSync(filePath, 'utf-8');
-        const stats = fs.statSync(filePath);
-        const name = file.replace('.md', '').split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-
-        // Extract first paragraph as summary
-        const lines = content.split('\n');
-        let summary = '';
-        let inSummary = false;
-
-        for (const line of lines) {
-          if (line.startsWith('# ')) {
-            inSummary = true;
-            continue;
-          }
-          if (inSummary && line.trim() && !line.startsWith('#')) {
-            summary = line.trim().substring(0, 200);
-            if (line.trim().length > 200) summary += '...';
-            break;
-          }
-        }
-
-        documents.push({
-          name,
-          filename: file,
-          summary: summary || 'No summary available',
-          content,
-          modifiedAt: stats.mtime,
-        });
-      }
+    // Validate directory is within project root
+    if (!isPathSafe(researchDir, PROJECT_ROOT)) {
+      return res.status(400).json({ error: 'Invalid research directory path' });
     }
 
+    const documents: { name: string; filename: string; summary: string; content: string; modifiedAt: Date }[] = [];
+
+    let files: string[];
+    try {
+      files = await fs.readdir(researchDir);
+    } catch (error) {
+      // Directory doesn't exist - return empty list
+      setCacheHeaders(res);
+      return res.json({ documents: [], count: 0 });
+    }
+
+    const mdFiles = files.filter(f => f.endsWith('.md') && !f.startsWith('.'));
+
+    for (const file of mdFiles) {
+      const filePath = path.join(researchDir, file);
+
+      // Validate file path and check it's a regular file (not symlink)
+      if (!isPathSafe(filePath, researchDir) || !(await isRegularFile(filePath))) {
+        continue;
+      }
+
+      const content = await safeReadFile(filePath);
+      if (!content) continue;
+
+      const stats = await fs.stat(filePath);
+      const name = file.replace('.md', '').split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+      // Extract first paragraph as summary
+      const lines = content.split('\n');
+      let summary = '';
+      let inSummary = false;
+
+      for (const line of lines) {
+        if (line.startsWith('# ')) {
+          inSummary = true;
+          continue;
+        }
+        if (inSummary && line.trim() && !line.startsWith('#')) {
+          summary = line.trim().substring(0, 200);
+          if (line.trim().length > 200) summary += '...';
+          break;
+        }
+      }
+
+      documents.push({
+        name,
+        filename: file,
+        summary: summary || 'No summary available',
+        content,
+        modifiedAt: stats.mtime,
+      });
+    }
+
+    setCacheHeaders(res);
     res.json({ documents, count: documents.length });
   } catch (error) {
-    console.error('Get research error:', error);
-    res.status(500).json({ error: 'Failed to fetch research documents' });
+    handleFSError(error, 'Research', res);
   }
 });
 
