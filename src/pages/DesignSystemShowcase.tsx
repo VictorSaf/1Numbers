@@ -58,6 +58,14 @@ const DesignSystemShowcase = () => {
     { id: 'spacing', label: 'Spacing', icon: Grid3X3 },
   ];
 
+  const scrollToSection = (id: string) => {
+    setActiveSection(id);
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <PageLayout>
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -71,13 +79,13 @@ const DesignSystemShowcase = () => {
         </div>
 
         {/* Navigation */}
-        <div className="flex flex-wrap gap-2 mb-12 pb-6 border-b border-border">
+        <div className="flex flex-wrap gap-2 mb-12 pb-6 border-b border-border sticky top-0 bg-background/95 backdrop-blur-sm z-10 py-4 -mx-4 px-4">
           {sections.map(({ id, label, icon: Icon }) => (
             <Button
               key={id}
               variant={activeSection === id ? 'default' : 'outline'}
               size="sm"
-              onClick={() => setActiveSection(activeSection === id ? null : id)}
+              onClick={() => scrollToSection(id)}
               className="gap-2"
             >
               <Icon className="w-4 h-4" />
