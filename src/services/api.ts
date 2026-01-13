@@ -220,7 +220,181 @@ class ApiService {
   }
 
   async checkSubscription() {
-    return this.request<{ success: boolean; isPremium: boolean; planName: string; status: string; endDate?: string }>('/subscriptions/check');
+    return this.request<{ success: boolean; isPremium: boolean; planName: string; status: string; endDate?: string; expiresAt?: string }>('/subscriptions/check');
+  }
+
+  // Tier and feature usage endpoints
+  async getTierInfo() {
+    return this.request<{ success: boolean; tierId: string; planName: string; isPremium: boolean; features: string[] }>('/subscriptions/tier');
+  }
+
+  async checkFeatureLimit(featureId: string, limit: number) {
+    return this.request<{ success: boolean; allowed: boolean; currentUsage: number; limit: number | 'unlimited' }>(
+      `/subscriptions/feature/${featureId}/check?limit=${limit}`
+    );
+  }
+
+  async useFeature(featureId: string) {
+    return this.request<{ success: boolean; newCount: number }>(`/subscriptions/feature/${featureId}/use`, {
+      method: 'POST',
+    });
+  }
+
+  async getFeatureUsage() {
+    return this.request<{ success: boolean; usage: Array<{ featureId: string; usageCount: number; periodStart: string; periodEnd: string }> }>('/subscriptions/usage');
+  }
+
+  // One-time purchases
+  async getPurchases() {
+    return this.request<{ success: boolean; purchases: Array<{
+      id: number;
+      productId: string;
+      productName: string;
+      price: number;
+      currency: string;
+      status: string;
+      purchasedAt: string;
+      expiresAt?: string;
+    }> }>('/subscriptions/purchases');
+  }
+
+  async createPurchase(data: { productId: string; productName: string; price: number; currency?: string; metadata?: Record<string, unknown> }) {
+    return this.request<{ success: boolean; purchase: unknown }>('/subscriptions/purchase', {
+      method: 'POST',
+      body: data,
+    });
+  }
+
+  // White label configuration (Pro users only)
+  async getWhiteLabelConfig() {
+    return this.request<{
+      success: boolean;
+      config: {
+        companyName: string;
+        logoUrl: string;
+        primaryColor: string;
+        contactInfo: string;
+        disclaimer: string;
+        isActive: boolean;
+      } | null;
+    }>('/subscriptions/white-label');
+  }
+
+  async updateWhiteLabelConfig(data: {
+    companyName?: string;
+    logoUrl?: string;
+    primaryColor?: string;
+    contactInfo?: string;
+    disclaimer?: string;
+    isActive?: boolean;
+  }) {
+    return this.request<{
+      success: boolean;
+      config: {
+        companyName: string;
+        logoUrl: string;
+        primaryColor: string;
+        contactInfo: string;
+        disclaimer: string;
+        isActive: boolean;
+      };
+    }>('/subscriptions/white-label', {
+      method: 'PUT',
+      body: data,
+    });
+  }
+
+  // Upgrade subscription
+  async upgradeSubscription(data: { targetTierId: string; billingPeriod?: 'monthly' | 'yearly' }) {
+    return this.request<{
+      success: boolean;
+      message: string;
+      subscription: unknown;
+      proratedCredit: string;
+    }>('/subscriptions/upgrade', {
+      method: 'POST',
+      body: data,
+    });
+  }
+
+  // Gamification endpoints
+  async getGamificationStats() {
+    return this.request<{ success: boolean; stats: unknown }>('/gamification/stats');
+  }
+
+  async getAchievements() {
+    return this.request<{ success: boolean; achievements: unknown[] }>('/gamification/achievements');
+  }
+
+  async getLeaderboard(period?: 'daily' | 'weekly' | 'monthly' | 'all_time') {
+    const query = period ? `?period=${period}` : '';
+    return this.request<{ success: boolean; leaderboard: unknown[] }>(`/gamification/leaderboard${query}`);
+  }
+
+  // AI Consultant endpoints
+  async sendAIMessage(message: string, context?: Record<string, unknown>) {
+    return this.request<{ success: boolean; response: string; usage?: { promptTokens: number; completionTokens: number } }>('/ai/chat', {
+      method: 'POST',
+      body: { message, context },
+    });
+  }
+
+  async getAIHistory(limit?: number) {
+    const query = limit ? `?limit=${limit}` : '';
+    return this.request<{ success: boolean; history: Array<{ role: string; content: string; timestamp: string }> }>(`/ai/history${query}`);
+  }
+
+  // Notifications endpoints
+  async registerPushSubscription(subscription: PushSubscription) {
+    return this.request<{ success: boolean }>('/notifications/subscribe', {
+      method: 'POST',
+      body: { subscription },
+    });
+  }
+
+  async getNotificationPreferences() {
+    return this.request<{ success: boolean; preferences: Record<string, boolean> }>('/notifications/preferences');
+  }
+
+  async updateNotificationPreferences(preferences: Record<string, boolean>) {
+    return this.request<{ success: boolean }>('/notifications/preferences', {
+      method: 'PUT',
+      body: { preferences },
+    });
+  }
+
+  // Friends endpoints
+  async getFriends() {
+    return this.request<{ success: boolean; friends: unknown[] }>('/friends');
+  }
+
+  async getFriendRequests() {
+    return this.request<{ success: boolean; received: unknown[]; sent: unknown[] }>('/friends/requests');
+  }
+
+  async sendFriendRequest(email: string) {
+    return this.request<{ success: boolean; request: unknown }>('/friends/request', {
+      method: 'POST',
+      body: { email },
+    });
+  }
+
+  async acceptFriendRequest(requestId: number) {
+    return this.request<{ success: boolean }>(`/friends/request/${requestId}/accept`, {
+      method: 'POST',
+    });
+  }
+
+  async removeFriend(friendId: number) {
+    return this.request<{ success: boolean }>(`/friends/${friendId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async createInviteLink() {
+    return this.request<{ success: boolean; inviteLink: unknown }>('/friends/invite-link', {
+      method: 'POST',
+    });
   }
 }
 

@@ -29,6 +29,7 @@ const AngelNumbers = lazy(() => import("./pages/AngelNumbers"));
 const Friends = lazy(() => import("./pages/Friends"));
 const ChaldeanAnalysis = lazy(() => import("./pages/ChaldeanAnalysis"));
 const Remedies = lazy(() => import("./pages/Remedies"));
+const WhiteLabelSettings = lazy(() => import("./pages/WhiteLabelSettings"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -73,6 +74,7 @@ const App = () => (
                   <Route path="/invite/:code" element={<Friends />} />
                   <Route path="/chaldean" element={<ChaldeanAnalysis />} />
                   <Route path="/remedies" element={<Remedies />} />
+                  <Route path="/white-label" element={<WhiteLabelSettings />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
