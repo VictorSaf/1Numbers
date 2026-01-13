@@ -67,7 +67,7 @@ const Tools = () => {
         setMatrixBirthDate(formattedDate);
       }
     }
-  }, [hasProfile, profileData]);
+  }, [hasProfile, profileData, calendarBirthDate, forecastBirthDate, matrixBirthDate]);
 
   const t = {
     ro: {
