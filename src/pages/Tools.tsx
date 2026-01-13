@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { RefreshCcw, Building2, TrendingUp, Sparkles, Grid3X3, ChevronRight, ChevronDown, CalendarDays, Wrench } from "lucide-react";
+import { RefreshCcw, Building2, TrendingUp, Sparkles, Grid3X3, ChevronRight, ChevronDown, CalendarDays, Wrench, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +16,7 @@ import { getAllCompatibilities, getCompatibilityDetail } from "@/lib/compatibili
 import { calculateLifePathNumber } from "@/lib/numerology";
 import { format } from "date-fns";
 import { NumerologyCalendar } from "@/components/NumerologyCalendar";
+import { LoShuGrid } from "@/components/LoShuGrid";
 
 const Tools = () => {
   const { language } = useLanguage();
@@ -52,6 +53,10 @@ const Tools = () => {
   const [calendarName, setCalendarName] = useState("");
   const [showCalendar, setShowCalendar] = useState(false);
 
+  // Lo Shu Grid State
+  const [loShuBirthDate, setLoShuBirthDate] = useState("");
+  const [showLoShuGrid, setShowLoShuGrid] = useState(false);
+
   // Auto-populate profile data
   useEffect(() => {
     if (hasProfile && profileData) {
@@ -66,8 +71,11 @@ const Tools = () => {
       if (!matrixBirthDate) {
         setMatrixBirthDate(formattedDate);
       }
+      if (!loShuBirthDate) {
+        setLoShuBirthDate(formattedDate);
+      }
     }
-  }, [hasProfile, profileData, calendarBirthDate, forecastBirthDate, matrixBirthDate]);
+  }, [hasProfile, profileData, calendarBirthDate, forecastBirthDate, matrixBirthDate, loShuBirthDate]);
 
   const t = {
     ro: {
@@ -82,6 +90,9 @@ const Tools = () => {
       calendar: "Calendar",
       showCalendar: "Afișează Calendarul",
       calendarSubtitle: "Introdu datele pentru a vedea calendarul tău personalizat",
+      loShuGrid: "Grila Lo Shu",
+      loShuSubtitle: "Analiza numerologiei chinezești bazată pe data nașterii",
+      showLoShuGrid: "Arată Grila Lo Shu",
       fullName: "Numele complet",
       analyze: "Analizează",
       calculate: "Calculează",
@@ -139,6 +150,9 @@ const Tools = () => {
       calendar: "Calendar",
       showCalendar: "Show Calendar",
       calendarSubtitle: "Enter your details to see your personalized calendar",
+      loShuGrid: "Lo Shu Grid",
+      loShuSubtitle: "Chinese numerology analysis based on birth date",
+      showLoShuGrid: "Show Lo Shu Grid",
       fullName: "Full name",
       analyze: "Analyze",
       calculate: "Calculate",
@@ -196,6 +210,9 @@ const Tools = () => {
       calendar: "Календарь",
       showCalendar: "Показать Календарь",
       calendarSubtitle: "Введите данные, чтобы увидеть ваш персонализированный календарь",
+      loShuGrid: "Сетка Ло Шу",
+      loShuSubtitle: "Анализ китайской нумерологии на основе даты рождения",
+      showLoShuGrid: "Показать Сетку Ло Шу",
       fullName: "Полное имя",
       analyze: "Анализировать",
       calculate: "Рассчитать",
@@ -304,10 +321,14 @@ const Tools = () => {
       <main className="relative z-10 px-4 pb-16">
         <div className="max-w-5xl mx-auto pt-4">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-6 mb-8 bg-card/50">
+            <TabsList className="grid grid-cols-4 sm:grid-cols-7 mb-8 bg-card/50">
               <TabsTrigger value="calendar" className="text-xs sm:text-sm gap-1">
                 <CalendarDays className="h-4 w-4" />
                 <span className="hidden sm:inline">{t.calendar}</span>
+              </TabsTrigger>
+              <TabsTrigger value="loshu" className="text-xs sm:text-sm gap-1">
+                <Layers className="h-4 w-4" />
+                <span className="hidden sm:inline">{t.loShuGrid}</span>
               </TabsTrigger>
               <TabsTrigger value="name-change" className="text-xs sm:text-sm gap-1">
                 <RefreshCcw className="h-4 w-4" />
@@ -373,6 +394,40 @@ const Tools = () => {
                         birthDate={new Date(calendarBirthDate)} 
                         fullName={calendarName} 
                       />
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Lo Shu Grid */}
+            <TabsContent value="loshu">
+              <Card className="card-mystic">
+                <CardHeader>
+                  <CardTitle className="font-cinzel text-primary">{t.loShuGrid}</CardTitle>
+                  <CardDescription>{t.loShuSubtitle}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label>{t.birthDate}</Label>
+                    <Input
+                      type="date"
+                      value={loShuBirthDate}
+                      onChange={(e) => setLoShuBirthDate(e.target.value)}
+                      className="input-mystic"
+                    />
+                  </div>
+                  <Button
+                    onClick={() => setShowLoShuGrid(true)}
+                    className="btn-mystic w-full"
+                    disabled={!loShuBirthDate}
+                  >
+                    {t.showLoShuGrid}
+                  </Button>
+
+                  {showLoShuGrid && loShuBirthDate && (
+                    <div className="mt-6 animate-fade-in">
+                      <LoShuGrid birthDate={new Date(loShuBirthDate)} />
                     </div>
                   )}
                 </CardContent>

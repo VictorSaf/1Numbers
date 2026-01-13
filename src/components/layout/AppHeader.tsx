@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { BookOpen, Heart, TrendingUp, GraduationCap, HelpCircle, Wrench, User, Menu, X } from 'lucide-react';
+import { BookOpen, Heart, TrendingUp, GraduationCap, HelpCircle, Wrench, User, Menu, X, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeSelector } from '@/components/ThemeSelector';
@@ -26,6 +26,7 @@ const AppHeader = () => {
     { path: '/compatibility', icon: Heart, labelKey: 'viewCompatibility', mobileLabel: 'Compatibility' },
     { path: '/predictions', icon: TrendingUp, labelKey: 'predictions', mobileLabel: 'Predictions' },
     { path: '/tools', icon: Wrench, labelKey: 'tools', mobileLabel: 'Tools' },
+    { path: '/angel-numbers', icon: Sparkles, labelKey: 'angelNumbers', mobileLabel: 'Angels' },
     { path: '/tutorials', icon: GraduationCap, labelKey: 'tutorials', mobileLabel: 'Tutorials' },
     { path: '/faq', icon: HelpCircle, labelKey: 'faq', mobileLabel: 'FAQ' },
   ];

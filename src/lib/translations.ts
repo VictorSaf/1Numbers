@@ -51,6 +51,7 @@ export const translations = {
     courses: "Cursuri",
     articles: "Articole",
     faq: "Întrebări Frecvente",
+    angelNumbers: "Numere Îngeri",
     back: "Înapoi",
     
     // NotFound page
@@ -454,7 +455,13 @@ export const translations = {
     login: "Login",
     courses: "Courses",
     articles: "Articles",
-    
+    predictions: "Predictions",
+    tools: "Tools",
+    tutorials: "Tutorials",
+    faq: "FAQ",
+    angelNumbers: "Angel Numbers",
+    back: "Back",
+
     // Profile page
     profilePageTitle: "My Numerological Profile",
     profilePageSubtitle: "Complete your personal data to quickly access numerological calculations",
@@ -882,6 +889,7 @@ export const translations = {
     tools: "Инструменты",
     tutorials: "Учебники",
     faq: "Часто Задаваемые Вопросы",
+    angelNumbers: "Ангельские Числа",
     back: "Назад",
     
     // NotFound page

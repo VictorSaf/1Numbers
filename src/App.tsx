@@ -25,6 +25,7 @@ const Courses = lazy(() => import("./pages/Courses"));
 const Articles = lazy(() => import("./pages/Articles"));
 const Journal = lazy(() => import("./pages/Journal"));
 const Premium = lazy(() => import("./pages/Premium"));
+const AngelNumbers = lazy(() => import("./pages/AngelNumbers"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -64,6 +65,7 @@ const App = () => (
                   <Route path="/journal" element={<Journal />} />
                   <Route path="/premium" element={<Premium />} />
                   <Route path="/tools" element={<Tools />} />
+                  <Route path="/angel-numbers" element={<AngelNumbers />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
