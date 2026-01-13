@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Sun, Moon, Calendar, TrendingUp, Sparkles, User } from 'lucide-react';
+import { Sun, Moon, Calendar, TrendingUp, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
 import { ro, enUS, ru } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
@@ -181,23 +181,6 @@ const Predictions = () => {
             <div className="card-mystic rounded-xl p-8 text-center">
               <Sparkles className="h-12 w-12 text-primary mx-auto mb-4" />
               <h3 className="font-cinzel text-xl text-foreground mb-2">{l.enterBirthDate}</h3>
-              {hasProfile && profileData && (
-                <div className="mb-4 p-4 rounded-lg bg-primary/5 border border-primary/20">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <User className="h-4 w-4 text-primary" />
-                    <span className="text-sm text-foreground/80">
-                      {t.useProfileData || "Using profile data"}
-                    </span>
-                  </div>
-                  <Button
-                    variant="outline"
-                    onClick={() => setBirthDate(profileData.birthDate)}
-                    className="border-primary/30 text-primary hover:bg-primary/10"
-                  >
-                    {t.useProfileData || "Use Profile"}
-                  </Button>
-                </div>
-              )}
               <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="mt-4 border-primary/30 text-foreground hover:bg-primary/10">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, Users, User, Sparkles } from "lucide-react";
+import { Heart, Users, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -153,30 +153,6 @@ const Compatibility = () => {
                     </div>
                     <h3 className="font-cinzel text-lg text-foreground">{t.person1}</h3>
                   </div>
-                  
-                  {hasProfile && profileData && (
-                    <div className="mb-4 p-3 rounded-lg bg-primary/5 border border-primary/20">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <User className="h-4 w-4 text-primary" />
-                          <span className="text-xs text-foreground/80">
-                            {t.useProfileData || "Use profile data"}
-                          </span>
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setPerson1({
-                            fullName: profileData.fullName,
-                            birthDate: profileData.birthDate,
-                          })}
-                          className="h-7 text-xs"
-                        >
-                          {t.useProfileData || "Use"}
-                        </Button>
-                      </div>
-                    </div>
-                  )}
                   
                   <div className="space-y-2">
                     <Label className="text-foreground/90 text-sm">{t.fullNameLabel}</Label>
