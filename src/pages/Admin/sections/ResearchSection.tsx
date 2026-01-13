@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Bot, FileCode, Eye, X } from 'lucide-react';
+import { FileSearch, FileText, Eye, Calendar } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,23 +10,24 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-interface Agent {
+interface ResearchDocument {
   name: string;
   filename: string;
-  description: string;
+  summary: string;
   content: string;
+  modifiedAt: string;
 }
 
-export const AgentsSection = () => {
-  const [agents, setAgents] = useState<Agent[]>([]);
+export const ResearchSection = () => {
+  const [documents, setDocuments] = useState<ResearchDocument[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
+  const [selectedDoc, setSelectedDoc] = useState<ResearchDocument | null>(null);
 
   useEffect(() => {
-    const fetchAgents = async () => {
+    const fetchResearch = async () => {
       try {
         const token = localStorage.getItem('auth_token');
-        const response = await fetch('http://localhost:3001/api/admin/agents', {
+        const response = await fetch('http://localhost:3001/api/admin/research', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -34,16 +35,16 @@ export const AgentsSection = () => {
 
         if (response.ok) {
           const data = await response.json();
-          setAgents(data.agents || []);
+          setDocuments(data.documents || []);
         }
       } catch (error) {
-        console.error('Failed to fetch agents:', error);
+        console.error('Failed to fetch research:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchAgents();
+    fetchResearch();
   }, []);
 
   if (loading) {
@@ -63,9 +64,9 @@ export const AgentsSection = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-cinzel font-bold mb-2">Claude Agents</h2>
+        <h2 className="text-2xl font-cinzel font-bold mb-2">Research Documents</h2>
         <p className="text-muted-foreground">
-          View all configured Claude agents from .claude/agents/
+          Project research and documentation from docs/research/
         </p>
       </div>
 
@@ -74,51 +75,54 @@ export const AgentsSection = () => {
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
             <div className="p-3 rounded-lg bg-primary/10">
-              <Bot className="h-6 w-6 text-primary" />
+              <FileSearch className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <div className="text-2xl font-bold">{agents.length} Agents</div>
+              <div className="text-2xl font-bold">{documents.length} Documents</div>
               <div className="text-sm text-muted-foreground">
-                Configured in .claude/agents/
+                Research files in docs/research/
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Agents List */}
+      {/* Documents List */}
       <Card className="card-mystic">
         <CardHeader>
-          <CardTitle>All Agents</CardTitle>
+          <CardTitle>All Documents</CardTitle>
           <CardDescription>
-            Multi-agent system for specialized tasks
+            Research, analysis, and documentation
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {agents.length === 0 ? (
+          {documents.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              No agents found in .claude/agents/
+              No research documents found in docs/research/
             </div>
           ) : (
-            agents.map((agent) => (
+            documents.map((doc) => (
               <div
-                key={agent.filename}
+                key={doc.filename}
                 className="flex items-center justify-between p-4 rounded-lg bg-muted/30 border border-border/30"
               >
                 <div className="flex items-center gap-4">
-                  <div className="p-2 rounded-lg bg-primary/10">
-                    <Bot className="h-5 w-5 text-primary" />
+                  <div className="p-2 rounded-lg bg-blue-500/10">
+                    <FileText className="h-5 w-5 text-blue-500" />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <div className="font-medium flex items-center gap-2">
-                      {agent.name}
+                      {doc.name}
                       <Badge variant="outline" className="text-xs">
-                        <FileCode className="h-3 w-3 mr-1" />
-                        {agent.filename}
+                        {doc.filename}
                       </Badge>
                     </div>
                     <div className="text-sm text-muted-foreground line-clamp-2">
-                      {agent.description}
+                      {doc.summary}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                      <Calendar className="h-3 w-3" />
+                      {new Date(doc.modifiedAt).toLocaleDateString()}
                     </div>
                   </div>
                 </div>
@@ -126,7 +130,7 @@ export const AgentsSection = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setSelectedAgent(agent)}
+                  onClick={() => setSelectedDoc(doc)}
                 >
                   <Eye className="h-4 w-4 mr-1" />
                   View
@@ -137,21 +141,40 @@ export const AgentsSection = () => {
         </CardContent>
       </Card>
 
-      {/* Agent Details Dialog */}
-      <Dialog open={!!selectedAgent} onOpenChange={() => setSelectedAgent(null)}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
+      {/* Info Card */}
+      <Card className="card-mystic border-primary/30">
+        <CardContent className="p-6">
+          <div className="flex items-start gap-4">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <FileSearch className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <div className="font-medium mb-1">Research Documentation</div>
+              <p className="text-sm text-muted-foreground">
+                This section displays research documents stored in the docs/research/
+                directory. These documents contain project analysis, technical research,
+                and domain knowledge.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Document Details Dialog */}
+      <Dialog open={!!selectedDoc} onOpenChange={() => setSelectedDoc(null)}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Bot className="h-5 w-5" />
-              {selectedAgent?.name}
+              <FileText className="h-5 w-5" />
+              {selectedDoc?.name}
               <Badge variant="outline" className="ml-2">
-                {selectedAgent?.filename}
+                {selectedDoc?.filename}
               </Badge>
             </DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-y-auto">
-            <pre className="whitespace-pre-wrap text-sm bg-muted/30 p-4 rounded-lg font-mono">
-              {selectedAgent?.content}
+            <pre className="whitespace-pre-wrap text-sm bg-muted/30 p-4 rounded-lg">
+              {selectedDoc?.content}
             </pre>
           </div>
         </DialogContent>

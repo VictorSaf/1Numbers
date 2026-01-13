@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Bot, FileCode, Eye, X } from 'lucide-react';
+import { Zap, FileCode, Eye, Terminal } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,23 +10,24 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-interface Agent {
+interface Skill {
   name: string;
+  command: string;
   filename: string;
   description: string;
   content: string;
 }
 
-export const AgentsSection = () => {
-  const [agents, setAgents] = useState<Agent[]>([]);
+export const SkillsSection = () => {
+  const [skills, setSkills] = useState<Skill[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
+  const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
 
   useEffect(() => {
-    const fetchAgents = async () => {
+    const fetchSkills = async () => {
       try {
         const token = localStorage.getItem('auth_token');
-        const response = await fetch('http://localhost:3001/api/admin/agents', {
+        const response = await fetch('http://localhost:3001/api/admin/skills', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -34,16 +35,16 @@ export const AgentsSection = () => {
 
         if (response.ok) {
           const data = await response.json();
-          setAgents(data.agents || []);
+          setSkills(data.skills || []);
         }
       } catch (error) {
-        console.error('Failed to fetch agents:', error);
+        console.error('Failed to fetch skills:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchAgents();
+    fetchSkills();
   }, []);
 
   if (loading) {
@@ -63,9 +64,9 @@ export const AgentsSection = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-cinzel font-bold mb-2">Claude Agents</h2>
+        <h2 className="text-2xl font-cinzel font-bold mb-2">Skills</h2>
         <p className="text-muted-foreground">
-          View all configured Claude agents from .claude/agents/
+          Custom Claude skills and workflows from .claude/skills/
         </p>
       </div>
 
@@ -74,51 +75,51 @@ export const AgentsSection = () => {
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
             <div className="p-3 rounded-lg bg-primary/10">
-              <Bot className="h-6 w-6 text-primary" />
+              <Zap className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <div className="text-2xl font-bold">{agents.length} Agents</div>
+              <div className="text-2xl font-bold">{skills.length} Skills</div>
               <div className="text-sm text-muted-foreground">
-                Configured in .claude/agents/
+                Configured in .claude/skills/
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Agents List */}
+      {/* Skills List */}
       <Card className="card-mystic">
         <CardHeader>
-          <CardTitle>All Agents</CardTitle>
+          <CardTitle>All Skills</CardTitle>
           <CardDescription>
-            Multi-agent system for specialized tasks
+            Custom slash commands and workflows
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {agents.length === 0 ? (
+          {skills.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              No agents found in .claude/agents/
+              No skills found in .claude/skills/
             </div>
           ) : (
-            agents.map((agent) => (
+            skills.map((skill) => (
               <div
-                key={agent.filename}
+                key={skill.filename}
                 className="flex items-center justify-between p-4 rounded-lg bg-muted/30 border border-border/30"
               >
                 <div className="flex items-center gap-4">
-                  <div className="p-2 rounded-lg bg-primary/10">
-                    <Bot className="h-5 w-5 text-primary" />
+                  <div className="p-2 rounded-lg bg-amber-500/10">
+                    <Terminal className="h-5 w-5 text-amber-500" />
                   </div>
                   <div>
                     <div className="font-medium flex items-center gap-2">
-                      {agent.name}
+                      <code className="text-primary font-mono">{skill.command}</code>
                       <Badge variant="outline" className="text-xs">
                         <FileCode className="h-3 w-3 mr-1" />
-                        {agent.filename}
+                        {skill.filename}
                       </Badge>
                     </div>
                     <div className="text-sm text-muted-foreground line-clamp-2">
-                      {agent.description}
+                      {skill.description}
                     </div>
                   </div>
                 </div>
@@ -126,7 +127,7 @@ export const AgentsSection = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setSelectedAgent(agent)}
+                  onClick={() => setSelectedSkill(skill)}
                 >
                   <Eye className="h-4 w-4 mr-1" />
                   View
@@ -137,21 +138,40 @@ export const AgentsSection = () => {
         </CardContent>
       </Card>
 
-      {/* Agent Details Dialog */}
-      <Dialog open={!!selectedAgent} onOpenChange={() => setSelectedAgent(null)}>
+      {/* Info Card */}
+      <Card className="card-mystic border-primary/30">
+        <CardContent className="p-6">
+          <div className="flex items-start gap-4">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Zap className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <div className="font-medium mb-1">Using Skills</div>
+              <p className="text-sm text-muted-foreground">
+                Skills are custom slash commands that can be invoked in Claude Code.
+                Use them by typing the command (e.g., /build-check) in your conversation
+                with Claude.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Skill Details Dialog */}
+      <Dialog open={!!selectedSkill} onOpenChange={() => setSelectedSkill(null)}>
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Bot className="h-5 w-5" />
-              {selectedAgent?.name}
+              <Zap className="h-5 w-5" />
+              <code className="font-mono">{selectedSkill?.command}</code>
               <Badge variant="outline" className="ml-2">
-                {selectedAgent?.filename}
+                {selectedSkill?.filename}
               </Badge>
             </DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-y-auto">
             <pre className="whitespace-pre-wrap text-sm bg-muted/30 p-4 rounded-lg font-mono">
-              {selectedAgent?.content}
+              {selectedSkill?.content}
             </pre>
           </div>
         </DialogContent>

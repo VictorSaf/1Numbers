@@ -4,7 +4,10 @@ import {
   Settings,
   Palette,
   Bot,
-  BarChart3
+  BarChart3,
+  Server,
+  Zap,
+  FileSearch
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -14,6 +17,9 @@ export type AdminSection =
   | 'platform'
   | 'ui-settings'
   | 'agents'
+  | 'skills'
+  | 'mcp-servers'
+  | 'research'
   | 'analytics';
 
 interface AdminSidebarProps {
@@ -27,6 +33,9 @@ const sidebarItems: { id: AdminSection; label: string; icon: typeof LayoutDashbo
   { id: 'platform', label: 'Platform', icon: Settings },
   { id: 'ui-settings', label: 'UI Settings', icon: Palette },
   { id: 'agents', label: 'Agents', icon: Bot },
+  { id: 'skills', label: 'Skills', icon: Zap },
+  { id: 'mcp-servers', label: 'MCP Servers', icon: Server },
+  { id: 'research', label: 'Research', icon: FileSearch },
   { id: 'analytics', label: 'Analytics', icon: BarChart3 },
 ];
 

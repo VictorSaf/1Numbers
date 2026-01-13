@@ -8,6 +8,9 @@ import { UsersSection } from './sections/UsersSection';
 import { PlatformSection } from './sections/PlatformSection';
 import { UISettingsSection } from './sections/UISettingsSection';
 import { AgentsSection } from './sections/AgentsSection';
+import { SkillsSection } from './sections/SkillsSection';
+import { MCPServersSection } from './sections/MCPServersSection';
+import { ResearchSection } from './sections/ResearchSection';
 import { AnalyticsSection } from './sections/AnalyticsSection';
 
 const Admin = () => {
@@ -25,6 +28,12 @@ const Admin = () => {
         return <UISettingsSection />;
       case 'agents':
         return <AgentsSection />;
+      case 'skills':
+        return <SkillsSection />;
+      case 'mcp-servers':
+        return <MCPServersSection />;
+      case 'research':
+        return <ResearchSection />;
       case 'analytics':
         return <AnalyticsSection />;
       default:
