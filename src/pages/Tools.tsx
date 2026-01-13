@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { RefreshCcw, Building2, TrendingUp, Sparkles, Grid3X3, ChevronRight, ChevronDown, CalendarDays, User, Wrench } from "lucide-react";
+import { RefreshCcw, Building2, TrendingUp, Sparkles, Grid3X3, ChevronRight, ChevronDown, CalendarDays, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,6 +51,23 @@ const Tools = () => {
   const [calendarBirthDate, setCalendarBirthDate] = useState("");
   const [calendarName, setCalendarName] = useState("");
   const [showCalendar, setShowCalendar] = useState(false);
+
+  // Auto-populate profile data
+  useEffect(() => {
+    if (hasProfile && profileData) {
+      const formattedDate = format(profileData.birthDate, 'yyyy-MM-dd');
+      if (!calendarBirthDate) {
+        setCalendarBirthDate(formattedDate);
+        setCalendarName(profileData.fullName);
+      }
+      if (!forecastBirthDate) {
+        setForecastBirthDate(formattedDate);
+      }
+      if (!matrixBirthDate) {
+        setMatrixBirthDate(formattedDate);
+      }
+    }
+  }, [hasProfile, profileData]);
 
   const t = {
     ro: {
@@ -322,29 +339,6 @@ const Tools = () => {
                   <CardDescription>{t.calendarSubtitle}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {hasProfile && profileData && (
-                    <div className="mb-4 p-4 rounded-lg bg-primary/5 border border-primary/20">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <User className="h-4 w-4 text-primary" />
-                          <span className="text-sm text-foreground/80">
-                            {t.useProfileData || "Using profile data"}
-                          </span>
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setCalendarBirthDate(format(profileData.birthDate, 'yyyy-MM-dd'));
-                            setCalendarName(profileData.fullName);
-                          }}
-                          className="h-8"
-                        >
-                          {t.useProfileData || "Use"}
-                        </Button>
-                      </div>
-                    </div>
-                  )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label>{t.birthDate}</Label>
@@ -490,26 +484,6 @@ const Tools = () => {
                   <CardTitle className="font-cinzel text-primary">{t.yearForecast}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {hasProfile && profileData && (
-                    <div className="mb-4 p-4 rounded-lg bg-primary/5 border border-primary/20">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <User className="h-4 w-4 text-primary" />
-                          <span className="text-sm text-foreground/80">
-                            {t.useProfileData || "Using profile data"}
-                          </span>
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setForecastBirthDate(format(profileData.birthDate, 'yyyy-MM-dd'))}
-                          className="h-8"
-                        >
-                          {t.useProfileData || "Use"}
-                        </Button>
-                      </div>
-                    </div>
-                  )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label>{t.birthDate}</Label>
@@ -630,26 +604,6 @@ const Tools = () => {
                   <CardTitle className="font-cinzel text-primary">{t.compatMatrix}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {hasProfile && profileData && (
-                    <div className="mb-4 p-4 rounded-lg bg-primary/5 border border-primary/20">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <User className="h-4 w-4 text-primary" />
-                          <span className="text-sm text-foreground/80">
-                            {t.useProfileData || "Using profile data"}
-                          </span>
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setMatrixBirthDate(format(profileData.birthDate, 'yyyy-MM-dd'))}
-                          className="h-8"
-                        >
-                          {t.useProfileData || "Use"}
-                        </Button>
-                      </div>
-                    </div>
-                  )}
                   <div>
                     <Label>{t.birthDate}</Label>
                     <Input type="date" value={matrixBirthDate} onChange={(e) => setMatrixBirthDate(e.target.value)} className="input-mystic" />

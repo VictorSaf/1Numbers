@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { ro, enUS, ru } from "date-fns/locale";
-import { CalendarIcon, Sparkles, User } from "lucide-react";
+import { CalendarIcon, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,8 +13,6 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useAuth } from "@/contexts/AuthContext";
-import { api } from "@/services/api";
 
 interface NumerologyFormProps {
   onCalculate: (data: { fullName: string; birthDate: Date }) => void;
@@ -25,7 +23,6 @@ const locales = { ro, en: enUS, ru };
 
 export const NumerologyForm = ({ onCalculate, profileData }: NumerologyFormProps) => {
   const { language, t } = useLanguage();
-  const { isAuthenticated } = useAuth();
   const [fullName, setFullName] = useState("");
   const [birthDate, setBirthDate] = useState<Date>();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -36,12 +33,6 @@ export const NumerologyForm = ({ onCalculate, profileData }: NumerologyFormProps
       setBirthDate(profileData.birthDate);
     }
   }, [profileData]);
-
-  const handleUseProfile = () => {
-    if (profileData) {
-      onCalculate({ fullName: profileData.fullName, birthDate: profileData.birthDate });
-    }
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,27 +46,6 @@ export const NumerologyForm = ({ onCalculate, profileData }: NumerologyFormProps
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {isAuthenticated && profileData && (
-        <div className="mb-4 p-4 rounded-lg bg-primary/5 border border-primary/20">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <User className="h-4 w-4 text-primary" />
-              <span className="text-sm text-foreground/80">
-                {t.useProfileData || "Use profile data"}
-              </span>
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleUseProfile}
-              className="h-8"
-            >
-              {t.useProfileData || "Use"}
-            </Button>
-          </div>
-        </div>
-      )}
       <div className="space-y-2">
         <Label htmlFor="fullName" className="text-foreground/90 font-raleway text-sm tracking-wide">
           {t.fullNameLabel}
