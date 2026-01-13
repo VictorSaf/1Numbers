@@ -18,7 +18,6 @@ interface User {
   name: string;
   role: string;
   createdAt: string;
-  lastLogin: string | null;
 }
 
 export const UsersSection = () => {
@@ -153,9 +152,9 @@ export const UsersSection = () => {
                     {user.role}
                   </Badge>
                   <div className="text-sm text-muted-foreground">
-                    {user.lastLogin
-                      ? new Date(user.lastLogin).toLocaleDateString()
-                      : 'Never'}
+                    {user.createdAt
+                      ? new Date(user.createdAt).toLocaleDateString()
+                      : 'N/A'}
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

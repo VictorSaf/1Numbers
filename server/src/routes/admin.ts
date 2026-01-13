@@ -15,9 +15,9 @@ router.get('/dashboard', async (req: AuthRequest, res: Response) => {
     const totalUsersResult = await pool.query('SELECT COUNT(*) FROM users');
     const totalUsers = parseInt(totalUsersResult.rows[0].count, 10);
 
-    // Get active users (last 7 days)
+    // Get active users (created in last 7 days as proxy for active)
     const activeUsersResult = await pool.query(
-      `SELECT COUNT(*) FROM users WHERE last_login > NOW() - INTERVAL '7 days'`
+      `SELECT COUNT(*) FROM users WHERE created_at > NOW() - INTERVAL '7 days'`
     );
     const activeUsers = parseInt(activeUsersResult.rows[0].count, 10);
 
@@ -54,7 +54,7 @@ router.get('/dashboard', async (req: AuthRequest, res: Response) => {
 router.get('/users', async (req: AuthRequest, res: Response) => {
   try {
     const result = await pool.query(
-      `SELECT id, email, name, role, created_at as "createdAt", last_login as "lastLogin"
+      `SELECT id, email, name, role, created_at as "createdAt"
        FROM users
        ORDER BY created_at DESC`
     );
@@ -163,17 +163,16 @@ router.put('/settings', async (req: AuthRequest, res: Response) => {
         id SERIAL PRIMARY KEY,
         key VARCHAR(100) UNIQUE NOT NULL,
         value JSONB NOT NULL,
-        updated_at TIMESTAMP DEFAULT NOW(),
-        updated_by INTEGER
+        updated_at TIMESTAMP DEFAULT NOW()
       )
     `);
 
     const upsertSetting = async (key: string, value: unknown) => {
       await pool.query(
-        `INSERT INTO platform_settings (key, value, updated_by)
-         VALUES ($1, $2, $3)
-         ON CONFLICT (key) DO UPDATE SET value = $2, updated_at = NOW(), updated_by = $3`,
-        [key, JSON.stringify(value), req.userId]
+        `INSERT INTO platform_settings (key, value)
+         VALUES ($1, $2)
+         ON CONFLICT (key) DO UPDATE SET value = $2, updated_at = NOW()`,
+        [key, JSON.stringify(value)]
       );
     };
 
