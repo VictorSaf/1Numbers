@@ -4,8 +4,12 @@ import jwt, { SignOptions } from 'jsonwebtoken';
 import pool from '../db';
 
 const router = Router();
-const JWT_SECRET = (process.env.JWT_SECRET || 'your-secret-key-change-in-production') as string;
-const JWT_EXPIRES_IN = (process.env.JWT_EXPIRES_IN || '7d') as string;
+const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required');
+}
 
 // Login
 router.post('/login', async (req: Request, res: Response) => {
