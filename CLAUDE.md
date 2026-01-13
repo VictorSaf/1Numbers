@@ -25,6 +25,8 @@ cd server
 npm run dev           # Start Express server with nodemon
 npm run build         # TypeScript compilation
 npm run migrate       # Run database migrations
+npm run test          # Run backend tests once
+npm run test:watch    # Run backend tests in watch mode
 ```
 
 ## Architecture
