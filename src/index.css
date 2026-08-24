@@ -221,76 +221,96 @@
    DESIGN TOKENS - CSS Custom Properties
    ============================================ */
 @layer base {
+  /* === Design tokens ==============================================
+     The palette is defined here and only here. Themes below shift the palette,
+     never the bridge, so no colour is reachable through a theme class alone.
+     Values are HSL triples because Tailwind consumes them as hsl(var(--token));
+     hex would not reach a single component. */
   :root {
-    /* === Color Palette === */
-    /* Primary - Mystical Gold */
-    --primary: 45 85% 58%;
-    --primary-foreground: 240 20% 6%;
-    --primary-hover: 45 85% 52%;
-    --primary-light: 45 85% 70%;
-    --primary-dark: 45 85% 45%;
-    
-    /* Secondary - Deep Purple */
-    --secondary: 260 55% 35%;
-    --secondary-foreground: 45 30% 95%;
-    --secondary-hover: 260 55% 30%;
-    --secondary-light: 260 55% 45%;
-    
-    /* Accent - Celestial Violet */
-    --accent: 280 50% 45%;
-    --accent-foreground: 45 30% 95%;
-    --accent-hover: 280 50% 40%;
-    
-    /* Background System */
-    --background: 240 20% 6%;
-    --background-elevated: 240 18% 10%;
-    --background-overlay: 240 20% 4%;
-    --foreground: 45 25% 96%;
-    --foreground-muted: 45 15% 75%;
-    
-    /* Surface/Card System */
-    --card: 240 18% 10%;
-    --card-foreground: 45 25% 96%;
-    --card-hover: 240 18% 12%;
-    --card-border: 260 30% 20%;
-    
-    /* Semantic Colors */
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
-    --error: 0 84% 60%;
-    --error-foreground: 0 0% 100%;
-    --info: 199 89% 48%;
-    --info-foreground: 0 0% 100%;
-    
-    /* Neutral Scale */
-    --muted: 240 15% 15%;
-    --muted-foreground: 240 10% 70%;
-    --muted-border: 240 15% 20%;
-    
-    /* Border & Input */
-    --border: 260 30% 22%;
-    --border-hover: 260 30% 28%;
-    --input: 240 18% 12%;
-    --input-focus: 260 30% 25%;
-    --ring: 45 85% 58%;
-    
-    /* Popover & Dropdown */
-    --popover: 240 18% 12%;
-    --popover-foreground: 45 25% 96%;
-    --popover-border: 260 30% 20%;
-    
-    /* Sidebar */
+    --bg: 225 17% 95%;
+    --surface: 0 0% 100%;
+    --surface-2: 220 23% 97%;
+    --sunken: 230 16% 93%;
+    --ink: 232 16% 10%;
+    --ink-2: 228 11% 26%;
+    --muted-ink: 232 10% 43%;
+    --faint: 232 10% 58%;
+    --line: 228 19% 89%;
+    --line-2: 228 17% 83%;
+    --accent: 256 45% 45%;
+    --accent-soft: 256 52% 94%;
+    --accent-ink: 256 49% 38%;
+    --ok: 162 57% 27%;
+    --ok-soft: 159 35% 92%;
+    --warn: 34 91% 34%;
+    --warn-soft: 34 76% 94%;
+    --crit: 4 66% 39%;
+    --crit-soft: 7 60% 94%;
+    --chart-1: 268 64% 50%;
+    --chart-2: 176 86% 30%;
+    --chart-3: 27 100% 38%;
+    --ramp-1: 256 52% 94%;
+    --ramp-2: 256 55% 87%;
+    --ramp-3: 256 55% 76%;
+    --ramp-4: 256 52% 64%;
+    --ramp-5: 259 48% 51%;
+    --ramp-6: 257 52% 38%;
+
+    /* Bridge: the names Tailwind already consumes, resolved from the palette
+       above. Components keep writing bg-background and text-foreground; only the
+       source of those values changed. Defined once, in :root only, so a theme
+       class can shift the palette without having to restate the bridge. */
+    --background: var(--bg);
+    --background-elevated: var(--surface);
+    --background-overlay: var(--surface-2);
+    --foreground: var(--ink);
+    --foreground-muted: var(--muted-ink);
+    --card: var(--surface);
+    --card-foreground: var(--ink);
+    --popover: var(--surface);
+    --popover-foreground: var(--ink);
+    --muted: var(--sunken);
+    --muted-foreground: var(--muted-ink);
+    --border: var(--line);
+    --card-border: var(--line);
+    --input: var(--line-2);
+    --ring: var(--accent);
+    --secondary: var(--surface-2);
+    --secondary-foreground: var(--ink-2);
+    --destructive: var(--crit);
+    --destructive-foreground: var(--surface);
+    --success: var(--ok);
+    --warning: var(--warn);
+    --error: var(--crit);
+
+    /* Brand and decoration, derived from the palette rather than restated.
+       --primary is what Tailwind resolves for bg-primary and text-primary, so it
+       has to exist: without it every accented control in the app loses its
+       colour. Deriving it from --accent is what lets a theme change its identity
+       by setting one value. */
+    --primary: var(--accent);
+    --primary-foreground: var(--surface);
+    --primary-hover: var(--accent-ink);
+    --primary-light: var(--accent-ink);
+    --primary-dark: var(--accent-ink);
+    --accent-foreground: var(--surface);
+    --accent-hover: var(--accent-ink);
+
+    --gradient-background: linear-gradient(135deg, hsl(var(--bg)) 0%, hsl(var(--surface-2)) 50%, hsl(var(--bg)) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(var(--accent)) 0%, hsl(var(--accent-ink)) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--surface-2)) 0%, hsl(var(--sunken)) 100%);
+    --gradient-glass: linear-gradient(135deg, hsl(var(--surface) / 0.10) 0%, hsl(var(--surface) / 0.05) 100%);
+
+    --glow-primary: 0 0 20px hsl(var(--accent) / 0.30), 0 0 40px hsl(var(--accent) / 0.15);
+    --glow-primary-subtle: 0 0 15px hsl(var(--accent) / 0.20);
+    --glow-accent: 0 0 20px hsl(var(--accent) / 0.30), 0 0 40px hsl(var(--accent) / 0.15);
+    --glow-success: 0 0 15px hsl(var(--ok) / 0.30);
+
     --sidebar-background: 240 20% 8%;
     --sidebar-foreground: 45 25% 96%;
     --sidebar-border: 260 30% 20%;
-    
-    /* === Typography === */
     --font-heading: 'Cinzel', serif;
     --font-body: 'Raleway', sans-serif;
-    
-    /* === Spacing Scale === */
     --space-xs: 0.25rem;    /* 4px */
     --space-sm: 0.5rem;     /* 8px */
     --space-md: 1rem;       /* 16px */
@@ -298,234 +318,248 @@
     --space-xl: 2rem;       /* 32px */
     --space-2xl: 3rem;      /* 48px */
     --space-3xl: 4rem;      /* 64px */
-    
-    /* === Border Radius === */
     --radius-sm: 0.375rem;  /* 6px */
     --radius-md: 0.5rem;    /* 8px */
     --radius-lg: 0.75rem;    /* 12px */
     --radius-xl: 1rem;      /* 16px */
     --radius-2xl: 1.5rem;   /* 24px */
     --radius-full: 9999px;
-    
-    /* === Shadows & Elevation === */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-    
-    /* === Glow Effects === */
-    --glow-primary: 0 0 20px hsl(45 85% 58% / 0.3), 0 0 40px hsl(45 85% 58% / 0.15);
-    --glow-primary-subtle: 0 0 15px hsl(45 85% 58% / 0.2);
-    --glow-accent: 0 0 20px hsl(280 50% 45% / 0.3), 0 0 40px hsl(280 50% 45% / 0.15);
-    --glow-success: 0 0 15px hsl(142 71% 45% / 0.3);
-    
-    /* === Gradients === */
-    --gradient-primary: linear-gradient(135deg, hsl(45 85% 58%) 0%, hsl(35 90% 50%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(260 55% 35%) 0%, hsl(280 50% 45%) 100%);
-    --gradient-background: linear-gradient(135deg, hsl(240 20% 6%) 0%, hsl(260 20% 8%) 50%, hsl(240 20% 6%) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(240 18% 10%) 0%, hsl(240 18% 12%) 100%);
-    --gradient-card-elevated: linear-gradient(145deg, hsl(240 18% 12%) 0%, hsl(240 18% 14%) 100%);
-    --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-    
-    /* === Transitions === */
-    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: 400ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 
-  /* === THEME: DAWN === */
+  /* System preference, only where no theme was chosen. */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]):not([class*="theme-"]) {
+      --bg: 231 19% 7%;
+      --surface: 229 19% 12%;
+      --surface-2: 227 19% 15%;
+      --sunken: 228 20% 10%;
+      --ink: 231 23% 94%;
+      --ink-2: 229 17% 80%;
+      --muted-ink: 232 11% 62%;
+      --faint: 230 10% 47%;
+      --line: 229 17% 19%;
+      --line-2: 228 16% 25%;
+      --accent: 252 73% 75%;
+      --accent-soft: 250 33% 18%;
+      --accent-ink: 252 80% 82%;
+      --ok: 161 46% 53%;
+      --ok-soft: 160 36% 12%;
+      --warn: 35 74% 59%;
+      --warn-soft: 36 40% 12%;
+      --crit: 6 82% 68%;
+      --crit-soft: 5 31% 14%;
+      --chart-1: 252 62% 64%;
+      --chart-2: 165 80% 35%;
+      --chart-3: 33 62% 48%;
+      --ramp-1: 250 33% 18%;
+      --ramp-2: 253 39% 26%;
+      --ramp-3: 252 40% 35%;
+      --ramp-4: 252 40% 46%;
+      --ramp-5: 252 47% 58%;
+      --ramp-6: 250 61% 69%;
+    }
+  }
+
+  /* An explicit choice wins in both directions. */
+  :root[data-theme="light"] { 
+    --bg: 225 17% 95%;
+    --surface: 0 0% 100%;
+    --surface-2: 220 23% 97%;
+    --sunken: 230 16% 93%;
+    --ink: 232 16% 10%;
+    --ink-2: 228 11% 26%;
+    --muted-ink: 232 10% 43%;
+    --faint: 232 10% 58%;
+    --line: 228 19% 89%;
+    --line-2: 228 17% 83%;
+    --accent: 256 45% 45%;
+    --accent-soft: 256 52% 94%;
+    --accent-ink: 256 49% 38%;
+    --ok: 162 57% 27%;
+    --ok-soft: 159 35% 92%;
+    --warn: 34 91% 34%;
+    --warn-soft: 34 76% 94%;
+    --crit: 4 66% 39%;
+    --crit-soft: 7 60% 94%;
+    --chart-1: 268 64% 50%;
+    --chart-2: 176 86% 30%;
+    --chart-3: 27 100% 38%;
+    --ramp-1: 256 52% 94%;
+    --ramp-2: 256 55% 87%;
+    --ramp-3: 256 55% 76%;
+    --ramp-4: 256 52% 64%;
+    --ramp-5: 259 48% 51%;
+    --ramp-6: 257 52% 38%;
+  }
+
+  :root[data-theme="dark"] {
+    --bg: 231 19% 7%;
+    --surface: 229 19% 12%;
+    --surface-2: 227 19% 15%;
+    --sunken: 228 20% 10%;
+    --ink: 231 23% 94%;
+    --ink-2: 229 17% 80%;
+    --muted-ink: 232 11% 62%;
+    --faint: 230 10% 47%;
+    --line: 229 17% 19%;
+    --line-2: 228 16% 25%;
+    --accent: 252 73% 75%;
+    --accent-soft: 250 33% 18%;
+    --accent-ink: 252 80% 82%;
+    --ok: 161 46% 53%;
+    --ok-soft: 160 36% 12%;
+    --warn: 35 74% 59%;
+    --warn-soft: 36 40% 12%;
+    --crit: 6 82% 68%;
+    --crit-soft: 5 31% 14%;
+    --chart-1: 252 62% 64%;
+    --chart-2: 165 80% 35%;
+    --chart-3: 33 62% 48%;
+    --ramp-1: 250 33% 18%;
+    --ramp-2: 253 39% 26%;
+    --ramp-3: 252 40% 35%;
+    --ramp-4: 252 40% 46%;
+    --ramp-5: 252 47% 58%;
+    --ramp-6: 250 61% 69%;
+  }
+
+  /* Named themes shift the palette only. Each keeps its own accent so the
+     product identity survives, while neutrals, lines and semantic colours stay
+     common -- that shared set is where the contrast guarantees live. */
   .theme-dawn {
-    /* Primary - Warm Gold */
-    --primary: 35 90% 50%;
-    --primary-foreground: 240 20% 6%;
-    --primary-hover: 35 90% 45%;
-    --primary-light: 35 90% 60%;
-    --primary-dark: 35 90% 40%;
-
-    /* Secondary - Soft Rose */
-    --secondary: 350 60% 45%;
-    --secondary-foreground: 0 0% 100%;
-    --secondary-hover: 350 60% 40%;
-    --secondary-light: 350 60% 55%;
-
-    /* Accent - Peach */
-    --accent: 25 80% 50%;
-    --accent-foreground: 240 20% 6%;
-    --accent-hover: 25 80% 45%;
-
-    /* Background System - Light Warm */
-    --background: 40 40% 97%;
-    --background-elevated: 40 30% 99%;
-    --background-overlay: 40 35% 94%;
-    --foreground: 240 20% 15%;
-    --foreground-muted: 240 10% 45%;
-
-    /* Surface/Card System */
-    --card: 40 30% 99%;
-    --card-foreground: 240 20% 15%;
-    --card-hover: 40 25% 97%;
-    --card-border: 35 30% 88%;
-
-    /* Neutral Scale */
-    --muted: 40 20% 92%;
-    --muted-foreground: 240 10% 50%;
-    --muted-border: 40 25% 88%;
-
-    /* Border & Input */
-    --border: 35 25% 85%;
-    --border-hover: 35 30% 80%;
-    --input: 40 25% 96%;
-    --input-focus: 35 40% 90%;
-    --ring: 35 90% 50%;
-
-    /* Popover & Dropdown */
-    --popover: 40 30% 99%;
-    --popover-foreground: 240 20% 15%;
-    --popover-border: 35 25% 88%;
-
-    /* Sidebar */
-    --sidebar-background: 40 35% 95%;
-    --sidebar-foreground: 240 20% 15%;
-    --sidebar-border: 35 25% 88%;
-
-    /* Theme-specific effects */
-    --glow-primary: 0 4px 20px hsl(35 90% 50% / 0.25), 0 0 40px hsl(35 90% 50% / 0.1);
-    --glow-primary-subtle: 0 2px 15px hsl(35 90% 50% / 0.15);
-    --gradient-primary: linear-gradient(135deg, hsl(35 90% 55%) 0%, hsl(25 85% 50%) 100%);
-    --gradient-background: linear-gradient(135deg, hsl(40 40% 97%) 0%, hsl(45 35% 96%) 50%, hsl(40 40% 97%) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(40 30% 99%) 0%, hsl(40 25% 97%) 100%);
+    --bg: 225 17% 95%;
+    --surface: 0 0% 100%;
+    --surface-2: 220 23% 97%;
+    --sunken: 230 16% 93%;
+    --ink: 232 16% 10%;
+    --ink-2: 228 11% 26%;
+    --muted-ink: 232 10% 43%;
+    --faint: 232 10% 58%;
+    --line: 228 19% 89%;
+    --line-2: 228 17% 83%;
+    --accent: 256 45% 45%;
+    --accent-soft: 256 52% 94%;
+    --accent-ink: 256 49% 38%;
+    --ok: 162 57% 27%;
+    --ok-soft: 159 35% 92%;
+    --warn: 34 91% 34%;
+    --warn-soft: 34 76% 94%;
+    --crit: 4 66% 39%;
+    --crit-soft: 7 60% 94%;
+    --chart-1: 268 64% 50%;
+    --chart-2: 176 86% 30%;
+    --chart-3: 27 100% 38%;
+    --ramp-1: 256 52% 94%;
+    --ramp-2: 256 55% 87%;
+    --ramp-3: 256 55% 76%;
+    --ramp-4: 256 52% 64%;
+    --ramp-5: 259 48% 51%;
+    --ramp-6: 257 52% 38%;
+    --accent: 35 90% 42%;
+    --accent-ink: 35 90% 34%;
   }
 
-  /* === THEME: MIDNIGHT === */
+  .theme-twilight {
+    --bg: 231 19% 7%;
+    --surface: 229 19% 12%;
+    --surface-2: 227 19% 15%;
+    --sunken: 228 20% 10%;
+    --ink: 231 23% 94%;
+    --ink-2: 229 17% 80%;
+    --muted-ink: 232 11% 62%;
+    --faint: 230 10% 47%;
+    --line: 229 17% 19%;
+    --line-2: 228 16% 25%;
+    --accent: 252 73% 75%;
+    --accent-soft: 250 33% 18%;
+    --accent-ink: 252 80% 82%;
+    --ok: 161 46% 53%;
+    --ok-soft: 160 36% 12%;
+    --warn: 35 74% 59%;
+    --warn-soft: 36 40% 12%;
+    --crit: 6 82% 68%;
+    --crit-soft: 5 31% 14%;
+    --chart-1: 252 62% 64%;
+    --chart-2: 165 80% 35%;
+    --chart-3: 33 62% 48%;
+    --ramp-1: 250 33% 18%;
+    --ramp-2: 253 39% 26%;
+    --ramp-3: 252 40% 35%;
+    --ramp-4: 252 40% 46%;
+    --ramp-5: 252 47% 58%;
+    --ramp-6: 250 61% 69%;
+    --accent: 45 85% 58%;
+    --accent-ink: 45 85% 68%;
+  }
+
   .theme-midnight {
-    /* Primary - Deep Blue */
-    --primary: 220 80% 55%;
-    --primary-foreground: 0 0% 100%;
-    --primary-hover: 220 80% 50%;
-    --primary-light: 220 80% 65%;
-    --primary-dark: 220 80% 45%;
-
-    /* Secondary - Indigo */
-    --secondary: 250 60% 40%;
-    --secondary-foreground: 0 0% 100%;
-    --secondary-hover: 250 60% 35%;
-    --secondary-light: 250 60% 50%;
-
-    /* Accent - Cyan */
-    --accent: 190 80% 50%;
-    --accent-foreground: 240 20% 6%;
-    --accent-hover: 190 80% 45%;
-
-    /* Background System - Deep Dark */
-    --background: 230 25% 6%;
-    --background-elevated: 230 22% 10%;
-    --background-overlay: 230 25% 4%;
-    --foreground: 220 30% 95%;
-    --foreground-muted: 220 20% 70%;
-
-    /* Surface/Card System */
-    --card: 230 22% 10%;
-    --card-foreground: 220 30% 95%;
-    --card-hover: 230 22% 12%;
-    --card-border: 220 35% 22%;
-
-    /* Neutral Scale */
-    --muted: 230 20% 14%;
-    --muted-foreground: 220 15% 70%;
-    --muted-border: 230 20% 18%;
-
-    /* Border & Input */
-    --border: 220 30% 20%;
-    --border-hover: 220 35% 28%;
-    --input: 230 22% 12%;
-    --input-focus: 220 35% 25%;
-    --ring: 220 80% 55%;
-
-    /* Popover & Dropdown */
-    --popover: 230 22% 12%;
-    --popover-foreground: 220 30% 95%;
-    --popover-border: 220 30% 22%;
-
-    /* Sidebar */
-    --sidebar-background: 230 24% 8%;
-    --sidebar-foreground: 220 30% 95%;
-    --sidebar-border: 220 30% 20%;
-
-    /* Theme-specific effects */
-    --glow-primary: 0 0 20px hsl(220 80% 55% / 0.4), 0 0 40px hsl(220 80% 55% / 0.2);
-    --glow-primary-subtle: 0 0 15px hsl(220 80% 55% / 0.25);
-    --glow-accent: 0 0 20px hsl(190 80% 50% / 0.4), 0 0 40px hsl(190 80% 50% / 0.2);
-    --gradient-primary: linear-gradient(135deg, hsl(220 80% 55%) 0%, hsl(200 75% 50%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(250 60% 40%) 0%, hsl(220 70% 50%) 100%);
-    --gradient-background: linear-gradient(135deg, hsl(230 25% 6%) 0%, hsl(240 28% 8%) 50%, hsl(230 25% 6%) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(230 22% 10%) 0%, hsl(230 22% 12%) 100%);
+    --bg: 231 19% 7%;
+    --surface: 229 19% 12%;
+    --surface-2: 227 19% 15%;
+    --sunken: 228 20% 10%;
+    --ink: 231 23% 94%;
+    --ink-2: 229 17% 80%;
+    --muted-ink: 232 11% 62%;
+    --faint: 230 10% 47%;
+    --line: 229 17% 19%;
+    --line-2: 228 16% 25%;
+    --accent: 252 73% 75%;
+    --accent-soft: 250 33% 18%;
+    --accent-ink: 252 80% 82%;
+    --ok: 161 46% 53%;
+    --ok-soft: 160 36% 12%;
+    --warn: 35 74% 59%;
+    --warn-soft: 36 40% 12%;
+    --crit: 6 82% 68%;
+    --crit-soft: 5 31% 14%;
+    --chart-1: 252 62% 64%;
+    --chart-2: 165 80% 35%;
+    --chart-3: 33 62% 48%;
+    --ramp-1: 250 33% 18%;
+    --ramp-2: 253 39% 26%;
+    --ramp-3: 252 40% 35%;
+    --ramp-4: 252 40% 46%;
+    --ramp-5: 252 47% 58%;
+    --ramp-6: 250 61% 69%;
+    --accent: 220 80% 62%;
+    --accent-ink: 220 80% 72%;
   }
 
-  /* === THEME: CELESTIAL === */
   .theme-celestial {
-    /* Primary - Star Gold */
-    --primary: 50 95% 60%;
-    --primary-foreground: 240 20% 6%;
-    --primary-hover: 50 95% 55%;
-    --primary-light: 50 95% 70%;
-    --primary-dark: 50 95% 50%;
-
-    /* Secondary - Cosmic Purple */
-    --secondary: 270 70% 50%;
-    --secondary-foreground: 50 30% 95%;
-    --secondary-hover: 270 70% 45%;
-    --secondary-light: 270 70% 60%;
-
-    /* Accent - Nebula Pink */
-    --accent: 320 70% 55%;
-    --accent-foreground: 0 0% 100%;
-    --accent-hover: 320 70% 50%;
-
-    /* Background System - Deep Space */
-    --background: 265 35% 8%;
-    --background-elevated: 265 32% 12%;
-    --background-overlay: 265 35% 5%;
-    --foreground: 50 30% 96%;
-    --foreground-muted: 50 20% 72%;
-
-    /* Surface/Card System */
-    --card: 265 32% 12%;
-    --card-foreground: 50 30% 96%;
-    --card-hover: 265 32% 14%;
-    --card-border: 270 45% 28%;
-
-    /* Neutral Scale */
-    --muted: 265 25% 16%;
-    --muted-foreground: 50 15% 70%;
-    --muted-border: 265 25% 20%;
-
-    /* Border & Input */
-    --border: 270 35% 24%;
-    --border-hover: 270 40% 32%;
-    --input: 265 30% 14%;
-    --input-focus: 270 40% 28%;
-    --ring: 50 95% 60%;
-
-    /* Popover & Dropdown */
-    --popover: 265 32% 14%;
-    --popover-foreground: 50 30% 96%;
-    --popover-border: 270 40% 26%;
-
-    /* Sidebar */
-    --sidebar-background: 265 34% 10%;
-    --sidebar-foreground: 50 30% 96%;
-    --sidebar-border: 270 35% 24%;
-
-    /* Theme-specific cosmic effects */
-    --glow-primary: 0 0 25px hsl(50 95% 60% / 0.4), 0 0 50px hsl(50 95% 60% / 0.2), 0 0 75px hsl(50 95% 60% / 0.1);
-    --glow-primary-subtle: 0 0 18px hsl(50 95% 60% / 0.3);
-    --glow-accent: 0 0 25px hsl(320 70% 55% / 0.4), 0 0 50px hsl(320 70% 55% / 0.2);
-    --glow-secondary: 0 0 25px hsl(270 70% 50% / 0.4), 0 0 50px hsl(270 70% 50% / 0.2);
-    --gradient-primary: linear-gradient(135deg, hsl(50 95% 60%) 0%, hsl(40 90% 55%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(270 70% 50%) 0%, hsl(320 70% 55%) 100%);
-    --gradient-background: linear-gradient(135deg, hsl(265 35% 8%) 0%, hsl(280 38% 10%) 50%, hsl(265 35% 8%) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(265 32% 12%) 0%, hsl(270 35% 14%) 100%);
+    --bg: 231 19% 7%;
+    --surface: 229 19% 12%;
+    --surface-2: 227 19% 15%;
+    --sunken: 228 20% 10%;
+    --ink: 231 23% 94%;
+    --ink-2: 229 17% 80%;
+    --muted-ink: 232 11% 62%;
+    --faint: 230 10% 47%;
+    --line: 229 17% 19%;
+    --line-2: 228 16% 25%;
+    --accent: 252 73% 75%;
+    --accent-soft: 250 33% 18%;
+    --accent-ink: 252 80% 82%;
+    --ok: 161 46% 53%;
+    --ok-soft: 160 36% 12%;
+    --warn: 35 74% 59%;
+    --warn-soft: 36 40% 12%;
+    --crit: 6 82% 68%;
+    --crit-soft: 5 31% 14%;
+    --chart-1: 252 62% 64%;
+    --chart-2: 165 80% 35%;
+    --chart-3: 33 62% 48%;
+    --ramp-1: 250 33% 18%;
+    --ramp-2: 253 39% 26%;
+    --ramp-3: 252 40% 35%;
+    --ramp-4: 252 40% 46%;
+    --ramp-5: 252 47% 58%;
+    --ramp-6: 250 61% 69%;
+    --accent: 50 95% 60%;
+    --accent-ink: 50 95% 70%;
   }
 
   /* === DISPLAY SETTINGS === */

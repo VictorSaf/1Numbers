@@ -28,6 +28,24 @@ export default {
         "border-hover": "hsl(var(--border-hover))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
+        // Palette tokens exposed as utilities, so a component can write
+        // text-ok or bg-crit-soft instead of text-green-500 or bg-red-100.
+        // Without these the semantic colours exist in CSS but no class reaches them.
+        surface: { DEFAULT: "hsl(var(--surface))", 2: "hsl(var(--surface-2))" },
+        sunken: "hsl(var(--sunken))",
+        ink: { DEFAULT: "hsl(var(--ink))", 2: "hsl(var(--ink-2))" },
+        faint: "hsl(var(--faint))",
+        line: { DEFAULT: "hsl(var(--line))", 2: "hsl(var(--line-2))" },
+        ok: { DEFAULT: "hsl(var(--ok))", soft: "hsl(var(--ok-soft))" },
+        warn: { DEFAULT: "hsl(var(--warn))", soft: "hsl(var(--warn-soft))" },
+        crit: { DEFAULT: "hsl(var(--crit))", soft: "hsl(var(--crit-soft))" },
+        chart: {
+          1: "hsl(var(--chart-1))", 2: "hsl(var(--chart-2))", 3: "hsl(var(--chart-3))",
+        },
+        ramp: {
+          1: "hsl(var(--ramp-1))", 2: "hsl(var(--ramp-2))", 3: "hsl(var(--ramp-3))",
+          4: "hsl(var(--ramp-4))", 5: "hsl(var(--ramp-5))", 6: "hsl(var(--ramp-6))",
+        },
         background: {
           DEFAULT: "hsl(var(--background))",
           elevated: "hsl(var(--background-elevated))",
