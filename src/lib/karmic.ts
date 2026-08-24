@@ -1,4 +1,5 @@
 import { reduceToSingleDigit } from "./numerology";
+import { splitLetters, sumLetters, pythagoreanValue } from './numerology-plus';
 
 export interface KarmicDebtInfo {
   number: number;
@@ -48,29 +49,16 @@ export const calculateKarmicDebts = (
     debts.push({ number: day, hasDebt: true, source: 'birthday' });
   }
   
-  // Check name numbers
-  const PYTHAGOREAN_VALUES: Record<string, number> = {
-    A: 1, B: 2, C: 3, D: 4, E: 5, F: 6, G: 7, H: 8, I: 9,
-    J: 1, K: 2, L: 3, M: 4, N: 5, O: 6, P: 7, Q: 8, R: 9,
-    S: 1, T: 2, U: 3, V: 4, W: 5, X: 6, Y: 7, Z: 8
-  };
-  const VOWELS = ['A', 'E', 'I', 'O', 'U'];
-  
-  const cleanName = fullName.toUpperCase().replace(/[^A-Z]/g, '');
-  
-  let destinySum = 0;
-  let soulUrgeSum = 0;
-  let personalitySum = 0;
-  
-  for (const char of cleanName) {
-    const value = PYTHAGOREAN_VALUES[char] || 0;
-    destinySum += value;
-    if (VOWELS.includes(char)) {
-      soulUrgeSum += value;
-    } else {
-      personalitySum += value;
-    }
-  }
+  // Letters come from the shared engine rather than a local table. The local copy
+  // stripped diacritics instead of transliterating them and treated Y as always a
+  // consonant, so this module disagreed with the main result for any name
+  // containing ș, ț, ă or Y -- on the same page, side by side.
+  const { vowels, consonants, all } = splitLetters(fullName);
+
+  const destinySum = sumLetters(all);
+  const soulUrgeSum = sumLetters(vowels);
+  const personalitySum = sumLetters(consonants);
+
   
   if (KARMIC_DEBT_NUMBERS.includes(destinySum)) {
     debts.push({ number: destinySum, hasDebt: true, source: 'destiny' });
@@ -87,17 +75,10 @@ export const calculateKarmicDebts = (
 
 // Calculate Karmic Lessons (missing numbers from name)
 export const calculateKarmicLessons = (fullName: string): number[] => {
-  const PYTHAGOREAN_VALUES: Record<string, number> = {
-    A: 1, B: 2, C: 3, D: 4, E: 5, F: 6, G: 7, H: 8, I: 9,
-    J: 1, K: 2, L: 3, M: 4, N: 5, O: 6, P: 7, Q: 8, R: 9,
-    S: 1, T: 2, U: 3, V: 4, W: 5, X: 6, Y: 7, Z: 8
-  };
-  
   const presentNumbers = new Set<number>();
-  const cleanName = fullName.toUpperCase().replace(/[^A-Z]/g, '');
-  
-  for (const char of cleanName) {
-    const value = PYTHAGOREAN_VALUES[char];
+
+  for (const char of splitLetters(fullName).all) {
+    const value = pythagoreanValue(char);
     if (value) {
       presentNumbers.add(value);
     }

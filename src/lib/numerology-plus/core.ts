@@ -120,6 +120,37 @@ export const splitLetters = (name: string): LetterSplit => {
   return { vowels, consonants, all };
 };
 
+export interface ClassifiedLetter {
+  letter: string;
+  value: number;
+  isVowel: boolean;
+  /** 1-based position across the whole name, ignoring spaces and punctuation. */
+  position: number;
+}
+
+/**
+ * Letters in order, each with its value and vowel flag.
+ *
+ * splitLetters groups letters and loses their order, which is what per-letter
+ * views need. Both resolve Y through the same rule, so a letter cannot be a
+ * vowel in one part of the app and a consonant in another.
+ */
+export const classifyLetters = (name: string): ClassifiedLetter[] => {
+  const out: ClassifiedLetter[] = [];
+  let position = 1;
+  for (const word of normalizeName(name).split(/[\s'-]+/).filter(Boolean)) {
+    [...word].forEach((letter, index) => {
+      out.push({
+        letter,
+        value: pythagoreanValue(letter),
+        isVowel: HARD_VOWELS.has(letter) || (letter === 'Y' && isYVowel(word, index)),
+        position: position++,
+      });
+    });
+  }
+  return out;
+};
+
 /** Sum Pythagorean values over a list of letters. */
 export const sumLetters = (letters: string[]): number =>
   letters.reduce((sum, letter) => sum + pythagoreanValue(letter), 0);

@@ -4,6 +4,7 @@ import {
   calculatePersonalityNumber,
   getNumberMeaning 
 } from './numerology';
+import { classifyLetters } from './numerology-plus';
 
 export interface NameAnalysis {
   destinyNumber: number;
@@ -450,25 +451,17 @@ export interface LetterAnalysis {
 }
 
 export const analyzeIndividualLetters = (fullName: string): LetterAnalysis[] => {
-  const PYTHAGOREAN_VALUES: Record<string, number> = {
-    A: 1, B: 2, C: 3, D: 4, E: 5, F: 6, G: 7, H: 8, I: 9,
-    J: 1, K: 2, L: 3, M: 4, N: 5, O: 6, P: 7, Q: 8, R: 9,
-    S: 1, T: 2, U: 3, V: 4, W: 5, X: 6, Y: 7, Z: 8
-  };
-  
-  const VOWELS = ['A', 'E', 'I', 'O', 'U'];
-  const cleanName = fullName.toUpperCase().replace(/[^A-Z]/g, '');
+  // Classification comes from the shared engine. The local table dropped
+  // diacritics and treated Y as always a consonant, so this per-letter view
+  // contradicted the numbers shown directly above it on the results page.
   const analysis: LetterAnalysis[] = [];
-  
-  let position = 1;
-  for (const letter of cleanName) {
-    const value = PYTHAGOREAN_VALUES[letter] || 0;
-    const isVowel = VOWELS.includes(letter);
+
+  for (const { letter, value, isVowel, position } of classifyLetters(fullName)) {
     const isConsonant = !isVowel && value > 0;
     
     analysis.push({
       letter,
-      position: position++,
+      position,
       value,
       isVowel,
       isConsonant,
