@@ -29,7 +29,15 @@ const mockCourses: Course[] = [
 ];
 
 const Courses = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const c = {
+    ro: { title: 'Cursuri Numerologie', subtitle: 'Învață numerologia pas cu pas prin cursuri structurate', badge: 'Cursuri',
+          soon: 'În curând', soonDesc: 'Pregătim cursuri structurate de numerologie. Revino în curând.' },
+    en: { title: 'Numerology Courses', subtitle: 'Learn numerology step by step through structured courses', badge: 'Courses',
+          soon: 'Coming soon', soonDesc: 'Structured numerology courses are in preparation. Check back soon.' },
+    ru: { title: 'Курсы нумерологии', subtitle: 'Изучайте нумерологию шаг за шагом', badge: 'Курсы',
+          soon: 'Скоро', soonDesc: 'Структурированные курсы по нумерологии готовятся. Загляните позже.' },
+  }[language] ?? { title: 'Numerology Courses', subtitle: '', badge: 'Courses', soon: 'Coming soon', soonDesc: '' };
   const [courses] = useState<Course[]>(mockCourses);
   const [progressData, setProgressData] = useState<CourseProgress[]>([]);
 
@@ -48,28 +56,23 @@ const Courses = () => {
   return (
     <PageLayout>
       <PageHeader
-        title="Cursuri Numerologie"
-        subtitle="Învață numerologia pas cu pas prin cursuri structurate"
+        title={c.title}
+        subtitle={c.subtitle}
         badge={{
           icon: <GraduationCap className="h-4 w-4 text-primary" />,
-          label: 'Cursuri'
+          label: c.badge
         }}
       />
 
       <main className="relative z-10 px-4 pb-16">
         <div className="max-w-6xl mx-auto space-y-8">
-          {/* Courses Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {courses.map((course) => {
-              const progress = progressData.find(p => p.courseId === course.id);
-              return (
-                <CourseCard
-                  key={course.id}
-                  course={course}
-                  progress={progress}
-                />
-              );
-            })}
+          {/* The two entries here were mock data with no lessons, and their cards
+              linked to /courses/:id, a route that does not exist. Showing an honest
+              placeholder until there is real course content. */}
+          <div className="max-w-xl mx-auto text-center py-16 space-y-3">
+            <GraduationCap className="h-10 w-10 text-primary mx-auto opacity-70" />
+            <h2 className="font-cinzel text-2xl text-foreground">{c.soon}</h2>
+            <p className="text-muted-foreground">{c.soonDesc}</p>
           </div>
 
           {/* Empty State */}
