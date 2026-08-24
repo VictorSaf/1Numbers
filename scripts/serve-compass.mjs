@@ -35,15 +35,14 @@ const MIME = {
 const isClientRoute = (pathname) => !extname(pathname);
 
 // The build emits no inline <script>, so script-src needs no 'unsafe-inline'.
-// style-src does: React and Recharts set style attributes at runtime, and the
-// stylesheet pulls Cinzel/Raleway from Google Fonts. Dropping those two font
-// origins is the reward for self-hosting the fonts later.
+// style-src still does: React and Recharts set style attributes at runtime.
+// Both Google font origins are gone now that the fonts are served from here.
 // img-src allows data: and blob: because html2canvas rasterises through both.
 const CSP = [
   "default-src 'self'",
   "script-src 'self'",
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "font-src 'self' https://fonts.gstatic.com",
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self'",
   "img-src 'self' data: blob:",
   "connect-src 'self'",
   "manifest-src 'self'",
