@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { ChevronDown, ChevronUp, Type, Eye, Sparkles, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,7 +16,14 @@ import {
   type ConsonantAnalysis,
   type HiddenNumber,
 } from "@/lib/nameAnalysis";
-import { LetterAnalysisChart } from "./charts/LetterAnalysisChart";
+const LetterAnalysisChart = lazy(() => import("./charts/LetterAnalysisChart").then(m => ({ default: m.LetterAnalysisChart })));
+
+// Chart loading skeleton
+const ChartSkeleton = () => (
+  <div className="h-48 flex items-center justify-center">
+    <div className="animate-pulse w-full h-32 bg-primary/10 rounded border border-primary/20" />
+  </div>
+);
 
 interface NameAnalysisCardProps {
   fullName: string;
@@ -54,7 +61,9 @@ export const NameAnalysisCard = ({ fullName }: NameAnalysisCardProps) => {
             <Eye className="h-4 w-4 text-primary" />
             {t.nameAnalysis?.letterDistribution || "Distribuția Literelor"}
           </h3>
-          <LetterAnalysisChart name={fullName} />
+          <Suspense fallback={<ChartSkeleton />}>
+            <LetterAnalysisChart name={fullName} />
+          </Suspense>
         </div>
 
         {/* Individual Letters Analysis */}
