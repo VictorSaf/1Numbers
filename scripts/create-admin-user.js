@@ -55,9 +55,24 @@ if (!DATABASE_URL) {
   process.exit(1);
 }
 
-const ADMIN_EMAIL = 'victor@victor.ro';
-const ADMIN_PASSWORD = 'victor';
-const ADMIN_NAME = 'Victor';
+// Credentials come from the environment. A hardcoded password here ends up in
+// git history permanently, which is exactly what happened to the previous
+// default and is why it had to be rotated. Run as:
+//   ADMIN_EMAIL=you@example.com ADMIN_PASSWORD='...' npm run create-admin-user
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+const ADMIN_NAME = process.env.ADMIN_NAME || 'Admin';
+
+if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
+  console.error('❌ ADMIN_EMAIL and ADMIN_PASSWORD environment variables are required.');
+  console.error("   Example: ADMIN_EMAIL=you@example.com ADMIN_PASSWORD='...' npm run create-admin-user");
+  process.exit(1);
+}
+
+if (ADMIN_PASSWORD.length < 12) {
+  console.error('❌ ADMIN_PASSWORD must be at least 12 characters.');
+  process.exit(1);
+}
 
 // Create PostgreSQL connection pool
 const pool = new Pool({
@@ -68,7 +83,6 @@ const pool = new Pool({
 async function createAdminUser() {
   console.log('🚀 Creating admin user...\n');
   console.log(`Email: ${ADMIN_EMAIL}`);
-  console.log(`Password: ${ADMIN_PASSWORD}`);
   console.log(`Name: ${ADMIN_NAME}\n`);
 
   const client = await pool.connect();
@@ -100,7 +114,7 @@ async function createAdminUser() {
       console.log(`ℹ️  User already exists: ${existingUser.rows[0].email}`);
       
       // Update existing user to admin
-      const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 10);
+      const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 12);
       await client.query(
         `UPDATE users 
          SET password_hash = $1, name = $2, role = 'admin', updated_at = NOW()
@@ -111,7 +125,7 @@ async function createAdminUser() {
     } else {
       // Step 3: Create new admin user
       console.log('📝 Step 3: Creating new admin user...');
-      const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 10);
+      const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 12);
       
       const result = await client.query(
         `INSERT INTO users (email, password_hash, name, role)
