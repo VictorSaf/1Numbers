@@ -150,7 +150,7 @@ export const generateFullReportPDF = async (
   doc.setFontSize(10);
   doc.setTextColor(100, 100, 100);
   yPos += 7;
-  doc.text(lifePathMeaning.description[data.language].substring(0, 150) + '...', margin, yPos, { maxWidth: pageWidth - 2 * margin });
+  doc.text(lifePathMeaning.description.substring(0, 150) + '...', margin, yPos, { maxWidth: pageWidth - 2 * margin });
   yPos += 12;
   
   // Destiny
@@ -164,7 +164,7 @@ export const generateFullReportPDF = async (
   doc.setFontSize(10);
   doc.setTextColor(100, 100, 100);
   yPos += 7;
-  doc.text(destinyMeaning.description[data.language].substring(0, 150) + '...', margin, yPos, { maxWidth: pageWidth - 2 * margin });
+  doc.text(destinyMeaning.description.substring(0, 150) + '...', margin, yPos, { maxWidth: pageWidth - 2 * margin });
   yPos += 12;
   
   // Soul Urge
@@ -178,7 +178,7 @@ export const generateFullReportPDF = async (
   doc.setFontSize(10);
   doc.setTextColor(100, 100, 100);
   yPos += 7;
-  doc.text(soulUrgeMeaning.description[data.language].substring(0, 150) + '...', margin, yPos, { maxWidth: pageWidth - 2 * margin });
+  doc.text(soulUrgeMeaning.description.substring(0, 150) + '...', margin, yPos, { maxWidth: pageWidth - 2 * margin });
   yPos += 12;
   
   // Personality
@@ -192,7 +192,7 @@ export const generateFullReportPDF = async (
   doc.setFontSize(10);
   doc.setTextColor(100, 100, 100);
   yPos += 7;
-  doc.text(personalityMeaning.description[data.language].substring(0, 150) + '...', margin, yPos, { maxWidth: pageWidth - 2 * margin });
+  doc.text(personalityMeaning.description.substring(0, 150) + '...', margin, yPos, { maxWidth: pageWidth - 2 * margin });
   yPos += 12;
   
   // Personal Year
