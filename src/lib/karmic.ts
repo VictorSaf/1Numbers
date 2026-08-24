@@ -1,5 +1,5 @@
 import { reduceToSingleDigit } from "./numerology";
-import { splitLetters, sumLetters, pythagoreanValue } from './numerology-plus';
+import { classifyFullName, sumLetters, PYTHAGOREAN } from './numerology-plus';
 
 export interface KarmicDebtInfo {
   number: number;
@@ -53,11 +53,9 @@ export const calculateKarmicDebts = (
   // stripped diacritics instead of transliterating them and treated Y as always a
   // consonant, so this module disagreed with the main result for any name
   // containing ș, ț, ă or Y -- on the same page, side by side.
-  const { vowels, consonants, all } = splitLetters(fullName);
-
-  const destinySum = sumLetters(all);
-  const soulUrgeSum = sumLetters(vowels);
-  const personalitySum = sumLetters(consonants);
+  const destinySum = sumLetters(fullName);
+  const soulUrgeSum = sumLetters(fullName, PYTHAGOREAN, (l) => l.vowel);
+  const personalitySum = sumLetters(fullName, PYTHAGOREAN, (l) => !l.vowel);
 
   
   if (KARMIC_DEBT_NUMBERS.includes(destinySum)) {
@@ -77,8 +75,8 @@ export const calculateKarmicDebts = (
 export const calculateKarmicLessons = (fullName: string): number[] => {
   const presentNumbers = new Set<number>();
 
-  for (const char of splitLetters(fullName).all) {
-    const value = pythagoreanValue(char);
+  for (const { ch } of classifyFullName(fullName)) {
+    const value = PYTHAGOREAN[ch];
     if (value) {
       presentNumbers.add(value);
     }

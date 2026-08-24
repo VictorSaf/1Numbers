@@ -1,0 +1,13 @@
+import { fullProfile } from './index.js';
+const p = fullProfile('Victor Ion Safta', { day:25, month:8, year:1990 }, { gender:'male', today:new Date(2026,7,24) });
+console.log('lifePath', p.pythagorean.core.lifePath.value, '| karmicDebt', p.pythagorean.core.lifePath.karmicDebt);
+console.log('maturity', p.pythagorean.extended.maturity.value, '| hiddenPassion', p.pythagorean.extended.hiddenPassion.value);
+console.log('planes', Object.fromEntries(Object.entries(p.pythagorean.planes.planeTotals).map(([k,v])=>[k,v.count])));
+console.log('essence@36', p.pythagorean.transits.essence.value, '| age', p.pythagorean.transits.age);
+console.log('vedic', p.vedic.mulank, p.vedic.bhagyank, p.vedic.naamank.compound+'/'+p.vedic.naamank.root, p.vedic.harmony);
+console.log('kua', p.kua?.kua, p.kua?.group, p.kua?.favorable);
+console.log('chaldean', p.chaldean.display, p.chaldean.compoundMeaning);
+console.log('matrix', p.destinyMatrix.byKey);
+console.log('periods[0..2]', p.destinyMatrix.periods.slice(0,3));
+console.log('biorhythm today', p.biorhythms.series.find(r=>r.offset===0));
+console.log('karmicDebts', p.pythagorean.karmicDebts);

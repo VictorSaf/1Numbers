@@ -1,5 +1,6 @@
 import {
   reduce,
+  toBirthDate,
   lifePath as lifePathPlus,
   expression as expressionPlus,
   soulUrge as soulUrgePlus,
@@ -30,7 +31,7 @@ export const reduceToSingleDigit = (num: number, preserveMaster = true): number 
   reduce(num, preserveMaster);
 
 // Calculate Life Path Number from birth date
-export const calculateLifePathNumber = (birthDate: Date): number => lifePathPlus(birthDate).value;
+export const calculateLifePathNumber = (birthDate: Date): number => lifePathPlus(toBirthDate(birthDate)).value;
 
 // Calculate name number from letters
 const calculateNameNumber = (name: string, filterFn?: (char: string) => boolean): number => {
@@ -59,7 +60,7 @@ export const calculatePersonalityNumber = (fullName: string): number => personal
 export const calculatePersonalYearNumber = (
   birthDate: Date,
   year: number = new Date().getFullYear(),
-): number => personalYearPlus(birthDate, year).value;
+): number => personalYearPlus(toBirthDate(birthDate), year).value;
 
 // Number interpretations
 export const NUMBER_MEANINGS: Record<number, { title: string; traits: string[]; description: string }> = {

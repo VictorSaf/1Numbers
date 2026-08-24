@@ -1,18 +1,20 @@
 import { describe, it, expect } from 'vitest';
-import { splitLetters, classifyLetters } from '../core';
+import { classifyFullName, PYTHAGOREAN, toBirthDate } from '../core';
+import { lifePath } from '../pythagorean';
+import * as M from '../matrix';
+import * as S from '../systems';
 import { analyzeIndividualLetters } from '@/lib/nameAnalysis';
 import { calculateKarmicLessons } from '@/lib/karmic';
 
 /**
- * These guard the property the unit tests could not: that separate modules agree
- * with each other. Every module used to carry its own letter table, its own
- * vowel list and its own name cleaning, so each was internally consistent and
- * collectively wrong -- the results page could show one Soul Urge in the header
- * and analyse a different set of letters directly underneath it.
+ * Guards the property unit tests cannot: that separate modules agree with each
+ * other. Every module used to carry its own letter table, its own vowel list and
+ * its own name cleaning, so each was internally consistent and collectively
+ * wrong -- the results page showed one Soul Urge in the header and analysed a
+ * different set of letters underneath it.
  *
- * Names chosen for the two ways the old copies diverged: Romanian diacritics,
- * which were dropped rather than transliterated, and Y, which was always a
- * consonant regardless of Y_VOWEL_MODE.
+ * Names chosen for the two ways those copies diverged: Romanian diacritics,
+ * dropped rather than transliterated, and Y, treated as always a consonant.
  */
 const NAMES = [
   'Ștefan Mureșan',
@@ -24,13 +26,11 @@ const NAMES = [
 ];
 
 describe('modules agree with the engine', () => {
-  it.each(NAMES)('analyzeIndividualLetters sees the same letters as the engine: %s', (name) => {
-    const core = splitLetters(name);
+  it.each(NAMES)('analyzeIndividualLetters sees the same letters: %s', (name) => {
+    const core = classifyFullName(name);
     const letters = analyzeIndividualLetters(name);
-
-    expect(letters).toHaveLength(core.all.length);
-    expect(letters.filter((l) => l.isVowel)).toHaveLength(core.vowels.length);
-    expect(letters.filter((l) => l.isConsonant)).toHaveLength(core.consonants.length);
+    expect(letters).toHaveLength(core.length);
+    expect(letters.filter((l) => l.isVowel)).toHaveLength(core.filter((l) => l.vowel).length);
   });
 
   it.each(NAMES)('positions run 1..n without gaps: %s', (name) => {
@@ -38,17 +38,41 @@ describe('modules agree with the engine', () => {
     expect(letters.map((l) => l.position)).toEqual(letters.map((_, i) => i + 1));
   });
 
-  it.each(NAMES)('a karmic lesson is never a number present in the name: %s', (name) => {
-    const present = new Set(classifyLetters(name).map((l) => l.value));
-    const contradictions = calculateKarmicLessons(name).filter((n) => present.has(n));
-    expect(contradictions).toEqual([]);
+  it.each(NAMES)('a karmic lesson is never present in the name: %s', (name) => {
+    const present = new Set(classifyFullName(name).map((l) => PYTHAGOREAN[l.ch]));
+    expect(calculateKarmicLessons(name).filter((n) => present.has(n))).toEqual([]);
+  });
+});
+
+describe('published reference values', () => {
+  it('Life Path 25.08.1990 is 7 from a raw 16', () => {
+    const lp = lifePath(toBirthDate(new Date(1990, 7, 25)));
+    expect([lp.value, lp.raw, lp.karmicDebt]).toEqual([7, 16, 16]);
   });
 
-  it('classifyLetters and splitLetters resolve Y identically', () => {
-    for (const name of NAMES) {
-      const bySplit = splitLetters(name).vowels.length;
-      const byClassify = classifyLetters(name).filter((l) => l.isVowel).length;
-      expect(byClassify).toBe(bySplit);
+  it('Destiny Matrix 25.08.1990 matches the published worked example', () => {
+    const at = (k: string) => M.destinyMatrix(toBirthDate(new Date(1990, 7, 25)))
+      .points.find((p) => p.key === k)?.arcana;
+    expect(['A', 'B', 'C', 'D', 'E'].map(at)).toEqual([7, 8, 19, 7, 5]);
+  });
+
+  it('every matrix point lands inside the arcana range', () => {
+    for (const d of [new Date(1990, 7, 25), new Date(1985, 0, 1), new Date(2003, 11, 31)]) {
+      for (const { arcana } of M.destinyMatrix(toBirthDate(d)).points) {
+        expect(arcana).toBeGreaterThanOrEqual(1);
+        expect(arcana).toBeLessThanOrEqual(22);
+      }
     }
+  });
+
+  it('Kua follows the classic rule for both sexes', () => {
+    expect(S.kuaNumber(1990, 'male').kua).toBe(1);
+    expect(S.kuaNumber(1990, 'female').kua).toBe(8);
+    expect(S.kuaNumber(1985, 'male').kua).toBe(6);
+    expect(S.kuaNumber(1985, 'female').kua).toBe(9);
+  });
+
+  it('Bhagyank 14.04.1995 is 6', () => {
+    expect(S.bhagyank(toBirthDate(new Date(1995, 3, 14)))).toBe(6);
   });
 });

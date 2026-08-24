@@ -4,7 +4,7 @@ import {
   calculatePersonalityNumber,
   getNumberMeaning 
 } from './numerology';
-import { classifyLetters } from './numerology-plus';
+import { classifyFullName, PYTHAGOREAN } from './numerology-plus';
 
 export interface NameAnalysis {
   destinyNumber: number;
@@ -456,7 +456,9 @@ export const analyzeIndividualLetters = (fullName: string): LetterAnalysis[] => 
   // contradicted the numbers shown directly above it on the results page.
   const analysis: LetterAnalysis[] = [];
 
-  for (const { letter, value, isVowel, position } of classifyLetters(fullName)) {
+  for (const [index, { ch: letter, vowel: isVowel }] of classifyFullName(fullName).entries()) {
+    const value = PYTHAGOREAN[letter] ?? 0;
+    const position = index + 1;
     const isConsonant = !isVowel && value > 0;
     
     analysis.push({

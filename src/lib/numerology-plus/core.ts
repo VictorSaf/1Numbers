@@ -1,156 +1,195 @@
-import {
-  KARMIC_DEBT_TOTALS,
-  MASTER_NUMBERS,
-  Y_VOWEL_MODE,
-} from './conventions';
+/**
+ * numerology-plus / core
+ *
+ * Fundația refactorizată: fiecare calcul întoarce ȘI totalul dinaintea reducerii.
+ * Fără `raw`, datoriile karmice nu pot fi detectate corect.
+ *
+ * CONVENȚII CONTESTATE — sursele din piață se contrazic. Fiecare e o constantă
+ * cu nume explicit, ca să fie o decizie conștientă și nu un accident.
+ */
+
+// ─────────────────────────────────────────────────────────────
+// Convenții configurabile
+// ─────────────────────────────────────────────────────────────
+
+/** Y ca vocală. Decoz și Numerologist.com diferă. 'heuristic' = Y e vocală doar
+ *  când e singura vocală din silabă (Bryn, Kylie) sau finală după consoană (Mary). */
+export type YMode = 'never' | 'always' | 'heuristic';
+export const Y_VOWEL_MODE: YMode = 'heuristic';
+
+/** Master 33: Decoz îl reduce la 6 „în sistemul clasic"; alte motoare îl păstrează. */
+export const KEEP_MASTER_33 = true;
+
+export const MASTERS = [11, 22, 33] as const;
+export const KARMIC_DEBTS = [13, 14, 16, 19] as const;
+
+// ─────────────────────────────────────────────────────────────
+// Tabele de litere
+// ─────────────────────────────────────────────────────────────
+
+export const PYTHAGOREAN: Record<string, number> = {
+  A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,
+  J:1,K:2,L:3,M:4,N:5,O:6,P:7,Q:8,R:9,
+  S:1,T:2,U:3,V:4,W:5,X:6,Y:7,Z:8,
+};
+
+/** Chaldean: 9 nu se atribuie niciunei litere (număr sacru). */
+export const CHALDEAN: Record<string, number> = {
+  A:1,I:1,J:1,Q:1,Y:1,
+  B:2,K:2,R:2,
+  C:3,G:3,L:3,S:3,
+  D:4,M:4,T:4,
+  E:5,H:5,N:5,X:5,
+  U:6,V:6,W:6,
+  O:7,Z:7,
+  F:8,P:8,
+};
+
+/** „Kabbalah" populară (mod-9 ciclic). NU e gematria ebraică — vezi kabbalah.ts. */
+export const KABBALAH_SIMPLE: Record<string, number> = (() => {
+  const t: Record<string, number> = {};
+  'ABCDEFGHI'.split('').forEach((c, i) => (t[c] = i + 1));
+  'JKLMNOPQR'.split('').forEach((c, i) => (t[c] = i + 1));
+  'STUVWXYZ'.split('').forEach((c, i) => (t[c] = i + 1));
+  return t;
+})();
+
+const HARD_VOWELS = new Set(['A', 'E', 'I', 'O', 'U']);
+
+// ─────────────────────────────────────────────────────────────
+// Normalizare
+// ─────────────────────────────────────────────────────────────
+
+/** Elimină diacriticele (ă→a, ș→s, й→и nu se atinge) și păstrează doar A–Z. */
+export function normalizeName(name: string): string {
+  return name
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/ș|ş/gi, 's')
+    .replace(/ț|ţ/gi, 't')
+    .toUpperCase()
+    .replace(/[^A-Z\s'-]/g, '');
+}
+
+export function letters(name: string): string[] {
+  return normalizeName(name).replace(/[^A-Z]/g, '').split('');
+}
+
+export function nameParts(name: string): string[] {
+  return normalizeName(name).split(/[\s'-]+/).filter(Boolean);
+}
+
+// ─────────────────────────────────────────────────────────────
+// Vocale / consoane (cu tratarea lui Y)
+// ─────────────────────────────────────────────────────────────
 
 /**
- * Every calculation returns this shape.
- *
- * `raw` is the total before the final reduction and is not decoration: karmic
- * debt is a property of that total, not of the digit it reduces to. A function
- * that returns only 7 cannot say whether it came from 16 (debt) or 25 (no debt),
- * so the previous engine could not detect debts at all.
+ * Marchează fiecare literă a unui cuvânt ca vocală sau consoană.
+ * Euristica pentru Y: e vocală dacă în cuvânt nu există altă vocală tare,
+ * SAU dacă e precedată de consoană și nu urmată de vocală (Mary, Lynn, Bryn).
  */
-export interface NumerologyResult {
-  /** Total before the final reduction. */
+export function classifyLetters(word: string): Array<{ ch: string; vowel: boolean }> {
+  const w = word.toUpperCase().replace(/[^A-Z]/g, '');
+  const hasHardVowel = w.split('').some((c) => HARD_VOWELS.has(c));
+  return w.split('').map((ch, i) => {
+    if (HARD_VOWELS.has(ch)) return { ch, vowel: true };
+    if (ch !== 'Y') return { ch, vowel: false };
+    if (Y_VOWEL_MODE === 'always') return { ch, vowel: true };
+    if (Y_VOWEL_MODE === 'never') return { ch, vowel: false };
+    if (!hasHardVowel) return { ch, vowel: true };
+    const prev = w[i - 1];
+    const next = w[i + 1];
+    const prevIsConsonant = prev !== undefined && !HARD_VOWELS.has(prev);
+    const nextIsVowel = next !== undefined && HARD_VOWELS.has(next);
+    return { ch, vowel: prevIsConsonant && !nextIsVowel };
+  });
+}
+
+export function classifyFullName(name: string): Array<{ ch: string; vowel: boolean }> {
+  return nameParts(name).flatMap(classifyLetters);
+}
+
+// ─────────────────────────────────────────────────────────────
+// Reducere
+// ─────────────────────────────────────────────────────────────
+
+export function digitSum(n: number): number {
+  return Math.abs(n).toString().split('').reduce((a, d) => a + Number(d), 0);
+}
+
+export function isMaster(n: number): boolean {
+  if (n === 33) return KEEP_MASTER_33;
+  return n === 11 || n === 22;
+}
+
+/** Reducere cu păstrarea opțională a numerelor master. */
+export function reduce(n: number, keepMasters = true): number {
+  let x = Math.abs(n);
+  while (x > 9) {
+    if (keepMasters && isMaster(x)) return x;
+    x = digitSum(x);
+  }
+  return x;
+}
+
+export interface NumResult {
+  /** Totalul înainte de reducerea finală — necesar pentru datoriile karmice. */
   raw: number;
-  /** Final value, after reduction. */
   value: number;
-  /** Whether `value` is a master number that survived reduction. */
   isMaster: boolean;
-  /** 13, 14, 16 or 19 when `raw` carries a karmic debt, otherwise null. */
   karmicDebt: number | null;
 }
 
-const isMasterNumber = (n: number, keepMasters: boolean) =>
-  keepMasters && MASTER_NUMBERS.includes(n);
-
-const digitSum = (n: number): number =>
-  String(Math.abs(n))
-    .split('')
-    .reduce((sum, d) => sum + Number(d), 0);
-
-/** Reduce to a single digit, optionally stopping on master numbers. */
-export const reduce = (n: number, keepMasters = true): number => {
-  let current = Math.abs(n);
-  while (current > 9 && !isMasterNumber(current, keepMasters)) {
-    current = digitSum(current);
-  }
-  return current;
-};
-
-/** Wrap a raw total into the full result shape. */
-export const toResult = (raw: number, keepMasters = true): NumerologyResult => {
+export function result(raw: number, keepMasters = true): NumResult {
   const value = reduce(raw, keepMasters);
   return {
     raw,
     value,
-    isMaster: isMasterNumber(value, keepMasters),
-    karmicDebt: KARMIC_DEBT_TOTALS.includes(raw) ? raw : null,
+    isMaster: isMaster(value),
+    karmicDebt: (KARMIC_DEBTS as readonly number[]).includes(raw) ? raw : null,
   };
-};
-
-// --- letters -------------------------------------------------------------
-
-/**
- * Strip diacritics so Romanian and Russian-transliterated input scores the same
- * as its ASCII spelling: ă/â/î -> a/a/i, ș -> s, ț -> t.
- */
-export const normalizeName = (name: string): string =>
-  name
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    // Comma-below forms used by Romanian are separate codepoints, not combining marks.
-    .replace(/[șş]/gi, (m) => (m === m.toUpperCase() ? 'S' : 's'))
-    .replace(/[țţ]/gi, (m) => (m === m.toUpperCase() ? 'T' : 't'))
-    .toUpperCase()
-    .replace(/[^A-Z\s'-]/g, '');
-
-/** Pythagorean values: A=1..I=9, J=1..R=9, S=1..Z=8. */
-export const pythagoreanValue = (letter: string): number => {
-  const code = letter.toUpperCase().charCodeAt(0);
-  if (code < 65 || code > 90) return 0;
-  return ((code - 65) % 9) + 1;
-};
-
-const HARD_VOWELS = new Set(['A', 'E', 'I', 'O', 'U']);
-
-/**
- * Whether the Y at `index` of `word` counts as a vowel, under Y_VOWEL_MODE.
- *
- * The heuristic reading: a Y is a vowel when its word has no other hard vowel
- * (LYNN, BRYN), or when it follows a consonant and is not followed by a vowel
- * (MARY). Both clauses are needed; either alone misses one of those names.
- */
-export const isYVowel = (word: string, index: number): boolean => {
-  if (Y_VOWEL_MODE === 'always') return true;
-  if (Y_VOWEL_MODE === 'never') return false;
-
-  const hasOtherHardVowel = [...word].some((c) => HARD_VOWELS.has(c));
-  if (!hasOtherHardVowel) return true;
-
-  const prev = word[index - 1];
-  const next = word[index + 1];
-  const followsConsonant = prev !== undefined && !HARD_VOWELS.has(prev) && prev !== 'Y';
-  const notFollowedByVowel = next === undefined || !HARD_VOWELS.has(next);
-  return followsConsonant && notFollowedByVowel;
-};
-
-export interface LetterSplit {
-  vowels: string[];
-  consonants: string[];
-  all: string[];
 }
 
-/** Split a normalized name into vowels and consonants, resolving Y per word. */
-export const splitLetters = (name: string): LetterSplit => {
-  const vowels: string[] = [];
-  const consonants: string[] = [];
-  const all: string[] = [];
+// ─────────────────────────────────────────────────────────────
+// Sume de litere
+// ─────────────────────────────────────────────────────────────
 
-  for (const word of normalizeName(name).split(/[\s'-]+/).filter(Boolean)) {
-    [...word].forEach((letter, index) => {
-      all.push(letter);
-      const isVowel = HARD_VOWELS.has(letter) || (letter === 'Y' && isYVowel(word, index));
-      (isVowel ? vowels : consonants).push(letter);
-    });
-  }
+export type LetterTable = Record<string, number>;
 
-  return { vowels, consonants, all };
-};
-
-export interface ClassifiedLetter {
-  letter: string;
-  value: number;
-  isVowel: boolean;
-  /** 1-based position across the whole name, ignoring spaces and punctuation. */
-  position: number;
+export function sumLetters(
+  name: string,
+  table: LetterTable = PYTHAGOREAN,
+  filter?: (l: { ch: string; vowel: boolean }) => boolean,
+): number {
+  return classifyFullName(name)
+    .filter((l) => (filter ? filter(l) : true))
+    .reduce((a, l) => a + (table[l.ch] ?? 0), 0);
 }
 
-/**
- * Letters in order, each with its value and vowel flag.
- *
- * splitLetters groups letters and loses their order, which is what per-letter
- * views need. Both resolve Y through the same rule, so a letter cannot be a
- * vowel in one part of the app and a consonant in another.
- */
-export const classifyLetters = (name: string): ClassifiedLetter[] => {
-  const out: ClassifiedLetter[] = [];
-  let position = 1;
-  for (const word of normalizeName(name).split(/[\s'-]+/).filter(Boolean)) {
-    [...word].forEach((letter, index) => {
-      out.push({
-        letter,
-        value: pythagoreanValue(letter),
-        isVowel: HARD_VOWELS.has(letter) || (letter === 'Y' && isYVowel(word, index)),
-        position: position++,
-      });
-    });
+/** Frecvența cifrelor 1–9 în tot numele. Baza pentru Pasiune Ascunsă,
+ *  Lecții Karmice, Tabel de Incluziune și Subconștient. */
+export function letterFrequency(name: string, table: LetterTable = PYTHAGOREAN): Record<number, number> {
+  const freq: Record<number, number> = { 1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0 };
+  for (const ch of letters(name)) {
+    const v = table[ch];
+    if (v && v >= 1 && v <= 9) freq[v]++;
   }
-  return out;
-};
+  return freq;
+}
 
-/** Sum Pythagorean values over a list of letters. */
-export const sumLetters = (letters: string[]): number =>
-  letters.reduce((sum, letter) => sum + pythagoreanValue(letter), 0);
+// ─────────────────────────────────────────────────────────────
+// Date
+// ─────────────────────────────────────────────────────────────
+
+export interface BirthDate { day: number; month: number; year: number }
+
+export function toBirthDate(d: Date): BirthDate {
+  return { day: d.getDate(), month: d.getMonth() + 1, year: d.getFullYear() };
+}
+
+export function daysBetween(a: Date, b: Date): number {
+  const MS = 86_400_000;
+  const ua = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+  const ub = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+  return Math.round((ub - ua) / MS);
+}
