@@ -27,6 +27,9 @@ import { api } from '@/services/api';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { getTierById, type PremiumTier } from '@/lib/premium';
 
+// Flip to true once checkout is implemented end to end.
+const PAYMENTS_ENABLED = false;
+
 const Premium = () => {
   const { language } = useLanguage();
   const { user } = useAuth();
@@ -267,30 +270,35 @@ const Premium = () => {
           <TabsContent value="plans" className="space-y-8 mt-6">
             <PricingCards currentTier={currentTier} />
 
-            {/* Trust Badges */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="flex items-center gap-3 p-4 rounded-lg border bg-card">
-                <Shield className="h-8 w-8 text-green-500" />
-                <div>
-                  <p className="font-semibold">{t.guarantee}</p>
-                  <p className="text-sm text-muted-foreground">{t.guaranteeDesc}</p>
+            {/* Trust badges promise a refund window, secure payment and priority
+                support, but no payment processor is wired up yet (see the TODO in
+                server/src/routes/subscriptions.ts). Hidden until checkout works, so
+                the page cannot make promises the flow cannot keep. */}
+            {PAYMENTS_ENABLED && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="flex items-center gap-3 p-4 rounded-lg border bg-card">
+                  <Shield className="h-8 w-8 text-green-500" />
+                  <div>
+                    <p className="font-semibold">{t.guarantee}</p>
+                    <p className="text-sm text-muted-foreground">{t.guaranteeDesc}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 p-4 rounded-lg border bg-card">
+                  <Shield className="h-8 w-8 text-blue-500" />
+                  <div>
+                    <p className="font-semibold">{t.securePayment}</p>
+                    <p className="text-sm text-muted-foreground">{t.securePaymentDesc}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 p-4 rounded-lg border bg-card">
+                  <Clock className="h-8 w-8 text-purple-500" />
+                  <div>
+                    <p className="font-semibold">{t.support}</p>
+                    <p className="text-sm text-muted-foreground">{t.supportDesc}</p>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-4 rounded-lg border bg-card">
-                <Shield className="h-8 w-8 text-blue-500" />
-                <div>
-                  <p className="font-semibold">{t.securePayment}</p>
-                  <p className="text-sm text-muted-foreground">{t.securePaymentDesc}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-4 rounded-lg border bg-card">
-                <Clock className="h-8 w-8 text-purple-500" />
-                <div>
-                  <p className="font-semibold">{t.support}</p>
-                  <p className="text-sm text-muted-foreground">{t.supportDesc}</p>
-                </div>
-              </div>
-            </div>
+            )}
           </TabsContent>
 
           <TabsContent value="consultant" className="mt-6">

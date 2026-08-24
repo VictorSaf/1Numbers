@@ -1,7 +1,8 @@
 // PricingCards Component
 // Displays tier-based pricing with feature comparison
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { API_BASE } from '@/lib/apiBase';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,6 +31,31 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
   const { user } = useAuth();
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('yearly');
   const [loadingTier, setLoadingTier] = useState<PremiumTier | null>(null);
+
+  // Amounts come from the server, never from the bundle: the two used to disagree
+  // by up to 2.5x. While this is null no price is rendered at all -- showing a
+  // stale or guessed figure on a checkout page is worse than showing none.
+  const [serverPricing, setServerPricing] = useState<Record<string, { monthly: number; yearly: number }> | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${API_BASE}/subscriptions/plans`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((data) => {
+        if (cancelled) return;
+        const byName: Record<string, { monthly: number; yearly: number }> = {};
+        for (const plan of data.plans ?? []) {
+          byName[plan.name] = { monthly: Number(plan.priceMonthly), yearly: Number(plan.priceYearly) };
+        }
+        setServerPricing(byName);
+      })
+      .catch(() => {
+        if (!cancelled) setServerPricing(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const translations: Record<string, Record<string, string>> = {
     ro: {
@@ -170,17 +196,10 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
           const isCurrentTier = tier.id === currentTier;
           const isHighlighted = tier.highlighted;
           const isFree = tier.id === 'free';
-          const price = tier.pricing
-            ? billingPeriod === 'monthly'
-              ? tier.pricing.monthly
-              : tier.pricing.yearly / 12
-            : 0;
-          const totalPrice = tier.pricing
-            ? billingPeriod === 'monthly'
-              ? tier.pricing.monthly
-              : tier.pricing.yearly
-            : 0;
-          const savings = tier.pricing ? calculateYearlySavings(tier) : 0;
+          const amounts = serverPricing?.[tier.id] ?? null;
+          const price = amounts ? (billingPeriod === 'monthly' ? amounts.monthly : amounts.yearly / 12) : 0;
+          const totalPrice = amounts ? (billingPeriod === 'monthly' ? amounts.monthly : amounts.yearly) : 0;
+          const savings = amounts ? calculateYearlySavings(amounts.monthly, amounts.yearly) : 0;
 
           return (
             <Card
@@ -220,6 +239,10 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
                 <div className="text-center mb-6">
                   {isFree ? (
                     <div className="text-4xl font-bold">{t.free}</div>
+                  ) : !amounts ? (
+                    <div className="h-16 flex items-center justify-center">
+                      <div className="h-8 w-28 rounded bg-muted animate-pulse" />
+                    </div>
                   ) : (
                     <>
                       <div className="flex items-baseline justify-center gap-1">

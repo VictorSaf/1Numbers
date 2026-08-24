@@ -3,10 +3,11 @@
 
 export type PremiumTier = 'free' | 'premium' | 'pro';
 
+// Presentation only. Amounts deliberately live on the server (subscription_plans)
+// so the price shown can never drift from the price charged; the UI reads them
+// from GET /api/subscriptions/plans.
 export interface TierPricing {
-  monthly: number;
-  yearly: number;
-  yearlyDiscount: number; // percentage saved
+  yearlyDiscount: number; // percentage saved, for the marketing badge
   currency: string;
 }
 
@@ -133,8 +134,6 @@ export const TIERS: TierDefinition[] = [
       ru: 'Полный опыт нумерологии для энтузиастов',
     },
     pricing: {
-      monthly: 4.99,
-      yearly: 39.99,
       yearlyDiscount: 33,
       currency: 'EUR',
     },
@@ -248,8 +247,6 @@ export const TIERS: TierDefinition[] = [
       ru: 'Профессиональные инструменты для практиков и консультантов',
     },
     pricing: {
-      monthly: 9.99,
-      yearly: 79.99,
       yearlyDiscount: 33,
       currency: 'EUR',
     },
@@ -491,10 +488,8 @@ export function formatPrice(price: number, currency: string): string {
   }).format(price);
 }
 
-export function calculateYearlySavings(tier: TierDefinition): number {
-  if (!tier.pricing) return 0;
-  const monthlyTotal = tier.pricing.monthly * 12;
-  return monthlyTotal - tier.pricing.yearly;
+export function calculateYearlySavings(monthly: number, yearly: number): number {
+  return monthly * 12 - yearly;
 }
 
 // Feature comparison for upgrade prompts

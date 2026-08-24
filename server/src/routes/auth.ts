@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import pool from '../db';
+import { ipRateLimit } from '../middleware/ipRateLimit';
 
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -12,7 +13,7 @@ if (!JWT_SECRET) {
 }
 
 // Login
-router.post('/login', async (req: Request, res: Response) => {
+router.post('/login', ipRateLimit({ windowMs: 15 * 60 * 1000, max: 10 }), async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
@@ -65,7 +66,7 @@ router.post('/login', async (req: Request, res: Response) => {
 // environment rather than removed, so it can be reopened without a code change.
 const registrationOpen = process.env.ALLOW_REGISTRATION === 'true';
 
-router.post('/register', async (req: Request, res: Response) => {
+router.post('/register', ipRateLimit({ windowMs: 60 * 60 * 1000, max: 5 }), async (req: Request, res: Response) => {
   if (!registrationOpen) {
     return res.status(403).json({ error: 'Registration is currently closed' });
   }
