@@ -31,6 +31,7 @@ import { getTierById, type PremiumTier } from '@/lib/premium';
 const PAYMENTS_ENABLED = false;
 
 const Premium = () => {
+  const { isAuthenticated } = useAuth();
   const { language } = useLanguage();
   const { user } = useAuth();
   const [currentTier, setCurrentTier] = useState<PremiumTier>('free');
@@ -42,9 +43,16 @@ const Premium = () => {
   } | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Only ask about a subscription when there is someone to ask about. Calling it
+  // anonymously returned 401 on every visit, logged an error to the console and
+  // told the visitor nothing.
   useEffect(() => {
+    if (!isAuthenticated) {
+      setLoading(false);
+      return;
+    }
     loadSubscriptionStatus();
-  }, []);
+  }, [isAuthenticated]);
 
   const loadSubscriptionStatus = async () => {
     try {

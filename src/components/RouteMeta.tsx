@@ -109,9 +109,15 @@ export const RouteMeta = () => {
     }
     link.href = href;
 
+    // Routes outside META are private (auth, profile, journal, admin) and are not
+    // meant to be indexed. They still need a title: without one they inherited
+    // whatever the previously viewed route had set.
+    const fallback: Record<string, string> = {
+      ro: "Numerologia", en: "Numerology Compass", ru: "Нумерология",
+    };
     const meta = META[path]?.[language] ?? META[path]?.en;
+    document.title = meta?.title ?? fallback[language] ?? fallback.en;
     if (meta) {
-      document.title = meta.title;
       setMeta('meta[name="description"]', "name", meta.description);
       setMeta('meta[property="og:title"]', "property", meta.title);
       setMeta('meta[property="og:description"]', "property", meta.description);

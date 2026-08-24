@@ -21,6 +21,8 @@ import {
 } from '@/lib/premium';
 import { api } from '@/services/api';
 import { track } from '@/lib/analytics';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface PricingCardsProps {
   onSubscribe?: (tierId: PremiumTier, billingPeriod: 'monthly' | 'yearly') => void;
@@ -28,6 +30,9 @@ interface PricingCardsProps {
 }
 
 export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCardsProps) => {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const { language } = useLanguage();
   const { user } = useAuth();
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('yearly');
@@ -72,6 +77,10 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
       subscribe: 'Abonează-te',
       getStarted: 'Începe Gratuit',
       mostPopular: 'Cel Mai Popular',
+      loginRequired: 'Cont necesar',
+      loginRequiredDesc: 'Conectează-te sau creează un cont pentru a te abona.',
+      errorTitle: 'Abonarea nu a reușit',
+      errorGeneric: 'A apărut o eroare. Încearcă din nou.',
       bestValue: 'Cea Mai Bună Valoare',
       billedYearly: 'Facturat anual',
       billedMonthly: 'Facturat lunar',
@@ -92,6 +101,10 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
       subscribe: 'Subscribe',
       getStarted: 'Get Started Free',
       mostPopular: 'Most Popular',
+      loginRequired: 'Account required',
+      loginRequiredDesc: 'Sign in or create an account to subscribe.',
+      errorTitle: 'Subscription failed',
+      errorGeneric: 'Something went wrong. Please try again.',
       bestValue: 'Best Value',
       billedYearly: 'Billed yearly',
       billedMonthly: 'Billed monthly',
@@ -112,6 +125,10 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
       subscribe: 'Подписаться',
       getStarted: 'Начать Бесплатно',
       mostPopular: 'Самый Популярный',
+      loginRequired: 'Требуется аккаунт',
+      loginRequiredDesc: 'Войдите или создайте аккаунт, чтобы оформить подписку.',
+      errorTitle: 'Не удалось оформить подписку',
+      errorGeneric: 'Произошла ошибка. Попробуйте ещё раз.',
       bestValue: 'Лучшая Цена',
       billedYearly: 'Оплата за год',
       billedMonthly: 'Оплата за месяц',
@@ -129,6 +146,14 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
     track('subscribe_clicked', { plan: tier.id, period: billingPeriod });
     if (tier.id === 'free' || tier.id === currentTier) return;
 
+    // Subscribing needs an account; without this the request 401'd in silence.
+    // The chosen plan travels along so the visitor returns to where they were.
+    if (!isAuthenticated) {
+      toast({ title: t.loginRequired, description: t.loginRequiredDesc });
+      navigate(`/auth?redirect=${encodeURIComponent(`/premium?plan=${tier.id}&period=${billingPeriod}`)}`);
+      return;
+    }
+
     setLoadingTier(tier.id);
     try {
       if (onSubscribe) {
@@ -144,7 +169,14 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
         }
       }
     } catch (error) {
+      // Previously this only reached the console: the button stopped spinning and
+      // the visitor was told nothing at all.
       console.error('Subscription error:', error);
+      toast({
+        title: t.errorTitle,
+        description: error instanceof Error ? error.message : t.errorGeneric,
+        variant: 'destructive',
+      });
     } finally {
       setLoadingTier(null);
     }
