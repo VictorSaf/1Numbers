@@ -9,6 +9,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ProtectedAdminRoute } from "@/components/ProtectedAdminRoute";
+import { CanonicalLink } from "@/components/CanonicalLink";
 
 // Eager load - main page
 import Index from "./pages/Index";
@@ -66,6 +67,7 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
+              <CanonicalLink />
               <Suspense fallback={<PageLoader />}>
                 <Routes>
                   <Route path="/" element={<Index />} />
