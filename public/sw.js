@@ -1,13 +1,17 @@
 // Service Worker for Numerology Compass
 // Handles push notifications and offline caching
 
-const CACHE_NAME = 'numerology-compass-v1';
+// Replaced at build time (scripts/stamp-sw.mjs). A fixed name meant the activate
+// handler below never deleted anything, so one cache outlived every deploy.
+const CACHE_VERSION = '__BUILD_ID__';
+const CACHE_NAME = `numerology-compass-${CACHE_VERSION}`;
 const OFFLINE_URL = '/offline.html';
 
 // Assets to cache for offline use
+// The app shell is deliberately absent. Pre-caching '/' and '/index.html' and
+// then serving them cache-first froze returning visitors on whichever build was
+// current when the worker installed -- no redeploy could ever reach them.
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
   '/manifest.json',
 ];
 
@@ -43,34 +47,57 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
-  // Skip non-GET requests
   if (event.request.method !== 'GET') return;
-
-  // Skip API requests
   if (event.request.url.includes('/api/')) return;
 
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
+  const url = new URL(event.request.url);
+  const isNavigation = event.request.mode === 'navigate';
+  // Vite emits content-hashed filenames under /assets/, so a hit there can never
+  // be stale: a changed file gets a new name.
+  const isHashedAsset = url.pathname.startsWith('/assets/');
 
-      return fetch(event.request).then((response) => {
-        // Don't cache non-successful responses
-        if (!response || response.status !== 200 || response.type !== 'basic') {
+  if (isNavigation) {
+    // Network first, cache only as an offline fallback. The document is the one
+    // response that must never be served stale, because it names every asset.
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
           return response;
-        }
+        })
+        .catch(() => caches.match(event.request).then((cached) => cached || caches.match(OFFLINE_URL)))
+    );
+    return;
+  }
 
-        // Clone the response
-        const responseToCache = response.clone();
-
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
+  if (isHashedAsset) {
+    event.respondWith(
+      caches.match(event.request).then((cached) => {
+        if (cached) return cached;
+        return fetch(event.request).then((response) => {
+          if (response && response.status === 200 && response.type === 'basic') {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          }
+          return response;
         });
+      })
+    );
+    return;
+  }
 
+  // Everything else: try the network, fall back to whatever was stored.
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        if (response && response.status === 200 && response.type === 'basic') {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        }
         return response;
-      });
-    })
+      })
+      .catch(() => caches.match(event.request))
   );
 });
 
