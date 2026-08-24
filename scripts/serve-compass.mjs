@@ -34,10 +34,31 @@ const MIME = {
 // silently returning HTML with a 200.
 const isClientRoute = (pathname) => !extname(pathname);
 
+// The build emits no inline <script>, so script-src needs no 'unsafe-inline'.
+// style-src does: React and Recharts set style attributes at runtime, and the
+// stylesheet pulls Cinzel/Raleway from Google Fonts. Dropping those two font
+// origins is the reward for self-hosting the fonts later.
+// img-src allows data: and blob: because html2canvas rasterises through both.
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self'",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' https://fonts.gstatic.com",
+  "img-src 'self' data: blob:",
+  "connect-src 'self'",
+  "manifest-src 'self'",
+  "worker-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+].join("; ");
+
 const SECURITY_HEADERS = {
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "DENY",
   "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Content-Security-Policy": CSP,
 };
 
 // Cloudflare terminates TLS and forwards the client's original scheme. Returns

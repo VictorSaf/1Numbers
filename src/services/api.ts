@@ -120,15 +120,6 @@ class ApiService {
     });
   }
 
-  // Predictions endpoints
-  async getDailyPrediction(birthDate: string) {
-    return this.request<{ prediction: unknown }>(`/predictions/daily?birthDate=${birthDate}`);
-  }
-
-  async getMonthlyPrediction(birthDate: string, month: number, year: number) {
-    return this.request<{ prediction: unknown }>(`/predictions/monthly?birthDate=${birthDate}&month=${month}&year=${year}`);
-  }
-
   // Journal endpoints
   async createJournalEntry(data: {
     entryType: 'journal' | 'prediction';
@@ -340,19 +331,6 @@ class ApiService {
     return this.request<{ success: boolean; leaderboard: unknown[] }>(`/gamification/leaderboard${query}`);
   }
 
-  // AI Consultant endpoints
-  async sendAIMessage(message: string, context?: Record<string, unknown>) {
-    return this.request<{ success: boolean; response: string; usage?: { promptTokens: number; completionTokens: number } }>('/ai/chat', {
-      method: 'POST',
-      body: { message, context },
-    });
-  }
-
-  async getAIHistory(limit?: number) {
-    const query = limit ? `?limit=${limit}` : '';
-    return this.request<{ success: boolean; history: Array<{ role: string; content: string; timestamp: string }> }>(`/ai/history${query}`);
-  }
-
   // Notifications endpoints
   async registerPushSubscription(subscription: PushSubscription) {
     return this.request<{ success: boolean }>('/notifications/subscribe', {
@@ -397,12 +375,6 @@ class ApiService {
   async removeFriend(friendId: number) {
     return this.request<{ success: boolean }>(`/friends/${friendId}`, {
       method: 'DELETE',
-    });
-  }
-
-  async createInviteLink() {
-    return this.request<{ success: boolean; inviteLink: unknown }>('/friends/invite-link', {
-      method: 'POST',
     });
   }
 

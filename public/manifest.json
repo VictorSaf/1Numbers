@@ -1,0 +1,13 @@
+{
+  "name": "Numerologia — Numerology Compass",
+  "short_name": "Numerologia",
+  "description": "Calculator de numerologie: Drumul Vieții, Destin, Sufletul și Personalitatea.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#2d1b4e",
+  "theme_color": "#2d1b4e",
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "48x48", "type": "image/x-icon" }
+  ]
+}
