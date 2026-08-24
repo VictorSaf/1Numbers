@@ -27,6 +27,23 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Cloudflare terminates TLS and forwards the client's original scheme. Mirrors
+// the static server so /api behaves identically to the rest of the origin.
+// HSTS without includeSubDomains: sibling subdomains on this tunnel must not
+// inherit the policy.
+app.use((req, res, next) => {
+  const proto = (req.headers['x-forwarded-proto'] as string | undefined)?.split(',')[0].trim();
+  if (proto === 'http') {
+    return res.redirect(301, `https://${req.headers.host}${req.originalUrl}`);
+  }
+  if (proto === 'https') {
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000');
+  }
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/profiles', profileRoutes);
