@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { RemedyCard } from '@/components/RemedyCard';
 import { getRemedyForNumber, getAllRemedies, getDailyRemedy, NumberRemedy } from '@/lib/remedies';
 import { calculateLifePathNumber, calculateDestinyNumber } from '@/lib/numerology';
+import { useProfile } from '@/hooks/use-profile';
 import {
   Sparkles,
   User,
@@ -26,11 +27,14 @@ import {
 } from 'lucide-react';
 
 const Remedies = () => {
+  const { profileData } = useProfile();
   const { language } = useLanguage();
   const { user } = useAuth();
 
-  const [birthDate, setBirthDate] = useState(user?.birthDate || '');
-  const [fullName, setFullName] = useState(user?.fullName || '');
+  // Birth data lives on the active profile; User carries only id, email, name
+  // and createdAt, so these always initialised empty.
+  const [birthDate, setBirthDate] = useState(profileData ? profileData.birthDate.toISOString().slice(0, 10) : '');
+  const [fullName, setFullName] = useState(profileData?.fullName ?? '');
   const [selectedNumber, setSelectedNumber] = useState<number | null>(null);
 
   const translations: Record<string, Record<string, string>> = {

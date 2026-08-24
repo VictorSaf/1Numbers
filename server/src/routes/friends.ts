@@ -16,11 +16,13 @@ router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
       `SELECT
         f.friend_id,
         u.email,
-        u.birth_date,
-        u.full_name,
+        p.birth_date,
+        p.full_name,
         f.created_at as friendship_date
+      -- birth_date and full_name live on user_profiles, not users
       FROM friendships f
       JOIN users u ON u.id = f.friend_id
+      LEFT JOIN user_profiles p ON p.user_id = u.id AND p.is_active = true
       WHERE f.user_id = $1
       ORDER BY f.created_at DESC`,
       [userId]
@@ -59,11 +61,12 @@ router.get('/requests', authenticateToken, async (req: AuthRequest, res: Respons
         fr.id,
         fr.from_user_id,
         u.email,
-        u.full_name,
+        p.full_name,
         fr.message,
         fr.created_at
       FROM friend_requests fr
       JOIN users u ON u.id = fr.from_user_id
+      LEFT JOIN user_profiles p ON p.user_id = u.id AND p.is_active = true
       WHERE fr.to_user_id = $1 AND fr.status = 'pending'
       ORDER BY fr.created_at DESC`,
       [userId]
@@ -103,11 +106,12 @@ router.get('/requests/sent', authenticateToken, async (req: AuthRequest, res: Re
         fr.id,
         fr.to_user_id,
         u.email,
-        u.full_name,
+        p.full_name,
         fr.status,
         fr.created_at
       FROM friend_requests fr
       JOIN users u ON u.id = fr.to_user_id
+      LEFT JOIN user_profiles p ON p.user_id = u.id AND p.is_active = true
       WHERE fr.from_user_id = $1
       ORDER BY fr.created_at DESC`,
       [userId]
@@ -430,7 +434,10 @@ router.post('/invite/:code', authenticateToken, async (req: AuthRequest, res: Re
 
     // Get inviter info
     const inviterResult = await pool.query(
-      'SELECT email, full_name FROM users WHERE id = $1',
+      `SELECT u.email, p.full_name
+       FROM users u
+       LEFT JOIN user_profiles p ON p.user_id = u.id AND p.is_active = true
+       WHERE u.id = $1`,
       [inviterId]
     );
 
@@ -543,8 +550,10 @@ router.get('/:friendId/profile', authenticateToken, async (req: AuthRequest, res
 
     // Get friend's profile
     const profileResult = await pool.query(
-      `SELECT id, email, birth_date, full_name, created_at
-       FROM users WHERE id = $1`,
+      `SELECT u.id, u.email, p.birth_date, p.full_name, u.created_at
+       FROM users u
+       LEFT JOIN user_profiles p ON p.user_id = u.id AND p.is_active = true
+       WHERE u.id = $1`,
       [friendId]
     );
 

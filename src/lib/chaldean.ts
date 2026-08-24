@@ -433,4 +433,3 @@ export interface SystemComparison {
 }
 
 // Export types
-export type { ChaldeanAnalysis, SystemComparison };

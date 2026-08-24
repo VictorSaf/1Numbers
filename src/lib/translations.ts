@@ -2,6 +2,7 @@ export type Language = "ro" | "en" | "ru";
 
 export const translations = {
   ro: {
+    loading: "Se încarcă...",
     // Header
     title: "Numerologia",
     subtitle: "Descoperă secretele ascunse în numerele tale personale",
@@ -410,6 +411,7 @@ export const translations = {
     }
   },
   en: {
+    loading: "Loading...",
     // Header
     title: "Numerology",
     subtitle: "Discover the hidden secrets in your personal numbers",
@@ -505,6 +507,11 @@ export const translations = {
     overallCompatibility: "Overall Compatibility",
     weight: "Weight",
     tryAnotherPair: "Try another pair",
+    notFound: {
+      title: "Page not found",
+      description: "The page you are looking for does not exist or has been moved.",
+      backHome: "Back to Home"
+    },
     compatibilityLevels: {
       excellent: "Excellent",
       good: "Good",
@@ -840,6 +847,7 @@ export const translations = {
     }
   },
   ru: {
+    loading: "Загрузка...",
     // Header
     title: "Нумерология",
     subtitle: "Откройте скрытые тайны в ваших личных числах",

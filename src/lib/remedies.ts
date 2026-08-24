@@ -1073,4 +1073,3 @@ export function getDailyRemedy(date: Date, language: string = 'en'): { dayNumber
   return { dayNumber: number, remedy };
 }
 
-export type { NumberRemedy };

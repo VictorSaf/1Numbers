@@ -314,7 +314,7 @@ const Tools = () => {
         subtitle={t.subtitle}
         badge={{
           icon: <Wrench className="h-4 w-4 text-primary" />,
-          label: t.tools
+          label: t.title
         }}
       />
 

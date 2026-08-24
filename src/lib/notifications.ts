@@ -131,7 +131,7 @@ export const showLocalNotification = async (
 
   const registration = await navigator.serviceWorker.ready;
 
-  await registration.showNotification(payload.title, {
+  const options: NotificationOptions & { actions?: unknown; vibrate?: number[] } = {
     body: payload.body,
     icon: payload.icon || '/icons/icon-192x192.png',
     badge: payload.badge || '/icons/badge-72x72.png',
@@ -140,7 +140,8 @@ export const showLocalNotification = async (
     actions: payload.actions,
     vibrate: [200, 100, 200],
     requireInteraction: false,
-  });
+  };
+  await registration.showNotification(payload.title, options);
 };
 
 // Helper function to convert VAPID key

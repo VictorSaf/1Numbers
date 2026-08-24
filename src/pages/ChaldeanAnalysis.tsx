@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useProfile } from '@/hooks/use-profile';
 import {
   calculateChaldeanAnalysis,
   getCompoundMeaning,
@@ -35,11 +36,14 @@ import {
 } from 'lucide-react';
 
 const ChaldeanAnalysis = () => {
+  const { profileData } = useProfile();
   const { language } = useLanguage();
   const { user } = useAuth();
 
-  const [fullName, setFullName] = useState(user?.fullName || '');
-  const [birthDate, setBirthDate] = useState(user?.birthDate || '');
+  // Birth data lives on the active profile; User carries only id, email, name
+  // and createdAt, so these always initialised empty.
+  const [fullName, setFullName] = useState(profileData?.fullName ?? '');
+  const [birthDate, setBirthDate] = useState(profileData ? profileData.birthDate.toISOString().slice(0, 10) : '');
   const [businessName, setBusinessName] = useState('');
   const [showResults, setShowResults] = useState(false);
 

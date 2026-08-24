@@ -1,5 +1,6 @@
+// calculatePersonalYearNumber lives in numerology, not personalCycles.
+import { calculatePersonalYearNumber } from './numerology';
 import { 
-  calculatePersonalYearNumber,
   calculatePersonalDayNumber,
   calculatePersonalMonthNumber,
   calculateUniversalDay,

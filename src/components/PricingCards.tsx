@@ -196,7 +196,7 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
   const getButtonText = (tier: TierDefinition) => {
     if (tier.id === currentTier) return t.currentPlan;
     if (tier.id === 'free') return t.getStarted;
-    if (currentTier !== 'free' && tier.id !== 'free') return t.upgrade;
+    if (currentTier !== 'free') return t.upgrade;
     return t.subscribe;
   };
 

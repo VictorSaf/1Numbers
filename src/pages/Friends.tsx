@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useProfile } from '@/hooks/use-profile';
 import {
   Dialog,
   DialogContent,
@@ -40,6 +41,7 @@ import {
 } from 'lucide-react';
 
 const Friends = () => {
+  const { profileData } = useProfile();
   const { language } = useLanguage();
   const { user } = useAuth();
   const {
@@ -224,7 +226,7 @@ const Friends = () => {
   }
 
   // Show comparison view if a friend is selected
-  if (selectedFriend && user.birthDate && user.fullName) {
+  if (selectedFriend && profileData) {
     return (
       <div className="container max-w-4xl mx-auto px-4 py-8">
         <Button
@@ -236,8 +238,8 @@ const Friends = () => {
         </Button>
         <FriendComparison
           user={{
-            birthDate: user.birthDate,
-            fullName: user.fullName,
+            birthDate: profileData.birthDate.toISOString(),
+            fullName: profileData.fullName,
           }}
           friend={{
             birthDate: selectedFriend.birthDate,

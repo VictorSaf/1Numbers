@@ -239,7 +239,9 @@ export const generateShareableLink = (
  * @returns Shareable URL with encoded compatibility data
  */
 export const generateCompatibilityLink = (
-  data: CompatibilityShareData,
+  // `url` is what this function returns, so requiring it as input was circular;
+  // every caller had to invent one just to get one back.
+  data: Omit<CompatibilityShareData, 'url'>,
   baseUrl: string = window.location.origin
 ): string => {
   const params = new URLSearchParams({

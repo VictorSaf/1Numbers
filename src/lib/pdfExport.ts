@@ -12,7 +12,9 @@ import {
   calculatePersonalMonthNumber,
   calculatePersonalDayNumber,
 } from './personalCycles';
+import type { KarmicDebtInfo } from './karmic';
 import { calculateKarmicDebts, calculateKarmicLessons } from './karmic';
+import type { PinnacleData, ChallengeData } from './pinnacles';
 import { calculatePinnacles, calculateChallenges } from './pinnacles';
 import { getRemedyForNumber } from './remedies';
 import { generateLoShuGrid } from './loShuGrid';
@@ -48,12 +50,14 @@ export interface NumerologyReport {
     personality: number;
   };
   karmicAnalysis: {
-    debt: number[];
+    // Mirrors what calculateKarmicDebts returns. Declaring number[] here meant the
+    // renderer interpolated whole objects, printing [object Object] in the report.
+    debt: KarmicDebtInfo[];
     lessons: number[];
   };
   pinnaclesAndChallenges: {
-    pinnacles: { number: number; startAge: number; endAge: number }[];
-    challenges: { number: number; startAge: number; endAge: number }[];
+    pinnacles: PinnacleData[];
+    challenges: ChallengeData[];
   };
   currentCycle?: {
     personalYear: number;
@@ -97,7 +101,7 @@ export function generateReportData(data: ReportData): NumerologyReport {
       lessons: calculateKarmicLessons(fullName),
     },
     pinnaclesAndChallenges: {
-      pinnacles: calculatePinnacles(birthDate, lifePath),
+      pinnacles: calculatePinnacles(birthDate),
       challenges: calculateChallenges(birthDate),
     },
   };
@@ -546,7 +550,7 @@ export function generateReportHTML(
         <div class="karmic-list" style="margin-top: 8px;">
           ${
             report.karmicAnalysis.debt.length > 0
-              ? report.karmicAnalysis.debt.map((d) => `<span class="karmic-badge">${d}</span>`).join('')
+              ? report.karmicAnalysis.debt.map((d) => `<span class="karmic-badge">${d.number}</span>`).join('')
               : `<span class="none-text">${t.noKarmicDebt}</span>`
           }
         </div>

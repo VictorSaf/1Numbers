@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { calculateLifePathNumber, calculateDestinyNumber, calculateSoulUrgeNumber, calculatePersonalityNumber } from '@/lib/numerology';
-import { calculateCompatibility } from '@/lib/compatibility';
+import { calculateFriendshipCompatibility } from '@/lib/compatibility';
 import { Heart, Users, Sparkles, ArrowRight, Star } from 'lucide-react';
 
 interface PersonData {
@@ -121,11 +121,14 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
   const compatibility = useMemo(() => {
     const userDate = new Date(user.birthDate);
     const friendDate = new Date(friend.birthDate);
-    return calculateCompatibility(
-      userDate,
-      user.fullName,
-      friendDate,
-      friend.fullName
+    // calculateCompatibility takes two person objects and returns only the three
+    // base scores. This component was written against a richer shape it never
+    // received, so every score read undefined and the analysis never rendered.
+    // calculateFriendshipCompatibility returns that richer shape, weighted for
+    // friendship rather than romance.
+    return calculateFriendshipCompatibility(
+      { fullName: user.fullName, birthDate: userDate },
+      { fullName: friend.fullName, birthDate: friendDate }
     );
   }, [user, friend]);
 
@@ -286,12 +289,12 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
                   ({userNumbers.lifePath} <ArrowRight className="inline h-3 w-3" /> {friendNumbers.lifePath})
                 </span>
               </div>
-              <span className={`font-bold ${getScoreColor(compatibility.lifePathScore)}`}>
-                {compatibility.lifePathScore}%
+              <span className={`font-bold ${getScoreColor(compatibility.lifePathCompatibility.score)}`}>
+                {compatibility.lifePathCompatibility.score}%
               </span>
             </div>
             <Progress
-              value={compatibility.lifePathScore}
+              value={compatibility.lifePathCompatibility.score}
               className="h-2"
             />
           </div>
@@ -305,12 +308,12 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
                   ({userNumbers.destiny} <ArrowRight className="inline h-3 w-3" /> {friendNumbers.destiny})
                 </span>
               </div>
-              <span className={`font-bold ${getScoreColor(compatibility.destinyScore)}`}>
-                {compatibility.destinyScore}%
+              <span className={`font-bold ${getScoreColor(compatibility.destinyCompatibility.score)}`}>
+                {compatibility.destinyCompatibility.score}%
               </span>
             </div>
             <Progress
-              value={compatibility.destinyScore}
+              value={compatibility.destinyCompatibility.score}
               className="h-2"
             />
           </div>
@@ -324,39 +327,24 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
                   ({userNumbers.soulUrge} <ArrowRight className="inline h-3 w-3" /> {friendNumbers.soulUrge})
                 </span>
               </div>
-              <span className={`font-bold ${getScoreColor(compatibility.soulUrgeScore)}`}>
-                {compatibility.soulUrgeScore}%
+              <span className={`font-bold ${getScoreColor(compatibility.soulUrgeCompatibility.score)}`}>
+                {compatibility.soulUrgeCompatibility.score}%
               </span>
             </div>
             <Progress
-              value={compatibility.soulUrgeScore}
+              value={compatibility.soulUrgeCompatibility.score}
               className="h-2"
             />
           </div>
 
-          {/* Personality Match */}
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <span>{t.personalityMatch}</span>
-                <span className="text-muted-foreground text-sm">
-                  ({userNumbers.personality} <ArrowRight className="inline h-3 w-3" /> {friendNumbers.personality})
-                </span>
-              </div>
-              <span className={`font-bold ${getScoreColor(compatibility.personalityScore || 50)}`}>
-                {compatibility.personalityScore || 50}%
-              </span>
-            </div>
-            <Progress
-              value={compatibility.personalityScore || 50}
-              className="h-2"
-            />
-          </div>
+          {/* Personality had no score behind it. Compatibility is weighted Life Path 50%,
+              Destiny 30%, Soul Urge 20% -- personality is not part of the model, and the
+              bar here read `personalityScore || 50`, showing a fabricated 50% to everyone. */}
         </CardContent>
       </Card>
 
       {/* Strengths and Challenges */}
-      {compatibility.analysis && (
+      {(compatibility.strengths || compatibility.challenges) && (
         <div className="grid md:grid-cols-2 gap-4">
           {/* Strengths */}
           <Card className="border-green-500/20">
@@ -365,7 +353,7 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
-                {compatibility.analysis.strengths?.map((strength, index) => (
+                {(compatibility.strengths?.[language] ?? []).map((strength, index) => (
                   <li key={index} className="flex items-start gap-2">
                     <span className="text-green-500">+</span>
                     <span className="text-sm">{strength}</span>
@@ -382,7 +370,7 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
-                {compatibility.analysis.challenges?.map((challenge, index) => (
+                {(compatibility.challenges?.[language] ?? []).map((challenge, index) => (
                   <li key={index} className="flex items-start gap-2">
                     <span className="text-orange-500">!</span>
                     <span className="text-sm">{challenge}</span>

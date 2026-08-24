@@ -280,7 +280,7 @@ export function generateDailySuggestion(context: AIContext): DailySuggestion {
   const { birthDate } = profile;
 
   const personalDay = calculatePersonalDayNumber(birthDate, currentDate);
-  const personalMonth = calculatePersonalMonthNumber(birthDate, currentDate);
+  const personalMonth = calculatePersonalMonthNumber(birthDate, currentDate.getFullYear(), currentDate.getMonth() + 1);
   const lifePath = calculateLifePathNumber(birthDate);
 
   const suggestions: Record<Language, Record<number, DailySuggestion>> = {
@@ -667,4 +667,3 @@ export function buildAIPrompt(
 }
 
 // Export types for use in components
-export type { AIContext, UserNumerologyProfile, DailySuggestion };

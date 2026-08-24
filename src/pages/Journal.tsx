@@ -4,7 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { JournalEntry, JournalStatistics } from '@/lib/journal';
+import { JournalEntry, JournalStatistics, PredictionEntry } from '@/lib/journal';
 import { api } from '@/services/api';
 import { JournalEntry as JournalEntryComponent } from '@/components/JournalEntry';
 import { PersonalStatistics } from '@/components/PersonalStatistics';
@@ -208,7 +208,7 @@ const Journal = () => {
     setEditingEntry(null);
   };
 
-  const predictions = entries.filter(e => e.entryType === 'prediction');
+  const predictions = entries.filter((e): e is PredictionEntry => e.entryType === 'prediction');
 
   if (authLoading || loading) {
     return (

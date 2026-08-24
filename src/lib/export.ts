@@ -10,7 +10,7 @@ import {
   getNumberMeaning
 } from './numerology';
 import { calculatePinnacles, calculateChallenges } from './pinnacles';
-import { calculateKarmicDebts, calculateKarmicLessons } from './karmic';
+import { calculateKarmicDebts, calculateKarmicLessons, KARMIC_DEBT_MEANINGS } from './karmic';
 import { Language } from './translations';
 
 export interface ReportData {
@@ -244,7 +244,9 @@ export const generateFullReportPDF = async (
     
     challenges.forEach((challenge, index) => {
       doc.setFont('helvetica', 'normal');
-      doc.text(`Challenge ${index + 1}: ${challenge.number} (Ages ${challenge.startAge}-${challenge.endAge})`, margin + 5, yPos);
+      const span = pinnacles.find((pinnacle) => pinnacle.period === challenge.period);
+      const ages = span ? ` (Ages ${span.startAge}-${span.endAge})` : '';
+      doc.text(`Challenge ${index + 1}: ${challenge.number}${ages}`, margin + 5, yPos);
       yPos += 6;
       
       if (yPos > doc.internal.pageSize.getHeight() - 40) {
@@ -281,7 +283,8 @@ export const generateFullReportPDF = async (
       
       karmicDebts.forEach((debt) => {
         doc.setFont('helvetica', 'normal');
-        doc.text(`Number ${debt.number}: ${debt.meaning[data.language]}`, margin + 5, yPos);
+        const info = KARMIC_DEBT_MEANINGS[debt.number];
+        doc.text(`Number ${debt.number}: ${info ? info.description[data.language] : ''}`, margin + 5, yPos);
         yPos += 6;
         
         if (yPos > doc.internal.pageSize.getHeight() - 40) {

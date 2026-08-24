@@ -20,15 +20,24 @@ const gridPositions = [
 export const MiniLoShuGrid = memo(({ birthDate, showTooltips = true }: MiniLoShuGridProps) => {
   const loShuData = useMemo(() => generateLoShuGrid(birthDate), [birthDate]);
 
+  // grid is a 3x3 matrix indexed [row][col]; indexing it by the digit 1-9 read
+  // rows that mostly do not exist, so `count` was an array (or undefined) and the
+  // comparisons below never matched. missingNumbers and repeatedNumbers say
+  // directly what this needs.
+  const countOf = (num: number): number => {
+    if (loShuData.missingNumbers.includes(num)) return 0;
+    return loShuData.repeatedNumbers.find((r) => r.number === num)?.count ?? 1;
+  };
+
   const getCellClass = (num: number) => {
-    const count = loShuData.grid[num] || 0;
+    const count = countOf(num);
     if (count === 0) return 'missing';
     if (count > 1) return 'repeated';
     return 'present';
   };
 
   const getCellTooltip = (num: number) => {
-    const count = loShuData.grid[num] || 0;
+    const count = countOf(num);
     if (count === 0) return `${num} is missing - consider remedies`;
     if (count > 1) return `${num} appears ${count} times - amplified energy`;
     return `${num} is present in your chart`;

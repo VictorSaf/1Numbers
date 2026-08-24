@@ -180,7 +180,7 @@ const AppHeader = () => {
                       )}
                     >
                       <Icon className="h-4 w-4" />
-                      <span>{t[item.labelKey as keyof typeof t] || item.mobileLabel}</span>
+                      <span>{(t[item.labelKey as keyof typeof t] as string) || item.mobileLabel}</span>
                     </Button>
                   </Link>
                 );
