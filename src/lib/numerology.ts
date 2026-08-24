@@ -1,3 +1,20 @@
+import {
+  reduce,
+  lifePath as lifePathPlus,
+  expression as expressionPlus,
+  soulUrge as soulUrgePlus,
+  personality as personalityPlus,
+  personalYear as personalYearPlus,
+} from './numerology-plus';
+
+/**
+ * These exports are the historical surface of the engine and are kept so the
+ * ~50 call sites across the app keep compiling. Each now delegates to
+ * numerology-plus, which is the single implementation: this file returns the
+ * plain number, callers that need `raw` (and therefore karmic debt) import from
+ * numerology-plus directly.
+ */
+
 // Pythagorean alphabet values
 const PYTHAGOREAN_VALUES: Record<string, number> = {
   A: 1, B: 2, C: 3, D: 4, E: 5, F: 6, G: 7, H: 8, I: 9,
@@ -9,33 +26,11 @@ const VOWELS = ['A', 'E', 'I', 'O', 'U'];
 const MASTER_NUMBERS = [11, 22, 33];
 
 // Reduce a number to single digit, preserving master numbers
-export const reduceToSingleDigit = (num: number, preserveMaster = true): number => {
-  if (preserveMaster && MASTER_NUMBERS.includes(num)) {
-    return num;
-  }
-  
-  while (num > 9 && !(preserveMaster && MASTER_NUMBERS.includes(num))) {
-    num = String(num).split('').reduce((sum, digit) => sum + parseInt(digit), 0);
-  }
-  
-  return num;
-};
+export const reduceToSingleDigit = (num: number, preserveMaster = true): number =>
+  reduce(num, preserveMaster);
 
 // Calculate Life Path Number from birth date
-export const calculateLifePathNumber = (birthDate: Date): number => {
-  const day = birthDate.getDate();
-  const month = birthDate.getMonth() + 1;
-  const year = birthDate.getFullYear();
-  
-  const reducedDay = reduceToSingleDigit(day);
-  const reducedMonth = reduceToSingleDigit(month);
-  const reducedYear = reduceToSingleDigit(
-    String(year).split('').reduce((sum, digit) => sum + parseInt(digit), 0)
-  );
-  
-  const total = reducedDay + reducedMonth + reducedYear;
-  return reduceToSingleDigit(total);
-};
+export const calculateLifePathNumber = (birthDate: Date): number => lifePathPlus(birthDate).value;
 
 // Calculate name number from letters
 const calculateNameNumber = (name: string, filterFn?: (char: string) => boolean): number => {
@@ -52,35 +47,19 @@ const calculateNameNumber = (name: string, filterFn?: (char: string) => boolean)
 };
 
 // Destiny Number (Expression Number) - all letters
-export const calculateDestinyNumber = (fullName: string): number => {
-  return calculateNameNumber(fullName);
-};
+export const calculateDestinyNumber = (fullName: string): number => expressionPlus(fullName).value;
 
 // Soul Urge Number (Heart's Desire) - vowels only
-export const calculateSoulUrgeNumber = (fullName: string): number => {
-  return calculateNameNumber(fullName, (char) => VOWELS.includes(char));
-};
+export const calculateSoulUrgeNumber = (fullName: string): number => soulUrgePlus(fullName).value;
 
 // Personality Number - consonants only
-export const calculatePersonalityNumber = (fullName: string): number => {
-  return calculateNameNumber(fullName, (char) => !VOWELS.includes(char));
-};
+export const calculatePersonalityNumber = (fullName: string): number => personalityPlus(fullName).value;
 
 // Personal Year Number
-export const calculatePersonalYearNumber = (birthDate: Date, year: number = new Date().getFullYear()): number => {
-  const day = birthDate.getDate();
-  const month = birthDate.getMonth() + 1;
-  
-  const reducedDay = reduceToSingleDigit(day, false);
-  const reducedMonth = reduceToSingleDigit(month, false);
-  const reducedYear = reduceToSingleDigit(
-    String(year).split('').reduce((sum, digit) => sum + parseInt(digit), 0),
-    false
-  );
-  
-  const total = reducedDay + reducedMonth + reducedYear;
-  return reduceToSingleDigit(total, false);
-};
+export const calculatePersonalYearNumber = (
+  birthDate: Date,
+  year: number = new Date().getFullYear(),
+): number => personalYearPlus(birthDate, year).value;
 
 // Number interpretations
 export const NUMBER_MEANINGS: Record<number, { title: string; traits: string[]; description: string }> = {
