@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Users, UserCheck, Crown, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { API_BASE } from '@/lib/apiBase';
 
 interface DashboardStats {
   totalUsers: number;
@@ -22,7 +23,7 @@ export const DashboardSection = () => {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem('auth_token');
-        const response = await fetch('http://localhost:3001/api/admin/dashboard', {
+        const response = await fetch(`${API_BASE}/admin/dashboard`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { API_BASE } from '@/lib/apiBase';
 
 interface UISettings {
   defaultTheme: string;
@@ -51,7 +52,7 @@ export const UISettingsSection = () => {
     const fetchSettings = async () => {
       try {
         const token = localStorage.getItem('auth_token');
-        const response = await fetch('http://localhost:3001/api/admin/settings', {
+        const response = await fetch(`${API_BASE}/admin/settings`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -77,7 +78,7 @@ export const UISettingsSection = () => {
     setSaving(true);
     try {
       const token = localStorage.getItem('auth_token');
-      const response = await fetch('http://localhost:3001/api/admin/settings', {
+      const response = await fetch(`${API_BASE}/admin/settings`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

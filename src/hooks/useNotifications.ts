@@ -20,6 +20,7 @@ import {
   DEFAULT_PREFERENCES,
 } from '@/lib/notifications';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { API_BASE } from '@/lib/apiBase';
 
 interface UseNotificationsReturn {
   // Status
@@ -134,7 +135,7 @@ export const useNotifications = (): UseNotificationsReturn => {
       if (subscription) {
         // Send subscription to server
         try {
-          await fetch('/api/notifications/subscribe', {
+          await fetch(`${API_BASE}/notifications/subscribe`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -177,7 +178,7 @@ export const useNotifications = (): UseNotificationsReturn => {
       if (success) {
         // Notify server
         try {
-          await fetch('/api/notifications/unsubscribe', {
+          await fetch(`${API_BASE}/notifications/unsubscribe`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

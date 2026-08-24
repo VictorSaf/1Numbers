@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
+import { API_BASE } from '@/lib/apiBase';
 
 interface PlatformSettings {
   appName: string;
@@ -39,7 +40,7 @@ export const PlatformSection = () => {
     const fetchSettings = async () => {
       try {
         const token = localStorage.getItem('auth_token');
-        const response = await fetch('http://localhost:3001/api/admin/settings', {
+        const response = await fetch(`${API_BASE}/admin/settings`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -65,7 +66,7 @@ export const PlatformSection = () => {
     setSaving(true);
     try {
       const token = localStorage.getItem('auth_token');
-      const response = await fetch('http://localhost:3001/api/admin/settings', {
+      const response = await fetch(`${API_BASE}/admin/settings`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

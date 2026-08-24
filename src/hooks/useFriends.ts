@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { API_BASE } from '@/lib/apiBase';
 
 export interface Friend {
   id: string;
@@ -62,8 +63,6 @@ interface FriendProfile {
   memberSince: string;
 }
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-
 export function useFriends() {
   const { token, user } = useAuth();
   const [friends, setFriends] = useState<Friend[]>([]);
@@ -81,7 +80,7 @@ export function useFriends() {
     if (!token) return null;
 
     try {
-      const response = await fetch(`${API_BASE}/api/friends${endpoint}`, {
+      const response = await fetch(`${API_BASE}/friends${endpoint}`, {
         ...options,
         headers: {
           'Content-Type': 'application/json',

@@ -1,8 +1,7 @@
 // API Service Configuration
-// Configure this file to point to your backend server
+import { API_BASE } from '@/lib/apiBase';
 
-// Default API URL - change this to your backend server URL
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = API_BASE;
 
 interface RequestConfig {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';

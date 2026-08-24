@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { BarChart3, Calculator, Users, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { API_BASE } from '@/lib/apiBase';
 
 interface AnalyticsData {
   calculationsByType: { type: string; count: number }[];
@@ -32,7 +33,7 @@ export const AnalyticsSection = () => {
     const fetchAnalytics = async () => {
       try {
         const token = localStorage.getItem('auth_token');
-        const response = await fetch('http://localhost:3001/api/admin/analytics', {
+        const response = await fetch(`${API_BASE}/admin/analytics`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

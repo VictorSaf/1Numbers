@@ -27,6 +27,7 @@ import {
   ChevronRight,
   RefreshCw,
 } from 'lucide-react';
+import { API_BASE } from '@/lib/apiBase';
 
 interface ConversationMessage {
   role: 'user' | 'assistant';
@@ -100,7 +101,7 @@ export const AIConsultant = () => {
       const { systemPrompt, userPrompt } = buildAIPrompt(currentQuestion, aiContext);
 
       // Try to call backend API
-      const response = await fetch('/api/ai/consult', {
+      const response = await fetch(`${API_BASE}/ai/consult`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

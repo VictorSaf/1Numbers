@@ -8,6 +8,15 @@ export default defineConfig(() => ({
   server: {
     host: "::",
     port: 8080,
+    // In production the tunnel routes /api/* to the backend on the same origin.
+    // Proxying here makes dev behave identically, so API calls stay relative in
+    // both environments and no host is ever hardcoded in the frontend.
+    proxy: {
+      "/api": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+      },
+    },
   },
   plugins: [react()],
   resolve: {
