@@ -41,7 +41,8 @@ const Remedies = () => {
       todayRemedy: 'Remediul Zilei',
       allRemedies: 'Toate Remediile',
       yourNumbers: 'Numerele Tale',
-      lifePath: 'Life Path',
+      birthDate: 'Data Nașterii',
+      lifePath: 'Drumul Vieții',
       destiny: 'Destin',
       enterDetails: 'Introdu datele pentru remedii personalizate',
       calculate: 'Calculează Remedii',
@@ -58,6 +59,7 @@ const Remedies = () => {
       todayRemedy: "Today's Remedy",
       allRemedies: 'All Remedies',
       yourNumbers: 'Your Numbers',
+      birthDate: 'Birth Date',
       lifePath: 'Life Path',
       destiny: 'Destiny',
       enterDetails: 'Enter your details for personalized remedies',
@@ -75,6 +77,7 @@ const Remedies = () => {
       todayRemedy: 'Средство Дня',
       allRemedies: 'Все Средства',
       yourNumbers: 'Ваши Числа',
+      birthDate: 'Дата рождения',
       lifePath: 'Путь Жизни',
       destiny: 'Судьба',
       enterDetails: 'Введите данные для персональных средств',
@@ -185,7 +188,7 @@ const Remedies = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="birthDate">Birth Date</Label>
+                    <Label htmlFor="birthDate">{t.birthDate}</Label>
                     <Input
                       id="birthDate"
                       type="date"

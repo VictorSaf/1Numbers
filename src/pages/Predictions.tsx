@@ -25,6 +25,21 @@ import { BirthDateSelect } from "@/components/BirthDateSelect";
 
 const locales = { ro, en: enUS, ru };
 
+// The daily data carries energies as English keys ("change", "harmony"); the
+// label beside them was translated but the value was not, producing "Energie:
+// Change" in the Romanian UI.
+const ENERGY_LABELS: Record<string, Record<string, string>> = {
+  leadership:    { ro: 'Leadership',   en: 'Leadership',   ru: 'Лидерство' },
+  cooperation:   { ro: 'Cooperare',    en: 'Cooperation',  ru: 'Сотрудничество' },
+  creativity:    { ro: 'Creativitate', en: 'Creativity',   ru: 'Творчество' },
+  stability:     { ro: 'Stabilitate',  en: 'Stability',    ru: 'Стабильность' },
+  change:        { ro: 'Schimbare',    en: 'Change',       ru: 'Перемены' },
+  harmony:       { ro: 'Armonie',      en: 'Harmony',      ru: 'Гармония' },
+  introspection: { ro: 'Introspecție', en: 'Introspection',ru: 'Интроспекция' },
+  abundance:     { ro: 'Abundență',    en: 'Abundance',    ru: 'Изобилие' },
+  completion:    { ro: 'Împlinire',    en: 'Completion',   ru: 'Завершение' },
+};
+
 const Predictions = () => {
   const { language, t } = useLanguage();
   const { profileData, hasProfile, loading: profileLoading } = useProfile();
@@ -171,7 +186,7 @@ const Predictions = () => {
             <div className="number-display mx-auto mb-4">
               {universalEnergy.number}
             </div>
-            <p className="text-muted-foreground capitalize">{l.energy}: {universalEnergy.energy}</p>
+            <p className="text-muted-foreground capitalize">{l.energy}: {ENERGY_LABELS[universalEnergy.energy]?.[language] ?? universalEnergy.energy}</p>
             <p className="text-xs text-muted-foreground mt-2">
               {format(today, 'EEEE, d MMMM yyyy', { locale: dateLocale })}
             </p>

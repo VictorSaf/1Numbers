@@ -8,7 +8,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Card, CardContent } from '@/components/ui/card';
 
 const Articles = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [articles] = useState<Article[]>(initialArticles);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
 
@@ -31,16 +31,16 @@ const Articles = () => {
                 onClick={() => setSelectedArticle(null)}
                 className="text-primary hover:underline"
               >
-                ← Înapoi la articole
+                ← {{ ro: 'Înapoi la articole', en: 'Back to articles', ru: 'Назад к статьям' }[language] ?? 'Back to articles'}
               </button>
               <Card className="card-mystic">
                 <CardContent className="p-8">
                   <h1 className="font-cinzel text-3xl text-foreground mb-4">
-                    {selectedArticle.title}
+                    {selectedArticle.title[language] ?? selectedArticle.title.en}
                   </h1>
                   <div className="prose prose-invert max-w-none">
                     <p className="text-foreground/90 whitespace-pre-wrap">
-                      {selectedArticle.content}
+                      {selectedArticle.content[language] ?? selectedArticle.content.en}
                     </p>
                   </div>
                 </CardContent>

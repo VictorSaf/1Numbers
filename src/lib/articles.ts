@@ -4,9 +4,11 @@
 
 export interface Article {
   id: string;
-  title: string;
-  content: string;
-  excerpt: string;
+  // Localized: the UI is trilingual, so these cannot be plain strings without
+  // leaking English into the Romanian and Russian views.
+  title: Record<string, string>;
+  content: Record<string, string>;
+  excerpt: Record<string, string>;
   category: ArticleCategory;
   tags: string[];
   author: string;
@@ -64,9 +66,9 @@ export const searchArticles = (
   if (filters.searchQuery) {
     const query = filters.searchQuery.toLowerCase();
     results = results.filter(a => 
-      a.title.toLowerCase().includes(query) ||
-      a.content.toLowerCase().includes(query) ||
-      a.excerpt.toLowerCase().includes(query) ||
+      Object.values(a.title).some((v) => v.toLowerCase().includes(query)) ||
+      Object.values(a.content).some((v) => v.toLowerCase().includes(query)) ||
+      Object.values(a.excerpt).some((v) => v.toLowerCase().includes(query)) ||
       a.tags.some(tag => tag.toLowerCase().includes(query))
     );
   }
@@ -110,9 +112,9 @@ export const getRelatedArticles = (
 export const initialArticles: Article[] = [
   {
     id: 'intro-numerology',
-    title: 'Introduction to Numerology',
-    excerpt: 'Discover the ancient art of numerology and how numbers influence our lives.',
-    content: 'Numerology is an ancient metaphysical science that studies the hidden meanings and influences of numbers...',
+    title: { en: "Introduction to Numerology", ro: "Introducere în Numerologie", ru: "Введение в нумерологию" },
+    excerpt: { en: "Discover the ancient art of numerology and how numbers influence our lives.", ro: "Descoperă arta antică a numerologiei și cum influențează numerele viețile noastre.", ru: "Откройте древнее искусство нумерологии и то, как числа влияют на нашу жизнь." },
+    content: { en: "Numerology is an ancient metaphysical science that studies the hidden meanings and influences of numbers...", ro: "Numerologia este o știință metafizică antică ce studiază semnificațiile ascunse și influențele numerelor...", ru: "Нумерология — древняя метафизическая наука, изучающая скрытые значения и влияние чисел..." },
     category: 'basics',
     tags: ['basics', 'introduction', 'history'],
     author: 'Numerology Compass',
@@ -122,9 +124,9 @@ export const initialArticles: Article[] = [
   },
   {
     id: 'master-numbers',
-    title: 'Understanding Master Numbers',
-    excerpt: 'Learn about the powerful master numbers 11, 22, and 33 and their special significance.',
-    content: 'Master numbers are special numbers in numerology that carry enhanced spiritual vibrations...',
+    title: { en: "Understanding Master Numbers", ro: "Înțelegerea Numerelor Master", ru: "Понимание мастер-чисел" },
+    excerpt: { en: "Learn about the powerful master numbers 11, 22, and 33 and their special significance.", ro: "Află despre puternicele numere master 11, 22 și 33 și semnificația lor specială.", ru: "Узнайте о мощных мастер-числах 11, 22 и 33 и их особом значении." },
+    content: { en: "Master numbers are special numbers in numerology that carry enhanced spiritual vibrations...", ro: "Numerele master sunt numere speciale în numerologie care poartă vibrații spirituale amplificate...", ru: "Мастер-числа — особые числа в нумерологии, несущие усиленные духовные вибрации..." },
     category: 'basics',
     tags: ['master-numbers', '11', '22', '33'],
     author: 'Numerology Compass',
@@ -134,9 +136,9 @@ export const initialArticles: Article[] = [
   },
   {
     id: 'life-path-guide',
-    title: 'Complete Guide to Life Path Numbers',
-    excerpt: 'Everything you need to know about calculating and interpreting your Life Path Number.',
-    content: 'The Life Path Number is the most important number in your numerology chart...',
+    title: { en: "Complete Guide to Life Path Numbers", ro: "Ghid Complet al Numerelor Drumului Vieții", ru: "Полное руководство по числам жизненного пути" },
+    excerpt: { en: "Everything you need to know about calculating and interpreting your Life Path Number.", ro: "Tot ce trebuie să știi despre calcularea și interpretarea Numărului Drumului Vieții.", ru: "Всё, что нужно знать о расчёте и толковании числа жизненного пути." },
+    content: { en: "The Life Path Number is the most important number in your numerology chart...", ro: "Numărul Drumului Vieții este cel mai important număr din harta ta numerologică...", ru: "Число жизненного пути — самое важное число в вашей нумерологической карте..." },
     category: 'calculations',
     tags: ['life-path', 'calculations', 'guide'],
     author: 'Numerology Compass',

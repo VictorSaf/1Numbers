@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Article, ArticleCategory, searchArticles, getArticlesByCategory } from '@/lib/articles';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ArticleLibraryProps {
   articles: Article[];
@@ -24,6 +25,7 @@ const categories: { value: ArticleCategory; label: string }[] = [
 ];
 
 export const ArticleLibrary = ({ articles, onArticleSelect, className }: ArticleLibraryProps) => {
+  const { language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<ArticleCategory | 'all'>('all');
 
@@ -87,14 +89,14 @@ export const ArticleLibrary = ({ articles, onArticleSelect, className }: Article
               <CardHeader>
                 <div className="flex items-start justify-between mb-2">
                   <CardTitle className="font-cinzel text-lg text-foreground line-clamp-2">
-                    {article.title}
+                    {article.title[language] ?? article.title.en}
                   </CardTitle>
                   {article.featured && (
                     <Badge variant="default" className="shrink-0 ml-2">Featured</Badge>
                   )}
                 </div>
                 <p className="text-sm text-muted-foreground line-clamp-2">
-                  {article.excerpt}
+                  {article.excerpt[language] ?? article.excerpt.en}
                 </p>
               </CardHeader>
               <CardContent className="space-y-3">
