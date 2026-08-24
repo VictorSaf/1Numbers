@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import { Language, getTranslation } from "@/lib/translations";
+import { track } from '@/lib/analytics';
 
 type TranslationType = ReturnType<typeof getTranslation>;
 
@@ -12,7 +13,11 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState<Language>("ro");
+  const [language, setLanguageState] = useState<Language>("ro");
+  const setLanguage = (lang: Language) => {
+    track('language_changed', { language: lang });
+    setLanguageState(lang);
+  };
   const t = getTranslation(language);
 
   return (

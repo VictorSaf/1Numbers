@@ -34,6 +34,10 @@
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#2d1b4e" />
     <link rel="manifest" href="/manifest.json" />
+
+    <!-- Plausible: cookie-free, so no consent banner is required. The domain must
+         also exist in the Plausible account or events are silently dropped. -->
+    <script defer data-domain="compass.oneaigency.com" src="https://plausible.io/js/script.js"></script>
     <!-- canonical is set per route by CanonicalLink; a static one would mark every route a duplicate of the homepage -->
   </head>
 

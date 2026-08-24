@@ -1,4 +1,4 @@
-import { useMemo, lazy, Suspense } from "react";
+import { useMemo, lazy, Suspense, useEffect } from "react";
 import { ArrowLeft, Star, BarChart3, Target, Mountain, AlertTriangle, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NumberCard } from "./NumberCard";
@@ -21,6 +21,7 @@ import { calculateKarmicDebts, calculateKarmicLessons, KARMIC_LESSON_MEANINGS } 
 import { generateShareableLink } from "@/lib/sharing";
 import { ExportMenu } from "./ExportMenu";
 import { ShareButtons } from "./ShareButtons";
+import { track } from '@/lib/analytics';
 
 // Lazy load heavy chart components (Recharts)
 const NumerologyRadarChart = lazy(() => import("./charts/NumerologyRadarChart").then(m => ({ default: m.NumerologyRadarChart })));
@@ -43,6 +44,7 @@ interface NumerologyResultsProps {
 }
 
 export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyResultsProps) => {
+  useEffect(() => { track('result_viewed'); }, []);
   const { t, language } = useLanguage();
   
   const results = useMemo(() => ({

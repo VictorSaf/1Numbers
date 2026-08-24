@@ -14,6 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { BirthDateSelect } from "@/components/BirthDateSelect";
+import { track } from '@/lib/analytics';
 
 interface NumerologyFormProps {
   onCalculate: (data: { fullName: string; birthDate: Date }) => void;
@@ -38,6 +39,7 @@ export const NumerologyForm = ({ onCalculate, profileData }: NumerologyFormProps
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (fullName.trim() && birthDate) {
+      track('calculate_submitted');
       onCalculate({ fullName: fullName.trim(), birthDate });
     }
   };

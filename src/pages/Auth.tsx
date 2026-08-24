@@ -10,6 +10,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { track } from '@/lib/analytics';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -133,6 +134,7 @@ const Auth = () => {
         });
         
         if (result.success) {
+          track('signup_completed');
           toast({ title: l.registerSuccess });
           navigate('/');
         } else {
@@ -285,6 +287,7 @@ const Auth = () => {
               <button
                 type="button"
                 onClick={() => {
+                  if (isLoginMode) track('signup_started');
                   setIsLoginMode(!isLoginMode);
                   setErrors({});
                 }}

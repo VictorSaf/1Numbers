@@ -20,6 +20,7 @@ import {
   type TierDefinition,
 } from '@/lib/premium';
 import { api } from '@/services/api';
+import { track } from '@/lib/analytics';
 
 interface PricingCardsProps {
   onSubscribe?: (tierId: PremiumTier, billingPeriod: 'monthly' | 'yearly') => void;
@@ -36,6 +37,8 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
   // by up to 2.5x. While this is null no price is rendered at all -- showing a
   // stale or guessed figure on a checkout page is worse than showing none.
   const [serverPricing, setServerPricing] = useState<Record<string, { monthly: number; yearly: number }> | null>(null);
+
+  useEffect(() => { track('paywall_shown'); }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -123,6 +126,7 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
   const t = translations[language] || translations.en;
 
   const handleSubscribe = async (tier: TierDefinition) => {
+    track('subscribe_clicked', { plan: tier.id, period: billingPeriod });
     if (tier.id === 'free' || tier.id === currentTier) return;
 
     setLoadingTier(tier.id);

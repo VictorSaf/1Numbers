@@ -35,16 +35,17 @@ const MIME = {
 const isClientRoute = (pathname) => !extname(pathname);
 
 // The build emits no inline <script>, so script-src needs no 'unsafe-inline'.
+// plausible.io is allowed for the analytics script and its event endpoint.
 // style-src still does: React and Recharts set style attributes at runtime.
 // Both Google font origins are gone now that the fonts are served from here.
 // img-src allows data: and blob: because html2canvas rasterises through both.
 const CSP = [
   "default-src 'self'",
-  "script-src 'self'",
+  "script-src 'self' https://plausible.io",
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self'",
   "img-src 'self' data: blob:",
-  "connect-src 'self'",
+  "connect-src 'self' https://plausible.io",
   "manifest-src 'self'",
   "worker-src 'self'",
   "object-src 'none'",
