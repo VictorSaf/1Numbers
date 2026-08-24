@@ -1,5 +1,5 @@
 import { useMemo, lazy, Suspense, useEffect } from "react";
-import { ArrowLeft, Star, BarChart3, Target, Mountain, AlertTriangle, Sparkles } from "lucide-react";
+import { ArrowLeft, Star, BarChart3, Target, Mountain, AlertTriangle, Sparkles, CalendarCheck, Type } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NumberCard } from "./NumberCard";
 import { PinnacleCard } from "./PinnacleCard";
@@ -22,6 +22,8 @@ import { generateShareableLink } from "@/lib/sharing";
 import { ExportMenu } from "./ExportMenu";
 import { ShareButtons } from "./ShareButtons";
 import { track } from '@/lib/analytics';
+import { ResultSection } from "@/components/ResultSection";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Lazy load heavy chart components (Recharts)
 const NumerologyRadarChart = lazy(() => import("./charts/NumerologyRadarChart").then(m => ({ default: m.NumerologyRadarChart })));
@@ -44,6 +46,7 @@ interface NumerologyResultsProps {
 }
 
 export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyResultsProps) => {
+  const { isAuthenticated } = useAuth();
   useEffect(() => { track('result_viewed'); }, []);
   const { t, language } = useLanguage();
   
@@ -68,7 +71,18 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     karmic: { ro: "Datorii Karmice", en: "Karmic Debts", ru: "Кармические Долги" },
     lessons: { ro: "Lecții Karmice", en: "Karmic Lessons", ru: "Кармические Уроки" },
     noDebts: { ro: "Nu ai datorii karmice detectate.", en: "No karmic debts detected.", ru: "Кармических долгов не обнаружено." },
-    noLessons: { ro: "Toate numerele sunt prezente în nume.", en: "All numbers are present in your name.", ru: "Все числа присутствуют в имени." }
+    noLessons: { ro: "Toate numerele sunt prezente în nume.", en: "All numbers are present in your name.", ru: "Все числа присутствуют в имени." },
+    luckyDates: { ro: "Date Favorabile", en: "Lucky Dates", ru: "Благоприятные Даты" },
+    nameAnalysis: { ro: "Analiza Numelui", en: "Name Analysis", ru: "Анализ Имени" }
+  };
+
+  // Shown in place of a locked section so the visitor knows what is behind it.
+  const teasers = {
+    pinnacles: { ro: "Cele patru etape majore ale vieții tale și provocările fiecăreia.", en: "The four major stages of your life and the challenge of each.", ru: "Четыре главных этапа вашей жизни и вызов каждого." },
+    karmic: { ro: "Datoriile 13, 14, 16 și 19 și ce înseamnă pentru tine.", en: "Debts 13, 14, 16 and 19 and what they mean for you.", ru: "Долги 13, 14, 16 и 19 и что они значат для вас." },
+    lessons: { ro: "Numerele lipsă din numele tău și lecțiile pe care le indică.", en: "The numbers missing from your name and the lessons they point to.", ru: "Числа, отсутствующие в имени, и уроки, на которые они указывают." },
+    luckyDates: { ro: "Zilele favorabile pentru decizii importante.", en: "The days that favour important decisions.", ru: "Дни, благоприятные для важных решений." },
+    nameAnalysis: { ro: "Distribuția literelor, vocalelor și consoanelor din numele tău.", en: "The distribution of letters, vowels and consonants in your name.", ru: "Распределение букв, гласных и согласных в вашем имени." }
   };
 
   // Generate share data
@@ -119,11 +133,13 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
       <PersonalCycleCard birthDate={birthDate} delay={550} />
 
       {/* Pinnacles & Challenges */}
-      <div className="opacity-0 animate-fade-in ds-delay-600">
-        <div className="flex items-center gap-2 mb-4">
-          <Mountain className="h-5 w-5 text-primary" />
-          <h3 className="font-cinzel text-lg text-foreground">{sectionLabels.pinnacles[language]}</h3>
-        </div>
+      <ResultSection
+        className="opacity-0 animate-fade-in ds-delay-600"
+        title={sectionLabels.pinnacles[language]}
+        icon={<Mountain className="h-5 w-5 text-primary" />}
+        locked={!isAuthenticated}
+        teaser={teasers.pinnacles[language]}
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {pinnacles.map((pinnacle, i) => (
             <PinnacleCard
@@ -135,14 +151,16 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
             />
           ))}
         </div>
-      </div>
+      </ResultSection>
 
       {/* Karmic Debts */}
-      <div className="opacity-0 animate-fade-in ds-delay-900">
-        <div className="flex items-center gap-2 mb-4">
-          <AlertTriangle className="h-5 w-5 text-amber-500" />
-          <h3 className="font-cinzel text-lg text-foreground">{sectionLabels.karmic[language]}</h3>
-        </div>
+      <ResultSection
+        className="opacity-0 animate-fade-in ds-delay-900"
+        title={sectionLabels.karmic[language]}
+        icon={<AlertTriangle className="h-5 w-5 text-amber-500" />}
+        locked={!isAuthenticated}
+        teaser={teasers.karmic[language]}
+      >
         {karmicDebts.length > 0 ? (
           <div className="space-y-4">
             {karmicDebts.map((debt, i) => (
@@ -154,12 +172,17 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
             ✓ {sectionLabels.noDebts[language]}
           </p>
         )}
-      </div>
+      </ResultSection>
 
       {/* Karmic Lessons */}
       {karmicLessons.length > 0 && (
-        <div className="opacity-0 animate-fade-in ds-delay-1000">
-          <h4 className="font-cinzel text-md text-foreground mb-3">{sectionLabels.lessons[language]}</h4>
+        <ResultSection
+          className="opacity-0 animate-fade-in ds-delay-1000"
+          title={sectionLabels.lessons[language]}
+          icon={<Sparkles className="h-5 w-5 text-primary" />}
+          locked={!isAuthenticated}
+          teaser={teasers.lessons[language]}
+        >
           <div className="flex flex-wrap gap-2">
             {karmicLessons.map((num) => (
               <div key={num} className="px-3 py-2 rounded-lg bg-muted/50 border border-border/50">
@@ -168,16 +191,29 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
               </div>
             ))}
           </div>
-        </div>
+        </ResultSection>
       )}
 
       {/* Lucky Dates */}
-      <LuckyDatesCard birthDate={birthDate} fullName={fullName} delay={1000} />
+      <ResultSection
+        title={sectionLabels.luckyDates[language]}
+        icon={<CalendarCheck className="h-5 w-5 text-primary" />}
+        locked={!isAuthenticated}
+        teaser={teasers.luckyDates[language]}
+      >
+        <LuckyDatesCard birthDate={birthDate} fullName={fullName} delay={1000} />
+      </ResultSection>
 
       {/* Name Analysis */}
-      <div className="opacity-0 animate-fade-in ds-delay-1100">
+      <ResultSection
+        className="opacity-0 animate-fade-in ds-delay-1100"
+        title={sectionLabels.nameAnalysis[language]}
+        icon={<Type className="h-5 w-5 text-primary" />}
+        locked={!isAuthenticated}
+        teaser={teasers.nameAnalysis[language]}
+      >
         <NameAnalysisCard fullName={fullName} />
-      </div>
+      </ResultSection>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 opacity-0 animate-fade-in ds-delay-1100">
