@@ -13,7 +13,8 @@
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "create-admin-user": "node scripts/create-admin-user.js",
-    "orchestrate": "cd .claude/orchestrator && npm start"
+    "orchestrate": "cd .claude/orchestrator && npm start",
+    "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

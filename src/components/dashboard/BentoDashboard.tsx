@@ -44,51 +44,54 @@ interface BentoDashboardProps {
 }
 
 // Day meanings for insights
-const dayMeanings: Record<number, { theme: string; message: string; detail: string }> = {
+// Localized: this is the dashboard every signed-in user lands on, and these
+// strings were English only, showing through in the Romanian and Russian UI.
+type DayMeaning = { theme: string; message: string; detail: string };
+const dayMeanings: Record<number, Record<string, DayMeaning>> = {
   1: {
-    theme: 'New Beginnings',
-    message: 'Today favors bold action and fresh starts',
-    detail: 'Your energy supports leadership and initiative. Take charge of situations and trust your instincts.',
+    en: { theme: "New Beginnings", message: "Today favors bold action and fresh starts", detail: "Your energy supports leadership and initiative. Take charge of situations and trust your instincts." },
+    ro: { theme: "Începuturi Noi", message: "Ziua favorizează acțiunea curajoasă și începuturile", detail: "Energia ta susține inițiativa și conducerea. Preia controlul situațiilor și ai încredere în instinct." },
+    ru: { theme: "Новые начинания", message: "День благоприятен для смелых действий и новых стартов", detail: "Ваша энергия поддерживает лидерство и инициативу. Берите ситуацию в свои руки." },
   },
   2: {
-    theme: 'Cooperation',
-    message: 'Partnerships and diplomacy are highlighted',
-    detail: 'Focus on relationships and collaborative efforts. Your sensitivity helps you understand others.',
+    en: { theme: "Cooperation", message: "Partnership and patience serve you well", detail: "Work with others rather than alone. Diplomacy opens doors that force cannot." },
+    ro: { theme: "Cooperare", message: "Parteneriatul și răbdarea îți sunt de folos", detail: "Lucrează cu ceilalți, nu singur. Diplomația deschide uși pe care forța nu le poate deschide." },
+    ru: { theme: "Сотрудничество", message: "Партнёрство и терпение сегодня на вашей стороне", detail: "Работайте с другими, а не в одиночку. Дипломатия открывает двери, недоступные силе." },
   },
   3: {
-    theme: 'Creative Expression',
-    message: 'Your creativity and communication shine',
-    detail: 'Express yourself through art, writing, or conversation. Social interactions bring joy.',
+    en: { theme: "Creative Expression", message: "Your creativity and communication shine", detail: "Express yourself through art, writing, or conversation. Social interactions bring joy." },
+    ro: { theme: "Expresie Creativă", message: "Creativitatea și comunicarea ta strălucesc", detail: "Exprimă-te prin artă, scris sau conversație. Interacțiunile sociale îți aduc bucurie." },
+    ru: { theme: "Творческое выражение", message: "Ваше творчество и общение сегодня ярки", detail: "Выражайте себя через искусство, письмо или беседу. Общение принесёт радость." },
   },
   4: {
-    theme: 'Foundation Building',
-    message: 'Focus on practical matters today',
-    detail: 'Organize, plan, and build solid foundations. Hard work pays off on this day.',
+    en: { theme: "Foundation Building", message: "Focus on practical matters today", detail: "Organize, plan, and build solid foundations. Hard work pays off on this day." },
+    ro: { theme: "Construirea Fundației", message: "Concentrează-te azi pe lucrurile practice", detail: "Organizează, planifică și construiește temelii solide. Munca susținută dă roade azi." },
+    ru: { theme: "Построение основы", message: "Сосредоточьтесь сегодня на практических делах", detail: "Организуйте, планируйте и стройте прочный фундамент. Усердный труд окупается." },
   },
   5: {
-    theme: 'Change & Freedom',
-    message: 'Embrace adventure and flexibility',
-    detail: 'Unexpected opportunities may arise. Stay adaptable and open to new experiences.',
+    en: { theme: "Change & Freedom", message: "Embrace adventure and flexibility", detail: "Unexpected opportunities may arise. Stay adaptable and open to new experiences." },
+    ro: { theme: "Schimbare și Libertate", message: "Îmbrățișează aventura și flexibilitatea", detail: "Pot apărea oportunități neașteptate. Rămâi adaptabil și deschis la experiențe noi." },
+    ru: { theme: "Перемены и свобода", message: "Примите приключения и гибкость", detail: "Могут появиться неожиданные возможности. Будьте гибкими и открытыми новому." },
   },
   6: {
-    theme: 'Harmony & Service',
-    message: 'Family and responsibilities take center stage',
-    detail: 'Nurture loved ones and create beauty in your environment. Balance giving with receiving.',
+    en: { theme: "Harmony & Service", message: "Family and responsibilities take center stage", detail: "Nurture loved ones and create beauty in your environment. Balance giving with receiving." },
+    ro: { theme: "Armonie și Grijă", message: "Familia și responsabilitățile trec pe primul plan", detail: "Ai grijă de cei dragi și creează frumusețe în jurul tău. Echilibrează datul cu primitul." },
+    ru: { theme: "Гармония и забота", message: "Семья и обязанности выходят на первый план", detail: "Заботьтесь о близких и создавайте красоту вокруг. Уравновешивайте отдачу и получение." },
   },
   7: {
-    theme: 'Inner Wisdom',
-    message: 'Seek solitude for reflection',
-    detail: 'Deep thinking and spiritual pursuits are favored. Trust your intuition and inner knowing.',
+    en: { theme: "Inner Wisdom", message: "Seek solitude for reflection", detail: "Study, meditate, or simply rest. Answers come from within rather than from others." },
+    ro: { theme: "Înțelepciune Interioară", message: "Caută singurătatea pentru reflecție", detail: "Studiază, meditează sau odihnește-te. Răspunsurile vin dinăuntru, nu de la ceilalți." },
+    ru: { theme: "Внутренняя мудрость", message: "Ищите уединение для размышлений", detail: "Учитесь, медитируйте или отдыхайте. Ответы приходят изнутри, а не от других." },
   },
   8: {
-    theme: 'Achievement',
-    message: 'Focus on career and material goals',
-    detail: 'Business matters and financial decisions are highlighted. Use your power wisely.',
+    en: { theme: "Power & Abundance", message: "Focus on goals, money, and achievement", detail: "A strong day for business decisions and negotiations. Claim what you have earned." },
+    ro: { theme: "Putere și Abundență", message: "Concentrează-te pe obiective, bani și realizări", detail: "Zi puternică pentru decizii de afaceri și negocieri. Revendică ce ai câștigat." },
+    ru: { theme: "Сила и изобилие", message: "Сосредоточьтесь на целях, деньгах и достижениях", detail: "Хороший день для деловых решений и переговоров. Требуйте заслуженное." },
   },
   9: {
-    theme: 'Completion',
-    message: 'Wrap up projects and practice compassion',
-    detail: 'Let go of what no longer serves you. Humanitarian efforts bring fulfillment.',
+    en: { theme: "Completion", message: "Let go of what no longer serves you", detail: "Finish what is unfinished and release the rest. Compassion and generosity are rewarded." },
+    ro: { theme: "Împlinire", message: "Lasă în urmă ce nu-ți mai folosește", detail: "Termină ce ai lăsat neterminat și eliberează restul. Compasiunea și generozitatea sunt răsplătite." },
+    ru: { theme: "Завершение", message: "Отпустите то, что больше не служит вам", detail: "Завершите незаконченное и отпустите остальное. Сострадание и щедрость вознаграждаются." },
   },
 };
 
@@ -108,13 +111,14 @@ export const BentoDashboard = ({
     soulUrge: calculateSoulUrgeNumber(fullName),
     personality: calculatePersonalityNumber(fullName),
     personalYear: calculatePersonalYearNumber(birthDate),
-    personalMonth: calculatePersonalMonthNumber(birthDate, today),
+    personalMonth: calculatePersonalMonthNumber(birthDate, today.getFullYear(), today.getMonth() + 1),
     personalDay: calculatePersonalDayNumber(birthDate, today),
   }), [fullName, birthDate]);
 
   // Get today's insight
   const todayInsight = useMemo(() => {
-    return dayMeanings[numbers.personalDay] || dayMeanings[1];
+    const entry = dayMeanings[numbers.personalDay] ?? dayMeanings[1];
+    return entry[language] ?? entry.en;
   }, [numbers.personalDay]);
 
   // Get remedy for personal day
