@@ -60,20 +60,24 @@ const AppHeader = () => {
             {navItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);
+              const label = (t[item.labelKey as keyof typeof t] as string) || item.mobileLabel;
               return (
-                <Link key={item.path} to={item.path}>
+                <Link key={item.path} to={item.path} title={label} aria-label={label}>
                   <Button
                     variant="ghost"
                     size="sm"
                     className={cn(
-                      "h-9 px-3 gap-2 font-raleway text-sm transition-all",
+                      // Labels only from 2xl up. Seven icon+label buttons plus the
+                      // right-hand controls overflowed the max-w-7xl container and
+                      // pushed the language switcher off screen below ~1900px.
+                      "h-9 px-2 2xl:px-3 gap-0 2xl:gap-2 font-raleway text-sm transition-all",
                       active
                         ? "bg-primary/10 text-primary border-b-2 border-primary"
                         : "text-foreground/90 hover:text-primary hover:bg-primary/5"
                     )}
                   >
                     <Icon className="h-4 w-4" />
-                    <span>{(t[item.labelKey as keyof typeof t] as string) || item.mobileLabel}</span>
+                    <span className="hidden 2xl:inline">{label}</span>
                   </Button>
                 </Link>
               );
@@ -132,10 +136,10 @@ const AppHeader = () => {
             )}
 
             {/* Theme Selector */}
-            <ThemeSelector />
+            <LanguageSwitcher />
 
             {/* Language Switcher */}
-            <LanguageSwitcher />
+            <ThemeSelector />
 
             {/* Mobile Menu Button */}
             <Button
