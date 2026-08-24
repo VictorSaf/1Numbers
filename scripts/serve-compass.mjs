@@ -133,6 +133,18 @@ const server = createServer(async (req, res) => {
     if (info.isFile()) {
       return await serveFile(res, filePath, { immutable: rel.startsWith("assets/"), head, proto });
     }
+    // A directory here means the build wrote a per-route index.html for it
+    // (see scripts/prerender-meta.mjs), carrying that route's meta tags.
+    if (info.isDirectory()) {
+      const nested = join(filePath, "index.html");
+      try {
+        if ((await stat(nested)).isFile()) {
+          return await serveFile(res, nested, { immutable: false, head, proto });
+        }
+      } catch {
+        // no prerendered file; fall through to the SPA shell
+      }
+    }
   } catch {
     // fall through
   }
