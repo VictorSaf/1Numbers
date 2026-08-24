@@ -61,7 +61,15 @@ router.post('/login', async (req: Request, res: Response) => {
 });
 
 // Register
+// Public sign-up is closed on the compass.oneaigency.com deployment. Gated by
+// environment rather than removed, so it can be reopened without a code change.
+const registrationOpen = process.env.ALLOW_REGISTRATION === 'true';
+
 router.post('/register', async (req: Request, res: Response) => {
+  if (!registrationOpen) {
+    return res.status(403).json({ error: 'Registration is currently closed' });
+  }
+
   try {
     const { email, password, name } = req.body;
 

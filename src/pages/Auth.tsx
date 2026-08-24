@@ -30,6 +30,10 @@ const Auth = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   
+  // Mirrors ALLOW_REGISTRATION on the server. With sign-up closed the backend
+  // answers 403, so offering the form would only lead users into a dead end.
+  // Both sides default to closed when the variable is unset.
+  const registrationOpen = import.meta.env.VITE_ALLOW_REGISTRATION === 'true';
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -275,19 +279,21 @@ const Auth = () => {
             </Button>
           </form>
 
-          {/* Switch mode */}
-          <div className="mt-6 text-center">
-            <button
-              type="button"
-              onClick={() => {
-                setIsLoginMode(!isLoginMode);
-                setErrors({});
-              }}
-              className="text-sm text-primary hover:text-primary/80 transition-colors"
-            >
-              {isLoginMode ? l.switchToRegister : l.switchToLogin}
-            </button>
-          </div>
+          {/* Switch mode -- hidden entirely while sign-up is closed */}
+          {registrationOpen && (
+            <div className="mt-6 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLoginMode(!isLoginMode);
+                  setErrors({});
+                }}
+                className="text-sm text-primary hover:text-primary/80 transition-colors"
+              >
+                {isLoginMode ? l.switchToRegister : l.switchToLogin}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
