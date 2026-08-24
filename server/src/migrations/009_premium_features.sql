@@ -21,7 +21,7 @@ WHERE NOT EXISTS (SELECT 1 FROM subscription_plans WHERE name = 'pro');
 -- Feature usage tracking table
 CREATE TABLE IF NOT EXISTS feature_usage (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   feature_id VARCHAR(50) NOT NULL,
   usage_count INTEGER DEFAULT 0,
   period_start DATE NOT NULL,
@@ -37,7 +37,7 @@ CREATE INDEX IF NOT EXISTS idx_feature_usage_period ON feature_usage(period_star
 -- One-time purchases table
 CREATE TABLE IF NOT EXISTS one_time_purchases (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   product_id VARCHAR(50) NOT NULL,
   product_name VARCHAR(100) NOT NULL,
   price DECIMAL(10,2) NOT NULL,
@@ -56,7 +56,7 @@ CREATE INDEX IF NOT EXISTS idx_purchases_status ON one_time_purchases(status);
 -- White label configurations for Pro users
 CREATE TABLE IF NOT EXISTS white_label_configs (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   company_name VARCHAR(100),
   logo_url VARCHAR(500),
   primary_color VARCHAR(7),
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS white_label_configs (
 
 -- Function to check and increment feature usage
 CREATE OR REPLACE FUNCTION check_feature_limit(
-  p_user_id INTEGER,
+  p_user_id UUID,
   p_feature_id VARCHAR(50),
   p_limit INTEGER
 ) RETURNS TABLE(
@@ -110,7 +110,7 @@ $$ LANGUAGE plpgsql;
 
 -- Function to increment feature usage
 CREATE OR REPLACE FUNCTION increment_feature_usage(
-  p_user_id INTEGER,
+  p_user_id UUID,
   p_feature_id VARCHAR(50)
 ) RETURNS INTEGER AS $$
 DECLARE
@@ -132,7 +132,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Function to get user's tier and limits
-CREATE OR REPLACE FUNCTION get_user_tier_info(p_user_id INTEGER)
+CREATE OR REPLACE FUNCTION get_user_tier_info(p_user_id UUID)
 RETURNS TABLE(
   tier_id VARCHAR(20),
   plan_name VARCHAR(50),
