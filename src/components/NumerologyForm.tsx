@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { BirthDateSelect } from "@/components/BirthDateSelect";
 
 interface NumerologyFormProps {
   onCalculate: (data: { fullName: string; birthDate: Date }) => void;
@@ -68,43 +69,7 @@ export const NumerologyForm = ({ onCalculate, profileData }: NumerologyFormProps
         <Label className="text-foreground/90 font-raleway text-sm tracking-wide">
           {t.birthDateLabel}
         </Label>
-        <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                "w-full justify-start text-left font-normal h-12 input-mystic",
-                !birthDate && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4 text-primary" />
-              {birthDate ? (
-                format(birthDate, "d MMMM yyyy", { locale: dateLocale })
-              ) : (
-                <span>{t.birthDatePlaceholder}</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0 bg-card border-border z-50" align="start">
-            <Calendar
-              mode="single"
-              selected={birthDate}
-              onSelect={(date) => {
-                setBirthDate(date);
-                setIsCalendarOpen(false);
-              }}
-              disabled={(date) =>
-                date > new Date() || date < new Date("1900-01-01")
-              }
-              initialFocus
-              className="pointer-events-auto"
-              captionLayout="dropdown-buttons"
-              fromYear={1920}
-              toYear={currentYear}
-              locale={dateLocale}
-            />
-          </PopoverContent>
-        </Popover>
+        <BirthDateSelect value={birthDate} onChange={setBirthDate} />
       </div>
 
       <Button

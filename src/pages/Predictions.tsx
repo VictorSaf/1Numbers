@@ -21,6 +21,7 @@ import {
 } from '@/lib/predictions';
 import { DailyPredictionCard } from '@/components/DailyPredictionCard';
 import { WeeklyMonthlyPredictionCard } from '@/components/WeeklyMonthlyPredictionCard';
+import { BirthDateSelect } from "@/components/BirthDateSelect";
 
 const locales = { ro, en: enUS, ru };
 
@@ -181,31 +182,7 @@ const Predictions = () => {
             <div className="card-mystic rounded-xl p-8 text-center">
               <Sparkles className="h-12 w-12 text-primary mx-auto mb-4" />
               <h3 className="font-cinzel text-xl text-foreground mb-2">{l.enterBirthDate}</h3>
-              <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="mt-4 border-primary/30 text-foreground hover:bg-primary/10">
-                    <Calendar className="mr-2 h-4 w-4 text-primary" />
-                    {l.selectBirthDate}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 bg-card border-border z-50" align="center">
-                  <CalendarComponent
-                    mode="single"
-                    selected={birthDate}
-                    onSelect={(date) => {
-                      setBirthDate(date);
-                      setIsCalendarOpen(false);
-                    }}
-                    disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
-                    initialFocus
-                    className="pointer-events-auto"
-                    captionLayout="dropdown-buttons"
-                    fromYear={1920}
-                    toYear={new Date().getFullYear()}
-                    locale={dateLocale}
-                  />
-                </PopoverContent>
-              </Popover>
+              <BirthDateSelect value={birthDate} onChange={setBirthDate} />
             </div>
           )}
 

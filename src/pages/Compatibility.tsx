@@ -28,6 +28,7 @@ import { format } from "date-fns";
 import { ro, enUS, ru } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { BirthDateSelect } from "@/components/BirthDateSelect";
 
 interface PersonData {
   fullName: string;
@@ -166,39 +167,7 @@ const Compatibility = () => {
                   
                   <div className="space-y-2">
                     <Label className="text-foreground/90 text-sm">{t.birthDateLabel}</Label>
-                    <Popover open={isCalendar1Open} onOpenChange={setIsCalendar1Open}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left font-normal input-mystic",
-                            !person1.birthDate && "text-muted-foreground"
-                          )}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4 text-primary" />
-                          {person1.birthDate
-                            ? format(person1.birthDate, "d MMMM yyyy", { locale: dateLocale })
-                            : t.birthDatePlaceholder}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 bg-card border-border z-50">
-                        <Calendar
-                          mode="single"
-                          selected={person1.birthDate}
-                          onSelect={(date) => {
-                            setPerson1({ ...person1, birthDate: date });
-                            setIsCalendar1Open(false);
-                          }}
-                          disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
-                          initialFocus
-                          className="pointer-events-auto"
-                          captionLayout="dropdown-buttons"
-                          fromYear={1920}
-                          toYear={currentYear}
-                          locale={dateLocale}
-                        />
-                      </PopoverContent>
-                    </Popover>
+                    <BirthDateSelect value={person1.birthDate} onChange={(date) => setPerson1({ ...person1, birthDate: date })} />
                   </div>
                 </div>
 
@@ -223,39 +192,7 @@ const Compatibility = () => {
                   
                   <div className="space-y-2">
                     <Label className="text-foreground/90 text-sm">{t.birthDateLabel}</Label>
-                    <Popover open={isCalendar2Open} onOpenChange={setIsCalendar2Open}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left font-normal input-mystic",
-                            !person2.birthDate && "text-muted-foreground"
-                          )}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4 text-primary" />
-                          {person2.birthDate
-                            ? format(person2.birthDate, "d MMMM yyyy", { locale: dateLocale })
-                            : t.birthDatePlaceholder}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 bg-card border-border z-50">
-                        <Calendar
-                          mode="single"
-                          selected={person2.birthDate}
-                          onSelect={(date) => {
-                            setPerson2({ ...person2, birthDate: date });
-                            setIsCalendar2Open(false);
-                          }}
-                          disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
-                          initialFocus
-                          className="pointer-events-auto"
-                          captionLayout="dropdown-buttons"
-                          fromYear={1920}
-                          toYear={currentYear}
-                          locale={dateLocale}
-                        />
-                      </PopoverContent>
-                    </Popover>
+                    <BirthDateSelect value={person2.birthDate} onChange={(date) => setPerson2({ ...person2, birthDate: date })} />
                   </div>
                 </div>
               </div>
