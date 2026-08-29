@@ -46,7 +46,7 @@ const AppHeader = () => {
           <Link to="/" className="flex items-center gap-2 group">
             <div className="relative">
               <div className="absolute inset-0 bg-primary/20 rounded-full blur-md group-hover:bg-primary/30 transition-colors" />
-              <div className="relative w-8 h-8 rounded-full bg-gradient-to-br from-primary to-amber-500 flex items-center justify-center">
+              <div className="relative w-8 h-8 rounded-full bg-gradient-to-br from-primary to-warn flex items-center justify-center">
                 <span className="text-primary-foreground font-cinzel font-bold text-lg">N</span>
               </div>
             </div>

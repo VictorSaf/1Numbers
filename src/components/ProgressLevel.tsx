@@ -76,7 +76,7 @@ export const ProgressLevel = ({
     <div
       className={cn(
         "flex items-center rounded-xl",
-        "bg-gradient-to-br from-primary/10 to-purple-500/10",
+        "bg-gradient-to-br from-primary/10 to-accent-ink/10",
         "border border-primary/20",
         classes.container
       )}

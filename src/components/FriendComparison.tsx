@@ -141,19 +141,19 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 90) return 'text-green-500';
-    if (score >= 75) return 'text-emerald-500';
-    if (score >= 60) return 'text-yellow-500';
-    if (score >= 45) return 'text-orange-500';
-    return 'text-red-500';
+    if (score >= 90) return 'text-ok';
+    if (score >= 75) return 'text-ok';
+    if (score >= 60) return 'text-warn';
+    if (score >= 45) return 'text-warn';
+    return 'text-crit';
   };
 
   const getProgressColor = (score: number) => {
-    if (score >= 90) return 'bg-green-500';
-    if (score >= 75) return 'bg-emerald-500';
-    if (score >= 60) return 'bg-yellow-500';
-    if (score >= 45) return 'bg-orange-500';
-    return 'bg-red-500';
+    if (score >= 90) return 'bg-ok';
+    if (score >= 75) return 'bg-ok';
+    if (score >= 60) return 'bg-warn';
+    if (score >= 45) return 'bg-warn';
+    return 'bg-crit';
   };
 
   const displayName = friendName || friend.fullName.split(' ')[0];
@@ -164,7 +164,7 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
       <Card className="border-2 border-primary/20">
         <CardHeader className="text-center pb-2">
           <div className="flex justify-center mb-2">
-            <Heart className="h-8 w-8 text-red-500 fill-red-500" />
+            <Heart className="h-8 w-8 text-crit fill-crit" />
           </div>
           <CardTitle className="text-2xl">{t.overallCompatibility}</CardTitle>
           <CardDescription>
@@ -236,7 +236,7 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
         <Card>
           <CardHeader className="pb-2">
             <div className="flex items-center gap-2">
-              <Star className="h-5 w-5 text-amber-500" />
+              <Star className="h-5 w-5 text-warn" />
               <CardTitle className="text-lg">{t.friendNumbers}</CardTitle>
             </div>
           </CardHeader>
@@ -275,7 +275,7 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-purple-500" />
+            <Sparkles className="h-5 w-5 text-primary" />
             <CardTitle>{t.analysis}</CardTitle>
           </div>
         </CardHeader>
@@ -347,15 +347,15 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
       {(compatibility.strengths || compatibility.challenges) && (
         <div className="grid md:grid-cols-2 gap-4">
           {/* Strengths */}
-          <Card className="border-green-500/20">
+          <Card className="border-ok/20">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg text-green-500">{t.strengths}</CardTitle>
+              <CardTitle className="text-lg text-ok">{t.strengths}</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
                 {(compatibility.strengths?.[language] ?? []).map((strength, index) => (
                   <li key={index} className="flex items-start gap-2">
-                    <span className="text-green-500">+</span>
+                    <span className="text-ok">+</span>
                     <span className="text-sm">{strength}</span>
                   </li>
                 ))}
@@ -364,15 +364,15 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
           </Card>
 
           {/* Challenges */}
-          <Card className="border-orange-500/20">
+          <Card className="border-warn/20">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg text-orange-500">{t.challenges}</CardTitle>
+              <CardTitle className="text-lg text-warn">{t.challenges}</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
                 {(compatibility.challenges?.[language] ?? []).map((challenge, index) => (
                   <li key={index} className="flex items-start gap-2">
-                    <span className="text-orange-500">!</span>
+                    <span className="text-warn">!</span>
                     <span className="text-sm">{challenge}</span>
                   </li>
                 ))}

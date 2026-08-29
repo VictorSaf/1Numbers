@@ -68,9 +68,11 @@ export const StreakDisplay = memo(({ streak, showAnimation = true, size = 'md' }
   };
 
   const getStreakColor = () => {
-    if (streak >= 30) return 'from-amber-500 to-yellow-500';
-    if (streak >= 7) return 'from-orange-500 to-red-500';
-    return 'from-orange-400 to-orange-600';
+    // An ordinal scale, so the three tiers have to stay three visible steps.
+    // Mapping every tier onto semantic tokens made the top and bottom identical.
+    if (streak >= 30) return 'from-crit to-crit-ink';
+    if (streak >= 7) return 'from-warn to-crit';
+    return 'from-warn-soft to-warn';
   };
 
   const sizeClasses = {
@@ -121,8 +123,8 @@ export const StreakDisplay = memo(({ streak, showAnimation = true, size = 'md' }
       {animate && streak >= 7 && (
         <>
           <span className="absolute -top-1 -right-1 flex h-3 w-3">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-warn opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-warn"></span>
           </span>
         </>
       )}
@@ -137,7 +139,7 @@ export const StreakBadge = memo(({ streak }: { streak: number }) => {
   if (streak === 0) return null;
 
   return (
-    <div className="flex items-center gap-1 text-orange-500">
+    <div className="flex items-center gap-1 text-warn">
       <Flame className="h-4 w-4" />
       <span className="font-bold">{streak}</span>
     </div>

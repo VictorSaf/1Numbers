@@ -72,7 +72,7 @@ export const PinnacleCard = ({ pinnacle, challenge, isCurrentPeriod, delay = 0 }
         </div>
         
         <div>
-          <p className="text-sm font-medium text-amber-500">
+          <p className="text-sm font-medium text-warn">
             {language === 'ro' ? 'Provocare' : language === 'ru' ? 'Вызов' : 'Challenge'}: {challengeInfo?.title[language]}
           </p>
         </div>
@@ -97,7 +97,7 @@ export const PinnacleCard = ({ pinnacle, challenge, isCurrentPeriod, delay = 0 }
             </p>
           </div>
           <div>
-            <p className="text-xs font-medium text-amber-500 mb-1">
+            <p className="text-xs font-medium text-warn mb-1">
               {language === 'ro' ? 'Despre Provocare' : language === 'ru' ? 'О Вызове' : 'About Challenge'}
             </p>
             <p className="text-xs text-muted-foreground">

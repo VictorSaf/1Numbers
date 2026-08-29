@@ -109,7 +109,7 @@ export const DailyPredictionCard = ({ prediction, birthDate, date }: DailyPredic
           </div>
           <div className="flex flex-wrap gap-2">
             {prediction.luckyHours.map((hour, index) => (
-              <Badge key={index} className="bg-amber-500/20 text-amber-300 border-amber-400/30">
+              <Badge key={index} className="bg-warn/20 text-warn border-warn/30">
                 {hour}
               </Badge>
             ))}

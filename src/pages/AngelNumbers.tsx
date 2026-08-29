@@ -207,8 +207,8 @@ const AngelNumbers = () => {
               )}
 
               {searchResults.type === "none" && (
-                <Alert className="border-amber-500/30 bg-amber-500/10">
-                  <Info className="h-4 w-4 text-amber-500" />
+                <Alert className="border-warn/30 bg-warn/10">
+                  <Info className="h-4 w-4 text-warn" />
                   <AlertDescription className="text-muted-foreground">
                     {t.noResults} {t.tryAnother}
                   </AlertDescription>

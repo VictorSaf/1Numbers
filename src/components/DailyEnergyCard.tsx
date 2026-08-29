@@ -133,10 +133,10 @@ export const DailyEnergyCard = memo(({ birthDate, userName }: DailyEnergyCardPro
   const meaning = dayMeanings[dailyData.personalDay]?.[language] || dayMeanings[dailyData.personalDay]?.en;
 
   return (
-    <Card className="overflow-hidden border-0 bg-gradient-to-br from-primary/10 via-purple-500/10 to-amber-500/10">
+    <Card className="overflow-hidden border-0 bg-gradient-to-br from-primary/10 via-primary/10 to-warn/10">
       <CardContent className="p-0">
         {/* Header with gradient */}
-        <div className="bg-gradient-to-r from-primary to-purple-600 p-6 text-white">
+        <div className="bg-gradient-to-r from-primary to-accent-ink p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-white/80 text-sm">{getGreeting()}{userName ? `, ${userName.split(' ')[0]}` : ''}</p>
@@ -159,7 +159,7 @@ export const DailyEnergyCard = memo(({ birthDate, userName }: DailyEnergyCardPro
           {/* Numbers row */}
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center p-4 rounded-xl bg-background/80 backdrop-blur border">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center mx-auto mb-2 shadow-lg">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-accent-ink flex items-center justify-center mx-auto mb-2 shadow-lg">
                 <span className="text-2xl font-bold text-white">{dailyData.personalDay}</span>
               </div>
               <p className="text-sm font-medium">{t.personalDay}</p>
@@ -170,7 +170,7 @@ export const DailyEnergyCard = memo(({ birthDate, userName }: DailyEnergyCardPro
               )}
             </div>
             <div className="text-center p-4 rounded-xl bg-background/80 backdrop-blur border">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center mx-auto mb-2 shadow-lg">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-warn to-warn-ink flex items-center justify-center mx-auto mb-2 shadow-lg">
                 <span className="text-2xl font-bold text-white">{dailyData.universalDay}</span>
               </div>
               <p className="text-sm font-medium">{t.universalDay}</p>
@@ -197,8 +197,8 @@ export const DailyEnergyCard = memo(({ birthDate, userName }: DailyEnergyCardPro
                 </div>
               </div>
               <div className="flex items-center gap-3 p-3 rounded-lg bg-background/60 border">
-                <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
-                  <Gem className="h-5 w-5 text-purple-500" />
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                  <Gem className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">{t.luckyStone}</p>
@@ -210,11 +210,11 @@ export const DailyEnergyCard = memo(({ birthDate, userName }: DailyEnergyCardPro
 
           {/* Daily tip */}
           {meaning && (
-            <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+            <div className="p-4 rounded-xl bg-warn/10 border border-warn/20">
               <div className="flex items-start gap-3">
-                <Sparkles className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+                <Sparkles className="h-5 w-5 text-warn shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-xs font-medium text-amber-600 mb-1">{t.tip}</p>
+                  <p className="text-xs font-medium text-warn mb-1">{t.tip}</p>
                   <p className="text-sm">{meaning.tip}</p>
                 </div>
               </div>

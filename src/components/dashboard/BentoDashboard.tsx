@@ -225,7 +225,7 @@ export const BentoDashboard = ({
         <BentoCard
           title={text.yourEnergy}
           icon={Sun}
-          iconColor="text-amber-500"
+          iconColor="text-chart-3"
           colSpan={2}
           rowSpan={2}
           variant="highlight"
@@ -277,7 +277,7 @@ export const BentoDashboard = ({
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Star className="w-5 h-5 text-purple-500" />
+                  <Star className="w-5 h-5 text-primary" />
                   <div>
                     <p className="text-xs text-muted-foreground">{text.luckyStone}</p>
                     <p className="text-sm font-medium">{remedy.gemstones.primary}</p>
@@ -324,7 +324,7 @@ export const BentoDashboard = ({
         <BentoCard
           title={text.soulUrge}
           icon={Heart}
-          iconColor="text-pink-500"
+          iconColor="text-chart-1"
           colSpan={1}
           animationDelay={200}
           interactive
@@ -341,7 +341,7 @@ export const BentoDashboard = ({
         <BentoCard
           title={text.personality}
           icon={Moon}
-          iconColor="text-indigo-500"
+          iconColor="text-chart-4"
           colSpan={1}
           animationDelay={250}
           interactive
@@ -358,7 +358,7 @@ export const BentoDashboard = ({
         <BentoCard
           title={text.loShu}
           icon={Grid3X3}
-          iconColor="text-amber-500"
+          iconColor="text-chart-5"
           colSpan={2}
           animationDelay={300}
           interactive
@@ -375,7 +375,7 @@ export const BentoDashboard = ({
         <BentoCard
           title={text.streak}
           icon={Flame}
-          iconColor="text-orange-500"
+          iconColor="text-chart-2"
           colSpan={1}
           animationDelay={350}
         >
@@ -388,13 +388,13 @@ export const BentoDashboard = ({
         <BentoCard
           title="Compatibility"
           icon={Heart}
-          iconColor="text-pink-500"
+          iconColor="text-chart-6"
           colSpan={1}
           animationDelay={400}
           interactive
         >
           <Link to="/compatibility" className="block text-center py-4">
-            <Heart className="w-10 h-10 mx-auto text-pink-500 mb-2" />
+            <Heart className="w-10 h-10 mx-auto text-chart-6 mb-2" />
             <p className="text-sm text-muted-foreground">Check compatibility</p>
           </Link>
         </BentoCard>
@@ -413,7 +413,7 @@ export const BentoDashboard = ({
         <BentoCard
           title={text.calendar}
           icon={Calendar}
-          iconColor="text-purple-500"
+          iconColor="text-primary"
           colSpan={2}
           animationDelay={500}
         >

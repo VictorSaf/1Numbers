@@ -125,12 +125,12 @@ export const SystemSelector = ({
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
                   <div
                     key={n}
-                    className="w-6 h-6 rounded bg-amber-500/20 flex items-center justify-center text-xs font-mono"
+                    className="w-6 h-6 rounded bg-warn/20 flex items-center justify-center text-xs font-mono"
                   >
                     {n}
                   </div>
                 ))}
-                <div className="w-6 h-6 rounded bg-amber-500/10 flex items-center justify-center text-xs font-mono text-muted-foreground">
+                <div className="w-6 h-6 rounded bg-warn/10 flex items-center justify-center text-xs font-mono text-muted-foreground">
                   9*
                 </div>
               </div>

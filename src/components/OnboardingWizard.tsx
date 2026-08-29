@@ -192,10 +192,10 @@ export const OnboardingWizard = ({ onComplete, onSkip }: OnboardingWizardProps) 
           {currentStep === 'welcome' && (
             <div className="text-center space-y-6 py-8">
               <div className="relative inline-block">
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-purple-500/20 flex items-center justify-center mx-auto animate-pulse">
+                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-accent-ink/20 flex items-center justify-center mx-auto animate-pulse">
                   <Compass className="h-12 w-12 text-primary" />
                 </div>
-                <Sparkles className="h-6 w-6 text-amber-500 absolute -top-1 -right-1 animate-bounce" />
+                <Sparkles className="h-6 w-6 text-warn absolute -top-1 -right-1 animate-bounce" />
               </div>
               <div>
                 <h1 className="text-3xl font-bold mb-2">{t.welcome}</h1>
@@ -260,8 +260,8 @@ export const OnboardingWizard = ({ onComplete, onSkip }: OnboardingWizardProps) 
           {currentStep === 'birthdate' && (
             <div className="space-y-6 py-4">
               <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-purple-500/10 flex items-center justify-center mx-auto mb-4">
-                  <Calendar className="h-8 w-8 text-purple-500" />
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <Calendar className="h-8 w-8 text-primary" />
                 </div>
                 <h2 className="text-2xl font-bold">{t.birthdateStep}</h2>
                 <p className="text-muted-foreground mt-2">{t.birthdateDesc}</p>
@@ -304,7 +304,7 @@ export const OnboardingWizard = ({ onComplete, onSkip }: OnboardingWizardProps) 
               <div className="relative py-8">
                 {isRevealing ? (
                   <div className="space-y-4">
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center mx-auto animate-spin">
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-accent-ink flex items-center justify-center mx-auto animate-spin">
                       <Star className="h-10 w-10 text-white" />
                     </div>
                     <p className="text-muted-foreground animate-pulse">{t.calculating}</p>
@@ -312,11 +312,11 @@ export const OnboardingWizard = ({ onComplete, onSkip }: OnboardingWizardProps) 
                 ) : (
                   <div className="space-y-4 animate-in fade-in zoom-in duration-500">
                     <div className="relative inline-block">
-                      <div className="w-32 h-32 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center mx-auto shadow-lg shadow-primary/30">
+                      <div className="w-32 h-32 rounded-full bg-gradient-to-br from-primary to-accent-ink flex items-center justify-center mx-auto shadow-lg shadow-primary/30">
                         <span className="text-5xl font-bold text-white">{revealedNumber}</span>
                       </div>
-                      <Sparkles className="h-8 w-8 text-amber-400 absolute -top-2 -right-2 animate-pulse" />
-                      <Sparkles className="h-6 w-6 text-amber-400 absolute -bottom-1 -left-1 animate-pulse delay-150" />
+                      <Sparkles className="h-8 w-8 text-warn absolute -top-2 -right-2 animate-pulse" />
+                      <Sparkles className="h-6 w-6 text-warn absolute -bottom-1 -left-1 animate-pulse delay-150" />
                     </div>
                     <div>
                       <p className="text-lg font-medium">{t.yourNumber} <strong>{revealedNumber}</strong></p>
@@ -348,8 +348,8 @@ export const OnboardingWizard = ({ onComplete, onSkip }: OnboardingWizardProps) 
           {/* Complete Step */}
           {currentStep === 'complete' && (
             <div className="text-center space-y-6 py-8">
-              <div className="w-20 h-20 rounded-full bg-green-500/10 flex items-center justify-center mx-auto">
-                <Check className="h-10 w-10 text-green-500" />
+              <div className="w-20 h-20 rounded-full bg-ok/10 flex items-center justify-center mx-auto">
+                <Check className="h-10 w-10 text-ok" />
               </div>
               <div>
                 <h2 className="text-2xl font-bold">{t.completeStep}</h2>

@@ -91,7 +91,7 @@ export const NumberCard = ({ title, number, description, delay = 0, isMain = fal
                 {/* Strengths */}
                 {'strengths' in meaning && meaning.strengths && (
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-emerald-500">
+                    <div className="flex items-center gap-2 text-ok">
                       <Shield className="h-4 w-4" />
                       <span className="text-sm font-medium">{t.strengthsLabel || 'Puncte Forte'}</span>
                     </div>
@@ -99,7 +99,7 @@ export const NumberCard = ({ title, number, description, delay = 0, isMain = fal
                       {(meaning.strengths as string[]).map((strength, idx) => (
                         <span
                           key={idx}
-                          className="px-2 py-1 text-xs rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                          className="px-2 py-1 text-xs rounded-md bg-ok/10 text-ok border border-ok/20"
                         >
                           {strength}
                         </span>
@@ -111,7 +111,7 @@ export const NumberCard = ({ title, number, description, delay = 0, isMain = fal
                 {/* Challenges */}
                 {'challenges' in meaning && meaning.challenges && (
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-amber-500">
+                    <div className="flex items-center gap-2 text-warn">
                       <AlertTriangle className="h-4 w-4" />
                       <span className="text-sm font-medium">{t.challengesLabel || 'Provocări'}</span>
                     </div>
@@ -119,7 +119,7 @@ export const NumberCard = ({ title, number, description, delay = 0, isMain = fal
                       {(meaning.challenges as string[]).map((challenge, idx) => (
                         <span
                           key={idx}
-                          className="px-2 py-1 text-xs rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20"
+                          className="px-2 py-1 text-xs rounded-md bg-warn/10 text-warn border border-warn/20"
                         >
                           {challenge}
                         </span>
@@ -131,7 +131,7 @@ export const NumberCard = ({ title, number, description, delay = 0, isMain = fal
                 {/* Career */}
                 {'career' in meaning && meaning.career && (
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-blue-500">
+                    <div className="flex items-center gap-2 text-info">
                       <Briefcase className="h-4 w-4" />
                       <span className="text-sm font-medium">{t.careerLabel || 'Carieră Potrivită'}</span>
                     </div>
@@ -139,7 +139,7 @@ export const NumberCard = ({ title, number, description, delay = 0, isMain = fal
                       {(meaning.career as string[]).map((job, idx) => (
                         <span
                           key={idx}
-                          className="px-2 py-1 text-xs rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"
+                          className="px-2 py-1 text-xs rounded-md bg-info/10 text-info border border-info/20"
                         >
                           {job}
                         </span>
@@ -151,7 +151,7 @@ export const NumberCard = ({ title, number, description, delay = 0, isMain = fal
                 {/* Relationships */}
                 {'relationships' in meaning && meaning.relationships && (
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-rose-500">
+                    <div className="flex items-center gap-2 text-crit">
                       <Heart className="h-4 w-4" />
                       <span className="text-sm font-medium">{t.relationshipsLabel || 'Relații'}</span>
                     </div>
@@ -164,7 +164,7 @@ export const NumberCard = ({ title, number, description, delay = 0, isMain = fal
                 {/* Personalized Advice */}
                 {'advice' in meaning && meaning.advice && (
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-purple-500">
+                    <div className="flex items-center gap-2 text-primary">
                       <Lightbulb className="h-4 w-4" />
                       <span className="text-sm font-medium">{t.adviceLabel || 'Sfaturi Personalizate'}</span>
                     </div>

@@ -54,8 +54,8 @@ export const StreakCounter = ({
     <div
       className={cn(
         "flex items-center rounded-xl",
-        "bg-gradient-to-br from-orange-500/20 to-red-500/20",
-        "border border-orange-500/30",
+        "bg-gradient-to-br from-warn/20 to-crit/20",
+        "border border-warn/30",
         isMilestone && "animate-pulse",
         classes.container
       )}
@@ -64,14 +64,14 @@ export const StreakCounter = ({
         <Flame
           className={cn(
             classes.icon,
-            "text-orange-500",
+            "text-warn",
             isOnFire && "animate-bounce"
           )}
         />
         {isOnFire && (
           <Sparkles
             className={cn(
-              "absolute -top-1 -right-1 h-3 w-3 text-yellow-400"
+              "absolute -top-1 -right-1 h-3 w-3 text-warn"
             )}
           />
         )}
@@ -80,7 +80,7 @@ export const StreakCounter = ({
       <div className="flex flex-col">
         <span
           className={cn(
-            "font-cinzel font-bold text-orange-500",
+            "font-cinzel font-bold text-warn",
             classes.number
           )}
         >
@@ -92,11 +92,11 @@ export const StreakCounter = ({
       </div>
 
       {showLongest && longestStreak > currentStreak && (
-        <div className="ml-2 pl-2 border-l border-orange-500/30 flex flex-col">
+        <div className="ml-2 pl-2 border-l border-warn/30 flex flex-col">
           <span className={cn("text-muted-foreground", classes.label)}>
             {labels.best[language]}
           </span>
-          <span className={cn("font-semibold text-orange-400/70", classes.label)}>
+          <span className={cn("font-semibold text-warn/70", classes.label)}>
             {longestStreak} {labels.days[language]}
           </span>
         </div>

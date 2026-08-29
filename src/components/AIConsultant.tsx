@@ -225,10 +225,10 @@ export const AIConsultant = () => {
     <div className="space-y-6">
       {/* Daily Energy Card */}
       {dailySuggestion && (
-        <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-purple-500/5">
+        <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-accent-ink/5">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
-              <Sun className="h-5 w-5 text-amber-500" />
+              <Sun className="h-5 w-5 text-warn" />
               <CardTitle className="text-lg">{tr.dailyEnergy}</CardTitle>
             </div>
           </CardHeader>
@@ -258,7 +258,7 @@ export const AIConsultant = () => {
                 <ul className="space-y-1">
                   {dailySuggestion.advice.slice(0, 3).map((tip, idx) => (
                     <li key={idx} className="text-sm flex items-start gap-2">
-                      <Lightbulb className="h-3 w-3 text-amber-500 mt-1 shrink-0" />
+                      <Lightbulb className="h-3 w-3 text-warn mt-1 shrink-0" />
                       <span>{tip}</span>
                     </li>
                   ))}
@@ -307,7 +307,7 @@ export const AIConsultant = () => {
             <TabsContent value="chat" className="space-y-4 mt-4">
               {/* No profile warning */}
               {!profile && (
-                <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/30 text-sm text-amber-600 dark:text-amber-400">
+                <div className="p-4 rounded-lg bg-warn/10 border border-warn/30 text-sm text-warn">
                   {tr.noProfile}
                 </div>
               )}

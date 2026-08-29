@@ -172,7 +172,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
       <ResultSection
         className="opacity-0 animate-fade-in ds-delay-900"
         title={sectionLabels.karmic[language]}
-        icon={<AlertTriangle className="h-5 w-5 text-amber-500" />}
+        icon={<AlertTriangle className="h-5 w-5 text-warn" />}
         locked={!isAuthenticated}
         teaser={teasers.karmic[language]}
       >
@@ -183,7 +183,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
             ))}
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground p-4 rounded-xl bg-green-500/10 border border-green-500/20">
+          <p className="text-sm text-muted-foreground p-4 rounded-xl bg-ok/10 border border-ok/20">
             ✓ {sectionLabels.noDebts[language]}
           </p>
         )}

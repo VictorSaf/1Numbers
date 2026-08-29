@@ -61,11 +61,11 @@ export const PersonalCycleCard = ({ birthDate, delay = 0 }: PersonalCycleCardPro
         </div>
 
         {/* Personal Month */}
-        <div className="text-center p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-          <Moon className="h-4 w-4 mx-auto text-purple-400 mb-1" />
+        <div className="text-center p-3 rounded-xl bg-primary/10 border border-primary/20">
+          <Moon className="h-4 w-4 mx-auto text-primary mb-1" />
           <p className="text-xs text-muted-foreground">{labels.personalMonth[language]}</p>
-          <p className="font-cinzel text-2xl text-purple-400">{personalMonth}</p>
-          <p className="text-xs text-purple-400/70">{monthInfo?.keywords[language]}</p>
+          <p className="font-cinzel text-2xl text-primary">{personalMonth}</p>
+          <p className="text-xs text-primary/70">{monthInfo?.keywords[language]}</p>
         </div>
 
         {/* Universal Day */}
@@ -90,8 +90,8 @@ export const PersonalCycleCard = ({ birthDate, delay = 0 }: PersonalCycleCardPro
           <p className="text-sm text-muted-foreground">{dayInfo?.dayMeaning[language]}</p>
         </div>
 
-        <div className="p-4 rounded-xl bg-purple-500/5 border border-purple-500/10">
-          <p className="text-sm font-medium text-purple-400 mb-2">{labels.monthEnergy[language]}</p>
+        <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
+          <p className="text-sm font-medium text-primary mb-2">{labels.monthEnergy[language]}</p>
           <p className="text-sm text-muted-foreground">{monthInfo?.monthMeaning[language]}</p>
         </div>
       </div>

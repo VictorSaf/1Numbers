@@ -227,8 +227,8 @@ const WhiteLabelSettings = () => {
         <div className="container mx-auto px-4 py-8">
           <Card className="max-w-lg mx-auto text-center">
             <CardContent className="pt-12 pb-12">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-100 flex items-center justify-center">
-                <Crown className="h-8 w-8 text-purple-500" />
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary flex items-center justify-center">
+                <Crown className="h-8 w-8 text-primary" />
               </div>
               <h2 className="text-2xl font-bold mb-2">{t.title}</h2>
               <p className="text-muted-foreground mb-6">{t.proOnly}</p>
@@ -250,9 +250,9 @@ const WhiteLabelSettings = () => {
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <Crown className="h-6 w-6 text-purple-500" />
+              <Crown className="h-6 w-6 text-primary" />
               <h1 className="text-2xl font-bold">{t.title}</h1>
-              <Badge variant="secondary" className="bg-purple-100 text-purple-700">
+              <Badge variant="secondary" className="bg-primary text-primary">
                 Pro
               </Badge>
             </div>
@@ -369,13 +369,13 @@ const WhiteLabelSettings = () => {
           </Button>
           <div className="flex items-center gap-3">
             {error && (
-              <div className="flex items-center gap-2 text-red-500 text-sm">
+              <div className="flex items-center gap-2 text-crit text-sm">
                 <AlertCircle className="h-4 w-4" />
                 {error}
               </div>
             )}
             {saved && (
-              <div className="flex items-center gap-2 text-green-500 text-sm">
+              <div className="flex items-center gap-2 text-ok text-sm">
                 <CheckCircle className="h-4 w-4" />
                 {t.saved}
               </div>

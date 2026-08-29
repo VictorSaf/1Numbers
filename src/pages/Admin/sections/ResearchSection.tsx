@@ -99,8 +99,8 @@ export const ResearchSection = () => {
                 className="flex items-center justify-between p-4 rounded-lg bg-muted/30 border border-border/30"
               >
                 <div className="flex items-center gap-4">
-                  <div className="p-2 rounded-lg bg-blue-500/10">
-                    <FileText className="h-5 w-5 text-blue-500" />
+                  <div className="p-2 rounded-lg bg-info/10">
+                    <FileText className="h-5 w-5 text-info" />
                   </div>
                   <div className="flex-1">
                     <div className="font-medium flex items-center gap-2">

@@ -58,7 +58,7 @@ export const QuizComponent = ({
               disabled={showResult}
               className={cn(
                 "p-4 rounded-lg border text-left transition-all",
-                showResult && index === quiz.correct && "bg-green-500/20 border-green-500",
+                showResult && index === quiz.correct && "bg-ok/20 border-ok",
                 showResult && selectedAnswer === index && index !== quiz.correct && "bg-destructive/20 border-destructive",
                 !showResult && "hover:border-primary/50 border-border/50",
                 showResult && "cursor-not-allowed"
@@ -67,13 +67,13 @@ export const QuizComponent = ({
               <div className="flex items-center justify-between">
                 <span className={cn(
                   "text-foreground/90",
-                  showResult && index === quiz.correct && "text-green-400 font-medium",
+                  showResult && index === quiz.correct && "text-ok font-medium",
                   showResult && selectedAnswer === index && index !== quiz.correct && "text-destructive"
                 )}>
                   {option}
                 </span>
                 {showResult && index === quiz.correct && (
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <CheckCircle className="h-5 w-5 text-ok" />
                 )}
                 {showResult && selectedAnswer === index && index !== quiz.correct && (
                   <XCircle className="h-5 w-5 text-destructive" />
@@ -86,13 +86,13 @@ export const QuizComponent = ({
         {showResult && (
           <div className={cn(
             "p-4 rounded-lg",
-            isCorrect ? "bg-green-500/10 border border-green-500/30" : "bg-destructive/10 border border-destructive/30"
+            isCorrect ? "bg-ok/10 border border-ok/30" : "bg-destructive/10 border border-destructive/30"
           )}>
             <div className="flex items-center gap-2 mb-2">
               {isCorrect ? (
                 <>
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                  <span className="font-medium text-green-400">Răspuns corect!</span>
+                  <CheckCircle className="h-5 w-5 text-ok" />
+                  <span className="font-medium text-ok">Răspuns corect!</span>
                 </>
               ) : (
                 <>

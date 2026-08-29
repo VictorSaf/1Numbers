@@ -107,11 +107,11 @@ export const MiniCalendar = memo(({ birthDate, currentDate = new Date() }: MiniC
       {/* Legend */}
       <div className="flex items-center gap-4 mt-3 text-[10px] text-muted-foreground">
         <div className="flex items-center gap-1">
-          <div className="w-2 h-2 rounded-full bg-emerald-500/50" />
+          <div className="w-2 h-2 rounded-full bg-ok/50" />
           <span>Favorable</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-2 h-2 rounded-full bg-amber-500/50" />
+          <div className="w-2 h-2 rounded-full bg-warn/50" />
           <span>Challenging</span>
         </div>
         <div className="flex items-center gap-1">

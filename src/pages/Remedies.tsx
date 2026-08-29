@@ -149,8 +149,8 @@ const Remedies = () => {
       <div className="text-center mb-8">
         <div className="flex justify-center mb-4">
           <div className="relative">
-            <Gem className="h-12 w-12 text-purple-500" />
-            <Sparkles className="h-6 w-6 text-amber-400 absolute -top-1 -right-1" />
+            <Gem className="h-12 w-12 text-primary" />
+            <Sparkles className="h-6 w-6 text-warn absolute -top-1 -right-1" />
           </div>
         </div>
         <h1 className="text-3xl font-bold mb-2">{t.title}</h1>
@@ -248,7 +248,7 @@ const Remedies = () => {
               {lifePathRemedy && (
                 <div>
                   <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                    <Star className="h-5 w-5 text-amber-500" />
+                    <Star className="h-5 w-5 text-warn" />
                     {t.lifePath} {userNumbers.lifePath} - {lifePathRemedy.planet.name}
                   </h2>
                   <RemedyCard remedy={lifePathRemedy} showAll />
@@ -259,7 +259,7 @@ const Remedies = () => {
               {destinyRemedy && userNumbers.destiny !== userNumbers.lifePath && (
                 <div>
                   <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                    <Star className="h-5 w-5 text-purple-500" />
+                    <Star className="h-5 w-5 text-primary" />
                     {t.destiny} {userNumbers.destiny} - {destinyRemedy.planet.name}
                   </h2>
                   <RemedyCard remedy={destinyRemedy} showAll />
@@ -273,10 +273,10 @@ const Remedies = () => {
         <TabsContent value="today" className="space-y-6">
           {todayRemedy && (
             <>
-              <Card className="border-amber-500/20 bg-amber-500/5">
+              <Card className="border-warn/20 bg-warn/5">
                 <CardHeader>
                   <div className="flex items-center gap-3">
-                    <Sun className="h-8 w-8 text-amber-500" />
+                    <Sun className="h-8 w-8 text-warn" />
                     <div>
                       <CardTitle>
                         {t.todayIs} {todayRemedy.remedy.planet.symbol} {todayRemedy.remedy.planet.name}
@@ -295,14 +295,14 @@ const Remedies = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-3 rounded-lg bg-background">
-                      <Gem className="h-5 w-5 text-purple-500" />
+                      <Gem className="h-5 w-5 text-primary" />
                       <div>
                         <p className="text-sm text-muted-foreground">Gemstone</p>
                         <p className="font-medium">{todayRemedy.remedy.gemstones.primary}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-3 rounded-lg bg-background">
-                      <Quote className="h-5 w-5 text-amber-500" />
+                      <Quote className="h-5 w-5 text-warn" />
                       <div>
                         <p className="text-sm text-muted-foreground">Mantra</p>
                         <p className="font-medium text-sm">{todayRemedy.remedy.mantras.vedic}</p>
@@ -374,7 +374,7 @@ const Remedies = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Gem className="h-5 w-5 text-purple-500" />
+                  <Gem className="h-5 w-5 text-primary" />
                   Gemstones
                 </CardTitle>
               </CardHeader>
@@ -396,7 +396,7 @@ const Remedies = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-blue-500" />
+                  <Calendar className="h-5 w-5 text-info" />
                   Days
                 </CardTitle>
               </CardHeader>

@@ -27,10 +27,10 @@ export const MultiPersonComparison = ({ comparison }: MultiPersonComparisonProps
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 85) return "text-green-400";
+    if (score >= 85) return "text-ok";
     if (score >= 70) return "text-primary";
-    if (score >= 55) return "text-amber-400";
-    return "text-red-400";
+    if (score >= 55) return "text-warn";
+    return "text-crit";
   };
 
   const getScoreBadgeVariant = (score: number): "default" | "secondary" | "destructive" | "outline" => {
@@ -83,7 +83,7 @@ export const MultiPersonComparison = ({ comparison }: MultiPersonComparisonProps
         {/* Strongest Pairs */}
         {comparison.strongestPairs.length > 0 && (
           <div className="space-y-3">
-            <div className="flex items-center gap-2 text-emerald-500">
+            <div className="flex items-center gap-2 text-ok">
               <TrendingUp className="h-5 w-5" />
               <h3 className="font-cinzel text-lg text-foreground">
                 {t.compatibility?.strongestPairs || "Perechi Cele Mai Puternice"}
@@ -148,7 +148,7 @@ export const MultiPersonComparison = ({ comparison }: MultiPersonComparisonProps
         {/* Weakest Pairs */}
         {comparison.weakestPairs.length > 0 && (
           <div className="space-y-3">
-            <div className="flex items-center gap-2 text-amber-500">
+            <div className="flex items-center gap-2 text-warn">
               <TrendingDown className="h-5 w-5" />
               <h3 className="font-cinzel text-lg text-foreground">
                 {t.compatibility?.weakestPairs || "Perechi Care Necesită Atenție"}
@@ -213,7 +213,7 @@ export const MultiPersonComparison = ({ comparison }: MultiPersonComparisonProps
         {/* Recommendations */}
         {comparison.recommendations[language].length > 0 && (
           <div className="space-y-3">
-            <div className="flex items-center gap-2 text-purple-500">
+            <div className="flex items-center gap-2 text-primary">
               <Sparkles className="h-5 w-5" />
               <h3 className="font-cinzel text-lg text-foreground">
                 {t.compatibility?.groupRecommendations || "Recomandări pentru Grup"}

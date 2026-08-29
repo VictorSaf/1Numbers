@@ -99,14 +99,14 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
   }, [birthDate, fullName, selectedMonth]);
 
   const getScoreColor = (score: number) => {
-    if (score >= 70) return "text-green-400";
-    if (score >= 50) return "text-amber-400";
+    if (score >= 70) return "text-ok";
+    if (score >= 50) return "text-warn";
     return "text-primary";
   };
 
   const getScoreBg = (score: number) => {
-    if (score >= 70) return "bg-green-500/20 border-green-500/30";
-    if (score >= 50) return "bg-amber-500/20 border-amber-500/30";
+    if (score >= 70) return "bg-ok/20 border-ok/30";
+    if (score >= 50) return "bg-warn/20 border-warn/30";
     return "bg-primary/20 border-primary/30";
   };
 
@@ -168,7 +168,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
       {nextLucky && (
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-3">
-            <Star className="h-4 w-4 text-amber-400" />
+            <Star className="h-4 w-4 text-warn" />
             <span className="text-sm font-medium text-foreground">{t.nextLucky}</span>
           </div>
           {renderDateCard(nextLucky, true)}

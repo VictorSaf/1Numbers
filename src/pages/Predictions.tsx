@@ -255,7 +255,7 @@ const Predictions = () => {
                           <p className="text-foreground/80 text-sm">{dailyPrediction.challenges}</p>
                         </div>
                         <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                          <h4 className="font-cinzel text-sm text-green-500 mb-2">{l.opportunities}</h4>
+                          <h4 className="font-cinzel text-sm text-ok mb-2">{l.opportunities}</h4>
                           <p className="text-foreground/80 text-sm">{dailyPrediction.opportunities}</p>
                         </div>
                       </div>

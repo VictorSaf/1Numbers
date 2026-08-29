@@ -99,8 +99,8 @@ export const SkillsSection = () => {
                 className="flex items-center justify-between p-4 rounded-lg bg-muted/30 border border-border/30"
               >
                 <div className="flex items-center gap-4">
-                  <div className="p-2 rounded-lg bg-amber-500/10">
-                    <Terminal className="h-5 w-5 text-amber-500" />
+                  <div className="p-2 rounded-lg bg-warn/10">
+                    <Terminal className="h-5 w-5 text-warn" />
                   </div>
                   <div>
                     <div className="font-medium flex items-center gap-2">

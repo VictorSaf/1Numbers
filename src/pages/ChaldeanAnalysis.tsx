@@ -167,18 +167,18 @@ const ChaldeanAnalysis = () => {
   const getNatureColor = (nature: 'positive' | 'negative' | 'neutral') => {
     switch (nature) {
       case 'positive':
-        return 'text-green-500';
+        return 'text-ok';
       case 'negative':
-        return 'text-red-500';
+        return 'text-crit';
       default:
-        return 'text-yellow-500';
+        return 'text-warn';
     }
   };
 
   const getNatureBadge = (nature: 'positive' | 'negative' | 'neutral') => {
     switch (nature) {
       case 'positive':
-        return <Badge className="bg-green-500">{t.positive}</Badge>;
+        return <Badge className="bg-ok">{t.positive}</Badge>;
       case 'negative':
         return <Badge variant="destructive">{t.negative}</Badge>;
       default:
@@ -211,7 +211,7 @@ const ChaldeanAnalysis = () => {
               <div className="text-sm text-muted-foreground">{t.compoundNumber}</div>
             </div>
             <div className="text-center p-4 bg-muted rounded-lg">
-              <div className="text-3xl font-bold text-amber-500">{single}</div>
+              <div className="text-3xl font-bold text-warn">{single}</div>
               <div className="text-sm text-muted-foreground">{t.singleDigit}</div>
             </div>
           </div>
@@ -258,8 +258,8 @@ const ChaldeanAnalysis = () => {
       <div className="text-center mb-8">
         <div className="flex justify-center mb-4">
           <div className="relative">
-            <Star className="h-12 w-12 text-amber-500" />
-            <Sparkles className="h-6 w-6 text-amber-400 absolute -top-1 -right-1" />
+            <Star className="h-12 w-12 text-warn" />
+            <Sparkles className="h-6 w-6 text-warn absolute -top-1 -right-1" />
           </div>
         </div>
         <h1 className="text-3xl font-bold mb-2">{t.title}</h1>
@@ -267,10 +267,10 @@ const ChaldeanAnalysis = () => {
       </div>
 
       {/* How It Works */}
-      <Card className="mb-8 border-amber-500/20 bg-amber-500/5">
+      <Card className="mb-8 border-warn/20 bg-warn/5">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg flex items-center gap-2">
-            <Hash className="h-5 w-5 text-amber-500" />
+            <Hash className="h-5 w-5 text-warn" />
             {t.howItWorks}
           </CardTitle>
         </CardHeader>
@@ -353,7 +353,7 @@ const ChaldeanAnalysis = () => {
                         className="flex flex-col items-center p-2 bg-muted rounded-lg min-w-[40px]"
                       >
                         <span className="font-bold">{item.letter}</span>
-                        <span className="text-sm text-amber-500">{item.value}</span>
+                        <span className="text-sm text-warn">{item.value}</span>
                       </div>
                     ))}
                     <div className="flex flex-col items-center p-2 bg-primary/20 rounded-lg min-w-[40px]">
@@ -378,13 +378,13 @@ const ChaldeanAnalysis = () => {
                   t.birthNumber,
                   analysis.birthNumber.compound,
                   analysis.birthNumber.single,
-                  <Calendar className="h-5 w-5 text-blue-500" />
+                  <Calendar className="h-5 w-5 text-info" />
                 )}
                 {renderNumberCard(
                   t.destinyNumber,
                   analysis.destinyNumber.compound,
                   analysis.destinyNumber.single,
-                  <Star className="h-5 w-5 text-amber-500" />
+                  <Star className="h-5 w-5 text-warn" />
                 )}
               </div>
 
@@ -393,7 +393,7 @@ const ChaldeanAnalysis = () => {
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg flex items-center gap-2">
-                      <Sun className="h-5 w-5 text-amber-500" />
+                      <Sun className="h-5 w-5 text-warn" />
                       {t.favorableDays}
                     </CardTitle>
                   </CardHeader>
@@ -411,7 +411,7 @@ const ChaldeanAnalysis = () => {
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg flex items-center gap-2">
-                      <Moon className="h-5 w-5 text-purple-500" />
+                      <Moon className="h-5 w-5 text-primary" />
                       {t.compatibleNumbers}
                     </CardTitle>
                   </CardHeader>
@@ -451,7 +451,7 @@ const ChaldeanAnalysis = () => {
 
           {businessName && businessAnalysis && (
             <>
-              <Card className={businessAnalysis.isLucky ? 'border-green-500/50' : 'border-red-500/50'}>
+              <Card className={businessAnalysis.isLucky ? 'border-ok/50' : 'border-crit/50'}>
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-4">
@@ -462,7 +462,7 @@ const ChaldeanAnalysis = () => {
                         <div className="text-sm text-muted-foreground">{t.compoundNumber}</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-4xl font-bold text-amber-500">
+                        <div className="text-4xl font-bold text-warn">
                           {businessAnalysis.single}
                         </div>
                         <div className="text-sm text-muted-foreground">{t.singleDigit}</div>
@@ -471,13 +471,13 @@ const ChaldeanAnalysis = () => {
                     <div className="flex items-center gap-2">
                       {businessAnalysis.isLucky ? (
                         <>
-                          <CheckCircle className="h-8 w-8 text-green-500" />
-                          <span className="font-bold text-green-500">{t.isLucky}</span>
+                          <CheckCircle className="h-8 w-8 text-ok" />
+                          <span className="font-bold text-ok">{t.isLucky}</span>
                         </>
                       ) : (
                         <>
-                          <XCircle className="h-8 w-8 text-red-500" />
-                          <span className="font-bold text-red-500">{t.notLucky}</span>
+                          <XCircle className="h-8 w-8 text-crit" />
+                          <span className="font-bold text-crit">{t.notLucky}</span>
                         </>
                       )}
                     </div>
@@ -503,9 +503,9 @@ const ChaldeanAnalysis = () => {
               </Card>
 
               <div className="grid md:grid-cols-2 gap-4">
-                <Card className="border-green-500/20">
+                <Card className="border-ok/20">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-lg flex items-center gap-2 text-green-500">
+                    <CardTitle className="text-lg flex items-center gap-2 text-ok">
                       <CheckCircle className="h-5 w-5" />
                       {t.luckyNumbers}
                     </CardTitle>
@@ -522,7 +522,7 @@ const ChaldeanAnalysis = () => {
                           }
                           className={
                             num === businessAnalysis.compound || num === businessAnalysis.single
-                              ? 'bg-green-500'
+                              ? 'bg-ok'
                               : ''
                           }
                         >
@@ -533,9 +533,9 @@ const ChaldeanAnalysis = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="border-red-500/20">
+                <Card className="border-crit/20">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-lg flex items-center gap-2 text-red-500">
+                    <CardTitle className="text-lg flex items-center gap-2 text-crit">
                       <AlertTriangle className="h-5 w-5" />
                       {t.avoidNumbers}
                     </CardTitle>

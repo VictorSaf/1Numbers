@@ -177,10 +177,10 @@ const Premium = () => {
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center gap-3">
             <div className="relative">
-              <Crown className="h-10 w-10 text-amber-500" />
-              <Sparkles className="h-4 w-4 text-purple-500 absolute -top-1 -right-1" />
+              <Crown className="h-10 w-10 text-warn" />
+              <Sparkles className="h-4 w-4 text-primary absolute -top-1 -right-1" />
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-amber-500 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-warn to-primary bg-clip-text text-transparent">
               {t.title}
             </h1>
           </div>
@@ -189,22 +189,22 @@ const Premium = () => {
 
         {/* Current Subscription Status */}
         {!loading && subscriptionStatus && currentTier !== 'free' && (
-          <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-purple-500/5">
+          <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-accent-ink/5">
             <CardContent className="pt-6">
               <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
                     {currentTier === 'pro' ? (
-                      <Crown className="h-6 w-6 text-purple-500" />
+                      <Crown className="h-6 w-6 text-primary" />
                     ) : (
-                      <Star className="h-6 w-6 text-amber-500" />
+                      <Star className="h-6 w-6 text-warn" />
                     )}
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">{t.currentPlan}</p>
                     <p className="text-2xl font-bold capitalize flex items-center gap-2">
                       {tierInfo?.name[language] || subscriptionStatus.planName}
-                      <Badge variant="secondary" className="bg-green-100 text-green-700">
+                      <Badge variant="secondary" className="bg-ok-soft text-ok">
                         <CheckCircle className="h-3 w-3 mr-1" />
                         {t.active}
                       </Badge>
@@ -227,7 +227,7 @@ const Premium = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-amber-500" />
+                <Sparkles className="h-5 w-5 text-warn" />
                 {t.whyPremium}
               </CardTitle>
             </CardHeader>
@@ -239,17 +239,17 @@ const Premium = () => {
                   <p className="text-sm text-muted-foreground">{t.benefit1Desc}</p>
                 </div>
                 <div className="flex flex-col items-center text-center p-4 rounded-lg bg-muted/50">
-                  <MessageSquare className="h-8 w-8 text-purple-500 mb-3" />
+                  <MessageSquare className="h-8 w-8 text-primary mb-3" />
                   <h3 className="font-semibold mb-1">{t.benefit2Title}</h3>
                   <p className="text-sm text-muted-foreground">{t.benefit2Desc}</p>
                 </div>
                 <div className="flex flex-col items-center text-center p-4 rounded-lg bg-muted/50">
-                  <FileText className="h-8 w-8 text-amber-500 mb-3" />
+                  <FileText className="h-8 w-8 text-warn mb-3" />
                   <h3 className="font-semibold mb-1">{t.benefit3Title}</h3>
                   <p className="text-sm text-muted-foreground">{t.benefit3Desc}</p>
                 </div>
                 <div className="flex flex-col items-center text-center p-4 rounded-lg bg-muted/50">
-                  <Zap className="h-8 w-8 text-green-500 mb-3" />
+                  <Zap className="h-8 w-8 text-ok mb-3" />
                   <h3 className="font-semibold mb-1">{t.benefit4Title}</h3>
                   <p className="text-sm text-muted-foreground">{t.benefit4Desc}</p>
                 </div>
@@ -285,21 +285,21 @@ const Premium = () => {
             {PAYMENTS_ENABLED && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="flex items-center gap-3 p-4 rounded-lg border bg-card">
-                  <Shield className="h-8 w-8 text-green-500" />
+                  <Shield className="h-8 w-8 text-ok" />
                   <div>
                     <p className="font-semibold">{t.guarantee}</p>
                     <p className="text-sm text-muted-foreground">{t.guaranteeDesc}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-4 rounded-lg border bg-card">
-                  <Shield className="h-8 w-8 text-blue-500" />
+                  <Shield className="h-8 w-8 text-info" />
                   <div>
                     <p className="font-semibold">{t.securePayment}</p>
                     <p className="text-sm text-muted-foreground">{t.securePaymentDesc}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-4 rounded-lg border bg-card">
-                  <Clock className="h-8 w-8 text-purple-500" />
+                  <Clock className="h-8 w-8 text-primary" />
                   <div>
                     <p className="font-semibold">{t.support}</p>
                     <p className="text-sm text-muted-foreground">{t.supportDesc}</p>

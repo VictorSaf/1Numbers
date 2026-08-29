@@ -32,9 +32,9 @@ export const AngelNumberCard = ({
   };
 
   const frequencyColors = {
-    common: "bg-green-500/20 text-green-600 dark:text-green-400",
-    uncommon: "bg-blue-500/20 text-blue-600 dark:text-blue-400",
-    rare: "bg-purple-500/20 text-purple-600 dark:text-purple-400",
+    common: "bg-ok/20 text-ok",
+    uncommon: "bg-info/20 text-info",
+    rare: "bg-primary/20 text-primary",
   };
 
   const sectionLabels = {
@@ -54,12 +54,12 @@ export const AngelNumberCard = ({
         <div className="flex items-start gap-4">
           {/* Number Display */}
           <div className="relative flex-shrink-0">
-            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary/20 to-purple-500/20 border border-primary/30 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary/20 to-accent-ink/20 border border-primary/30 flex items-center justify-center">
               <span className="font-cinzel text-2xl text-gradient-gold">
                 {meaning.number}
               </span>
             </div>
-            <Sparkles className="absolute -top-2 -right-2 h-5 w-5 text-yellow-400" />
+            <Sparkles className="absolute -top-2 -right-2 h-5 w-5 text-warn" />
           </div>
 
           {/* Title and Message */}
@@ -118,7 +118,7 @@ export const AngelNumberCard = ({
 
           {/* Spiritual Significance */}
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-purple-500">
+            <div className="flex items-center gap-2 text-primary">
               <Sparkles className="h-4 w-4" />
               <span className="text-sm font-medium">
                 {sectionLabels.spiritual[language]}
@@ -131,7 +131,7 @@ export const AngelNumberCard = ({
 
           {/* Action Advice */}
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-amber-500">
+            <div className="flex items-center gap-2 text-warn">
               <Lightbulb className="h-4 w-4" />
               <span className="text-sm font-medium">
                 {sectionLabels.action[language]}
@@ -143,7 +143,7 @@ export const AngelNumberCard = ({
                   key={idx}
                   className="text-sm text-muted-foreground flex items-start gap-2"
                 >
-                  <span className="text-amber-500 mt-1">•</span>
+                  <span className="text-warn mt-1">•</span>
                   <span>{advice}</span>
                 </li>
               ))}
@@ -152,7 +152,7 @@ export const AngelNumberCard = ({
 
           {/* Related Numbers */}
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-blue-500">
+            <div className="flex items-center gap-2 text-info">
               <Link className="h-4 w-4" />
               <span className="text-sm font-medium">
                 {sectionLabels.related[language]}
@@ -162,7 +162,7 @@ export const AngelNumberCard = ({
               {meaning.relatedNumbers.map((num) => (
                 <span
                   key={num}
-                  className="px-3 py-1 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 text-sm font-medium"
+                  className="px-3 py-1 rounded-lg bg-info/10 text-info text-sm font-medium"
                 >
                   {num}
                 </span>

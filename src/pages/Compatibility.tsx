@@ -116,17 +116,17 @@ const Compatibility = () => {
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 85) return "text-green-400";
+    if (score >= 85) return "text-ok";
     if (score >= 70) return "text-primary";
-    if (score >= 55) return "text-amber-400";
-    return "text-red-400";
+    if (score >= 55) return "text-warn";
+    return "text-crit";
   };
 
   const getScoreBg = (score: number) => {
-    if (score >= 85) return "from-green-500/20 to-green-600/10 border-green-500/30";
-    if (score >= 70) return "from-primary/20 to-primary/10 border-primary/30";
-    if (score >= 55) return "from-amber-500/20 to-amber-600/10 border-amber-500/30";
-    return "from-red-500/20 to-red-600/10 border-red-500/30";
+    if (score >= 85) return "from-ok/20 to-ok-ink/10 border-ok/30";
+    if (score >= 70) return "from-primary/20 to-accent-ink/10 border-primary/30";
+    if (score >= 55) return "from-warn/20 to-warn-ink/10 border-warn/30";
+    return "from-crit/20 to-crit-ink/10 border-crit/30";
   };
 
   return (

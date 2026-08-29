@@ -29,7 +29,7 @@ export const CourseCard = ({ course, progress, className }: CourseCardProps) => 
               {course.title}
             </CardTitle>
             {isCompleted && (
-              <CheckCircle className="h-5 w-5 text-green-500 shrink-0 ml-2" />
+              <CheckCircle className="h-5 w-5 text-ok shrink-0 ml-2" />
             )}
           </div>
           <p className="text-sm text-muted-foreground line-clamp-2">

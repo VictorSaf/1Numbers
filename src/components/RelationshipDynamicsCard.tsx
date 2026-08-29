@@ -13,10 +13,10 @@ export const RelationshipDynamicsCard = ({ compatibility }: RelationshipDynamics
   const { language, t } = useLanguage();
 
   const getScoreColor = (score: number) => {
-    if (score >= 85) return "text-green-400";
+    if (score >= 85) return "text-ok";
     if (score >= 70) return "text-primary";
-    if (score >= 55) return "text-amber-400";
-    return "text-red-400";
+    if (score >= 55) return "text-warn";
+    return "text-crit";
   };
 
   const getScoreBadgeVariant = (score: number): "default" | "secondary" | "destructive" | "outline" => {
@@ -54,7 +54,7 @@ export const RelationshipDynamicsCard = ({ compatibility }: RelationshipDynamics
         {/* Strengths */}
         {compatibility.strengths[language].length > 0 && (
           <div className="space-y-3">
-            <div className="flex items-center gap-2 text-emerald-500">
+            <div className="flex items-center gap-2 text-ok">
               <Shield className="h-5 w-5" />
               <h3 className="font-cinzel text-lg text-foreground">
                 {t.compatibility?.strengths || "Puncte Forte"}
@@ -65,7 +65,7 @@ export const RelationshipDynamicsCard = ({ compatibility }: RelationshipDynamics
                 <Badge
                   key={idx}
                   variant="outline"
-                  className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                  className="bg-ok/10 text-ok border-ok/20"
                 >
                   {strength}
                 </Badge>
@@ -79,7 +79,7 @@ export const RelationshipDynamicsCard = ({ compatibility }: RelationshipDynamics
         {/* Challenges */}
         {compatibility.challenges[language].length > 0 && (
           <div className="space-y-3">
-            <div className="flex items-center gap-2 text-amber-500">
+            <div className="flex items-center gap-2 text-warn">
               <AlertTriangle className="h-5 w-5" />
               <h3 className="font-cinzel text-lg text-foreground">
                 {t.compatibility?.challenges || "Provocări"}
@@ -90,7 +90,7 @@ export const RelationshipDynamicsCard = ({ compatibility }: RelationshipDynamics
                 <Badge
                   key={idx}
                   variant="outline"
-                  className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
+                  className="bg-warn/10 text-warn border-warn/20"
                 >
                   {challenge}
                 </Badge>
@@ -110,7 +110,7 @@ export const RelationshipDynamicsCard = ({ compatibility }: RelationshipDynamics
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-3 rounded-lg bg-card/50 border border-border/30">
               <div className="flex items-center gap-2 mb-2">
-                <MessageSquare className="h-4 w-4 text-blue-500" />
+                <MessageSquare className="h-4 w-4 text-info" />
                 <span className="text-sm font-medium text-foreground">
                   {t.compatibility?.communication || "Comunicare"}
                 </span>
@@ -121,7 +121,7 @@ export const RelationshipDynamicsCard = ({ compatibility }: RelationshipDynamics
             </div>
             <div className="p-3 rounded-lg bg-card/50 border border-border/30">
               <div className="flex items-center gap-2 mb-2">
-                <Heart className="h-4 w-4 text-rose-500" />
+                <Heart className="h-4 w-4 text-crit" />
                 <span className="text-sm font-medium text-foreground">
                   {t.compatibility?.emotional || "Emoțional"}
                 </span>
@@ -132,7 +132,7 @@ export const RelationshipDynamicsCard = ({ compatibility }: RelationshipDynamics
             </div>
             <div className="p-3 rounded-lg bg-card/50 border border-border/30">
               <div className="flex items-center gap-2 mb-2">
-                <Briefcase className="h-4 w-4 text-purple-500" />
+                <Briefcase className="h-4 w-4 text-primary" />
                 <span className="text-sm font-medium text-foreground">
                   {t.compatibility?.practical || "Practic"}
                 </span>
@@ -149,7 +149,7 @@ export const RelationshipDynamicsCard = ({ compatibility }: RelationshipDynamics
         {/* Recommendations */}
         {compatibility.recommendations[language].length > 0 && (
           <div className="space-y-3">
-            <div className="flex items-center gap-2 text-purple-500">
+            <div className="flex items-center gap-2 text-primary">
               <Lightbulb className="h-5 w-5" />
               <h3 className="font-cinzel text-lg text-foreground">
                 {t.compatibility?.recommendations || "Recomandări"}

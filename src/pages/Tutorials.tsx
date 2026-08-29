@@ -368,7 +368,7 @@ const Tutorials = () => {
                 <div className="flex items-start justify-between mb-3">
                   <span className="text-xs text-muted-foreground">{l.lesson} {index + 1}</span>
                   {completedLessons.includes(index) && (
-                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <CheckCircle className="h-4 w-4 text-ok" />
                   )}
                 </div>
                 <h3 className="font-cinzel text-foreground mb-2">{les.title}</h3>
@@ -418,7 +418,7 @@ const Tutorials = () => {
                             "p-3 rounded-lg border text-left transition-all",
                             quizAnswer === idx 
                               ? idx === step.quiz!.correct
-                                ? "bg-green-500/20 border-green-500 text-green-400"
+                                ? "bg-ok/20 border-ok text-ok"
                                 : "bg-destructive/20 border-destructive text-destructive"
                               : "border-border/50 hover:border-primary/50 text-foreground/80"
                           )}
@@ -430,7 +430,7 @@ const Tutorials = () => {
                     {quizAnswer !== null && (
                       <p className={cn(
                         "mt-3 text-sm",
-                        quizAnswer === step.quiz.correct ? "text-green-400" : "text-destructive"
+                        quizAnswer === step.quiz.correct ? "text-ok" : "text-destructive"
                       )}>
                         {quizAnswer === step.quiz.correct ? l.correct : l.incorrect}
                       </p>

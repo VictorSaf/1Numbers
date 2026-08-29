@@ -19,16 +19,16 @@ const variantStyles = {
     bg: '',
   },
   positive: {
-    theme: 'text-emerald-500',
-    bg: 'bg-emerald-500/5',
+    theme: 'text-ok',
+    bg: 'bg-ok/5',
   },
   caution: {
-    theme: 'text-amber-500',
-    bg: 'bg-amber-500/5',
+    theme: 'text-warn',
+    bg: 'bg-warn/5',
   },
   special: {
-    theme: 'text-purple-500',
-    bg: 'bg-purple-500/5',
+    theme: 'text-primary',
+    bg: 'bg-primary/5',
   },
 };
 

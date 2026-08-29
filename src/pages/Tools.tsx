@@ -293,18 +293,18 @@ const Tools = () => {
 
   const getImpactColor = (impact: string) => {
     switch (impact) {
-      case 'positive': return 'bg-green-500/20 text-green-400';
-      case 'negative': return 'bg-red-500/20 text-red-400';
-      case 'mixed': return 'bg-yellow-500/20 text-yellow-400';
+      case 'positive': return 'bg-ok/20 text-ok';
+      case 'negative': return 'bg-crit/20 text-crit';
+      case 'mixed': return 'bg-warn/20 text-warn';
       default: return 'bg-muted text-muted-foreground';
     }
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 85) return 'text-green-400';
-    if (score >= 70) return 'text-emerald-400';
-    if (score >= 55) return 'text-yellow-400';
-    return 'text-orange-400';
+    if (score >= 85) return 'text-ok';
+    if (score >= 70) return 'text-ok';
+    if (score >= 55) return 'text-warn';
+    return 'text-warn';
   };
 
   return (
@@ -506,7 +506,7 @@ const Tools = () => {
                         <div className="number-display">{businessAnalysis.destinyNumber}</div>
                         <div>
                           <div className="text-lg font-cinzel text-foreground">{businessAnalysis.name}</div>
-                          <Badge className={businessAnalysis.vibrationalEnergy === 'strong' ? 'bg-green-500/20 text-green-400' : businessAnalysis.vibrationalEnergy === 'moderate' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400'}>
+                          <Badge className={businessAnalysis.vibrationalEnergy === 'strong' ? 'bg-ok/20 text-ok' : businessAnalysis.vibrationalEnergy === 'moderate' ? 'bg-warn/20 text-warn' : 'bg-crit/20 text-crit'}>
                             {t.vibrationalEnergy}: {t[businessAnalysis.vibrationalEnergy]}
                           </Badge>
                         </div>
@@ -514,11 +514,11 @@ const Tools = () => {
                       
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <Card className="bg-card/50">
-                          <CardHeader className="py-3"><CardTitle className="text-sm text-green-400">{t.suitableFor}</CardTitle></CardHeader>
+                          <CardHeader className="py-3"><CardTitle className="text-sm text-ok">{t.suitableFor}</CardTitle></CardHeader>
                           <CardContent><ul className="text-sm space-y-1">{businessAnalysis.suitableFor.map((s, i) => <li key={i}>• {s}</li>)}</ul></CardContent>
                         </Card>
                         <Card className="bg-card/50">
-                          <CardHeader className="py-3"><CardTitle className="text-sm text-orange-400">{t.challenges}</CardTitle></CardHeader>
+                          <CardHeader className="py-3"><CardTitle className="text-sm text-warn">{t.challenges}</CardTitle></CardHeader>
                           <CardContent><ul className="text-sm space-y-1">{businessAnalysis.challenges.map((c, i) => <li key={i}>• {c}</li>)}</ul></CardContent>
                         </Card>
                         <Card className="bg-card/50">
@@ -586,8 +586,8 @@ const Tools = () => {
                             {expandedMonth === month.month && (
                               <CardContent className="pt-0 space-y-2 text-sm animate-fade-in">
                                 <div><span className="text-primary">{t.focus}:</span> {month.focus.join(', ')}</div>
-                                <div><span className="text-green-400">{t.opportunities}:</span> {month.opportunities.join(', ')}</div>
-                                <div><span className="text-orange-400">{t.challenges}:</span> {month.challenges.join(', ')}</div>
+                                <div><span className="text-ok">{t.opportunities}:</span> {month.opportunities.join(', ')}</div>
+                                <div><span className="text-warn">{t.challenges}:</span> {month.challenges.join(', ')}</div>
                                 <div><span className="text-muted-foreground">{t.advice}:</span> {month.advice}</div>
                               </CardContent>
                             )}
@@ -691,13 +691,13 @@ const Tools = () => {
                               return (
                                 <>
                                   <div className="flex gap-2">
-                                    <Badge className={detail.level === 'excellent' ? 'bg-green-500/20 text-green-400' : detail.level === 'good' ? 'bg-emerald-500/20 text-emerald-400' : detail.level === 'moderate' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-orange-500/20 text-orange-400'}>
+                                    <Badge className={detail.level === 'excellent' ? 'bg-ok/20 text-ok' : detail.level === 'good' ? 'bg-ok/20 text-ok' : detail.level === 'moderate' ? 'bg-warn/20 text-warn' : 'bg-warn/20 text-warn'}>
                                       {t[detail.level] || detail.level}
                                     </Badge>
                                     <span className={`font-bold ${getScoreColor(detail.score)}`}>{detail.score}%</span>
                                   </div>
-                                  <div><span className="text-green-400">{t.strengths}:</span> {detail.strengths[language].join(', ')}</div>
-                                  <div><span className="text-orange-400">{t.challenges}:</span> {detail.challenges[language].join(', ')}</div>
+                                  <div><span className="text-ok">{t.strengths}:</span> {detail.strengths[language].join(', ')}</div>
+                                  <div><span className="text-warn">{t.challenges}:</span> {detail.challenges[language].join(', ')}</div>
                                   <div><span className="text-primary">{t.advice}:</span> {detail.advice[language]}</div>
                                 </>
                               );

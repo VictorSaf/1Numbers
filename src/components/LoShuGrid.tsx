@@ -176,7 +176,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
                             "hover:scale-105 cursor-pointer",
                             isMissing && "bg-muted/30 border border-dashed border-border/50",
                             !isMissing && !isRepeated && "bg-primary/10 border border-primary/30",
-                            isRepeated && "bg-gradient-to-br from-primary/20 to-purple-500/20 border-2 border-primary/50",
+                            isRepeated && "bg-gradient-to-br from-primary/20 to-accent-ink/20 border-2 border-primary/50",
                             isSelected && "ring-2 ring-primary ring-offset-2 ring-offset-background"
                           )}
                         >
@@ -227,8 +227,8 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
           {/* Present & Missing Numbers */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Present Numbers */}
-            <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-              <h4 className="text-sm font-medium text-emerald-600 dark:text-emerald-400 mb-2 flex items-center gap-2">
+            <div className="p-4 rounded-xl bg-ok/10 border border-ok/20">
+              <h4 className="text-sm font-medium text-ok mb-2 flex items-center gap-2">
                 <Sparkles className="h-4 w-4" />
                 {labels.presentNumbers[language]}
               </h4>
@@ -238,7 +238,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
                     key={num}
                     className={cn(
                       "px-3 py-1 rounded-full text-sm font-medium",
-                      "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300"
+                      "bg-ok/20 text-ok"
                     )}
                   >
                     {num}
@@ -248,8 +248,8 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
             </div>
 
             {/* Missing Numbers */}
-            <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
-              <h4 className="text-sm font-medium text-amber-600 dark:text-amber-400 mb-2 flex items-center gap-2">
+            <div className="p-4 rounded-xl bg-warn/10 border border-warn/20">
+              <h4 className="text-sm font-medium text-warn mb-2 flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4" />
                 {labels.missingNumbers[language]}
               </h4>
@@ -260,7 +260,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
                       key={num}
                       className={cn(
                         "px-3 py-1 rounded-full text-sm font-medium",
-                        "bg-amber-500/20 text-amber-700 dark:text-amber-300"
+                        "bg-warn/20 text-warn"
                       )}
                     >
                       {num}
@@ -281,15 +281,15 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
 
           {/* Repeated Numbers */}
           {result.repeatedNumbers.length > 0 && (
-            <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
-              <h4 className="text-sm font-medium text-purple-600 dark:text-purple-400 mb-2">
+            <div className="p-4 rounded-xl bg-primary/10 border border-primary/20">
+              <h4 className="text-sm font-medium text-primary mb-2">
                 {labels.repeatedNumbers[language]}
               </h4>
               <div className="flex flex-wrap gap-2">
                 {result.repeatedNumbers.map(({ number, count }) => (
                   <span
                     key={number}
-                    className="px-3 py-1 rounded-full text-sm font-medium bg-purple-500/20 text-purple-700 dark:text-purple-300"
+                    className="px-3 py-1 rounded-full text-sm font-medium bg-primary/20 text-primary"
                   >
                     {number} × {count}
                   </span>
@@ -310,10 +310,10 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
                   className={cn(
                     "p-2 rounded-lg text-xs",
                     plane.strength === "empty" && "bg-muted/30 text-muted-foreground",
-                    plane.strength === "weak" && "bg-amber-500/10 text-amber-600",
-                    plane.strength === "balanced" && "bg-blue-500/10 text-blue-600",
-                    plane.strength === "strong" && "bg-emerald-500/10 text-emerald-600",
-                    plane.strength === "dominant" && "bg-purple-500/10 text-purple-600"
+                    plane.strength === "weak" && "bg-warn/10 text-warn",
+                    plane.strength === "balanced" && "bg-info/10 text-info",
+                    plane.strength === "strong" && "bg-ok/10 text-ok",
+                    plane.strength === "dominant" && "bg-primary/10 text-primary"
                   )}
                 >
                   <div className="font-medium">
@@ -386,8 +386,8 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
                 className={cn(
                   "p-3 rounded-lg",
                   arrow.direction === "positive"
-                    ? "bg-emerald-500/10 border border-emerald-500/20"
-                    : "bg-amber-500/10 border border-amber-500/20"
+                    ? "bg-ok/10 border border-ok/20"
+                    : "bg-warn/10 border border-warn/20"
                 )}
               >
                 <div className="flex items-center gap-2 mb-1">
@@ -395,8 +395,8 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
                     className={cn(
                       "text-xs font-medium",
                       arrow.direction === "positive"
-                        ? "text-emerald-600 dark:text-emerald-400"
-                        : "text-amber-600 dark:text-amber-400"
+                        ? "text-ok"
+                        : "text-warn"
                     )}
                   >
                     {arrow.numbers.join(" - ")}
@@ -435,14 +435,14 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Strengths */}
         {result.analysis.strengths[language].length > 0 && (
-          <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-            <h4 className="text-sm font-medium text-emerald-600 dark:text-emerald-400 mb-2">
+          <div className="p-4 rounded-xl bg-ok/10 border border-ok/20">
+            <h4 className="text-sm font-medium text-ok mb-2">
               {labels.strengths[language]}
             </h4>
             <ul className="space-y-1">
               {result.analysis.strengths[language].map((strength, idx) => (
                 <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
-                  <span className="text-emerald-500 mt-1">+</span>
+                  <span className="text-ok mt-1">+</span>
                   {strength}
                 </li>
               ))}
@@ -452,14 +452,14 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
 
         {/* Weaknesses */}
         {result.analysis.weaknesses[language].length > 0 && (
-          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
-            <h4 className="text-sm font-medium text-amber-600 dark:text-amber-400 mb-2">
+          <div className="p-4 rounded-xl bg-warn/10 border border-warn/20">
+            <h4 className="text-sm font-medium text-warn mb-2">
               {labels.weaknesses[language]}
             </h4>
             <ul className="space-y-1">
               {result.analysis.weaknesses[language].map((weakness, idx) => (
                 <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
-                  <span className="text-amber-500 mt-1">!</span>
+                  <span className="text-warn mt-1">!</span>
                   {weakness}
                 </li>
               ))}

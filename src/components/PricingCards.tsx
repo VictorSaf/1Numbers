@@ -187,9 +187,9 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
       case 'free':
         return <Zap className="h-6 w-6" />;
       case 'premium':
-        return <Star className="h-6 w-6 text-amber-500" />;
+        return <Star className="h-6 w-6 text-warn" />;
       case 'pro':
-        return <Crown className="h-6 w-6 text-purple-500" />;
+        return <Crown className="h-6 w-6 text-primary" />;
     }
   };
 
@@ -220,7 +220,7 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
           className={billingPeriod === 'yearly' ? 'font-semibold' : 'text-muted-foreground'}
         >
           {t.yearly}
-          <Badge variant="secondary" className="ml-2 bg-green-100 text-green-700">
+          <Badge variant="secondary" className="ml-2 bg-ok-soft text-ok">
             {t.savePercent} 33%
           </Badge>
         </Label>
@@ -254,7 +254,7 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
                 </Badge>
               )}
               {tier.id === 'pro' && (
-                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-600">
+                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">
                   <Crown className="h-3 w-3 mr-1" />
                   {t.bestValue}
                 </Badge>
@@ -293,7 +293,7 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
                           : t.billedMonthly}
                       </p>
                       {billingPeriod === 'yearly' && savings > 0 && (
-                        <Badge variant="outline" className="mt-2 text-green-600 border-green-600">
+                        <Badge variant="outline" className="mt-2 text-ok border-ok">
                           {t.save} {formatPrice(savings, tier.pricing!.currency)}
                         </Badge>
                       )}
@@ -306,7 +306,7 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
                   {tier.features.map((feature) => (
                     <li key={feature.id} className="flex items-start gap-3">
                       {feature.included ? (
-                        <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                        <Check className="h-5 w-5 text-ok shrink-0 mt-0.5" />
                       ) : (
                         <X className="h-5 w-5 text-muted-foreground/50 shrink-0 mt-0.5" />
                       )}

@@ -50,9 +50,9 @@ export const PredictionHistory = ({ predictions, className }: PredictionHistoryP
                       <div
                         className={cn(
                           "h-full",
-                          dist.range === '81-100' ? "bg-green-500" :
+                          dist.range === '81-100' ? "bg-ok" :
                           dist.range === '61-80' ? "bg-primary" :
-                          dist.range === '41-60' ? "bg-yellow-500" :
+                          dist.range === '41-60' ? "bg-warn" :
                           "bg-destructive"
                         )}
                         style={{

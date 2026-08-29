@@ -174,13 +174,13 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
     }
     
     if (day.isLucky && day.isMasterDay) {
-      classes += "bg-gradient-to-br from-amber-500/30 to-purple-500/30 border-amber-400/50 hover:from-amber-500/40 hover:to-purple-500/40 ";
+      classes += "bg-gradient-to-br from-warn/30 to-primary/30 border-warn/50 hover:from-warn/40 hover:to-primary/40 ";
     } else if (day.isMasterDay) {
-      classes += "bg-purple-500/20 border-purple-400/40 hover:bg-purple-500/30 ";
+      classes += "bg-primary/20 border-primary/40 hover:bg-primary/30 ";
     } else if (day.isLucky) {
-      classes += "bg-amber-500/20 border-amber-400/40 hover:bg-amber-500/30 ";
+      classes += "bg-warn/20 border-warn/40 hover:bg-warn/30 ";
     } else if (day.luckyScore >= 25) {
-      classes += "bg-emerald-500/10 border-emerald-400/20 hover:bg-emerald-500/20 ";
+      classes += "bg-ok/10 border-ok/20 hover:bg-ok/20 ";
     } else {
       classes += "bg-card/50 border-border/30 hover:bg-card ";
     }
@@ -189,9 +189,9 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 60) return "text-amber-400";
-    if (score >= 40) return "text-emerald-400";
-    if (score >= 25) return "text-blue-400";
+    if (score >= 60) return "text-warn";
+    if (score >= 40) return "text-ok";
+    if (score >= 25) return "text-info";
     return "text-muted-foreground";
   };
 
@@ -233,15 +233,15 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
         {/* Legend */}
         <div className="flex flex-wrap gap-3 mb-4 text-xs">
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded bg-amber-500/40 border border-amber-400/60" />
+            <div className="w-3 h-3 rounded bg-warn/40 border border-warn/60" />
             <span className="text-muted-foreground">{t.luckyDays}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded bg-purple-500/40 border border-purple-400/60" />
+            <div className="w-3 h-3 rounded bg-primary/40 border border-primary/60" />
             <span className="text-muted-foreground">{t.masterDays}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded bg-emerald-500/20 border border-emerald-400/40" />
+            <div className="w-3 h-3 rounded bg-ok/20 border border-ok/40" />
             <span className="text-muted-foreground">{t.highEnergy}</span>
           </div>
         </div>
@@ -273,10 +273,10 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
                       {/* Day indicators */}
                       <div className="flex gap-0.5 mt-0.5">
                         {day.isMasterDay && (
-                          <Sparkles className="h-3 w-3 text-purple-400" />
+                          <Sparkles className="h-3 w-3 text-primary" />
                         )}
                         {day.isLucky && (
-                          <Star className="h-3 w-3 text-amber-400 fill-amber-400/50" />
+                          <Star className="h-3 w-3 text-warn fill-warn/50" />
                         )}
                       </div>
                       
@@ -284,7 +284,7 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
                       <div className="hidden sm:flex gap-1 mt-0.5 text-[10px]">
                         <span className="text-primary/80">{day.personalDay}</span>
                         <span className="text-muted-foreground">/</span>
-                        <span className="text-amber-400/80">{day.universalDay}</span>
+                        <span className="text-warn/80">{day.universalDay}</span>
                       </div>
                     </div>
                   </DialogTrigger>
@@ -304,9 +304,9 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
                           <div className="text-2xl font-cinzel text-primary font-bold">{day.personalDay}</div>
                           <div className="text-xs text-muted-foreground">{t.personalDay}</div>
                         </div>
-                        <div className="bg-amber-500/10 rounded-lg p-3 text-center">
-                          <Moon className="h-5 w-5 text-amber-400 mx-auto mb-1" />
-                          <div className="text-2xl font-cinzel text-amber-400 font-bold">{day.universalDay}</div>
+                        <div className="bg-warn/10 rounded-lg p-3 text-center">
+                          <Moon className="h-5 w-5 text-warn mx-auto mb-1" />
+                          <div className="text-2xl font-cinzel text-warn font-bold">{day.universalDay}</div>
                           <div className="text-xs text-muted-foreground">{t.universalDay}</div>
                         </div>
                       </div>
@@ -324,13 +324,13 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
                       {/* Badges */}
                       <div className="flex flex-wrap gap-2">
                         {day.isMasterDay && (
-                          <Badge className="bg-purple-500/20 text-purple-300 border-purple-400/30">
+                          <Badge className="bg-primary/20 text-primary border-primary/30">
                             <Sparkles className="h-3 w-3 mr-1" />
                             {t.masterDay}
                           </Badge>
                         )}
                         {day.isLucky && (
-                          <Badge className="bg-amber-500/20 text-amber-300 border-amber-400/30">
+                          <Badge className="bg-warn/20 text-warn border-warn/30">
                             <Star className="h-3 w-3 mr-1" />
                             {t.luckyDay}
                           </Badge>
@@ -378,20 +378,20 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
         {/* Month Summary */}
         <div className="mt-6 pt-4 border-t border-border/50">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-            <div className="bg-amber-500/10 rounded-lg p-3">
-              <div className="text-2xl font-bold text-amber-400">
+            <div className="bg-warn/10 rounded-lg p-3">
+              <div className="text-2xl font-bold text-warn">
                 {monthData.filter(d => d.isLucky).length}
               </div>
               <div className="text-xs text-muted-foreground">{t.luckyDays}</div>
             </div>
-            <div className="bg-purple-500/10 rounded-lg p-3">
-              <div className="text-2xl font-bold text-purple-400">
+            <div className="bg-primary/10 rounded-lg p-3">
+              <div className="text-2xl font-bold text-primary">
                 {monthData.filter(d => d.isMasterDay).length}
               </div>
               <div className="text-xs text-muted-foreground">{t.masterDays}</div>
             </div>
-            <div className="bg-emerald-500/10 rounded-lg p-3">
-              <div className="text-2xl font-bold text-emerald-400">
+            <div className="bg-ok/10 rounded-lg p-3">
+              <div className="text-2xl font-bold text-ok">
                 {monthData.filter(d => d.luckyScore >= 25 && !d.isLucky).length}
               </div>
               <div className="text-xs text-muted-foreground">{t.highEnergy}</div>

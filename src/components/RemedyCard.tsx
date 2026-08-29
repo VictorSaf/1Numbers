@@ -155,7 +155,7 @@ export const RemedyCard = ({ remedy, showAll = false }: RemedyCardProps) => {
               <p className="text-sm text-muted-foreground mb-2">{t.avoid}</p>
               <div className="flex flex-wrap gap-2">
                 {remedy.colors.avoid.map((color) => (
-                  <Badge key={color} variant="outline" className="text-red-500 border-red-500">
+                  <Badge key={color} variant="outline" className="text-crit border-crit">
                     {color}
                   </Badge>
                 ))}
@@ -169,12 +169,12 @@ export const RemedyCard = ({ remedy, showAll = false }: RemedyCardProps) => {
         {/* Gemstones Section */}
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <Gem className="h-5 w-5 text-purple-500" />
+            <Gem className="h-5 w-5 text-primary" />
             <h3 className="font-semibold">{t.gemstones}</h3>
           </div>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <Badge className="bg-purple-500">{remedy.gemstones.primary}</Badge>
+              <Badge className="bg-primary">{remedy.gemstones.primary}</Badge>
               <span className="text-sm text-muted-foreground">({t.primary})</span>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -196,12 +196,12 @@ export const RemedyCard = ({ remedy, showAll = false }: RemedyCardProps) => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Calendar className="h-4 w-4 text-green-500" />
+              <Calendar className="h-4 w-4 text-ok" />
               <span className="text-sm font-medium">{t.favorable}</span>
             </div>
             <div className="flex flex-wrap gap-1">
               {remedy.days.favorable.map((day) => (
-                <Badge key={day} variant="secondary" className="bg-green-100 text-green-700">
+                <Badge key={day} variant="secondary" className="bg-ok-soft text-ok">
                   <CheckCircle className="h-3 w-3 mr-1" />
                   {day}
                 </Badge>
@@ -210,12 +210,12 @@ export const RemedyCard = ({ remedy, showAll = false }: RemedyCardProps) => {
           </div>
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Calendar className="h-4 w-4 text-red-500" />
+              <Calendar className="h-4 w-4 text-crit" />
               <span className="text-sm font-medium">{t.unfavorable}</span>
             </div>
             <div className="flex flex-wrap gap-1">
               {remedy.days.avoid.map((day) => (
-                <Badge key={day} variant="secondary" className="bg-red-100 text-red-700">
+                <Badge key={day} variant="secondary" className="bg-crit-soft text-crit">
                   <XCircle className="h-3 w-3 mr-1" />
                   {day}
                 </Badge>
@@ -229,7 +229,7 @@ export const RemedyCard = ({ remedy, showAll = false }: RemedyCardProps) => {
         {/* Directions Section */}
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <Compass className="h-5 w-5 text-blue-500" />
+            <Compass className="h-5 w-5 text-info" />
             <h3 className="font-semibold">{t.directions}</h3>
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -249,13 +249,13 @@ export const RemedyCard = ({ remedy, showAll = false }: RemedyCardProps) => {
         {/* Mantras Section */}
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <Quote className="h-5 w-5 text-amber-500" />
+            <Quote className="h-5 w-5 text-warn" />
             <h3 className="font-semibold">{t.mantras}</h3>
           </div>
           <div className="space-y-3">
-            <div className="p-3 bg-amber-50 dark:bg-amber-950/30 rounded-lg">
+            <div className="p-3 bg-warn-soft rounded-lg">
               <p className="text-xs text-muted-foreground mb-1">{t.vedic}</p>
-              <p className="font-medium text-amber-700 dark:text-amber-400">
+              <p className="font-medium text-warn">
                 {remedy.mantras.vedic}
               </p>
             </div>
@@ -273,7 +273,7 @@ export const RemedyCard = ({ remedy, showAll = false }: RemedyCardProps) => {
             {/* Foods Section */}
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <Apple className="h-5 w-5 text-green-500" />
+                <Apple className="h-5 w-5 text-ok" />
                 <h3 className="font-semibold">{t.foods}</h3>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -281,7 +281,7 @@ export const RemedyCard = ({ remedy, showAll = false }: RemedyCardProps) => {
                   <p className="text-sm text-muted-foreground mb-2">{t.recommended}</p>
                   <div className="flex flex-wrap gap-1">
                     {remedy.elements.foods.map((food) => (
-                      <Badge key={food} variant="outline" className="text-green-600">
+                      <Badge key={food} variant="outline" className="text-ok">
                         {food}
                       </Badge>
                     ))}
@@ -291,7 +291,7 @@ export const RemedyCard = ({ remedy, showAll = false }: RemedyCardProps) => {
                   <p className="text-sm text-muted-foreground mb-2">{t.avoid}</p>
                   <div className="flex flex-wrap gap-1">
                     {remedy.elements.avoidFoods.map((food) => (
-                      <Badge key={food} variant="outline" className="text-red-500">
+                      <Badge key={food} variant="outline" className="text-crit">
                         {food}
                       </Badge>
                     ))}
@@ -305,7 +305,7 @@ export const RemedyCard = ({ remedy, showAll = false }: RemedyCardProps) => {
             {/* Careers Section */}
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <Briefcase className="h-5 w-5 text-blue-500" />
+                <Briefcase className="h-5 w-5 text-info" />
                 <h3 className="font-semibold">{t.careers}</h3>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -322,7 +322,7 @@ export const RemedyCard = ({ remedy, showAll = false }: RemedyCardProps) => {
             {/* Body Parts Section */}
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <Heart className="h-5 w-5 text-red-500" />
+                <Heart className="h-5 w-5 text-crit" />
                 <h3 className="font-semibold">{t.bodyParts}</h3>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -339,13 +339,13 @@ export const RemedyCard = ({ remedy, showAll = false }: RemedyCardProps) => {
             {/* Remedial Actions Section */}
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="h-5 w-5 text-amber-500" />
+                <Sparkles className="h-5 w-5 text-warn" />
                 <h3 className="font-semibold">{t.remedialActions}</h3>
               </div>
               <ul className="space-y-2">
                 {remedy.remedialActions.map((action, idx) => (
                   <li key={idx} className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                    <CheckCircle className="h-4 w-4 text-ok mt-0.5 shrink-0" />
                     <span className="text-sm">{action}</span>
                   </li>
                 ))}
