@@ -73,6 +73,10 @@ export default {
         },
         accent: {
           DEFAULT: "hsl(var(--accent))",
+          // The palette defines a soft tint and a darker ink for the accent;
+          // without exposing them here, bg-accent-soft silently produces nothing.
+          soft: "hsl(var(--accent-soft))",
+          ink: "hsl(var(--accent-ink))",
           foreground: "hsl(var(--accent-foreground))",
           hover: "hsl(var(--accent-hover))",
         },

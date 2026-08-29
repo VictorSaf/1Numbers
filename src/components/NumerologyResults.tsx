@@ -1,5 +1,5 @@
 import { useMemo, lazy, Suspense, useEffect } from "react";
-import { ArrowLeft, Star, BarChart3, Target, Mountain, AlertTriangle, Sparkles, CalendarCheck, Type } from "lucide-react";
+import { ArrowLeft, Star, BarChart3, Target, Mountain, AlertTriangle, Sparkles, CalendarCheck, Type, Grid3x3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NumberCard } from "./NumberCard";
 import { PinnacleCard } from "./PinnacleCard";
@@ -26,6 +26,7 @@ import { ResultSection } from "@/components/ResultSection";
 import { useAuth } from "@/contexts/AuthContext";
 
 // Lazy load heavy chart components (Recharts)
+const ExpressionPlanes = lazy(() => import("@/components/numerology/ExpressionPlanes"));
 const NewNumbers = lazy(() => import("@/components/numerology/NewNumbers"));
 const NumerologyRadarChart = lazy(() => import("./charts/NumerologyRadarChart").then(m => ({ default: m.NumerologyRadarChart })));
 const NumberDistributionChart = lazy(() => import("./charts/NumberDistributionChart").then(m => ({ default: m.NumberDistributionChart })));
@@ -75,7 +76,8 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     noLessons: { ro: "Toate numerele sunt prezente în nume.", en: "All numbers are present in your name.", ru: "Все числа присутствуют в имени." },
     luckyDates: { ro: "Date Favorabile", en: "Lucky Dates", ru: "Благоприятные Даты" },
     nameAnalysis: { ro: "Analiza Numelui", en: "Name Analysis", ru: "Анализ Имени" },
-    newNumbers: { ro: "Numerele Noi", en: "The New Numbers", ru: "Новые Числа" }
+    newNumbers: { ro: "Numerele Noi", en: "The New Numbers", ru: "Новые Числа" },
+    planes: { ro: "Planurile de Expresie", en: "Planes of Expression", ru: "Планы Выражения" }
   };
 
   // Shown in place of a locked section so the visitor knows what is behind it.
@@ -85,7 +87,8 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     lessons: { ro: "Numerele lipsă din numele tău și lecțiile pe care le indică.", en: "The numbers missing from your name and the lessons they point to.", ru: "Числа, отсутствующие в имени, и уроки, на которые они указывают." },
     luckyDates: { ro: "Zilele favorabile pentru decizii importante.", en: "The days that favour important decisions.", ru: "Дни, благоприятные для важных решений." },
     nameAnalysis: { ro: "Distribuția literelor, vocalelor și consoanelor din numele tău.", en: "The distribution of letters, vowels and consonants in your name.", ru: "Распределение букв, гласных и согласных в вашем имени." },
-    newNumbers: { ro: "Atitudine, Maturitate, Echilibru, Pasiune Ascunsă și încă zece.", en: "Attitude, Maturity, Balance, Hidden Passion and ten more.", ru: "Отношение, Зрелость, Баланс, Скрытая страсть и ещё десять." }
+    newNumbers: { ro: "Atitudine, Maturitate, Echilibru, Pasiune Ascunsă și încă zece.", en: "Attitude, Maturity, Balance, Hidden Passion and ten more.", ru: "Отношение, Зрелость, Баланс, Скрытая страсть и ещё десять." },
+    planes: { ro: "Cum se distribuie literele numelui tău pe patru planuri și trei naturi.", en: "How the letters of your name spread across four planes and three natures.", ru: "Как буквы вашего имени распределяются по четырём планам и трём натурам." }
   };
 
   // Generate share data
@@ -229,6 +232,18 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
       >
         <Suspense fallback={<ChartSkeleton />}>
           <NewNumbers fullName={fullName} birthDate={birthDate} />
+        </Suspense>
+      </ResultSection>
+
+      {/* Planes of Expression. Lazy on the same pattern as the new numbers. */}
+      <ResultSection
+        title={sectionLabels.planes[language]}
+        icon={<Grid3x3 className="h-5 w-5 text-primary" />}
+        locked={!isAuthenticated}
+        teaser={teasers.planes[language]}
+      >
+        <Suspense fallback={<ChartSkeleton />}>
+          <ExpressionPlanes fullName={fullName} />
         </Suspense>
       </ResultSection>
 
