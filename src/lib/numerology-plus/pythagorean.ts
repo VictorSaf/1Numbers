@@ -270,6 +270,15 @@ export function essence(name: string, age: number, table: LetterTable = PYTHAGOR
   return result(sum);
 }
 
+/** Vârsta împlinită la o dată dată. Exportată pentru ca interfața să nu-și
+ *  rescrie propria formulă: o a doua definiție ar diverge tăcut de motor. */
+export function ageAt(b: BirthDate, today: Date): number {
+  const hadBirthday =
+    today.getMonth() + 1 > b.month ||
+    (today.getMonth() + 1 === b.month && today.getDate() >= b.day);
+  return today.getFullYear() - b.year - (hadBirthday ? 0 : 1);
+}
+
 /** Timeline pe ani: tranzite + esență + an personal. `duality: true` = an de intensitate
  *  maximă în sistemul Decoz (Esența coincide cu Anul Personal). */
 export function dualitiesTimeline(name: string, b: BirthDate, fromAge: number, toAge: number) {
@@ -308,8 +317,7 @@ export function fullPythagoreanProfile(name: string, b: BirthDate, today = new D
   const py = personalYear(b, today.getFullYear());
 
   const tiebreak = [exp.value, su.value, pers.value, lp.value, bday.value];
-  const age = today.getFullYear() - b.year -
-    (today.getMonth() + 1 < b.month || (today.getMonth() + 1 === b.month && today.getDate() < b.day) ? 1 : 0);
+  const age = ageAt(b, today);
 
   const pm = personalMonth(py, today.getMonth() + 1);
 

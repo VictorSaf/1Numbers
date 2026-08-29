@@ -1,5 +1,5 @@
 import { useMemo, lazy, Suspense, useEffect } from "react";
-import { ArrowLeft, Star, BarChart3, Target, Mountain, AlertTriangle, Sparkles, CalendarCheck, Type, Grid3x3, Compass } from "lucide-react";
+import { ArrowLeft, Star, BarChart3, Target, Mountain, AlertTriangle, Sparkles, CalendarCheck, Type, Grid3x3, Compass, CalendarRange, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NumberCard } from "./NumberCard";
 import { PinnacleCard } from "./PinnacleCard";
@@ -27,6 +27,8 @@ import { useAuth } from "@/contexts/AuthContext";
 
 // Lazy load heavy chart components (Recharts)
 const ExpressionPlanes = lazy(() => import("@/components/numerology/ExpressionPlanes"));
+const TransitsTimeline = lazy(() => import("@/components/numerology/TransitsTimeline"));
+const Biorhythms = lazy(() => import("@/components/numerology/Biorhythms"));
 const DestinyMatrix = lazy(() => import("@/components/numerology/DestinyMatrix"));
 const NewNumbers = lazy(() => import("@/components/numerology/NewNumbers"));
 const NumerologyRadarChart = lazy(() => import("./charts/NumerologyRadarChart").then(m => ({ default: m.NumerologyRadarChart })));
@@ -79,7 +81,9 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     nameAnalysis: { ro: "Analiza Numelui", en: "Name Analysis", ru: "Анализ Имени" },
     newNumbers: { ro: "Numerele Noi", en: "The New Numbers", ru: "Новые Числа" },
     planes: { ro: "Planurile de Expresie", en: "Planes of Expression", ru: "Планы Выражения" },
-    matrix: { ro: "Matrița Destinului", en: "Destiny Matrix", ru: "Матрица Судьбы" }
+    matrix: { ro: "Matrița Destinului", en: "Destiny Matrix", ru: "Матрица Судьбы" },
+    transits: { ro: "Tranzite și Esență", en: "Transits and Essence", ru: "Транзиты и Сущность" },
+    biorhythms: { ro: "Biorritmuri", en: "Biorhythms", ru: "Биоритмы" }
   };
 
   // Shown in place of a locked section so the visitor knows what is behind it.
@@ -91,7 +95,9 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     nameAnalysis: { ro: "Distribuția literelor, vocalelor și consoanelor din numele tău.", en: "The distribution of letters, vowels and consonants in your name.", ru: "Распределение букв, гласных и согласных в вашем имени." },
     newNumbers: { ro: "Atitudine, Maturitate, Echilibru, Pasiune Ascunsă și încă zece.", en: "Attitude, Maturity, Balance, Hidden Passion and ten more.", ru: "Отношение, Зрелость, Баланс, Скрытая страсть и ещё десять." },
     planes: { ro: "Cum se distribuie literele numelui tău pe patru planuri și trei naturi.", en: "How the letters of your name spread across four planes and three natures.", ru: "Как буквы вашего имени распределяются по четырём планам и трём натурам." },
-    matrix: { ro: "Cele nouă puncte ale octagramei, calculate din data nașterii.", en: "The nine points of the octagram, drawn from your birth date.", ru: "Девять точек октаграммы, рассчитанных по дате рождения." }
+    matrix: { ro: "Cele nouă puncte ale octagramei, calculate din data nașterii.", en: "The nine points of the octagram, drawn from your birth date.", ru: "Девять точек октаграммы, рассчитанных по дате рождения." },
+    transits: { ro: "Ce literă îți guvernează fiecare an și când Esența întâlnește Anul Personal.", en: "Which letter governs each year, and when Essence meets the Personal Year.", ru: "Какая буква управляет каждым годом и когда Сущность встречает Личный год." },
+    biorhythms: { ro: "Ciclurile fizic, emoțional și intelectual pe o lună în jurul zilei de azi.", en: "Physical, emotional and intellectual cycles across a month around today.", ru: "Физический, эмоциональный и интеллектуальный циклы за месяц вокруг сегодняшнего дня." }
   };
 
   // Generate share data
@@ -260,6 +266,31 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
       >
         <Suspense fallback={<ChartSkeleton />}>
           <DestinyMatrix birthDate={birthDate} />
+        </Suspense>
+      </ResultSection>
+
+      {/* Transits and Essence, with the Duality years highlighted. */}
+      <ResultSection
+        title={sectionLabels.transits[language]}
+        icon={<CalendarRange className="h-5 w-5 text-primary" />}
+        locked={!isAuthenticated}
+        teaser={teasers.transits[language]}
+      >
+        <Suspense fallback={<ChartSkeleton />}>
+          <TransitsTimeline fullName={fullName} birthDate={birthDate} />
+        </Suspense>
+      </ResultSection>
+
+      {/* Biorhythms. Recharts is already on this page, so this is a lazy chunk
+          rather than a new dependency. */}
+      <ResultSection
+        title={sectionLabels.biorhythms[language]}
+        icon={<Activity className="h-5 w-5 text-primary" />}
+        locked={!isAuthenticated}
+        teaser={teasers.biorhythms[language]}
+      >
+        <Suspense fallback={<ChartSkeleton />}>
+          <Biorhythms birthDate={birthDate} />
         </Suspense>
       </ResultSection>
 
