@@ -20,6 +20,9 @@ export default {
     },
     extend: {
       fontFamily: {
+        // Any column of numbers uses this; tabular-nums is applied by the
+        // .num utility so figures line up down the column.
+        mono: ["var(--font-mono)"],
         cinzel: ["var(--font-heading)", "serif"],
         raleway: ["var(--font-body)", "sans-serif"],
       },

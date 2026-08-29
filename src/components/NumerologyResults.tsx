@@ -26,6 +26,7 @@ import { ResultSection } from "@/components/ResultSection";
 import { useAuth } from "@/contexts/AuthContext";
 
 // Lazy load heavy chart components (Recharts)
+const NewNumbers = lazy(() => import("@/components/numerology/NewNumbers"));
 const NumerologyRadarChart = lazy(() => import("./charts/NumerologyRadarChart").then(m => ({ default: m.NumerologyRadarChart })));
 const NumberDistributionChart = lazy(() => import("./charts/NumberDistributionChart").then(m => ({ default: m.NumberDistributionChart })));
 
@@ -73,7 +74,8 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     noDebts: { ro: "Nu ai datorii karmice detectate.", en: "No karmic debts detected.", ru: "Кармических долгов не обнаружено." },
     noLessons: { ro: "Toate numerele sunt prezente în nume.", en: "All numbers are present in your name.", ru: "Все числа присутствуют в имени." },
     luckyDates: { ro: "Date Favorabile", en: "Lucky Dates", ru: "Благоприятные Даты" },
-    nameAnalysis: { ro: "Analiza Numelui", en: "Name Analysis", ru: "Анализ Имени" }
+    nameAnalysis: { ro: "Analiza Numelui", en: "Name Analysis", ru: "Анализ Имени" },
+    newNumbers: { ro: "Numerele Noi", en: "The New Numbers", ru: "Новые Числа" }
   };
 
   // Shown in place of a locked section so the visitor knows what is behind it.
@@ -82,7 +84,8 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     karmic: { ro: "Datoriile 13, 14, 16 și 19 și ce înseamnă pentru tine.", en: "Debts 13, 14, 16 and 19 and what they mean for you.", ru: "Долги 13, 14, 16 и 19 и что они значат для вас." },
     lessons: { ro: "Numerele lipsă din numele tău și lecțiile pe care le indică.", en: "The numbers missing from your name and the lessons they point to.", ru: "Числа, отсутствующие в имени, и уроки, на которые они указывают." },
     luckyDates: { ro: "Zilele favorabile pentru decizii importante.", en: "The days that favour important decisions.", ru: "Дни, благоприятные для важных решений." },
-    nameAnalysis: { ro: "Distribuția literelor, vocalelor și consoanelor din numele tău.", en: "The distribution of letters, vowels and consonants in your name.", ru: "Распределение букв, гласных и согласных в вашем имени." }
+    nameAnalysis: { ro: "Distribuția literelor, vocalelor și consoanelor din numele tău.", en: "The distribution of letters, vowels and consonants in your name.", ru: "Распределение букв, гласных и согласных в вашем имени." },
+    newNumbers: { ro: "Atitudine, Maturitate, Echilibru, Pasiune Ascunsă și încă zece.", en: "Attitude, Maturity, Balance, Hidden Passion and ten more.", ru: "Отношение, Зрелость, Баланс, Скрытая страсть и ещё десять." }
   };
 
   // Generate share data
@@ -213,6 +216,20 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
         teaser={teasers.nameAnalysis[language]}
       >
         <NameAnalysisCard fullName={fullName} />
+      </ResultSection>
+
+      {/* The fourteen new numbers. Lazily loaded: this is the only import of the
+          engine's content layer, which carries archetypes, frames and arcana in
+          three languages and has no business in the initial bundle. */}
+      <ResultSection
+        title={sectionLabels.newNumbers[language]}
+        icon={<Sparkles className="h-5 w-5 text-primary" />}
+        locked={!isAuthenticated}
+        teaser={teasers.newNumbers[language]}
+      >
+        <Suspense fallback={<ChartSkeleton />}>
+          <NewNumbers fullName={fullName} birthDate={birthDate} />
+        </Suspense>
       </ResultSection>
 
       {/* Charts */}

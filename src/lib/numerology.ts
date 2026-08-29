@@ -1,12 +1,14 @@
+// Imported per module rather than through the barrel: the barrel re-exports the
+// content layer, and this file sits in the numerology-core manual chunk, which
+// is preloaded. A barrel import here puts arcana and archetypes on every page.
+import { reduce, toBirthDate } from './numerology-plus/core';
 import {
-  reduce,
-  toBirthDate,
   lifePath as lifePathPlus,
   expression as expressionPlus,
   soulUrge as soulUrgePlus,
   personality as personalityPlus,
   personalYear as personalYearPlus,
-} from './numerology-plus';
+} from './numerology-plus/pythagorean';
 
 /**
  * These exports are the historical surface of the engine and are kept so the

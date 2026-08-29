@@ -1,5 +1,8 @@
 import { reduceToSingleDigit } from "./numerology";
-import { classifyFullName, sumLetters, PYTHAGOREAN } from './numerology-plus';
+// Imported from the module, not the barrel: the barrel re-exports the content
+// layer, and karmic.ts sits inside the numerology-core manual chunk, so a
+// barrel import drags arcana and archetypes into a chunk that is preloaded.
+import { classifyFullName, sumLetters, PYTHAGOREAN } from './numerology-plus/core';
 
 export interface KarmicDebtInfo {
   number: number;

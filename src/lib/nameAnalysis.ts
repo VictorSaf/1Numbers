@@ -4,7 +4,9 @@ import {
   calculatePersonalityNumber,
   getNumberMeaning 
 } from './numerology';
-import { classifyFullName, PYTHAGOREAN } from './numerology-plus';
+// From the module rather than the barrel, so the content layer stays out of
+// whichever chunk this file lands in.
+import { classifyFullName, PYTHAGOREAN } from './numerology-plus/core';
 
 export interface NameAnalysis {
   destinyNumber: number;
