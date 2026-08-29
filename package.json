@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && node scripts/prerender-meta.mjs && node scripts/stamp-sw.mjs",
+    "build:check": "vite build --outDir .build-check --emptyOutDir",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",

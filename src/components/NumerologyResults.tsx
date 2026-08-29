@@ -1,5 +1,5 @@
 import { useMemo, lazy, Suspense, useEffect } from "react";
-import { ArrowLeft, Star, BarChart3, Target, Mountain, AlertTriangle, Sparkles, CalendarCheck, Type, Grid3x3 } from "lucide-react";
+import { ArrowLeft, Star, BarChart3, Target, Mountain, AlertTriangle, Sparkles, CalendarCheck, Type, Grid3x3, Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NumberCard } from "./NumberCard";
 import { PinnacleCard } from "./PinnacleCard";
@@ -27,6 +27,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 // Lazy load heavy chart components (Recharts)
 const ExpressionPlanes = lazy(() => import("@/components/numerology/ExpressionPlanes"));
+const DestinyMatrix = lazy(() => import("@/components/numerology/DestinyMatrix"));
 const NewNumbers = lazy(() => import("@/components/numerology/NewNumbers"));
 const NumerologyRadarChart = lazy(() => import("./charts/NumerologyRadarChart").then(m => ({ default: m.NumerologyRadarChart })));
 const NumberDistributionChart = lazy(() => import("./charts/NumberDistributionChart").then(m => ({ default: m.NumberDistributionChart })));
@@ -77,7 +78,8 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     luckyDates: { ro: "Date Favorabile", en: "Lucky Dates", ru: "Благоприятные Даты" },
     nameAnalysis: { ro: "Analiza Numelui", en: "Name Analysis", ru: "Анализ Имени" },
     newNumbers: { ro: "Numerele Noi", en: "The New Numbers", ru: "Новые Числа" },
-    planes: { ro: "Planurile de Expresie", en: "Planes of Expression", ru: "Планы Выражения" }
+    planes: { ro: "Planurile de Expresie", en: "Planes of Expression", ru: "Планы Выражения" },
+    matrix: { ro: "Matrița Destinului", en: "Destiny Matrix", ru: "Матрица Судьбы" }
   };
 
   // Shown in place of a locked section so the visitor knows what is behind it.
@@ -88,7 +90,8 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     luckyDates: { ro: "Zilele favorabile pentru decizii importante.", en: "The days that favour important decisions.", ru: "Дни, благоприятные для важных решений." },
     nameAnalysis: { ro: "Distribuția literelor, vocalelor și consoanelor din numele tău.", en: "The distribution of letters, vowels and consonants in your name.", ru: "Распределение букв, гласных и согласных в вашем имени." },
     newNumbers: { ro: "Atitudine, Maturitate, Echilibru, Pasiune Ascunsă și încă zece.", en: "Attitude, Maturity, Balance, Hidden Passion and ten more.", ru: "Отношение, Зрелость, Баланс, Скрытая страсть и ещё десять." },
-    planes: { ro: "Cum se distribuie literele numelui tău pe patru planuri și trei naturi.", en: "How the letters of your name spread across four planes and three natures.", ru: "Как буквы вашего имени распределяются по четырём планам и трём натурам." }
+    planes: { ro: "Cum se distribuie literele numelui tău pe patru planuri și trei naturi.", en: "How the letters of your name spread across four planes and three natures.", ru: "Как буквы вашего имени распределяются по четырём планам и трём натурам." },
+    matrix: { ro: "Cele nouă puncte ale octagramei, calculate din data nașterii.", en: "The nine points of the octagram, drawn from your birth date.", ru: "Девять точек октаграммы, рассчитанных по дате рождения." }
   };
 
   // Generate share data
@@ -244,6 +247,19 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
       >
         <Suspense fallback={<ChartSkeleton />}>
           <ExpressionPlanes fullName={fullName} />
+        </Suspense>
+      </ResultSection>
+
+      {/* The Destiny Matrix octagram. Only the nine base points the engine marks
+          confidence:'high'; the derived layers stay out of the reading. */}
+      <ResultSection
+        title={sectionLabels.matrix[language]}
+        icon={<Compass className="h-5 w-5 text-primary" />}
+        locked={!isAuthenticated}
+        teaser={teasers.matrix[language]}
+      >
+        <Suspense fallback={<ChartSkeleton />}>
+          <DestinyMatrix birthDate={birthDate} />
         </Suspense>
       </ResultSection>
 
