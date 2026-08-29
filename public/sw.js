@@ -13,6 +13,11 @@ const OFFLINE_URL = '/offline.html';
 // current when the worker installed -- no redeploy could ever reach them.
 const STATIC_ASSETS = [
   '/manifest.json',
+  // The navigation handler below falls back to this when the network is
+  // gone and nothing is cached. It has to be precached to be reachable --
+  // and until now the file did not exist at all, so that branch resolved to
+  // undefined and the browser showed its own error instead.
+  OFFLINE_URL,
 ];
 
 // Install event - cache static assets

@@ -16,13 +16,25 @@ dotenv.config();
 const app = express();
 
 // Middleware
+//
+// Production is same-origin -- the tunnel routes /api/* to this process on the
+// host that serves the frontend -- so CORS matters only for local development,
+// where Vite serves the app on 8082 and proxies here.
+//
+// The list used to also carry 8080 (twice) and 8081. Those are llama-server's
+// ports on this machine now, not the frontend's; vite.config.ts explains why the
+// dev server moved to 8082 with strictPort.
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:8082',
+  'http://localhost:8082',
+  'http://127.0.0.1:8082',
+  // The production build served locally by scripts/serve-compass.mjs.
+  'http://localhost:8090',
+  'http://127.0.0.1:8090',
+];
+
 app.use(cors({
-  origin: [
-    process.env.FRONTEND_URL || 'http://localhost:8080',
-    'http://localhost:8081',
-    'http://localhost:8082',
-    'http://localhost:8080'
-  ],
+  origin: [...new Set(allowedOrigins)],
   credentials: true
 }));
 app.use(express.json());
