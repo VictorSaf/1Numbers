@@ -23,7 +23,6 @@ import { ExportMenu } from "./ExportMenu";
 import { ShareButtons } from "./ShareButtons";
 import { track } from '@/lib/analytics';
 import { ResultSection } from "@/components/ResultSection";
-import { useAuth } from "@/contexts/AuthContext";
 
 // Lazy load heavy chart components (Recharts)
 const ExpressionPlanes = lazy(() => import("@/components/numerology/ExpressionPlanes"));
@@ -51,7 +50,6 @@ interface NumerologyResultsProps {
 }
 
 export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyResultsProps) => {
-  const { isAuthenticated } = useAuth();
   useEffect(() => { track('result_viewed'); }, []);
   const { t, language } = useLanguage();
   
@@ -86,7 +84,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     biorhythms: { ro: "Biorritmuri", en: "Biorhythms", ru: "Биоритмы" }
   };
 
-  // Shown in place of a locked section so the visitor knows what is behind it.
+  // One line per section, shown under its title whether it is open or closed.
   const teasers = {
     pinnacles: { ro: "Cele patru etape majore ale vieții tale și provocările fiecăreia.", en: "The four major stages of your life and the challenge of each.", ru: "Четыре главных этапа вашей жизни и вызов каждого." },
     karmic: { ro: "Datoriile 13, 14, 16 și 19 și ce înseamnă pentru tine.", en: "Debts 13, 14, 16 and 19 and what they mean for you.", ru: "Долги 13, 14, 16 и 19 и что они значат для вас." },
@@ -152,7 +150,6 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
         className="opacity-0 animate-fade-in ds-delay-600"
         title={sectionLabels.pinnacles[language]}
         icon={<Mountain className="h-5 w-5 text-primary" />}
-        locked={!isAuthenticated}
         teaser={teasers.pinnacles[language]}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -173,7 +170,6 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
         className="opacity-0 animate-fade-in ds-delay-900"
         title={sectionLabels.karmic[language]}
         icon={<AlertTriangle className="h-5 w-5 text-warn" />}
-        locked={!isAuthenticated}
         teaser={teasers.karmic[language]}
       >
         {karmicDebts.length > 0 ? (
@@ -195,7 +191,6 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
           className="opacity-0 animate-fade-in ds-delay-1000"
           title={sectionLabels.lessons[language]}
           icon={<Sparkles className="h-5 w-5 text-primary" />}
-          locked={!isAuthenticated}
           teaser={teasers.lessons[language]}
         >
           <div className="flex flex-wrap gap-2">
@@ -213,7 +208,6 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
       <ResultSection
         title={sectionLabels.luckyDates[language]}
         icon={<CalendarCheck className="h-5 w-5 text-primary" />}
-        locked={!isAuthenticated}
         teaser={teasers.luckyDates[language]}
       >
         <LuckyDatesCard birthDate={birthDate} fullName={fullName} delay={1000} />
@@ -224,7 +218,6 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
         className="opacity-0 animate-fade-in ds-delay-1100"
         title={sectionLabels.nameAnalysis[language]}
         icon={<Type className="h-5 w-5 text-primary" />}
-        locked={!isAuthenticated}
         teaser={teasers.nameAnalysis[language]}
       >
         <NameAnalysisCard fullName={fullName} />
@@ -236,7 +229,6 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
       <ResultSection
         title={sectionLabels.newNumbers[language]}
         icon={<Sparkles className="h-5 w-5 text-primary" />}
-        locked={!isAuthenticated}
         teaser={teasers.newNumbers[language]}
       >
         <Suspense fallback={<ChartSkeleton />}>
@@ -248,7 +240,6 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
       <ResultSection
         title={sectionLabels.planes[language]}
         icon={<Grid3x3 className="h-5 w-5 text-primary" />}
-        locked={!isAuthenticated}
         teaser={teasers.planes[language]}
       >
         <Suspense fallback={<ChartSkeleton />}>
@@ -261,7 +252,6 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
       <ResultSection
         title={sectionLabels.matrix[language]}
         icon={<Compass className="h-5 w-5 text-primary" />}
-        locked={!isAuthenticated}
         teaser={teasers.matrix[language]}
       >
         <Suspense fallback={<ChartSkeleton />}>
@@ -273,7 +263,6 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
       <ResultSection
         title={sectionLabels.transits[language]}
         icon={<CalendarRange className="h-5 w-5 text-primary" />}
-        locked={!isAuthenticated}
         teaser={teasers.transits[language]}
       >
         <Suspense fallback={<ChartSkeleton />}>
@@ -286,7 +275,6 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
       <ResultSection
         title={sectionLabels.biorhythms[language]}
         icon={<Activity className="h-5 w-5 text-primary" />}
-        locked={!isAuthenticated}
         teaser={teasers.biorhythms[language]}
       >
         <Suspense fallback={<ChartSkeleton />}>
