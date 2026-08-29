@@ -2,18 +2,9 @@
 // Ancient Babylonian system using values 1-8 (no 9)
 // More focused on name vibrations and compound numbers
 
-// Chaldean letter values (different from Pythagorean)
-// Note: 9 is considered sacred and not assigned to any letter
-const CHALDEAN_VALUES: Record<string, number> = {
-  A: 1, I: 1, J: 1, Q: 1, Y: 1,
-  B: 2, K: 2, R: 2,
-  C: 3, G: 3, L: 3, S: 3,
-  D: 4, M: 4, T: 4,
-  E: 5, H: 5, N: 5, X: 5,
-  U: 6, V: 6, W: 6,
-  O: 7, Z: 7,
-  F: 8, P: 8,
-};
+// Imported per module rather than through the barrel, which re-exports the
+// content layer and would drag arcana and archetypes in behind one addition.
+import { sumLetters, reduce, classifyFullName, CHALDEAN } from './numerology-plus/core';
 
 // Compound number meanings (11-52 are significant in Chaldean)
 const COMPOUND_MEANINGS: Record<string, Record<number, { title: string; meaning: string; nature: 'positive' | 'negative' | 'neutral' }>> = {
@@ -195,33 +186,24 @@ const SINGLE_DIGIT_MEANINGS: Record<string, Record<number, { keywords: string[];
  * Get Chaldean value for a single letter
  */
 export function getChaldeanLetterValue(letter: string): number {
-  const upper = letter.toUpperCase();
-  return CHALDEAN_VALUES[upper] || 0;
+  return CHALDEAN[letter.toUpperCase()] || 0;
 }
 
 /**
  * Calculate Chaldean name number (compound and single)
  */
 export function calculateChaldeanNameNumber(name: string): { compound: number; single: number } {
-  const letters = name.toUpperCase().replace(/[^A-Z]/g, '');
-  let total = 0;
-
-  for (const letter of letters) {
-    total += getChaldeanLetterValue(letter);
-  }
-
-  // The compound number is the total before final reduction
-  const compound = total;
-
-  // Reduce to single digit
-  let single = total;
-  while (single > 9) {
-    single = String(single)
-      .split('')
-      .reduce((sum, digit) => sum + parseInt(digit, 10), 0);
-  }
-
-  return { compound, single };
+  // Letters and reduction both come from the engine. The local pass stripped
+  // diacritics rather than transliterating them, so Stefan Muresan summed to 46
+  // over eleven letters where the engine reads thirteen and reaches 52 -- a
+  // different compound number, and therefore a different reading.
+  //
+  // sumLetters rather than the engine's chaldeanName(): that function also
+  // returns the classical compound meanings, and this module already carries its
+  // own in getCompoundMeaning. Pulling in a second copy to reuse one addition
+  // would trade a small duplication for a larger one.
+  const compound = sumLetters(name, CHALDEAN);
+  return { compound, single: reduce(compound, false) };
 }
 
 /**
@@ -265,11 +247,11 @@ export function calculateChaldeanAnalysis(name: string, birthDate: Date): Chalde
       .reduce((sum, digit) => sum + parseInt(digit, 10), 0);
   }
 
-  // Letter breakdown
-  const letters = name.toUpperCase().replace(/[^A-Z]/g, '');
-  const letterBreakdown = letters.split('').map((letter) => ({
-    letter,
-    value: getChaldeanLetterValue(letter),
+  // Letter breakdown, from the same classification that produced the totals --
+  // otherwise the list under the number would not add up to the number above it.
+  const letterBreakdown = classifyFullName(name).map(({ ch }) => ({
+    letter: ch,
+    value: getChaldeanLetterValue(ch),
   }));
 
   return {

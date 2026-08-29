@@ -1,8 +1,14 @@
 import { describe, it, expect } from 'vitest';
-import { classifyFullName, PYTHAGOREAN, toBirthDate } from '../core';
+import { classifyFullName, PYTHAGOREAN, CHALDEAN, toBirthDate } from '../core';
 import { lifePath, inclusionTable, hiddenPassion } from '../pythagorean';
 import * as M from '../matrix';
 import * as S from '../systems';
+import { chaldeanName } from '../systems';
+import {
+  calculateChaldeanNameNumber,
+  calculateChaldeanAnalysis,
+  getChaldeanLetterValue,
+} from '@/lib/chaldean';
 import { analyzeIndividualLetters } from '@/lib/nameAnalysis';
 import { calculateKarmicLessons } from '@/lib/karmic';
 import { calculateHiddenPassions, analyzeLetterDistribution } from '@/lib/numerology';
@@ -67,6 +73,36 @@ describe('modules agree with the engine', () => {
     // The shapes differ -- an array here, a value-plus-ties there -- but they
     // must not disagree about which digit dominates the name.
     expect(hiddenPassion(name).tied).toContain(calculateHiddenPassions(name)[0]);
+  });
+});
+
+describe('chaldean agrees with the engine', () => {
+  it.each(NAMES)('name number matches, letter for letter: %s', (name) => {
+    const engine = chaldeanName(name);
+    const module_ = calculateChaldeanNameNumber(name);
+    expect(module_.compound).toBe(engine.compound);
+    expect(module_.single).toBe(engine.root);
+  });
+
+  it.each(NAMES)('the breakdown adds up to the number above it: %s', (name) => {
+    // A list of letters that sums to something other than the headline number
+    // is worse than no list at all.
+    const { letterBreakdown, nameNumber } = calculateChaldeanAnalysis(name, new Date(1990, 7, 25));
+    expect(letterBreakdown).toHaveLength(classifyFullName(name).length);
+    expect(letterBreakdown.reduce((a, l) => a + l.value, 0)).toBe(nameNumber.compound);
+  });
+
+  it('reads every letter value from the engine table', () => {
+    for (const ch of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+      expect(getChaldeanLetterValue(ch), `letter ${ch}`).toBe(CHALDEAN[ch]);
+    }
+  });
+
+  it('counts a transliterated name rather than dropping the letter', () => {
+    // The regression this delegation fixes: the local pass saw eleven letters
+    // and summed to 46; the engine reads thirteen and reaches 52.
+    expect(classifyFullName('Ștefan Mureșan')).toHaveLength(13);
+    expect(calculateChaldeanNameNumber('Ștefan Mureșan').compound).toBe(52);
   });
 });
 
