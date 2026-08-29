@@ -1,8 +1,9 @@
 // Imported per module rather than through the barrel: the barrel re-exports the
 // content layer, and this file sits in the numerology-core manual chunk, which
 // is preloaded. A barrel import here puts arcana and archetypes on every page.
-import { reduce, toBirthDate } from './numerology-plus/core';
+import { reduce, toBirthDate, classifyFullName, PYTHAGOREAN } from './numerology-plus/core';
 import {
+  inclusionTable,
   lifePath as lifePathPlus,
   expression as expressionPlus,
   soulUrge as soulUrgePlus,
@@ -18,36 +19,12 @@ import {
  * numerology-plus directly.
  */
 
-// Pythagorean alphabet values
-const PYTHAGOREAN_VALUES: Record<string, number> = {
-  A: 1, B: 2, C: 3, D: 4, E: 5, F: 6, G: 7, H: 8, I: 9,
-  J: 1, K: 2, L: 3, M: 4, N: 5, O: 6, P: 7, Q: 8, R: 9,
-  S: 1, T: 2, U: 3, V: 4, W: 5, X: 6, Y: 7, Z: 8
-};
-
-const VOWELS = ['A', 'E', 'I', 'O', 'U'];
-const MASTER_NUMBERS = [11, 22, 33];
-
 // Reduce a number to single digit, preserving master numbers
 export const reduceToSingleDigit = (num: number, preserveMaster = true): number =>
   reduce(num, preserveMaster);
 
 // Calculate Life Path Number from birth date
 export const calculateLifePathNumber = (birthDate: Date): number => lifePathPlus(toBirthDate(birthDate)).value;
-
-// Calculate name number from letters
-const calculateNameNumber = (name: string, filterFn?: (char: string) => boolean): number => {
-  const cleanName = name.toUpperCase().replace(/[^A-Z]/g, '');
-  
-  let total = 0;
-  for (const char of cleanName) {
-    if (!filterFn || filterFn(char)) {
-      total += PYTHAGOREAN_VALUES[char] || 0;
-    }
-  }
-  
-  return reduceToSingleDigit(total);
-};
 
 // Destiny Number (Expression Number) - all letters
 export const calculateDestinyNumber = (fullName: string): number => expressionPlus(fullName).value;
@@ -139,27 +116,16 @@ export const getNumberMeaning = (num: number) => {
  * @returns Array of numbers (1-9) sorted by frequency, representing hidden passions
  */
 export const calculateHiddenPassions = (fullName: string): number[] => {
-  const cleanName = fullName.toUpperCase().replace(/[^A-Z]/g, '');
-  const frequencyMap = new Map<number, number>();
-  
-  for (const char of cleanName) {
-    const value = PYTHAGOREAN_VALUES[char];
-    if (value) {
-      frequencyMap.set(value, (frequencyMap.get(value) || 0) + 1);
-    }
-  }
-  
-  // Sort by frequency (descending), then by number (ascending)
-  const sorted = Array.from(frequencyMap.entries())
-    .sort((a, b) => {
-      if (b[1] !== a[1]) {
-        return b[1] - a[1]; // Higher frequency first
-      }
-      return a[0] - b[0]; // Lower number first if same frequency
-    });
-  
-  // Return top 3 most frequent numbers
-  return sorted.slice(0, 3).map(([num]) => num);
+  // Frequencies come from the engine, which transliterates diacritics instead of
+  // dropping them and decides Y by position. The return shape stays a top-three
+  // array because the report builder and the PDF both expect one; the engine's
+  // own hiddenPassion() answers a different question (single value plus ties).
+  return Object.entries(inclusionTable(fullName))
+    .map(([num, count]) => [Number(num), count] as [number, number])
+    .filter(([, count]) => count > 0)
+    .sort((a, b) => (b[1] !== a[1] ? b[1] - a[1] : a[0] - b[0]))
+    .slice(0, 3)
+    .map(([num]) => num);
 };
 
 /**
@@ -208,23 +174,22 @@ export interface LetterDistribution {
 }
 
 export const analyzeLetterDistribution = (fullName: string): LetterDistribution => {
-  const cleanName = fullName.toUpperCase().replace(/[^A-Z]/g, '');
-  
+  // Letters and their vowel/consonant status both come from the engine. Note
+  // that numberCounts keeps only the digits actually present, as before: the
+  // engine's inclusionTable includes zeros, and passing those through would
+  // make leastFrequentNumber report a digit the name does not contain.
   const letterCounts: Record<string, number> = {};
   const numberCounts: Record<number, number> = {};
   let vowels = 0;
   let consonants = 0;
-  
-  for (const char of cleanName) {
-    // Count letters
-    letterCounts[char] = (letterCounts[char] || 0) + 1;
-    
-    // Count numbers
-    const value = PYTHAGOREAN_VALUES[char];
+
+  for (const { ch, vowel } of classifyFullName(fullName)) {
+    letterCounts[ch] = (letterCounts[ch] || 0) + 1;
+
+    const value = PYTHAGOREAN[ch];
     if (value) {
       numberCounts[value] = (numberCounts[value] || 0) + 1;
-      
-      if (VOWELS.includes(char)) {
+      if (vowel) {
         vowels++;
       } else {
         consonants++;

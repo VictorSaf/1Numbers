@@ -1,10 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { classifyFullName, PYTHAGOREAN, toBirthDate } from '../core';
-import { lifePath } from '../pythagorean';
+import { lifePath, inclusionTable, hiddenPassion } from '../pythagorean';
 import * as M from '../matrix';
 import * as S from '../systems';
 import { analyzeIndividualLetters } from '@/lib/nameAnalysis';
 import { calculateKarmicLessons } from '@/lib/karmic';
+import { calculateHiddenPassions, analyzeLetterDistribution } from '@/lib/numerology';
 
 /**
  * Guards the property unit tests cannot: that separate modules agree with each
@@ -41,6 +42,31 @@ describe('modules agree with the engine', () => {
   it.each(NAMES)('a karmic lesson is never present in the name: %s', (name) => {
     const present = new Set(classifyFullName(name).map((l) => PYTHAGOREAN[l.ch]));
     expect(calculateKarmicLessons(name).filter((n) => present.has(n))).toEqual([]);
+  });
+
+  it.each(NAMES)('letter distribution counts the same letters: %s', (name) => {
+    const core = classifyFullName(name);
+    const d = analyzeLetterDistribution(name);
+    const counted = Object.values(d.letterCounts).reduce((a, c) => a + c, 0);
+    expect(counted).toBe(core.length);
+    expect(d.vowels).toBe(core.filter((l) => l.vowel).length);
+    expect(d.vowels + d.consonants).toBe(core.length);
+  });
+
+  it.each(NAMES)('hidden passions come from the engine frequencies: %s', (name) => {
+    const freq = inclusionTable(name);
+    const passions = calculateHiddenPassions(name);
+    expect(passions.length).toBeLessThanOrEqual(3);
+    const top = Math.max(...Object.values(freq));
+    // Whatever leads must be a digit that actually reaches the peak.
+    expect(freq[passions[0]]).toBe(top);
+    for (const pn of passions) expect(freq[pn]).toBeGreaterThan(0);
+  });
+
+  it.each(NAMES)('hidden passions agree with the engine on the peak: %s', (name) => {
+    // The shapes differ -- an array here, a value-plus-ties there -- but they
+    // must not disagree about which digit dominates the name.
+    expect(hiddenPassion(name).tied).toContain(calculateHiddenPassions(name)[0]);
   });
 });
 
