@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/prerender-meta.mjs && node scripts/stamp-sw.mjs",
+    "build": "vite build && node scripts/prerender-meta.mjs && node scripts/stamp-sw.mjs && node scripts/emit-routes.mjs",
     "build:check": "vite build --outDir .build-check --emptyOutDir",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
@@ -15,7 +15,8 @@
     "test:coverage": "vitest run --coverage",
     "create-admin-user": "node scripts/create-admin-user.js",
     "orchestrate": "cd .claude/orchestrator && npm start",
-    "typecheck": "tsc -b --noEmit"
+    "typecheck": "tsc -b --noEmit",
+    "build:internal": "VITE_INCLUDE_INTERNAL=1 npm run build"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -46,7 +47,6 @@
     "@radix-ui/react-toggle": "^1.1.9",
     "@radix-ui/react-toggle-group": "^1.1.10",
     "@radix-ui/react-tooltip": "^1.2.7",
-    "@supabase/supabase-js": "^2.89.0",
     "@tanstack/react-query": "^5.83.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

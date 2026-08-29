@@ -18,6 +18,8 @@ const MIME = {
   ".js": "text/javascript; charset=utf-8",
   ".css": "text/css; charset=utf-8",
   ".json": "application/json; charset=utf-8",
+  ".xml": "application/xml; charset=utf-8",
+  ".map": "application/json; charset=utf-8",
   ".svg": "image/svg+xml",
   ".ico": "image/x-icon",
   ".png": "image/png",
@@ -28,11 +30,48 @@ const MIME = {
   ".webmanifest": "application/manifest+json",
 };
 
-// A path with no file extension is a client-side route; hand it index.html so
-// React Router can render it. Anything with an extension is an asset request and
-// gets an honest 404, which keeps broken bundle references visible instead of
-// silently returning HTML with a 200.
-const isClientRoute = (pathname) => !extname(pathname);
+// Which paths are real client routes, read from the manifest the build emits
+// (scripts/emit-routes.mjs) out of src/data/routes.json.
+//
+// This used to be `!extname(pathname)`: anything without a file extension got
+// the SPA shell with a 200. That made a typo in a shared link and a real page
+// indistinguishable over HTTP -- crawlers indexed invented URLs as valid pages,
+// and monitoring could not tell a broken route from a working one. Unknown
+// paths now get the same shell, so React Router still renders NotFound, but
+// with an honest 404 status.
+//
+// If the manifest is missing the server stays permissive rather than answering
+// 404 for the whole site: a half-finished build should degrade, not go dark.
+const ROUTE_PATTERNS = await (async () => {
+  try {
+    const paths = JSON.parse(await readFile(join(ROOT, "routes.json"), "utf8"));
+    // "/invite/:code" -> /^\/invite\/[^/]+$/
+    return paths.map(
+      (p) =>
+        new RegExp(
+          "^" +
+            p
+              .split("/")
+              .map((seg) =>
+                seg.startsWith(":")
+                  ? "[^/]+"
+                  : seg.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+              )
+              .join("/") +
+            "$",
+        ),
+    );
+  } catch {
+    console.warn("compass: dist/routes.json missing; serving every path as a route");
+    return null;
+  }
+})();
+
+const isKnownRoute = (pathname) => {
+  if (ROUTE_PATTERNS === null) return true;
+  const path = pathname !== "/" ? pathname.replace(/\/+$/, "") : "/";
+  return ROUTE_PATTERNS.some((re) => re.test(path));
+};
 
 // The build emits no inline <script>, so script-src needs no 'unsafe-inline'.
 // plausible.io is allowed for the analytics script and its event endpoint.
@@ -82,9 +121,9 @@ const send = (res, status, body, { head = false, proto, ...headers } = {}) => {
   res.end(head ? undefined : body);
 };
 
-const serveFile = async (res, filePath, { immutable, head, proto }) => {
+const serveFile = async (res, filePath, { immutable, head, proto, status = 200 }) => {
   const body = await readFile(filePath);
-  res.writeHead(200, {
+  res.writeHead(status, {
     "Content-Type": MIME[extname(filePath)] ?? "application/octet-stream",
     "Content-Length": body.length,
     "Cache-Control": immutable
@@ -149,12 +188,22 @@ const server = createServer(async (req, res) => {
     // fall through
   }
 
-  if (isClientRoute(pathname)) {
-    return await serveFile(res, join(ROOT, "index.html"), { immutable: false, head, proto });
+  // A path with an extension that reached here is a missing asset, and gets an
+  // honest 404 rather than HTML with a 200, which keeps broken bundle references
+  // visible. Anything else is a client route: the shell renders it either way,
+  // but the status distinguishes a real page from one that does not exist.
+  if (!extname(pathname)) {
+    return await serveFile(res, join(ROOT, "index.html"), {
+      immutable: false,
+      head,
+      proto,
+      status: isKnownRoute(pathname) ? 200 : 404,
+    });
   }
   return send(res, 404, "Not Found", { head, proto, "Content-Type": MIME[".txt"] });
 });
 
 server.listen(PORT, HOST, () => {
-  console.log(`compass: serving ${ROOT} at http://${HOST}:${PORT}/`);
+  const known = ROUTE_PATTERNS === null ? "no manifest" : `${ROUTE_PATTERNS.length} routes`;
+  console.log(`compass: serving ${ROOT} at http://${HOST}:${PORT}/ (${known})`);
 });

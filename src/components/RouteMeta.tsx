@@ -2,8 +2,9 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 // Shared with scripts/prerender-meta.mjs, which injects the same values into the
-// HTML at build time so crawlers that do not run JavaScript see them too.
-import routeMeta from "@/data/routeMeta.json";
+// HTML at build time so crawlers that do not run JavaScript see them too. Both
+// read src/data/routes.json; see src/lib/routes.ts.
+import { SITE_ORIGIN, metaFor } from "@/lib/routes";
 
 // Sets canonical, title and description for the route being viewed.
 //
@@ -18,11 +19,6 @@ import routeMeta from "@/data/routeMeta.json";
 //
 // SITE_ORIGIN is fixed rather than read from location.origin so previews and
 // local runs cannot emit a canonical pointing at themselves.
-const SITE_ORIGIN = "https://compass.oneaigency.com";
-
-type Meta = { title: string; description: string };
-
-const META = routeMeta as Record<string, Record<string, Meta>>;
 
 const setMeta = (selector: string, attr: string, value: string) => {
   let el = document.head.querySelector<HTMLMetaElement>(selector);
@@ -51,13 +47,14 @@ export const RouteMeta = () => {
     }
     link.href = href;
 
-    // Routes outside META are private (auth, profile, journal, admin) and are not
-    // meant to be indexed. They still need a title: without one they inherited
-    // whatever the previously viewed route had set.
+    // Routes with no meta in the registry are private (auth, profile, journal,
+    // admin) and are not meant to be indexed. They still need a title: without
+    // one they inherited whatever the previously viewed route had set.
     const fallback: Record<string, string> = {
       ro: "Numerologia", en: "Numerology Compass", ru: "Нумерология",
     };
-    const meta = META[path]?.[language] ?? META[path]?.en;
+    const entry = metaFor(path);
+    const meta = entry?.[language] ?? entry?.en;
     document.title = meta?.title ?? fallback[language] ?? fallback.en;
     if (meta) {
       setMeta('meta[name="description"]', "name", meta.description);

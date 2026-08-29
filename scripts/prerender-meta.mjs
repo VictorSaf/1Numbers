@@ -18,7 +18,7 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = join(ROOT, "dist");
-const ORIGIN = "https://compass.oneaigency.com";
+
 // Romanian is the interface default, so it is what an un-run bundle would show.
 const DEFAULT_LANG = "ro";
 
@@ -28,11 +28,15 @@ const escape = (s) =>
 const replaceTag = (html, pattern, replacement) =>
   pattern.test(html) ? html.replace(pattern, replacement) : html;
 
-const meta = JSON.parse(await readFile(join(ROOT, "src/data/routeMeta.json"), "utf8"));
+// The route list and the origin both come from src/data/routes.json, the one
+// registry sitemap.xml and the static server's 404 allowlist also read.
+const registry = JSON.parse(await readFile(join(ROOT, "src/data/routes.json"), "utf8"));
+const ORIGIN = registry.origin;
+const publicRoutes = registry.routes.filter((r) => r.kind === "public");
 const shell = await readFile(join(DIST, "index.html"), "utf8");
 
 let written = 0;
-for (const [route, langs] of Object.entries(meta)) {
+for (const { path: route, meta: langs } of publicRoutes) {
   const { title, description } = langs[DEFAULT_LANG] ?? Object.values(langs)[0];
   const url = `${ORIGIN}${route === "/" ? "/" : route}`;
 
