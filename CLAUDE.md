@@ -41,7 +41,8 @@ src/
 ├── components/    # UI: shadcn in ui/, custom at root, charts/
 ├── contexts/      # LanguageContext, AuthContext, ThemeContext
 ├── hooks/         # Custom React hooks
-└── integrations/  # API client (Supabase)
+├── services/      # api.ts — client for the Express API (JWT in localStorage)
+└── data/          # routes.json — the route registry (see Routing)
 
 server/src/
 ├── routes/        # API endpoints
@@ -60,6 +61,33 @@ All numerology calculations are pure TypeScript functions:
 - `predictions.ts` - Daily/monthly forecasts
 - `nameAnalysis.ts`, `phoneAnalysis.ts`, `vehicleAnalysis.ts`, `locationAnalysis.ts`, `dateAnalysis.ts` - Specialized analysis
 - `translations.ts` - All UI text in RO/EN/RU
+
+### Routing
+
+`src/data/routes.json` is the single source of truth for every route. Nothing
+else declares a route list — `sitemap.xml`, the prerendered per-route `index.html`
+files and the static server's 404 allowlist are all generated from it by
+`scripts/emit-routes.mjs` at build time. `src/App.tsx` maps each path to a
+component and fails loudly in development if the registry lists one it cannot
+render.
+
+Each route has a `kind`:
+
+- `public` — indexable, carries `meta` per language, appears in the sitemap
+- `app` — a real route that is private or carries params: served, never indexed
+- `internal` — development only, dropped from the production build entirely
+  (`/admin`, `/design-system`, `/white-label`). `npm run build:internal` puts
+  them back for the copy served locally on :8090.
+
+Adding a route means editing `routes.json` și `PAGES` in `App.tsx`. Nothing else.
+
+### Auth
+
+JWT issued by the Express API in `server/`, held in `localStorage`, attached by
+`src/services/api.ts` and surfaced through `AuthContext`. There is no Supabase —
+the dead client, its folder și cheile sale were removed on 2026-08-30. Likewise
+there is no Python backend, Docker stack or Kubernetes deployment; the versions
+of those that used to sit in this repo never ran.
 
 ### Key Conventions
 
