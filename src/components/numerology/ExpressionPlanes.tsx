@@ -23,16 +23,19 @@ const LABELS = {
   ro: {
     planes: { physical: "Fizic", mental: "Mental", emotional: "Emoțional", intuitive: "Intuitiv" },
     natures: { creative: "Creativ", vacillating: "Oscilant", grounded: "Ancorat" },
+    reading: "În fiecare celulă: numărul de litere deasupra, suma valorilor lor dedesubt.",
     total: "Total", legend: "Puține litere", legendHigh: "Multe litere", cells: "litere",
   },
   en: {
     planes: { physical: "Physical", mental: "Mental", emotional: "Emotional", intuitive: "Intuitive" },
     natures: { creative: "Creative", vacillating: "Vacillating", grounded: "Grounded" },
+    reading: "In each cell: how many letters above, the sum of their values below.",
     total: "Total", legend: "Few letters", legendHigh: "Many letters", cells: "letters",
   },
   ru: {
     planes: { physical: "Физический", mental: "Ментальный", emotional: "Эмоциональный", intuitive: "Интуитивный" },
     natures: { creative: "Творческий", vacillating: "Колеблющийся", grounded: "Заземлённый" },
+    reading: "В каждой ячейке: количество букв сверху, сумма их значений снизу.",
     total: "Всего", legend: "Мало букв", legendHigh: "Много букв", cells: "букв",
   },
 };
@@ -99,8 +102,13 @@ const ExpressionPlanes = ({ fullName }: ExpressionPlanesProps) => {
                     </td>
                   );
                 })}
-                <td className="num rounded-md bg-surface-2 p-2 text-center text-sm text-ink-2">
-                  {planeTotals[plane].sum}
+                {/* Totals carry both figures in the same arrangement as the cells.
+                    Showing only the sum put the column in different units from
+                    the large number beside it: a row reading 2, 1, 0 totalling 7
+                    invites the reader to think the arithmetic is wrong. */}
+                <td className="rounded-md bg-surface-2 p-2 text-center text-ink-2">
+                  <span className="num block text-sm leading-none">{planeTotals[plane].count}</span>
+                  <span className="num block text-[10px] opacity-70">{planeTotals[plane].sum}</span>
                 </td>
               </tr>
             ))}
@@ -109,8 +117,9 @@ const ExpressionPlanes = ({ fullName }: ExpressionPlanesProps) => {
                 {l.total}
               </th>
               {NATURES.map((n) => (
-                <td key={n} className="num rounded-md bg-surface-2 p-2 text-center text-sm text-ink-2">
-                  {natureTotals[n].sum}
+                <td key={n} className="rounded-md bg-surface-2 p-2 text-center text-ink-2">
+                  <span className="num block text-sm leading-none">{natureTotals[n].count}</span>
+                  <span className="num block text-[10px] opacity-70">{natureTotals[n].sum}</span>
                 </td>
               ))}
               <td />
@@ -118,6 +127,8 @@ const ExpressionPlanes = ({ fullName }: ExpressionPlanesProps) => {
           </tbody>
         </table>
       </div>
+
+      <p className="text-[11px] text-faint">{l.reading}</p>
 
       {/* A sequential ramp is meaningless without its ends named. */}
       <div className="flex items-center gap-2 text-[11px] text-faint">
