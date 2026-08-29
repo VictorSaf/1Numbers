@@ -1,34 +1,23 @@
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from 'recharts';
+import { classifyFullName } from '@/lib/numerology-plus/core';
+import { inclusionTable } from '@/lib/numerology-plus/pythagorean';
 
 interface NumberDistributionChartProps {
   name: string;
 }
 
-// Calculate letter frequency for a name
+// Frequencies come from the engine. The table that used to live here dropped
+// diacritics instead of transliterating them, so for a name like Stefan Muresan
+// this chart drew bars for eleven letters while the rest of the page counted
+// thirteen -- two different answers to the same question, side by side.
 const calculateLetterDistribution = (name: string) => {
-  const PYTHAGOREAN_VALUES: Record<string, number> = {
-    A: 1, B: 2, C: 3, D: 4, E: 5, F: 6, G: 7, H: 8, I: 9,
-    J: 1, K: 2, L: 3, M: 4, N: 5, O: 6, P: 7, Q: 8, R: 9,
-    S: 1, T: 2, U: 3, V: 4, W: 5, X: 6, Y: 7, Z: 8
-  };
-
-  const distribution: Record<number, number> = {
-    1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0
-  };
-
-  const cleanName = name.toUpperCase().replace(/[^A-Z]/g, '');
-  
-  for (const char of cleanName) {
-    const value = PYTHAGOREAN_VALUES[char];
-    if (value) {
-      distribution[value]++;
-    }
-  }
+  const distribution = inclusionTable(name);
+  const total = classifyFullName(name).length;
 
   return Object.entries(distribution).map(([number, count]) => ({
     number: parseInt(number),
     count,
-    percentage: cleanName.length > 0 ? Math.round((count / cleanName.length) * 100) : 0
+    percentage: total > 0 ? Math.round((count / total) * 100) : 0
   }));
 };
 
