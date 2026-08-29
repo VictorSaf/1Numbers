@@ -7,7 +7,13 @@ import path from "path";
 export default defineConfig({
   server: {
     host: "::",
-    port: 8080,
+    // 8080 and 8081 are held by the llama-server that One21 uses for embeddings.
+    // Vite would fall through to the next free port on its own, but silently, so
+    // the address printed at startup stopped matching the one in the docs.
+    // strictPort turns the next such collision into a startup error rather than
+    // a quiet move to another port.
+    port: 8082,
+    strictPort: true,
     // In production the tunnel routes /api/* to the backend on the same origin.
     // Proxying here makes dev behave identically, so API calls stay relative in
     // both environments and no host is ever hardcoded in the frontend.

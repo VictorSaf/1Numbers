@@ -10,7 +10,7 @@ Numerology Compass is a multilingual (Romanian/English/Russian) numerology web a
 
 ```bash
 # Frontend
-npm run dev           # Start dev server on http://localhost:8080
+npm run dev           # Start dev server on http://localhost:8082
 npm run build         # Production build
 npm run lint          # Run ESLint
 npm run test          # Run tests in watch mode
