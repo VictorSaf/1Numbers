@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { api } from '@/services/api';
+import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -19,6 +20,7 @@ interface Plan {
 
 export const SubscriptionPlans = () => {
   const { t, language } = useLanguage();
+  const { toast } = useToast();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
@@ -27,6 +29,53 @@ export const SubscriptionPlans = () => {
   useEffect(() => {
     loadPlans();
   }, []);
+
+  const translations: Record<string, Record<string, string>> = {
+    ro: {
+      monthly: 'Lunar',
+      yearly: 'Anual',
+      subscribe: 'Abonează-te',
+      current: 'Planul tău',
+      mostPopular: 'Cel mai popular',
+      features: 'Caracteristici',
+      save: 'Economisește',
+      perMonth: '/lună',
+      perYear: '/an',
+      billingClosed: 'Plățile nu sunt disponibile',
+      billingClosedDesc: 'Abonamentele nu se pot cumpăra încă. Nu ți s-a luat niciun ban.',
+      errorGeneric: 'A apărut o eroare. Încearcă din nou.'
+    },
+    en: {
+      monthly: 'Monthly',
+      yearly: 'Yearly',
+      subscribe: 'Subscribe',
+      current: 'Your plan',
+      mostPopular: 'Most popular',
+      features: 'Features',
+      save: 'Save',
+      perMonth: '/month',
+      perYear: '/year',
+      billingClosed: 'Payments are unavailable',
+      billingClosedDesc: 'Subscriptions cannot be bought yet. You have not been charged.',
+      errorGeneric: 'Something went wrong. Please try again.'
+    },
+    ru: {
+      monthly: 'Ежемесячно',
+      yearly: 'Ежегодно',
+      subscribe: 'Подписаться',
+      current: 'Ваш план',
+      mostPopular: 'Самый популярный',
+      features: 'Возможности',
+      save: 'Сэкономить',
+      perMonth: '/месяц',
+      perYear: '/год',
+      billingClosed: 'Оплата недоступна',
+      billingClosedDesc: 'Подписку пока нельзя купить. Деньги не списаны.',
+      errorGeneric: 'Произошла ошибка. Попробуйте ещё раз.'
+    }
+  };
+
+  const tr = translations[language] || translations.en;
 
   const loadPlans = async () => {
     try {
@@ -54,7 +103,15 @@ export const SubscriptionPlans = () => {
         window.location.href = '/premium?success=true';
       }
     } catch (error) {
+      // This used to end at the console: the button simply stopped spinning.
+      // 403 is the billing gate on the API, so it gets its own copy.
       console.error('Error subscribing:', error);
+      const status = (error as { status?: number } | null)?.status;
+      toast({
+        title: status === 403 ? tr.billingClosed : tr.errorGeneric,
+        description: status === 403 ? tr.billingClosedDesc : undefined,
+        variant: 'destructive',
+      });
     } finally {
       setSelectedPlan(null);
     }
@@ -77,44 +134,6 @@ export const SubscriptionPlans = () => {
       </div>
     );
   }
-
-  const translations: Record<string, Record<string, string>> = {
-    ro: {
-      monthly: 'Lunar',
-      yearly: 'Anual',
-      subscribe: 'Abonează-te',
-      current: 'Planul tău',
-      mostPopular: 'Cel mai popular',
-      features: 'Caracteristici',
-      save: 'Economisește',
-      perMonth: '/lună',
-      perYear: '/an'
-    },
-    en: {
-      monthly: 'Monthly',
-      yearly: 'Yearly',
-      subscribe: 'Subscribe',
-      current: 'Your plan',
-      mostPopular: 'Most popular',
-      features: 'Features',
-      save: 'Save',
-      perMonth: '/month',
-      perYear: '/year'
-    },
-    ru: {
-      monthly: 'Ежемесячно',
-      yearly: 'Ежегодно',
-      subscribe: 'Подписаться',
-      current: 'Ваш план',
-      mostPopular: 'Самый популярный',
-      features: 'Возможности',
-      save: 'Сэкономить',
-      perMonth: '/месяц',
-      perYear: '/год'
-    }
-  };
-
-  const tr = translations[language] || translations.en;
 
   return (
     <div className="space-y-6">

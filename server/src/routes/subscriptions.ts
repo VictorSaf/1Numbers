@@ -4,6 +4,15 @@ import { authenticateToken, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
+// Nothing on this router charges anyone. /create and /upgrade write
+// status = 'active' straight to the database, /purchase writes 'completed' and
+// takes the price from the request body, and no payment processor sits behind
+// any of them -- the Subscribe button is the entire checkout. Gated by
+// environment rather than removed, the same way public sign-up is in auth.ts,
+// so a real integration can open it again without a code change.
+const billingOpen = process.env.ALLOW_BILLING === 'true';
+const BILLING_CLOSED = { error: 'Payments are currently unavailable' };
+
 // Get all available subscription plans
 router.get('/plans', async (req, res: Response) => {
   try {
@@ -104,6 +113,10 @@ router.get('/status', authenticateToken, async (req: AuthRequest, res: Response)
 
 // Create subscription
 router.post('/create', authenticateToken, async (req: AuthRequest, res: Response) => {
+  if (!billingOpen) {
+    return res.status(403).json(BILLING_CLOSED);
+  }
+
   try {
     const userId = req.userId;
     const { planId, billingPeriod = 'monthly' } = req.body;
@@ -376,6 +389,10 @@ router.get('/purchases', authenticateToken, async (req: AuthRequest, res: Respon
 
 // Create one-time purchase
 router.post('/purchase', authenticateToken, async (req: AuthRequest, res: Response) => {
+  if (!billingOpen) {
+    return res.status(403).json(BILLING_CLOSED);
+  }
+
   try {
     const userId = req.userId;
     const { productId, productName, price, currency = 'EUR', metadata = {} } = req.body;
@@ -492,6 +509,10 @@ router.put('/white-label', authenticateToken, async (req: AuthRequest, res: Resp
 
 // Upgrade subscription
 router.post('/upgrade', authenticateToken, async (req: AuthRequest, res: Response) => {
+  if (!billingOpen) {
+    return res.status(403).json(BILLING_CLOSED);
+  }
+
   try {
     const userId = req.userId;
     const { targetTierId, billingPeriod = 'yearly' } = req.body;

@@ -81,6 +81,8 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
       loginRequiredDesc: 'Conectează-te sau creează un cont pentru a te abona.',
       errorTitle: 'Abonarea nu a reușit',
       errorGeneric: 'A apărut o eroare. Încearcă din nou.',
+      billingClosed: 'Plățile nu sunt disponibile',
+      billingClosedDesc: 'Abonamentele nu se pot cumpăra încă. Nu ți s-a luat niciun ban.',
       bestValue: 'Cea Mai Bună Valoare',
       billedYearly: 'Facturat anual',
       billedMonthly: 'Facturat lunar',
@@ -105,6 +107,8 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
       loginRequiredDesc: 'Sign in or create an account to subscribe.',
       errorTitle: 'Subscription failed',
       errorGeneric: 'Something went wrong. Please try again.',
+      billingClosed: 'Payments are unavailable',
+      billingClosedDesc: 'Subscriptions cannot be bought yet. You have not been charged.',
       bestValue: 'Best Value',
       billedYearly: 'Billed yearly',
       billedMonthly: 'Billed monthly',
@@ -129,6 +133,8 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
       loginRequiredDesc: 'Войдите или создайте аккаунт, чтобы оформить подписку.',
       errorTitle: 'Не удалось оформить подписку',
       errorGeneric: 'Произошла ошибка. Попробуйте ещё раз.',
+      billingClosed: 'Оплата недоступна',
+      billingClosedDesc: 'Подписку пока нельзя купить. Деньги не списаны.',
       bestValue: 'Лучшая Цена',
       billedYearly: 'Оплата за год',
       billedMonthly: 'Оплата за месяц',
@@ -172,9 +178,17 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
       // Previously this only reached the console: the button stopped spinning and
       // the visitor was told nothing at all.
       console.error('Subscription error:', error);
+      // 403 is the billing gate on the API, not a failure the visitor caused, so
+      // it gets its own copy in their language rather than the server's English.
+      const status = (error as { status?: number } | null)?.status;
       toast({
-        title: t.errorTitle,
-        description: error instanceof Error ? error.message : t.errorGeneric,
+        title: status === 403 ? t.billingClosed : t.errorTitle,
+        description:
+          status === 403
+            ? t.billingClosedDesc
+            : error instanceof Error
+              ? error.message
+              : t.errorGeneric,
         variant: 'destructive',
       });
     } finally {

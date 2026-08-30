@@ -31,3 +31,21 @@ Lucruri găsite în afara listei. Nimic din ce e aici n-a fost reparat; e doar c
   `smoke.ts` n-avea nicio aserțiune — doar `console.log` peste `fullProfile`, formă
   păzită azi de `profile.test.ts` și valori păzite de `engine.test.ts`.
   Deci: șterse, nu convertite.
+
+## Etapa 1
+
+- **`server/node_modules` nu exista.** Suita de teste de backend (supertest,
+  vitest, jsonwebtoken) era nerulabilă, deci `auth.middleware.test.ts` și
+  `health.test.ts` n-au rulat nici ele. Rezolvat cu `npm ci` în `server/`.
+  Ambele fișiere trec — nu erau stricate, doar neinstalate.
+
+- **`PricingCards.tsx:404` — `handlePurchase` e un buton fals.** Nu apelează
+  `/api/subscriptions/purchase`: face `console.log`, așteaptă o secundă și se
+  oprește. Deci cumpărăturile one-time nu sângerau bani, dar butonul se învârte
+  și apoi nu spune nimic. Neatins — e pe aceeași temă, dar cere o decizie de
+  produs (se ascunde secțiunea? se marchează „în curând"?), iar Etapa 1 cere doar
+  închiderea celor trei rute.
+
+- **`ALLOW_BILLING` e documentat doar în `server/.env`**, care e în `.gitignore`,
+  deci nu ajunge în repo. Nu există `.env.example` în `server/` — aceeași lipsă
+  o are și `ALLOW_REGISTRATION`. Merită unul, dar e curățenie de Etapa 7.
