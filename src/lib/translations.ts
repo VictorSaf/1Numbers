@@ -51,15 +51,10 @@ export const translations = {
     
     // Number titles
     lifePathTitle: "Numărul Drumului Vieții",
-    lifePathDesc: "Cel mai important număr în numerologie. Reprezintă calea ta de viață, lecțiile de învățat și scopul existenței tale.",
     destinyTitle: "Numărul Destinului",
-    destinyDesc: "Derivat din numele tău complet, arată talentele și abilitățile pe care le ai pentru a-ți îndeplini misiunea de viață.",
     soulUrgeTitle: "Numărul Sufletului",
-    soulUrgeDesc: "Calculat din vocalele numelui, relevă dorințele tale interioare și motivațiile cele mai profunde.",
     personalityTitle: "Numărul Personalității",
-    personalityDesc: "Derivat din consoanele numelui, arată cum te percep alții și prima impresie pe care o lași.",
     personalYearTitle: "Anul Personal",
-    personalYearDesc: "Energia care te ghidează în acest an. Fiecare an personal aduce oportunități și provocări unice.",
     
     // Info cards
     infoLifePath: "Misiunea ta în această viață",
@@ -447,15 +442,10 @@ export const translations = {
     
     // Number titles
     lifePathTitle: "Life Path Number",
-    lifePathDesc: "The most important number in numerology. It represents your life path, lessons to learn, and your life purpose.",
     destinyTitle: "Destiny Number",
-    destinyDesc: "Derived from your full name, it shows the talents and abilities you have to fulfill your life mission.",
     soulUrgeTitle: "Soul Urge Number",
-    soulUrgeDesc: "Calculated from the vowels in your name, it reveals your innermost desires and deepest motivations.",
     personalityTitle: "Personality Number",
-    personalityDesc: "Derived from the consonants in your name, it shows how others perceive you and your first impression.",
     personalYearTitle: "Personal Year",
-    personalYearDesc: "The energy guiding you this year. Each personal year brings unique opportunities and challenges.",
     
     // Info cards
     infoLifePath: "Your mission in this life",
@@ -870,15 +860,10 @@ export const translations = {
     
     // Number titles
     lifePathTitle: "Число Жизненного Пути",
-    lifePathDesc: "Самое важное число в нумерологии. Оно представляет ваш жизненный путь, уроки и цель вашей жизни.",
     destinyTitle: "Число Судьбы",
-    destinyDesc: "Полученное из вашего полного имени, оно показывает таланты и способности для выполнения вашей жизненной миссии.",
     soulUrgeTitle: "Число Души",
-    soulUrgeDesc: "Рассчитанное из гласных в имени, оно раскрывает ваши внутренние желания и глубочайшие мотивации.",
     personalityTitle: "Число Личности",
-    personalityDesc: "Полученное из согласных в имени, показывает как другие воспринимают вас и первое впечатление.",
     personalYearTitle: "Личный Год",
-    personalYearDesc: "Энергия, направляющая вас в этом году. Каждый личный год приносит уникальные возможности и вызовы.",
     
     // Info cards
     infoLifePath: "Ваша миссия в этой жизни",

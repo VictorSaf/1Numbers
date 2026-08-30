@@ -37,6 +37,7 @@ const TransitsTimeline = lazy(() => import("@/components/numerology/TransitsTime
 const Biorhythms = lazy(() => import("@/components/numerology/Biorhythms"));
 const DestinyMatrix = lazy(() => import("@/components/numerology/DestinyMatrix"));
 const NewNumbers = lazy(() => import("@/components/numerology/NewNumbers"));
+const Contradictions = lazy(() => import("@/components/numerology/Contradictions"));
 const NumerologyRadarChart = lazy(() => import("./charts/NumerologyRadarChart").then(m => ({ default: m.NumerologyRadarChart })));
 
 // Chart loading skeleton
@@ -147,6 +148,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     distribution: { ro: "Distribuția cifrelor", en: "Number distribution", ru: "Распределение чисел" },
     cycles: { ro: "Ciclurile personale", en: "Personal cycles", ru: "Личные циклы" },
     tension: { ro: "Punțile și echilibrul", en: "The bridges and the balance", ru: "Мосты и равновесие" },
+    contradiction: { ro: "Ce nu se potrivește", en: "What does not fit", ru: "Что не сходится" },
     depth: { ro: "Ce e sub suprafață", en: "What sits under the surface", ru: "Что лежит под поверхностью" }
   };
 
@@ -166,6 +168,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     distribution: { ro: "Câte litere din numele tău cad pe fiecare cifră.", en: "How many letters of your name land on each digit.", ru: "Сколько букв вашего имени приходится на каждую цифру." },
     profile: { ro: "Cele cinci numere de bază, pe aceeași scară.", en: "The five core numbers, on one scale.", ru: "Пять основных чисел на одной шкале." },
     tension: { ro: "Distanța dintre cine ești pe dinăuntru și cine pari pe dinafară.", en: "The distance between who you are inside and who you appear to be.", ru: "Расстояние между тем, кто вы внутри, и тем, кем кажетесь." },
+    contradiction: { ro: "Cele două numere care trag în direcții diferite, și ce închide distanța.", en: "The two numbers pulling different ways, and what closes the distance.", ru: "Два числа, тянущие в разные стороны, и что закрывает расстояние." },
     depth: { ro: "Pasiunea ascunsă și cifrele care lipsesc cu totul din nume.", en: "The hidden passion, and the digits missing from your name entirely.", ru: "Скрытая страсть и цифры, которых в имени нет вовсе." }
   };
 
@@ -238,10 +241,10 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
         <Chapter meta={chapters[0]} index={1}>
           <Block title={sectionLabels.core[language]} icon={<Star className="h-5 w-5 text-primary" />}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <NumberCard title={t.lifePathTitle} number={results.lifePath} description={t.lifePathDesc} delay={100} isMain />
-              <NumberCard title={t.destinyTitle} number={results.destiny} description={t.destinyDesc} delay={200} />
-              <NumberCard title={t.soulUrgeTitle} number={results.soulUrge} description={t.soulUrgeDesc} delay={300} />
-              <NumberCard title={t.personalityTitle} number={results.personality} description={t.personalityDesc} delay={400} />
+              <NumberCard title={t.lifePathTitle} number={results.lifePath} delay={100} isMain />
+              <NumberCard title={t.destinyTitle} number={results.destiny} delay={200} />
+              <NumberCard title={t.soulUrgeTitle} number={results.soulUrge} delay={300} />
+              <NumberCard title={t.personalityTitle} number={results.personality} delay={400} />
             </div>
           </Block>
 
@@ -265,6 +268,13 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
 
         {/* 2 — Ce se contrazice în tine */}
         <Chapter meta={chapters[1]} index={2}>
+          {/* The chapter's answer, before its parts. */}
+          <Block title={sectionLabels.contradiction[language]} icon={<AlertTriangle className="h-5 w-5 text-warn" />} note={teasers.contradiction[language]}>
+            <Suspense fallback={chartSkeleton}>
+              <Contradictions fullName={fullName} birthDate={birthDate} />
+            </Suspense>
+          </Block>
+
           <Block title={sectionLabels.tension[language]} icon={<AlertTriangle className="h-5 w-5 text-warn" />} note={teasers.tension[language]}>
             <Suspense fallback={chartSkeleton}>
               <NewNumbers fullName={fullName} birthDate={birthDate} keys={CHAPTER_TENSION} />
@@ -333,7 +343,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
         <Chapter meta={chapters[3]} index={4}>
           <Block title={sectionLabels.cycles[language]} icon={<CalendarCheck className="h-5 w-5 text-primary" />}>
             <div className="space-y-6">
-              <NumberCard title={`${t.personalYearTitle} ${currentYear}`} number={results.personalYear} description={t.personalYearDesc} delay={100} />
+              <NumberCard title={`${t.personalYearTitle} ${currentYear}`} number={results.personalYear} delay={100} />
               <PersonalCycleCard birthDate={birthDate} delay={150} />
             </div>
           </Block>

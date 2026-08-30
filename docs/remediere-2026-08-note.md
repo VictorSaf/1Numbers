@@ -365,3 +365,30 @@ Lucruri găsite în afara listei. Nimic din ce e aici n-a fost reparat; e doar c
 - **Build:** `Learn.js` 4,4 KB și `tabs.js` 1,1 KB apar; `Courses.js`,
   `NumberDistributionChart.js` și `use.js` dispar. Total neschimbat, un chunk
   mai puțin.
+
+## Plan de implementare — Etapa 3
+
+- **Separatorul după număr e două puncte, nu linie de pauză.** Forma din plan e
+  „Drumul tău spune **7** — retragere, analiză", dar mai multe esențe de arhetip
+  poartă ele însele o linie de pauză, iar rezultatul era „spune 7 — energia
+  întrebării — nu accepți un răspuns" — o propoziție cu o cratimă în plus.
+  Restul formei e neschimbat.
+
+- **Puntea 0 numește numărul pe care cele două părți sunt de acord.** Prima
+  variantă spunea doar „spun același număr", ceea ce citea ca un răspuns lipsă
+  acolo unde e chiar un răspuns. Acum: „Sufletul tău și Personalitatea ta spun
+  amândouă 5: energia mișcării — stagnarea te costă mai mult decât riscul."
+
+- **Puntea Suflet–Expresie nu e folosită.** `bridges()` întoarce trei, dar
+  `interpretProfile` are rame doar pentru două, iar planul cere două. A treia
+  rămâne calculată și neafișată — n-am inventat o ramă pentru ea.
+
+- **Cele cinci chei generice au fost șterse din traduceri**, nu doar din card:
+  `lifePathDesc`, `destinyDesc`, `soulUrgeDesc`, `personalityDesc`,
+  `personalYearDesc`, câte trei limbi. Nimic altceva nu le citea. Testul de
+  paritate a cheilor trece în continuare.
+
+- **Build:** stratul de conținut s-a desprins într-un chunk de 39,9 KB partajat
+  de `NewNumbers` și `Contradictions`. Nu e preîncărcat în `index.html`, deci
+  ajunge tot lazy — dar acum o singură dată pentru amândouă, în loc de duplicat.
+  Total 2860 KB → 2868 KB; `Contradictions.js` are 3,2 KB.

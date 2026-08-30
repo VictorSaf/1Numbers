@@ -9,13 +9,12 @@ import { getDelayClass } from "@/components/design-system";
 interface NumberCardProps {
   title: string;
   number: number;
-  description: string;
   delay?: number;
   isMain?: boolean;
   showDetails?: boolean;
 }
 
-export const NumberCard = ({ title, number, description, delay = 0, isMain = false, showDetails = true }: NumberCardProps) => {
+export const NumberCard = ({ title, number, delay = 0, isMain = false, showDetails = true }: NumberCardProps) => {
   const { t } = useLanguage();
   const [isExpanded, setIsExpanded] = useState(false);
   
@@ -56,10 +55,10 @@ export const NumberCard = ({ title, number, description, delay = 0, isMain = fal
           ))}
         </div>
         
-        <p className="text-sm text-muted-foreground leading-relaxed max-w-md">
-          {description}
-        </p>
-        
+        {/* The number's own reading. A second paragraph used to sit above this
+            one -- t.lifePathDesc and its four siblings -- describing what a Life
+            Path *is*, identical for every visitor, placed above the sentence
+            that was actually about them. */}
         <p className="text-sm text-foreground/80 leading-relaxed">
           {meaning.description}
         </p>
