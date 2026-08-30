@@ -84,16 +84,16 @@
       "priority": 0.8,
       "meta": {
         "ro": {
-          "title": "Instrumente Numerologice — Nume, Telefon, Adresă",
-          "description": "Analizează numerologic numele, numărul de telefon, adresa și numărul de înmatriculare."
+          "title": "Instrumente Numerologice — Calendar, Lo Shu, Prognoză Anuală",
+          "description": "Calendar numerologic, grila Lo Shu, schimbarea numelui, nume de firmă, prognoză pe an, optimizator de nume și matrice de compatibilitate."
         },
         "en": {
-          "title": "Numerology Tools — Name, Phone, Address",
-          "description": "Run a numerology analysis on names, phone numbers, addresses and vehicle plates."
+          "title": "Numerology Tools — Calendar, Lo Shu, Year Forecast",
+          "description": "Numerology calendar, Lo Shu grid, name change, business name, year forecast, name optimiser and a compatibility matrix."
         },
         "ru": {
-          "title": "Нумерологические инструменты — имя, телефон, адрес",
-          "description": "Нумерологический анализ имени, номера телефона, адреса и номера автомобиля."
+          "title": "Нумерологические инструменты — календарь, Ло Шу, прогноз на год",
+          "description": "Нумерологический календарь, сетка Ло Шу, смена имени, название компании, годовой прогноз, оптимизатор имени и матрица совместимости."
         }
       }
     },

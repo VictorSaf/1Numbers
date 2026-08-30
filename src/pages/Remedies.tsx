@@ -2,6 +2,7 @@
 // Display numerological remedies based on user's numbers
 
 import { useState, useMemo } from 'react';
+import { parseCalendarDate } from '@/lib/calendarDate';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -98,7 +99,7 @@ const Remedies = () => {
 
   const userNumbers = useMemo(() => {
     if (!birthDate || !fullName) return null;
-    const date = new Date(birthDate);
+    const date = parseCalendarDate(birthDate);
     return {
       lifePath: calculateLifePathNumber(date),
       destiny: calculateDestinyNumber(fullName),

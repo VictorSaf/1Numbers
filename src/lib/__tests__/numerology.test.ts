@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { parseCalendarDate } from '../calendarDate';
 import {
   reduceToSingleDigit,
   calculateLifePathNumber,
@@ -64,21 +65,21 @@ describe("calculateLifePathNumber", () => {
   it("calculates correctly for May 15, 1990", () => {
     // Day: 15 → 6, Month: 5, Year: 1990 → 19 → 10 → 1
     // Total: 6 + 5 + 1 = 12 → 3
-    const birthDate = new Date("1990-05-15");
+    const birthDate = parseCalendarDate("1990-05-15");
     expect(calculateLifePathNumber(birthDate)).toBe(3);
   });
 
   it("calculates correctly for December 25, 1985", () => {
     // Day: 25 → 7, Month: 12 → 3, Year: 1985 → 23 → 5
     // Total: 7 + 3 + 5 = 15 → 6
-    const birthDate = new Date("1985-12-25");
+    const birthDate = parseCalendarDate("1985-12-25");
     expect(calculateLifePathNumber(birthDate)).toBe(6);
   });
 
   it("calculates correctly for January 1, 2000", () => {
     // Day: 1, Month: 1, Year: 2000 → 2
     // Total: 1 + 1 + 2 = 4
-    const birthDate = new Date("2000-01-01");
+    const birthDate = parseCalendarDate("2000-01-01");
     expect(calculateLifePathNumber(birthDate)).toBe(4);
   });
 
@@ -94,7 +95,7 @@ describe("calculateLifePathNumber", () => {
     // Simple case: March 20, 1950
     // Day: 20 → 2, Month: 3, Year: 1950 → 15 → 6
     // Total: 2 + 3 + 6 = 11 (preserved!)
-    const birthDate = new Date("1950-03-20");
+    const birthDate = parseCalendarDate("1950-03-20");
     expect(calculateLifePathNumber(birthDate)).toBe(11);
   });
 
@@ -116,7 +117,7 @@ describe("calculateLifePathNumber", () => {
 
     // This is tricky - let's skip specific master 22 test
     // and just verify the function doesn't crash
-    const birthDate = new Date("1968-07-22");
+    const birthDate = parseCalendarDate("1968-07-22");
     const result = calculateLifePathNumber(birthDate);
     expect(result).toBeGreaterThan(0);
     expect(result).toBeLessThanOrEqual(33);
@@ -185,12 +186,12 @@ describe("calculatePersonalYearNumber", () => {
     // Birth: May 15 (any year), Year: 2024
     // Day: 15 → 6, Month: 5, Year: 2024 → 8
     // Total: 6 + 5 + 8 = 19 → 10 → 1
-    const birthDate = new Date("1990-05-15");
+    const birthDate = parseCalendarDate("1990-05-15");
     expect(calculatePersonalYearNumber(birthDate, 2024)).toBe(1);
   });
 
   it("uses current year when not specified", () => {
-    const birthDate = new Date("1990-05-15");
+    const birthDate = parseCalendarDate("1990-05-15");
     const result = calculatePersonalYearNumber(birthDate);
     expect(result).toBeGreaterThan(0);
     expect(result).toBeLessThanOrEqual(9);

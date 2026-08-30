@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { calculateLifePathNumber, calculateDestinyNumber, calculateSoulUrgeNumber, calculatePersonalityNumber } from '@/lib/numerology';
 import { calculateFriendshipCompatibility } from '@/lib/compatibility';
 import { Heart, Users, Sparkles, ArrowRight, Star } from 'lucide-react';
+import { parseCalendarDate } from '@/lib/calendarDate';
 
 interface PersonData {
   birthDate: string;
@@ -99,7 +100,7 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
   const t = translations[language] || translations.en;
 
   const userNumbers = useMemo(() => {
-    const birthDate = new Date(user.birthDate);
+    const birthDate = parseCalendarDate(user.birthDate);
     return {
       lifePath: calculateLifePathNumber(birthDate),
       destiny: calculateDestinyNumber(user.fullName),
@@ -109,7 +110,7 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
   }, [user.birthDate, user.fullName]);
 
   const friendNumbers = useMemo(() => {
-    const birthDate = new Date(friend.birthDate);
+    const birthDate = parseCalendarDate(friend.birthDate);
     return {
       lifePath: calculateLifePathNumber(birthDate),
       destiny: calculateDestinyNumber(friend.fullName),
@@ -119,8 +120,8 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
   }, [friend.birthDate, friend.fullName]);
 
   const compatibility = useMemo(() => {
-    const userDate = new Date(user.birthDate);
-    const friendDate = new Date(friend.birthDate);
+    const userDate = parseCalendarDate(user.birthDate);
+    const friendDate = parseCalendarDate(friend.birthDate);
     // calculateCompatibility takes two person objects and returns only the three
     // base scores. This component was written against a richer shape it never
     // received, so every score read undefined and the analysis never rendered.

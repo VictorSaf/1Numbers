@@ -27,6 +27,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { API_BASE } from '@/lib/apiBase';
+import { parseCalendarDate } from '@/lib/calendarDate';
 
 interface ConversationMessage {
   role: 'user' | 'assistant';
@@ -55,7 +56,7 @@ export const AIConsultant = () => {
   const aiContext: AIContext | null = useMemo(() => {
     if (!profile) return null;
 
-    const birthDate = new Date(profile.birthDate);
+    const birthDate = parseCalendarDate(profile.birthDate);
     const loShuGrid = generateLoShuGrid(birthDate);
 
     return {

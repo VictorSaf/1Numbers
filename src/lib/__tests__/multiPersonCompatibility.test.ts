@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { parseCalendarDate } from '../calendarDate';
 import {
   compareMultiplePeople,
   analyzeGroupCompatibility,
@@ -10,17 +11,17 @@ const people: PersonData[] = [
   {
     id: "1",
     fullName: "Maria Elena Popescu",
-    birthDate: new Date("1990-05-15"),
+    birthDate: parseCalendarDate("1990-05-15"),
   },
   {
     id: "2",
     fullName: "Ion Alexandru Ionescu",
-    birthDate: new Date("1988-08-22"),
+    birthDate: parseCalendarDate("1988-08-22"),
   },
   {
     id: "3",
     fullName: "Ana Maria Georgescu",
-    birthDate: new Date("1992-03-10"),
+    birthDate: parseCalendarDate("1992-03-10"),
   },
 ];
 
@@ -159,7 +160,7 @@ describe("calculateGroupHarmony", () => {
       {
         id: "4",
         fullName: "George Popescu",
-        birthDate: new Date("1985-11-20"),
+        birthDate: parseCalendarDate("1985-11-20"),
       },
     ];
     const harmony = calculateGroupHarmony(fourPeople);

@@ -21,6 +21,7 @@ import {
   calculateBusinessNameNumber,
   ChaldeanAnalysis as ChaldeanAnalysisType,
 } from '@/lib/chaldean';
+import { parseCalendarDate } from '@/lib/calendarDate';
 import {
   Star,
   Calendar,
@@ -150,7 +151,7 @@ const ChaldeanAnalysis = () => {
 
   const analysis = useMemo<ChaldeanAnalysisType | null>(() => {
     if (!fullName || !birthDate || !showResults) return null;
-    return calculateChaldeanAnalysis(fullName, new Date(birthDate));
+    return calculateChaldeanAnalysis(fullName, parseCalendarDate(birthDate));
   }, [fullName, birthDate, showResults]);
 
   const businessAnalysis = useMemo(() => {

@@ -12,8 +12,10 @@
 // Convenții configurabile
 // ─────────────────────────────────────────────────────────────
 
-/** Y ca vocală. Decoz și Numerologist.com diferă. 'heuristic' = Y e vocală doar
- *  când e singura vocală din silabă (Bryn, Kylie) sau finală după consoană (Mary). */
+/** Y ca vocală. Decoz și Numerologist.com diferă.
+ *  'heuristic' = Y e consoană doar când deschide o silabă, adică e urmat direct
+ *  de o vocală tare (Yolanda, Bryan, Maya). În rest e vocală: Yvonne, Yves,
+ *  Mary, Lynn, Bryn. Vezi classifyLetters. */
 export type YMode = 'never' | 'always' | 'heuristic';
 export const Y_VOWEL_MODE: YMode = 'heuristic';
 
@@ -60,15 +62,62 @@ const HARD_VOWELS = new Set(['A', 'E', 'I', 'O', 'U']);
 // Normalizare
 // ─────────────────────────────────────────────────────────────
 
-/** Elimină diacriticele (ă→a, ș→s, й→и nu se atinge) și păstrează doar A–Z. */
+/**
+ * Cyrillic → Latin, so a Russian name reaches the letter table at all.
+ *
+ * The app is RO/EN/RU, but normalizeName ended with `[^A-Z\s'-]` → '', which
+ * for 'Анна Петрова' left a single space: every position came out 0, all nine
+ * karmic lessons read as missing, and archetypeFor(0) exists — so the UI
+ * rendered a confident interpretation of nothing at all.
+ *
+ * This is a romanisation, not a Cyrillic numerology table. The two are different
+ * methods and give different numbers: Ш becomes SH and so counts as two letters.
+ * A native Cyrillic table is the other way to do this and would be a larger
+ * change than a bug fix; romanising is what makes the existing engine answer.
+ *
+ * Ordered longest-first is unnecessary here because each key is one character,
+ * but Ъ and Ь map to nothing on purpose: they are silent.
+ */
+const CYRILLIC_TO_LATIN: Record<string, string> = {
+  А: 'A',  Б: 'B',  В: 'V',  Г: 'G',  Д: 'D',  Е: 'E',  Ё: 'E',  Ж: 'ZH',
+  З: 'Z',  И: 'I',  Й: 'Y',  К: 'K',  Л: 'L',  М: 'M',  Н: 'N',  О: 'O',
+  П: 'P',  Р: 'R',  С: 'S',  Т: 'T',  У: 'U',  Ф: 'F',  Х: 'KH', Ц: 'TS',
+  Ч: 'CH', Ш: 'SH', Щ: 'SHCH', Ъ: '',  Ы: 'Y', Ь: '',   Э: 'E',  Ю: 'YU',
+  Я: 'YA',
+  // Ukrainian and Belarusian letters that appear in names written in Cyrillic.
+  І: 'I',  Ї: 'YI', Є: 'YE', Ґ: 'G',  Ў: 'U',
+};
+
+const CYRILLIC = /[\u0400-\u04FF]/;
+
+/** Elimină diacriticele (ă→a, ș→s), transliterează chirilicele, păstrează A–Z. */
 export function normalizeName(name: string): string {
   return name
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .replace(/ș|ş/gi, 's')
     .replace(/ț|ţ/gi, 't')
     .toUpperCase()
+    .replace(/[\u0400-\u04FF]/g, (ch) => CYRILLIC_TO_LATIN[ch] ?? '')
     .replace(/[^A-Z\s'-]/g, '');
+}
+
+/**
+ * Does this name reach the letter table at all?
+ *
+ * Anything the engine cannot romanise — Greek, Arabic, Han, an emoji — still
+ * normalises to nothing, and a profile built on nothing is indistinguishable
+ * from a real one on screen. Callers ask before they calculate, so the answer
+ * is a message rather than a page of zeroes.
+ */
+export function isNameSupported(name: string): boolean {
+  if (!name.trim()) return false;
+  return letters(name).length > 0;
+}
+
+/** True if the name needed romanising to be read. Useful for telling the user. */
+export function isCyrillic(name: string): boolean {
+  return CYRILLIC.test(name);
 }
 
 export function letters(name: string): string[] {
@@ -90,18 +139,22 @@ export function nameParts(name: string): string[] {
  */
 export function classifyLetters(word: string): Array<{ ch: string; vowel: boolean }> {
   const w = word.toUpperCase().replace(/[^A-Z]/g, '');
-  const hasHardVowel = w.split('').some((c) => HARD_VOWELS.has(c));
   return w.split('').map((ch, i) => {
     if (HARD_VOWELS.has(ch)) return { ch, vowel: true };
     if (ch !== 'Y') return { ch, vowel: false };
     if (Y_VOWEL_MODE === 'always') return { ch, vowel: true };
     if (Y_VOWEL_MODE === 'never') return { ch, vowel: false };
-    if (!hasHardVowel) return { ch, vowel: true };
-    const prev = w[i - 1];
-    const next = w[i + 1];
-    const prevIsConsonant = prev !== undefined && !HARD_VOWELS.has(prev);
-    const nextIsVowel = next !== undefined && HARD_VOWELS.has(next);
-    return { ch, vowel: prevIsConsonant && !nextIsVowel };
+
+    // One rule: Y is a consonant when it opens a syllable, which in writing is
+    // when a hard vowel follows it directly. Otherwise it is carrying the vowel
+    // sound itself.
+    //
+    // What this replaced also asked whether the previous letter was a consonant,
+    // and that was false at the start of a word -- so a word-initial Y could
+    // never be a vowel and Yvonne and Yves came out with none. The
+    // `hasHardVowel` special case for Bryn is subsumed: a Y with no vowel after
+    // it is a vowel whether or not the word has one elsewhere.
+    return { ch, vowel: !HARD_VOWELS.has(w[i + 1]) };
   });
 }
 

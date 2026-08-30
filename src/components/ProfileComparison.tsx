@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { parseCalendarDate } from '@/lib/calendarDate';
 
 interface ProfileComparisonProps {
   className?: string;
@@ -37,7 +38,7 @@ export const ProfileComparison = ({ className }: ProfileComparisonProps) => {
   };
 
   const calculateProfileNumbers = (profile: Profile) => {
-    const birthDate = new Date(profile.birthDate);
+    const birthDate = parseCalendarDate(profile.birthDate);
 
     const lifePath = calculateLifePathNumber(birthDate);
     const destiny = calculateDestinyNumber(profile.fullName);
@@ -139,7 +140,7 @@ export const ProfileComparison = ({ className }: ProfileComparisonProps) => {
                       <td className="p-2">
                         <div className="font-medium">{profile.fullName}</div>
                         <div className="text-xs text-muted-foreground">
-                          {new Date(profile.birthDate).toLocaleDateString()}
+                          {parseCalendarDate(profile.birthDate)?.toLocaleDateString()}
                         </div>
                       </td>
                       <td className="text-center p-2">

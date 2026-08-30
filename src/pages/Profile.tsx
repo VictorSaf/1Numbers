@@ -33,6 +33,7 @@ import { ProfileComparison } from '@/components/ProfileComparison';
 import { NotificationSettings } from '@/components/NotificationSettings';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { parseCalendarDate } from '@/lib/calendarDate';
 
 const locales = { ro, en: enUS, ru };
 
@@ -84,7 +85,7 @@ const Profile = () => {
       if (editingProfileId === activeProfile.id || !editingProfileId) {
         setFormData({
           fullName: activeProfile.fullName,
-          birthDate: new Date(activeProfile.birthDate),
+          birthDate: parseCalendarDate(activeProfile.birthDate),
           birthTime: activeProfile.birthTime || '',
           birthPlace: activeProfile.birthPlace || '',
         });
@@ -110,7 +111,7 @@ const Profile = () => {
       setEditingProfileId(profileId);
       setFormData({
         fullName: profile.fullName,
-        birthDate: new Date(profile.birthDate),
+        birthDate: parseCalendarDate(profile.birthDate),
         birthTime: profile.birthTime || '',
         birthPlace: profile.birthPlace || '',
       });
@@ -279,7 +280,7 @@ const Profile = () => {
                     <div className="flex-1">
                       <div className="font-medium">{profile.fullName}</div>
                       <div className="text-sm text-muted-foreground">
-                        {new Date(profile.birthDate).toLocaleDateString()}
+                        {parseCalendarDate(profile.birthDate)?.toLocaleDateString()}
                         {profile.isActive && (
                           <Badge variant="secondary" className="ml-2">
                             {t.activeProfile}

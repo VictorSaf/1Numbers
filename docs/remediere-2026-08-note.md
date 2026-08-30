@@ -182,3 +182,37 @@ Lucruri găsite în afara listei. Nimic din ce e aici n-a fost reparat; e doar c
   `src/lib/__tests__/sw-update.test.ts`. Rămâne de confirmat manual: DevTools →
   Application arată SW activ, aplicația instalabilă, promptul de reîncărcare
   apare la al doilea deploy.
+
+## Etapa 6
+
+- **`strictNullChecks: false` în `tsconfig.json`, `strict: false` în
+  `tsconfig.app.json`.** Deci `parseCalendarDate` care întoarce `Date | null` se
+  poate pasa într-un prop tipat `Date` fără ca `tsc` să spună nimic. Verificat
+  explicit: `BentoDashboard.birthDate: Date` primește `Date | null` și
+  compilarea trece. Typecheck-ul din poartă nu prinde clasa asta de bug-uri
+  nicăieri în proiect. Neatins — activarea ar fi un refactor separat, dar merită
+  știut că poarta verde nu înseamnă „fără null-uri".
+
+- **Transliterare, nu tabel chirilic.** Am ales romanizarea (Ш → SH) fiindcă asta
+  ofereau alternativele din directivă. Metoda autentică pentru RU ar fi un tabel
+  pitagoreic pe alfabetul chirilic de 33 de litere — numere diferite, sistem
+  diferit. E o decizie de produs pe care n-am luat-o singur; dacă o vrei, e o
+  etapă separată.
+
+- **Regula pentru Y, decisă:** Y e consoană doar când deschide o silabă, adică
+  e urmat direct de o vocală tare. În rest e vocală. O singură condiție, care
+  păstrează verzi toate cele trei aserțiuni existente (MARY, BRYN, YOLANDA) și
+  repară Yvonne/Yves. `hasHardVowel` și `prevIsConsonant` au dispărut — cazul
+  BRYN e acoperit de regula generală.
+
+- **`types.setTypeParser(DATE)` în `db.ts`, nu formatare per rută.** Un singur
+  loc acoperă toate rutele care întorc o coloană `DATE`, nu doar
+  `profiles.ts:30`. `journal_entries.date` beneficiază la fel.
+
+- **`index.html` declara `lang="en"`** cu UI implicit RO. Trecut pe `ro`, iar
+  `LanguageContext` sincronizează `document.documentElement.lang` la fiecare
+  schimbare.
+
+- **`ThemeContext` avea flash-ul reparat în trecere**, cum cerea directiva:
+  citirea din `localStorage` s-a mutat din `useEffect` în initializer-ul lazy,
+  cu try/catch pentru modurile private.

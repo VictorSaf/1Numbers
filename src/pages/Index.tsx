@@ -9,6 +9,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/services/api";
+import { parseCalendarDate } from '@/lib/calendarDate';
 
 interface UserData {
   fullName: string;
@@ -126,7 +127,7 @@ const Index = () => {
         {shouldShowDashboard && !loadingProfile && (
           <BentoDashboard
             fullName={profile.fullName}
-            birthDate={new Date(profile.birthDate)}
+            birthDate={parseCalendarDate(profile.birthDate)}
             userName={user?.email?.split('@')[0] || profile.fullName}
             streak={streak}
           />
@@ -153,7 +154,7 @@ const Index = () => {
                   onCalculate={handleCalculate}
                   profileData={profile ? {
                     fullName: profile.fullName,
-                    birthDate: new Date(profile.birthDate)
+                    birthDate: parseCalendarDate(profile.birthDate)
                   } : null}
                 />
               </div>

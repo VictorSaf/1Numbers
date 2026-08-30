@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { calculateLifePathNumber, calculateDestinyNumber } from '@/lib/numerology';
 import { cn } from '@/lib/utils';
+import { parseCalendarDate } from '@/lib/calendarDate';
 
 interface OnboardingWizardProps {
   onComplete: (data: { fullName: string; birthDate: string }) => void;
@@ -124,7 +125,7 @@ export const OnboardingWizard = ({ onComplete, onSkip }: OnboardingWizardProps) 
         setCurrentStep('reveal');
         // Animate the reveal
         setTimeout(() => {
-          const date = new Date(birthDate);
+          const date = parseCalendarDate(birthDate);
           const lifePath = calculateLifePathNumber(date);
           setRevealedNumber(lifePath);
           setIsRevealing(false);
@@ -362,7 +363,7 @@ export const OnboardingWizard = ({ onComplete, onSkip }: OnboardingWizardProps) 
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span>{new Date(birthDate).toLocaleDateString()}</span>
+                  <span>{parseCalendarDate(birthDate)?.toLocaleDateString()}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Star className="h-4 w-4 text-primary" />
