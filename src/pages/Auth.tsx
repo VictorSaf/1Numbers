@@ -5,12 +5,11 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { StarField } from '@/components/StarField';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { track } from '@/lib/analytics';
+import { PageLayout } from '@/components/layout/PageLayout';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -161,16 +160,11 @@ const Auth = () => {
     }
   };
 
+  // Wrapped in PageLayout like every other route. It used to render its own
+  // StarField and a floating language switcher instead of the header, so
+  // signing in meant losing the way back and the theme switcher both.
   return (
-    <div className="min-h-screen relative flex items-center justify-center py-12 px-4">
-      <StarField />
-      
-      {/* Language Switcher */}
-      <div className="absolute top-4 right-4 z-20">
-        <LanguageSwitcher />
-      </div>
-
-
+    <PageLayout className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12">
       <div className="relative z-10 w-full max-w-md">
         <div className="card-mystic rounded-2xl p-8 glow-gold-subtle">
           {/* Header */}
@@ -299,7 +293,7 @@ const Auth = () => {
           )}
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 

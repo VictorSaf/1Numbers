@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { LanguageProvider, useLanguage } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
@@ -12,25 +12,20 @@ import { ChunkErrorBoundary } from "@/components/ChunkErrorBoundary";
 import { AppUpdatePrompt } from "@/components/AppUpdatePrompt";
 import { ProtectedAdminRoute } from "@/components/ProtectedAdminRoute";
 import { RouteMeta } from "@/components/RouteMeta";
-import { ROUTES, isRouteBuilt, INCLUDE_INTERNAL } from "@/lib/routes";
+import { ROUTES, REDIRECTS, isRouteBuilt, INCLUDE_INTERNAL } from "@/lib/routes";
 
 // Eager load - main page
 import Index from "./pages/Index";
 
 // Lazy load - secondary pages
-const NumerologyGuide = lazy(() => import("./pages/NumerologyGuide"));
+const Learn = lazy(() => import("./pages/Learn"));
 const Compatibility = lazy(() => import("./pages/Compatibility"));
 const Auth = lazy(() => import("./pages/Auth"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Predictions = lazy(() => import("./pages/Predictions"));
-const FAQ = lazy(() => import("./pages/FAQ"));
-const Tutorials = lazy(() => import("./pages/Tutorials"));
 const Tools = lazy(() => import("./pages/Tools"));
-const Courses = lazy(() => import("./pages/Courses"));
-const Articles = lazy(() => import("./pages/Articles"));
 const Journal = lazy(() => import("./pages/Journal"));
 const Premium = lazy(() => import("./pages/Premium"));
-const AngelNumbers = lazy(() => import("./pages/AngelNumbers"));
 const Friends = lazy(() => import("./pages/Friends"));
 const ChaldeanAnalysis = lazy(() => import("./pages/ChaldeanAnalysis"));
 const Remedies = lazy(() => import("./pages/Remedies"));
@@ -52,22 +47,17 @@ const Admin = INCLUDE_INTERNAL ? lazy(() => import("./pages/Admin")) : null;
 // server's 404 allowlist all read the same source this does.
 const PAGES: Record<string, ComponentType | null> = {
   "/": Index,
-  "/guide": NumerologyGuide,
-  "/compatibility": Compatibility,
-  "/predictions": Predictions,
-  "/tools": Tools,
-  "/angel-numbers": AngelNumbers,
+  "/doi": Compatibility,
+  "/azi": Predictions,
+  "/unelte": Tools,
+  "/invata": Learn,
   "/chaldean": ChaldeanAnalysis,
   "/remedies": Remedies,
-  "/tutorials": Tutorials,
-  "/faq": FAQ,
-  "/articles": Articles,
-  "/premium": Premium,
   "/auth": Auth,
-  "/profile": Profile,
-  "/journal": Journal,
-  "/courses": Courses,
-  "/friends": Friends,
+  "/eu": Profile,
+  "/jurnal": Journal,
+  "/cercul-meu": Friends,
+  "/raport": Premium,
   "/invite/:code": Friends,
   "/admin": Admin,
   "/design-system": DesignSystemShowcase,
@@ -157,6 +147,12 @@ const RoutedPages = () => {
               />
             );
           })}
+          {/* Old paths. The static server answers these 301 before the app
+              loads; this is for a link followed inside the app, which never
+              reaches the server. */}
+          {REDIRECTS.map((r) => (
+            <Route key={r.from} path={r.from} element={<Navigate to={r.to} replace />} />
+          ))}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

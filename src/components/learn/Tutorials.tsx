@@ -2,11 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, GraduationCap, ChevronRight, ChevronLeft, CheckCircle, Sparkles, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Progress } from '@/components/ui/progress';
-import { PageLayout } from '@/components/layout/PageLayout';
-import { PageHeader } from '@/components/layout/PageHeader';
 import { cn } from '@/lib/utils';
 
 interface TutorialStep {
@@ -335,20 +332,8 @@ const Tutorials = () => {
   };
 
   return (
-    <PageLayout>
-      {/* Language Switcher */}
-      <div className="absolute top-4 right-4 z-20">
-        <LanguageSwitcher />
-      </div>
+    <>
 
-      <PageHeader
-        title={l.title}
-        subtitle={l.subtitle}
-        badge={{
-          icon: <GraduationCap className="h-4 w-4 text-primary" />,
-          label: l.label
-        }}
-      />
 
       {/* Main Content */}
       <main className="relative z-10 px-4 pb-16">
@@ -471,7 +456,7 @@ const Tutorials = () => {
           <p className="text-sm text-muted-foreground font-raleway">{t.footer}</p>
         </div>
       </footer>
-    </PageLayout>
+    </>
   );
 };
 

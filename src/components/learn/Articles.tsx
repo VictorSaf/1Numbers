@@ -3,8 +3,6 @@ import { BookOpen } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ArticleLibrary } from '@/components/ArticleLibrary';
 import { Article, initialArticles } from '@/lib/articles';
-import { PageLayout } from '@/components/layout/PageLayout';
-import { PageHeader } from '@/components/layout/PageHeader';
 import { Card, CardContent } from '@/components/ui/card';
 
 const Articles = () => {
@@ -13,15 +11,7 @@ const Articles = () => {
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
 
   return (
-    <PageLayout>
-      <PageHeader
-        title="Bibliotecă Articole"
-        subtitle="Explorează articole despre numerologie, calcule și interpretări"
-        badge={{
-          icon: <BookOpen className="h-4 w-4 text-primary" />,
-          label: 'Articole'
-        }}
-      />
+    <>
 
       <main className="relative z-10 px-4 pb-16">
         <div className="max-w-6xl mx-auto">
@@ -54,7 +44,7 @@ const Articles = () => {
           )}
         </div>
       </main>
-    </PageLayout>
+    </>
   );
 };
 

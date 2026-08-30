@@ -14,8 +14,16 @@ export type RouteDef = {
   meta?: Record<string, RouteMeta>;
 };
 
+export type Redirect = { from: string; to: string };
+
 export const SITE_ORIGIN: string = registry.origin;
 export const ROUTES = registry.routes as unknown as RouteDef[];
+
+// Paths that used to be routes. Every one of them has been linked to from
+// somewhere -- a bookmark, a share, an index -- so they answer 301 rather than
+// 404. The static server reads the same list out of dist/routes.json; App.tsx
+// renders a <Navigate replace> for each so a client-side link lands too.
+export const REDIRECTS = registry.redirects as unknown as Redirect[];
 
 // Internal routes exist only while developing. Vite replaces import.meta.env
 // values with literals at build time, so this constant folds and Rollup drops

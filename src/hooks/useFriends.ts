@@ -257,8 +257,12 @@ export function useFriends() {
     }
   }, [fetchWithAuth, fetchInviteLinks]);
 
-  // Use invite link
-  const useInviteLink = useCallback(async (code: string) => {
+  // Redeem an invite link.
+  //
+  // Named `useInviteLink` until 2026-08-30, which made every linter treat it as
+  // a React hook and refuse to see it called from inside a callback -- where an
+  // action like this is only ever called.
+  const redeemInviteLink = useCallback(async (code: string) => {
     try {
       const data = await fetchWithAuth<ApiResponse<void>>(`/invite/${code}`, {
         method: 'POST',
@@ -343,7 +347,7 @@ export function useFriends() {
     rejectRequest,
     removeFriend,
     generateInviteLink,
-    useInviteLink,
+    redeemInviteLink,
     deactivateInviteLink,
     getFriendProfile,
     refreshAll,

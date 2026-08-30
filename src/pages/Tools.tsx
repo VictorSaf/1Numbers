@@ -5,6 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSearchParams } from "react-router-dom";
+import { lazy, Suspense } from "react";
+
+// Absorbed from /angel-numbers, which was its own destination with a header
+// link and nothing else to it. Lazy, because it carries its own directory of
+// number meanings and most visitors here want the calendar.
+const AngelNumbers = lazy(() => import("@/components/tools/AngelNumbers"));
 import { Badge } from "@/components/ui/badge";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -21,7 +28,12 @@ import { LoShuGrid } from "@/components/LoShuGrid";
 const Tools = () => {
   const { language } = useLanguage();
   const { profileData, hasProfile } = useProfile();
-  const [activeTab, setActiveTab] = useState("calendar");
+  // The tab is in the query string: /unelte?s=angel is where the 301 from
+  // /angel-numbers lands, and a link to one tool has to stay a link to that tool.
+  const [params, setParams] = useSearchParams();
+  const activeTab = params.get("s") ?? "calendar";
+  const setActiveTab = (next: string) =>
+    setParams(next === "calendar" ? {} : { s: next }, { replace: true });
   
   // Name Change State
   const [originalName, setOriginalName] = useState("");
@@ -87,6 +99,7 @@ const Tools = () => {
       yearForecast: "Previziune An",
       nameOptimizer: "Optimizator Nume",
       compatMatrix: "Matrice Compatibilitate",
+      angelNumbers: "Numere Înger",
       calendar: "Calendar",
       showCalendar: "Afișează Calendarul",
       calendarSubtitle: "Introdu datele pentru a vedea calendarul tău personalizat",
@@ -147,6 +160,7 @@ const Tools = () => {
       yearForecast: "Year Forecast",
       nameOptimizer: "Name Optimizer",
       compatMatrix: "Compatibility Matrix",
+      angelNumbers: "Angel Numbers",
       calendar: "Calendar",
       showCalendar: "Show Calendar",
       calendarSubtitle: "Enter your details to see your personalized calendar",
@@ -207,6 +221,7 @@ const Tools = () => {
       yearForecast: "Прогноз на год",
       nameOptimizer: "Оптимизатор имени",
       compatMatrix: "Матрица совместимости",
+      angelNumbers: "Ангельские числа",
       calendar: "Календарь",
       showCalendar: "Показать Календарь",
       calendarSubtitle: "Введите данные, чтобы увидеть ваш персонализированный календарь",
@@ -321,36 +336,50 @@ const Tools = () => {
       <main className="relative z-10 px-4 pb-16">
         <div className="max-w-5xl mx-auto pt-4">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-4 sm:grid-cols-7 mb-8 bg-card/50">
-              <TabsTrigger value="calendar" className="text-xs sm:text-sm gap-1">
+            {/* Eight tools. The labels used to be hidden below 640px, which
+                left eight icon-only buttons wrapping onto three rows with
+                nothing to say what any of them did. They scroll sideways now
+                and keep their names. */}
+            <TabsList className="mb-8 flex w-full justify-start gap-1 overflow-x-auto bg-card/50 [scrollbar-width:none] sm:grid sm:grid-cols-4 lg:grid-cols-8 [&::-webkit-scrollbar]:hidden">
+              <TabsTrigger value="calendar" className="shrink-0 gap-1 text-xs sm:text-sm">
                 <CalendarDays className="h-4 w-4" />
-                <span className="hidden sm:inline">{t.calendar}</span>
+                {t.calendar}
               </TabsTrigger>
-              <TabsTrigger value="loshu" className="text-xs sm:text-sm gap-1">
+              <TabsTrigger value="loshu" className="shrink-0 gap-1 text-xs sm:text-sm">
                 <Layers className="h-4 w-4" />
-                <span className="hidden sm:inline">{t.loShuGrid}</span>
+                {t.loShuGrid}
               </TabsTrigger>
-              <TabsTrigger value="name-change" className="text-xs sm:text-sm gap-1">
-                <RefreshCcw className="h-4 w-4" />
-                <span className="hidden sm:inline">{t.nameChange}</span>
-              </TabsTrigger>
-              <TabsTrigger value="business" className="text-xs sm:text-sm gap-1">
-                <Building2 className="h-4 w-4" />
-                <span className="hidden sm:inline">{t.businessName}</span>
-              </TabsTrigger>
-              <TabsTrigger value="forecast" className="text-xs sm:text-sm gap-1">
-                <TrendingUp className="h-4 w-4" />
-                <span className="hidden sm:inline">{t.yearForecast}</span>
-              </TabsTrigger>
-              <TabsTrigger value="optimizer" className="text-xs sm:text-sm gap-1">
+              <TabsTrigger value="angel" className="shrink-0 gap-1 text-xs sm:text-sm">
                 <Sparkles className="h-4 w-4" />
-                <span className="hidden sm:inline">{t.nameOptimizer}</span>
+                {t.angelNumbers}
               </TabsTrigger>
-              <TabsTrigger value="matrix" className="text-xs sm:text-sm gap-1">
+              <TabsTrigger value="name-change" className="shrink-0 gap-1 text-xs sm:text-sm">
+                <RefreshCcw className="h-4 w-4" />
+                {t.nameChange}
+              </TabsTrigger>
+              <TabsTrigger value="business" className="shrink-0 gap-1 text-xs sm:text-sm">
+                <Building2 className="h-4 w-4" />
+                {t.businessName}
+              </TabsTrigger>
+              <TabsTrigger value="forecast" className="shrink-0 gap-1 text-xs sm:text-sm">
+                <TrendingUp className="h-4 w-4" />
+                {t.yearForecast}
+              </TabsTrigger>
+              <TabsTrigger value="optimizer" className="shrink-0 gap-1 text-xs sm:text-sm">
+                <Sparkles className="h-4 w-4" />
+                {t.nameOptimizer}
+              </TabsTrigger>
+              <TabsTrigger value="matrix" className="shrink-0 gap-1 text-xs sm:text-sm">
                 <Grid3X3 className="h-4 w-4" />
-                <span className="hidden sm:inline">{t.compatMatrix}</span>
+                {t.compatMatrix}
               </TabsTrigger>
             </TabsList>
+
+            <TabsContent value="angel">
+              <Suspense fallback={<div className="h-64 animate-pulse rounded-xl border border-primary/20 bg-primary/5" />}>
+                <AngelNumbers />
+              </Suspense>
+            </TabsContent>
 
             {/* Numerology Calendar */}
             <TabsContent value="calendar">

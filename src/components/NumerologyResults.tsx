@@ -21,6 +21,7 @@ import { generateShareableLink } from "@/lib/sharing";
 import { ExportMenu } from "./ExportMenu";
 import { ShareButtons } from "./ShareButtons";
 import { track } from '@/lib/analytics';
+import { Link } from "react-router-dom";
 import { Chapter, Block, type ChapterMeta } from "@/components/numerology/Chapter";
 import { LetterMap } from "@/components/numerology/LetterMap";
 import { ChapterNav } from "@/components/numerology/ChapterNav";
@@ -137,6 +138,8 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     newNumbers: { ro: "Numerele Noi", en: "The New Numbers", ru: "Новые Числа" },
     planes: { ro: "Planurile de Expresie", en: "Planes of Expression", ru: "Планы Выражения" },
     matrix: { ro: "Matrița Destinului", en: "Destiny Matrix", ru: "Матрица Судьбы" },
+    parallel: { ro: "Sisteme paralele", en: "Parallel systems", ru: "Параллельные системы" },
+    openChaldean: { ro: "Deschide analiza caldeeană", en: "Open the Chaldean analysis", ru: "Открыть халдейский анализ" },
     transits: { ro: "Tranzite și Esență", en: "Transits and Essence", ru: "Транзиты и Сущность" },
     biorhythms: { ro: "Biorritmuri", en: "Biorhythms", ru: "Биоритмы" },
     core: { ro: "Numerele de bază", en: "The core numbers", ru: "Основные числа" },
@@ -157,6 +160,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     newNumbers: { ro: "Atitudine, Maturitate, Echilibru, Pasiune Ascunsă și încă zece.", en: "Attitude, Maturity, Balance, Hidden Passion and ten more.", ru: "Отношение, Зрелость, Баланс, Скрытая страсть и ещё десять." },
     planes: { ro: "Cum se distribuie literele numelui tău pe patru planuri și trei naturi.", en: "How the letters of your name spread across four planes and three natures.", ru: "Как буквы вашего имени распределяются по четырём планам и трём натурам." },
     matrix: { ro: "Cele nouă puncte ale octagramei, calculate din data nașterii.", en: "The nine points of the octagram, drawn from your birth date.", ru: "Девять точек октаграммы, рассчитанных по дате рождения." },
+    parallel: { ro: "Aceleași litere, citite de alt sistem. Numărul compus caldeean spune altceva decât cel pitagoreic.", en: "The same letters, read by another system. The Chaldean compound says something the Pythagorean one does not.", ru: "Те же буквы, прочитанные другой системой. Халдейское составное число говорит не то же, что пифагорейское." },
     transits: { ro: "Ce literă îți guvernează fiecare an și când Esența întâlnește Anul Personal.", en: "Which letter governs each year, and when Essence meets the Personal Year.", ru: "Какая буква управляет каждым годом и когда Сущность встречает Личный год." },
     biorhythms: { ro: "Ciclurile fizic, emoțional și intelectual pe o lună în jurul zilei de azi.", en: "Physical, emotional and intellectual cycles across a month around today.", ru: "Физический, эмоциональный и интеллектуальный циклы за месяц вокруг сегодняшнего дня." },
     distribution: { ro: "Câte litere din numele tău cad pe fiecare cifră.", en: "How many letters of your name land on each digit.", ru: "Сколько букв вашего имени приходится на каждую цифру." },
@@ -383,6 +387,19 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
             <Suspense fallback={chartSkeleton}>
               <DestinyMatrix birthDate={birthDate} />
             </Suspense>
+          </Block>
+
+          {/* /chaldean had no link into it from anywhere in the application --
+              it was reachable by typing the URL. It belongs to this chapter, and
+              this is where the engine's Vedic, Kabbalah and Chaldean numbers
+              will render inline; until then, the link is the entrance. */}
+          <Block title={sectionLabels.parallel[language]} icon={<Compass className="h-5 w-5 text-primary" />} note={teasers.parallel[language]}>
+            <Link
+              to="/chaldean"
+              className="inline-flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-primary transition-colors hover:bg-primary/10"
+            >
+              {sectionLabels.openChaldean[language]}
+            </Link>
           </Block>
         </Chapter>
 

@@ -38,7 +38,7 @@ const quickActions: QuickAction[] = [
     id: 'compatibility',
     icon: <Heart className="h-5 w-5" />,
     label: { en: 'Compatibility', ro: 'Compatibilitate', ru: 'Совместимость' },
-    href: '/compatibility',
+    href: '/doi',
     color: 'text-chart-6',
     bgColor: 'bg-chart-6/10 hover:bg-chart-6/20',
   },
@@ -46,7 +46,7 @@ const quickActions: QuickAction[] = [
     id: 'predictions',
     icon: <Calendar className="h-5 w-5" />,
     label: { en: 'Predictions', ro: 'Predicții', ru: 'Прогнозы' },
-    href: '/predictions',
+    href: '/azi',
     color: 'text-chart-2',
     bgColor: 'bg-chart-2/10 hover:bg-chart-2/20',
   },
@@ -54,7 +54,7 @@ const quickActions: QuickAction[] = [
     id: 'loShu',
     icon: <Grid3X3 className="h-5 w-5" />,
     label: { en: 'Lo Shu', ro: 'Lo Shu', ru: 'Ло Шу' },
-    href: '/tools',
+    href: '/unelte',
     color: 'text-chart-3',
     bgColor: 'bg-chart-3/10 hover:bg-chart-3/20',
   },
@@ -70,7 +70,7 @@ const quickActions: QuickAction[] = [
     id: 'angel',
     icon: <Sparkles className="h-5 w-5" />,
     label: { en: 'Angel #', ro: 'Îngeri #', ru: 'Ангел #' },
-    href: '/angel-numbers',
+    href: '/unelte?s=angel',
     color: 'text-chart-4',
     bgColor: 'bg-chart-4/10 hover:bg-chart-4/20',
   },
@@ -78,7 +78,7 @@ const quickActions: QuickAction[] = [
     id: 'friends',
     icon: <Users className="h-5 w-5" />,
     label: { en: 'Friends', ro: 'Prieteni', ru: 'Друзья' },
-    href: '/friends',
+    href: '/cercul-meu',
     color: 'text-chart-1',
     bgColor: 'bg-chart-1/10 hover:bg-chart-1/20',
   },
@@ -86,7 +86,7 @@ const quickActions: QuickAction[] = [
     id: 'guide',
     icon: <BookOpen className="h-5 w-5" />,
     label: { en: 'Guide', ro: 'Ghid', ru: 'Гид' },
-    href: '/guide',
+    href: '/invata',
     color: 'text-chart-3',
     bgColor: 'bg-chart-3/10 hover:bg-chart-3/20',
   },
@@ -106,7 +106,10 @@ export const QuickActions = () => {
       <h3 className="text-sm font-medium text-muted-foreground px-1">
         {translations[language] || translations.en}
       </h3>
-      <div className="grid grid-cols-4 gap-3">
+      {/* Two rows of four on a phone, not four columns of anything. The fixed
+          grid-cols-4 had no responsive prefix, so eight actions squeezed into
+          four columns at every width. */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {quickActions.map((action) => (
           <Link key={action.id} to={action.href}>
             <div

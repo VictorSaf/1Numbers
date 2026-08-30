@@ -2,9 +2,6 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { HelpCircle, BookOpen, Lightbulb, Calculator, Users, TrendingUp, Sparkles, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { PageLayout } from '@/components/layout/PageLayout';
-import { PageHeader } from '@/components/layout/PageHeader';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { cn } from '@/lib/utils';
@@ -254,20 +251,8 @@ const FAQ = () => {
   }, {} as Record<string, typeof l.faqs>);
 
   return (
-    <PageLayout>
-      {/* Language Switcher */}
-      <div className="absolute top-4 right-4 z-20">
-        <LanguageSwitcher />
-      </div>
+    <>
 
-      <PageHeader
-        title={l.title}
-        subtitle={l.subtitle}
-        badge={{
-          icon: <HelpCircle className="h-4 w-4 text-primary" />,
-          label: l.label
-        }}
-      />
 
       {/* Main Content */}
       <main className="relative z-10 px-4 pb-16">
@@ -313,7 +298,7 @@ const FAQ = () => {
           <p className="text-sm text-muted-foreground font-raleway">{t.footer}</p>
         </div>
       </footer>
-    </PageLayout>
+    </>
   );
 };
 

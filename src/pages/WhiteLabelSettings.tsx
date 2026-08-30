@@ -232,7 +232,7 @@ const WhiteLabelSettings = () => {
               </div>
               <h2 className="text-2xl font-bold mb-2">{t.title}</h2>
               <p className="text-muted-foreground mb-6">{t.proOnly}</p>
-              <Button onClick={() => (window.location.href = '/premium')}>
+              <Button onClick={() => (window.location.href = '/raport')}>
                 <Crown className="h-4 w-4 mr-2" />
                 {t.upgradeToPro}
               </Button>

@@ -218,7 +218,7 @@ export const generateDailyPredictionNotification = (
     data: {
       type: 'daily-prediction',
       personalDay,
-      url: '/predictions',
+      url: '/azi',
     },
     actions: [
       {
@@ -294,7 +294,7 @@ export const generateAchievementNotification = (
       type: 'achievement',
       achievementName,
       xpAwarded,
-      url: '/profile',
+      url: '/eu',
     },
   };
 };
@@ -357,7 +357,7 @@ export const generateSpecialDateNotification = (
     data: {
       type: 'special-date',
       eventType,
-      url: '/predictions',
+      url: '/azi',
     },
   };
 };

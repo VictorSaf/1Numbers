@@ -61,6 +61,9 @@ Cinci funcții complete n-au niciun link de intrare.
   complet, deci și limba, și tema, și orice cale de întoarcere.
 - `/invite/:code` își ignoră parametrul: `Friends.tsx` nu cheamă niciodată `useParams`. Citește codul
   și consumă invitația.
+- `Index.tsx:89` — `handleNewCalculation` a rămas fără apelant după ce etapa 1 a înlocuit „Calculează
+  din nou" cu „Salvează harta asta". Ori îl legi de o intrare reală în noua navigație, ori îl ștergi.
+- `.claude/settings.local.json` e neurmărit în arbore. Intră în `.gitignore`.
 - `/angel-numbers` devine tab în `/unelte`. `/chaldean` se absoarbe în capitolul 5. `/courses` se șterge.
 - `routes.json`: redirecturi 301 de la căile vechi, sitemap regenerat.
 - `/tools` pe mobil: șapte taburi în `grid-cols-4 sm:grid-cols-7` cu etichete `hidden sm:inline` —

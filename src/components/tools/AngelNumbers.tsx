@@ -2,8 +2,6 @@ import { useState, useMemo } from "react";
 import { Search, Sparkles, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PageLayout } from "@/components/layout/PageLayout";
-import { PageHeader } from "@/components/layout/PageHeader";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
   getAllAngelNumbers,
@@ -119,15 +117,7 @@ const AngelNumbers = () => {
   };
 
   return (
-    <PageLayout>
-      <PageHeader
-        title={t.title}
-        subtitle={t.subtitle}
-        badge={{
-          icon: <Sparkles className="h-4 w-4 text-primary" />,
-          label: t.title,
-        }}
-      />
+    <>
 
       <main className="relative z-10 px-4 pb-16">
         <div className="max-w-4xl mx-auto space-y-8">
@@ -273,7 +263,7 @@ const AngelNumbers = () => {
           )}
         </div>
       </main>
-    </PageLayout>
+    </>
   );
 };
 

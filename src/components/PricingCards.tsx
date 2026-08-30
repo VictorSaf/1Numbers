@@ -156,7 +156,7 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
     // The chosen plan travels along so the visitor returns to where they were.
     if (!isAuthenticated) {
       toast({ title: t.loginRequired, description: t.loginRequiredDesc });
-      navigate(`/auth?redirect=${encodeURIComponent(`/premium?plan=${tier.id}&period=${billingPeriod}`)}`);
+      navigate(`/auth?redirect=${encodeURIComponent(`/raport?plan=${tier.id}&period=${billingPeriod}`)}`);
       return;
     }
 
@@ -171,7 +171,7 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
           billingPeriod,
         });
         if (response.success) {
-          window.location.href = '/premium?success=true';
+          window.location.href = '/raport?success=true';
         }
       }
     } catch (error) {

@@ -22,26 +22,7 @@
       }
     },
     {
-      "path": "/guide",
-      "kind": "public",
-      "priority": 0.9,
-      "meta": {
-        "ro": {
-          "title": "Ghid Numerologie — Semnificația Numerelor 1-9, 11, 22, 33",
-          "description": "Ghid complet al numerelor în numerologie: numerele fundamentale 1-9 și numerele master 11, 22 și 33."
-        },
-        "en": {
-          "title": "Numerology Guide — Meaning of Numbers 1-9, 11, 22, 33",
-          "description": "A complete guide to numbers in numerology: the core numbers 1-9 and the master numbers 11, 22 and 33."
-        },
-        "ru": {
-          "title": "Руководство по нумерологии — значения чисел 1-9, 11, 22, 33",
-          "description": "Полное руководство по числам: основные числа 1-9 и мастер-числа 11, 22 и 33."
-        }
-      }
-    },
-    {
-      "path": "/compatibility",
+      "path": "/doi",
       "kind": "public",
       "priority": 0.9,
       "meta": {
@@ -60,7 +41,7 @@
       }
     },
     {
-      "path": "/predictions",
+      "path": "/azi",
       "kind": "public",
       "priority": 0.8,
       "meta": {
@@ -79,40 +60,40 @@
       }
     },
     {
-      "path": "/tools",
+      "path": "/unelte",
       "kind": "public",
       "priority": 0.8,
       "meta": {
         "ro": {
           "title": "Instrumente Numerologice — Calendar, Lo Shu, Prognoză Anuală",
-          "description": "Calendar numerologic, grila Lo Shu, schimbarea numelui, nume de firmă, prognoză pe an, optimizator de nume și matrice de compatibilitate."
+          "description": "Calendar numerologic, grila Lo Shu, schimbarea numelui, nume de firmă, prognoză pe an, optimizator de nume și matrice de compatibilitate, numere înger."
         },
         "en": {
           "title": "Numerology Tools — Calendar, Lo Shu, Year Forecast",
-          "description": "Numerology calendar, Lo Shu grid, name change, business name, year forecast, name optimiser and a compatibility matrix."
+          "description": "Numerology calendar, Lo Shu grid, name change, business name, year forecast, name optimiser and a compatibility matrix, angel numbers."
         },
         "ru": {
           "title": "Нумерологические инструменты — календарь, Ло Шу, прогноз на год",
-          "description": "Нумерологический календарь, сетка Ло Шу, смена имени, название компании, годовой прогноз, оптимизатор имени и матрица совместимости."
+          "description": "Нумерологический календарь, сетка Ло Шу, смена имени, название компании, годовой прогноз, оптимизатор имени и матрица совместимости, ангельские числа."
         }
       }
     },
     {
-      "path": "/angel-numbers",
+      "path": "/invata",
       "kind": "public",
-      "priority": 0.7,
+      "priority": 0.9,
       "meta": {
         "ro": {
-          "title": "Numere Îngerești — Semnificația 111, 222, 333",
-          "description": "Ce înseamnă numerele repetitive pe care le vezi des: 111, 222, 333 și celelalte secvențe îngerești."
+          "title": "Învață Numerologie — Ghid, Tutoriale, Întrebări, Articole",
+          "description": "Semnificația numerelor 1-9 și a masterilor 11, 22, 33, tutoriale pas cu pas, întrebări frecvente și articole."
         },
         "en": {
-          "title": "Angel Numbers — Meaning of 111, 222, 333",
-          "description": "What the repeating numbers you keep seeing mean: 111, 222, 333 and the other angel sequences."
+          "title": "Learn Numerology — Guide, Tutorials, Questions, Articles",
+          "description": "What the numbers 1-9 and the master numbers 11, 22 and 33 mean, step-by-step tutorials, frequent questions and articles."
         },
         "ru": {
-          "title": "Ангельские числа — значения 111, 222, 333",
-          "description": "Что означают повторяющиеся числа: 111, 222, 333 и другие ангельские последовательности."
+          "title": "Изучайте нумерологию — руководство, уроки, вопросы, статьи",
+          "description": "Значения чисел 1-9 и мастер-чисел 11, 22, 33, пошаговые уроки, частые вопросы и статьи."
         }
       }
     },
@@ -155,64 +136,23 @@
       }
     },
     {
-      "path": "/tutorials",
-      "kind": "public",
-      "priority": 0.6,
-      "meta": {
-        "ro": {
-          "title": "Tutoriale Numerologie — Cum se Calculează",
-          "description": "Tutoriale pas cu pas despre cum se calculează fiecare număr numerologic."
-        },
-        "en": {
-          "title": "Numerology Tutorials — How the Numbers Are Calculated",
-          "description": "Step-by-step tutorials on how each numerology number is calculated."
-        },
-        "ru": {
-          "title": "Уроки нумерологии — как рассчитываются числа",
-          "description": "Пошаговые уроки о том, как рассчитывается каждое нумерологическое число."
-        }
-      }
+      "path": "/auth",
+      "kind": "app"
     },
     {
-      "path": "/faq",
-      "kind": "public",
-      "priority": 0.6,
-      "meta": {
-        "ro": {
-          "title": "Întrebări Frecvente despre Numerologie",
-          "description": "Răspunsuri la cele mai frecvente întrebări despre numerologie și modul de calcul."
-        },
-        "en": {
-          "title": "Frequently Asked Questions about Numerology",
-          "description": "Answers to the most common questions about numerology and how the numbers are worked out."
-        },
-        "ru": {
-          "title": "Часто задаваемые вопросы о нумерологии",
-          "description": "Ответы на самые частые вопросы о нумерологии и расчётах."
-        }
-      }
+      "path": "/eu",
+      "kind": "app"
     },
     {
-      "path": "/articles",
-      "kind": "public",
-      "priority": 0.6,
-      "meta": {
-        "ro": {
-          "title": "Articole de Numerologie",
-          "description": "Articole despre numerologie: bazele, numerele master și Numărul Drumului Vieții."
-        },
-        "en": {
-          "title": "Numerology Articles",
-          "description": "Articles on numerology: the basics, master numbers and the Life Path number."
-        },
-        "ru": {
-          "title": "Статьи по нумерологии",
-          "description": "Статьи о нумерологии: основы, мастер-числа и число жизненного пути."
-        }
-      }
+      "path": "/jurnal",
+      "kind": "app"
     },
     {
-      "path": "/premium",
+      "path": "/cercul-meu",
+      "kind": "app"
+    },
+    {
+      "path": "/raport",
       "kind": "public",
       "priority": 0.5,
       "meta": {
@@ -231,26 +171,6 @@
       }
     },
     {
-      "path": "/auth",
-      "kind": "app"
-    },
-    {
-      "path": "/profile",
-      "kind": "app"
-    },
-    {
-      "path": "/journal",
-      "kind": "app"
-    },
-    {
-      "path": "/courses",
-      "kind": "app"
-    },
-    {
-      "path": "/friends",
-      "kind": "app"
-    },
-    {
       "path": "/invite/:code",
       "kind": "app"
     },
@@ -265,6 +185,60 @@
     {
       "path": "/white-label",
       "kind": "internal"
+    }
+  ],
+  "redirects": [
+    {
+      "from": "/angel-numbers",
+      "to": "/unelte?s=angel"
+    },
+    {
+      "from": "/articles",
+      "to": "/invata?s=articole"
+    },
+    {
+      "from": "/compatibility",
+      "to": "/doi"
+    },
+    {
+      "from": "/courses",
+      "to": "/"
+    },
+    {
+      "from": "/faq",
+      "to": "/invata?s=intrebari"
+    },
+    {
+      "from": "/friends",
+      "to": "/cercul-meu"
+    },
+    {
+      "from": "/guide",
+      "to": "/invata"
+    },
+    {
+      "from": "/journal",
+      "to": "/jurnal"
+    },
+    {
+      "from": "/predictions",
+      "to": "/azi"
+    },
+    {
+      "from": "/premium",
+      "to": "/raport"
+    },
+    {
+      "from": "/profile",
+      "to": "/eu"
+    },
+    {
+      "from": "/tools",
+      "to": "/unelte"
+    },
+    {
+      "from": "/tutorials",
+      "to": "/invata?s=tutoriale"
     }
   ]
 }

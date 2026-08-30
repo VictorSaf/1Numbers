@@ -67,6 +67,18 @@ const ROUTE_PATTERNS = await (async () => {
   }
 })();
 
+// The paths that used to be routes, emitted beside the manifest. A rename does
+// not un-bookmark anything, so these answer 301 rather than 404 -- before the
+// SPA shell is even considered.
+const REDIRECTS = await (async () => {
+  try {
+    return JSON.parse(await readFile(join(ROOT, "redirects.json"), "utf8"));
+  } catch {
+    console.warn("compass: dist/redirects.json missing; old paths will 404");
+    return {};
+  }
+})();
+
 const isKnownRoute = (pathname) => {
   if (ROUTE_PATTERNS === null) return true;
   const path = pathname !== "/" ? pathname.replace(/\/+$/, "") : "/";
@@ -154,6 +166,17 @@ const server = createServer(async (req, res) => {
   // misrouting; answer 404 rather than masking it with the SPA shell.
   if (pathname === "/api" || pathname.startsWith("/api/")) {
     return send(res, 404, "Not Found", { head, proto, "Content-Type": MIME[".txt"] });
+  }
+
+  // A retired path, before anything else looks for a file to serve.
+  const moved = REDIRECTS[pathname.replace(/(.)\/+$/, "$1")];
+  if (moved) {
+    return send(res, 301, `Moved to ${moved}`, {
+      head,
+      proto,
+      Location: moved,
+      "Content-Type": MIME[".txt"],
+    });
   }
 
   const rel = decodeURIComponent(pathname.slice(1));

@@ -4,6 +4,7 @@
 //   dist/routes.json  — every route the build actually serves, which
 //                       scripts/serve-compass.mjs uses to tell a real page from
 //                       a typo instead of handing the SPA shell to both with 200
+//   dist/redirects.json — the paths that used to be routes, and where they went
 //
 // Both come from src/data/routes.json. public/sitemap.xml is gone: a sitemap
 // checked into the source tree drifts from App.tsx the moment a route is added,
@@ -19,7 +20,7 @@ const DIST = join(ROOT, "dist");
 const registry = JSON.parse(
   await readFile(join(ROOT, "src/data/routes.json"), "utf8"),
 );
-const { origin, routes } = registry;
+const { origin, routes, redirects = [] } = registry;
 
 // A build that excluded the internal pages must not advertise them in the
 // manifest either, or the static server would answer 200 for /admin on a build
@@ -56,7 +57,19 @@ await writeFile(
   JSON.stringify(built.map((r) => r.path)) + "\n",
 );
 
+// ---- redirects.json --------------------------------------------------------
+//
+// A renamed route is still a route someone has bookmarked, linked or indexed.
+// The static server answers these 301 before the app loads; App.tsx renders the
+// same list as <Navigate replace> for links followed inside the app.
+
+await writeFile(
+  join(DIST, "redirects.json"),
+  JSON.stringify(Object.fromEntries(redirects.map((r) => [r.from, r.to]))) + "\n",
+);
+
 console.log(
-  `emit-routes: ${indexable.length} urls in sitemap, ${built.length} routes in manifest` +
+  `emit-routes: ${indexable.length} urls in sitemap, ${built.length} routes in manifest, ` +
+    `${redirects.length} redirects` +
     (includeInternal ? " (internal pages included)" : ""),
 );

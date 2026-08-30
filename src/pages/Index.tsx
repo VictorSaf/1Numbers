@@ -86,11 +86,6 @@ const Index = () => {
     }
   };
 
-  const handleNewCalculation = () => {
-    setShowDashboard(false);
-    setUserData(null);
-  };
-
   // Determine what to show
   const shouldShowDashboard = isAuthenticated && profile && showDashboard && !userData;
   const shouldShowResults = userData !== null;

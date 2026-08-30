@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { Sparkles, Crown, Star } from "lucide-react";
-import { PageLayout } from "@/components/layout/PageLayout";
-import { PageHeader } from "@/components/layout/PageHeader";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import { getDelayClass } from "@/components/design-system";
@@ -18,15 +16,7 @@ const NumerologyGuide = () => {
   };
 
   return (
-    <PageLayout>
-      <PageHeader
-        title={t.guideTitle}
-        subtitle={t.guideSubtitle}
-        badge={{
-          icon: <Sparkles className="h-4 w-4 text-primary" />,
-          label: t.guideLabel
-        }}
-      />
+    <>
 
       {/* Main Content */}
       <main className="relative z-10 px-4 pb-16">
@@ -191,7 +181,7 @@ const NumerologyGuide = () => {
           </p>
         </div>
       </footer>
-    </PageLayout>
+    </>
   );
 };
 

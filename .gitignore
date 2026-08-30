@@ -33,3 +33,6 @@ server/.env
 
 # Playwright MCP scratch output (page snapshots from browser checks)
 .playwright-mcp/
+
+# Written by Claude Code per project; local to this machine.
+.claude/settings.local.json

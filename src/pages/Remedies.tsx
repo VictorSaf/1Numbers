@@ -15,6 +15,7 @@ import { RemedyCard } from '@/components/RemedyCard';
 import { getRemedyForNumber, getAllRemedies, getDailyRemedy, NumberRemedy } from '@/lib/remedies';
 import { calculateLifePathNumber, calculateDestinyNumber } from '@/lib/numerology';
 import { useProfile } from '@/hooks/use-profile';
+import { PageLayout } from '@/components/layout/PageLayout';
 import {
   Sparkles,
   User,
@@ -144,8 +145,12 @@ const Remedies = () => {
     );
   }
 
+  // Wrapped in PageLayout like every other route. Without it this page had no
+  // header at all: no way back, no language switcher, no theme switcher -- and
+  // the language a reader had chosen was simply not changeable from here.
   return (
-    <div className="container max-w-4xl mx-auto px-4 py-8">
+    <PageLayout>
+      <div className="container max-w-4xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="text-center mb-8">
         <div className="flex justify-center mb-4">
@@ -416,8 +421,9 @@ const Remedies = () => {
             </Card>
           </div>
         </TabsContent>
-      </Tabs>
-    </div>
+        </Tabs>
+      </div>
+    </PageLayout>
   );
 };
 

@@ -363,7 +363,7 @@ export const BentoDashboard = ({
           animationDelay={300}
           interactive
         >
-          <Link to="/tools" className="block">
+          <Link to="/unelte" className="block">
             <MiniLoShuGrid birthDate={birthDate} />
             <p className="text-xs text-center text-muted-foreground mt-3">
               Tap for full analysis
@@ -393,7 +393,7 @@ export const BentoDashboard = ({
           animationDelay={400}
           interactive
         >
-          <Link to="/compatibility" className="block text-center py-4">
+          <Link to="/doi" className="block text-center py-4">
             <Heart className="w-10 h-10 mx-auto text-chart-6 mb-2" />
             <p className="text-sm text-muted-foreground">Check compatibility</p>
           </Link>

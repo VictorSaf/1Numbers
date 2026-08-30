@@ -320,3 +320,48 @@ Lucruri găsite în afara listei. Nimic din ce e aici n-a fost reparat; e doar c
 
 - **Build:** zero chunk-uri noi. `index.js` 380 KB → 388 KB, cele patru
   componente noi de structură.
+
+## Plan de implementare — Etapa 2
+
+- **`/raport` e `public`, nu `app`.** Planul îl pune în meniul de cont, dar e
+  pagina de cumpărare — trebuie indexabilă. E linkată din meniul de cont și
+  rămâne în sitemap. Astăzi randează `Premium`; Etapa 7 o transformă.
+
+- **`/chaldean` n-a fost absorbit.** Planul zice că intră în capitolul 5, dar
+  asta e munca Etapei 6 (sistemele paralele din motor). Ștergerea rutei acum ar
+  fi scos o funcție care merge, fără nimic în loc. A primit în schimb prima ei
+  intrare: un bloc în capitolul 5, exact acolo unde Etapa 6 îl va înlocui cu
+  randarea inline. Era singura rută din aplicație la care nu ducea niciun link.
+
+- **Redirecturile poartă și secțiunea.** `/faq` → `/invata?s=intrebari`, nu
+  `/invata`. Un 301 care aterizează pe alt tab pierde exact motivul pentru care
+  cineva a dat click. La fel `/angel-numbers` → `/unelte?s=angel`. Ambele pagini
+  citesc tabul din query string, deci un link către o unealtă rămâne un link
+  către acea unealtă.
+
+- **`useInviteLink` a devenit `redeemInviteLink`.** Numele cu prefix `use` făcea
+  `react-hooks/rules-of-hooks` să-l trateze ca hook și să refuze apelul dintr-un
+  callback — singurul loc din care o acțiune se apelează vreodată. Funcția era
+  scrisă, exportată și niciodată chemată de nimeni.
+
+- **`api.ts` e exclus din testul de navigație.** Căile de acolo se adresează
+  API-ului Express: `/friends` e endpoint, n-are legătură cu ruta care purta
+  numele ăsta. Prima variantă a rescrierii automate chiar l-a stricat.
+
+- **Cele patru pagini de învățat au ieșit din `src/pages/`** în
+  `src/components/learn/`. Nu mai sunt destinații, sunt panouri de tab; un fișier
+  în `pages/` care nu e rută minte despre ce e.
+
+- **`/courses` a fost șters** — 92 de linii, fără importator și fără link.
+  `AngelNumbers` a fost mutat, nu șters: e tab în `/unelte`.
+
+- **`QuickActions` avea `grid-cols-4` fix**, fără prefix responsive, pentru opt
+  acțiuni. Acum `grid-cols-2 sm:grid-cols-4`.
+
+- **Taburile din `/unelte`** erau opt (cu Numere Înger) în `grid-cols-4
+  sm:grid-cols-7` cu etichete `hidden sm:inline` — sub 640px, opt butoane
+  doar-iconiță pe trei rânduri. Acum derulează lateral și își păstrează numele.
+
+- **Build:** `Learn.js` 4,4 KB și `tabs.js` 1,1 KB apar; `Courses.js`,
+  `NumberDistributionChart.js` și `use.js` dispar. Total neschimbat, un chunk
+  mai puțin.
