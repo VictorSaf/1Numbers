@@ -1,11 +1,18 @@
 // Daily and Monthly Predictions based on Numerology
-import { 
-  reduceToSingleDigit,
+import {
   calculateLifePathNumber,
   calculateDestinyNumber,
   calculatePersonalYearNumber
 } from './numerology';
 import { calculateLuckyScore } from './luckyDates';
+// The cycles live in one place. This module used to carry its own copies, which
+// agreed by accident -- repeated digit sums are associative -- rather than by
+// construction.
+import {
+  calculatePersonalDayNumber,
+  calculateUniversalDay,
+  calculatePersonalMonthNumber as personalMonthFor,
+} from './personalCycles';
 
 export interface DailyPrediction {
   number: number;
@@ -28,54 +35,6 @@ export interface MonthlyPrediction {
   spirituality: string;
   keyDays: number[];
 }
-
-// Calculate Universal Day Number
-export const calculateUniversalDayNumber = (date: Date = new Date()): number => {
-  const day = date.getDate();
-  const month = date.getMonth() + 1;
-  const year = date.getFullYear();
-  
-  const total = day + month + String(year).split('').reduce((sum, d) => sum + parseInt(d), 0);
-  return reduceToSingleDigit(total, false);
-};
-
-// Calculate Personal Day Number
-export const calculatePersonalDayNumber = (birthDate: Date, date: Date = new Date()): number => {
-  const birthDay = birthDate.getDate();
-  const birthMonth = birthDate.getMonth() + 1;
-  const currentDay = date.getDate();
-  const currentMonth = date.getMonth() + 1;
-  const currentYear = date.getFullYear();
-  
-  const reducedBirthDay = reduceToSingleDigit(birthDay, false);
-  const reducedBirthMonth = reduceToSingleDigit(birthMonth, false);
-  const reducedCurrentDay = reduceToSingleDigit(currentDay, false);
-  const reducedCurrentMonth = reduceToSingleDigit(currentMonth, false);
-  const reducedYear = reduceToSingleDigit(
-    String(currentYear).split('').reduce((sum, d) => sum + parseInt(d), 0),
-    false
-  );
-  
-  const total = reducedBirthDay + reducedBirthMonth + reducedCurrentDay + reducedCurrentMonth + reducedYear;
-  return reduceToSingleDigit(total, false);
-};
-
-// Calculate Personal Month Number
-export const calculatePersonalMonthNumber = (birthDate: Date, month: number, year: number): number => {
-  const birthDay = birthDate.getDate();
-  const birthMonth = birthDate.getMonth() + 1;
-  
-  const reducedBirthDay = reduceToSingleDigit(birthDay, false);
-  const reducedBirthMonth = reduceToSingleDigit(birthMonth, false);
-  const reducedMonth = reduceToSingleDigit(month, false);
-  const reducedYear = reduceToSingleDigit(
-    String(year).split('').reduce((sum, d) => sum + parseInt(d), 0),
-    false
-  );
-  
-  const total = reducedBirthDay + reducedBirthMonth + reducedMonth + reducedYear;
-  return reduceToSingleDigit(total, false);
-};
 
 // Daily predictions data
 const dailyPredictionsData: Record<number, Omit<DailyPrediction, 'number'>> = {
@@ -247,7 +206,7 @@ export const getDailyPrediction = (birthDate: Date, date: Date = new Date()): Da
 };
 
 export const getMonthlyPrediction = (birthDate: Date, month: number, year: number): MonthlyPrediction => {
-  const number = calculatePersonalMonthNumber(birthDate, month, year);
+  const number = personalMonthFor(birthDate, year, month);
   
   // Calculate key days for this month (days where personal day number matches personal month number)
   const daysInMonth = new Date(year, month, 0).getDate();
@@ -269,7 +228,7 @@ export const getMonthlyPrediction = (birthDate: Date, month: number, year: numbe
 };
 
 export const getUniversalDayEnergy = (date: Date = new Date()): { number: number; energy: string } => {
-  const number = calculateUniversalDayNumber(date);
+  const number = calculateUniversalDay(date);
   return {
     number,
     energy: dailyPredictionsData[number].energy
@@ -426,7 +385,7 @@ export const calculateWeeklyTheme = (
   const daysDiff = Math.floor((weekStartDate.getTime() - firstDayOfMonth.getTime()) / (1000 * 60 * 60 * 24));
   const weekNumber = Math.floor(daysDiff / 7) + 1;
   
-  const personalMonth = calculatePersonalMonthNumber(birthDate, month, year);
+  const personalMonth = personalMonthFor(birthDate, year, month);
   
   // Calculate average day numbers for the week
   const weekDays: number[] = [];
@@ -546,7 +505,7 @@ export const calculateMonthlyFocus = (
   month: number,
   year: number
 ): string[] => {
-  const personalMonth = calculatePersonalMonthNumber(birthDate, month, year);
+  const personalMonth = personalMonthFor(birthDate, year, month);
   const monthly = getMonthlyPrediction(birthDate, month, year);
   
   const focusAreas: Record<number, string[]> = {
@@ -576,7 +535,7 @@ export const getMonthlyRecommendations = (
   month: number,
   year: number
 ): string[] => {
-  const personalMonth = calculatePersonalMonthNumber(birthDate, month, year);
+  const personalMonth = personalMonthFor(birthDate, year, month);
   const monthly = getMonthlyPrediction(birthDate, month, year);
   
   const recommendations: Record<number, string[]> = {
@@ -1046,7 +1005,7 @@ export const analyzeEventDate = (
   recommendations: string[];
 } => {
   const personalDay = calculatePersonalDayNumber(birthDate, eventDate);
-  const universalDay = calculateUniversalDayNumber(eventDate);
+  const universalDay = calculateUniversalDay(eventDate);
   const lifePath = calculateLifePathNumber(birthDate);
   const personalYear = calculatePersonalYearNumber(birthDate, eventDate.getFullYear());
   const { score } = calculateLuckyScore(eventDate, lifePath, 0, personalYear);

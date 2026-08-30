@@ -114,3 +114,35 @@ Lucruri găsite în afara listei. Nimic din ce e aici n-a fost reparat; e doar c
   login și register). Nu a fost nevoie de `express-rate-limit`. `/ai/consult`
   primește 30 de cereri pe oră pe IP, peste rate limit-ul pe abonament care
   există separat în `middleware/rateLimit.ts`.
+
+## Etapa 4
+
+- **Life Path 33 a devenit imposibil.** Consecință directă a convenției alese:
+  segmentele reduse dau maximum 9+9+9=27, deci masterii rămași sunt doar 11 și
+  22. Pe 1900–2100 distribuția e 1:8155 · 2:2693 · 3:8156 · 4:6772 · 5:8159 ·
+  6:8160 · 7:8158 · 8:8159 · 9:8156 · 11:5460 · 22:1386 · **33:0**.
+  Conținutul pentru arhetipul 33 rămâne accesibil prin Destiny, Soul Urge și
+  celelalte poziții — doar Drumul Vieții nu-l mai poate produce.
+  Scris explicit ca test în `lifepath-table.test.ts`.
+
+- **„Ultimul pas de două cifre" pierdea 19.** Directiva cere ca `result()` să
+  raporteze ultimul pas de două cifre din lanț. Aplicat literal, `19 → 10 → 1`
+  raportează 10, deci datoria 19 dispărea — exact opusul scopului. Regula
+  implementată e „datoria găsită oriunde în lanț". Nu pot fi două: niciuna dintre
+  13, 14, 16, 19 nu are suma cifrelor tot o datorie.
+
+- **`predictions.ts` și `personalCycles.ts` erau de acord din întâmplare.**
+  Prima face o sumă plată, a doua reduce în trepte; ies la fel doar pentru că
+  rădăcina digitală e asociativă. Coincidență, nu construcție — de-asta au fost
+  unificate chiar dacă nu diferă azi.
+
+- **Bonusul de zi master din `businessNumerology.ts` era cod mort.** După ce ziua
+  universală vine din motor (redusă, 1–9), `if ([11,22,33].includes(universalDay))
+  compatibility += 15` nu se mai poate atinge. Șters.
+
+- **`NumerologyResults.tsx` n-a fost modificat.** Trece pe motor tranzitiv:
+  `pinnacles.ts` și `karmic.ts` delegă acum, iar componenta le importă pe ele.
+  Zero divergențe pe toate cele 36.525 de date verificate.
+
+- **Sweep-ul acoperă 36.525 de date** (1930–2029), nu 27.216 din audit. Superset,
+  ales ca să prindă și anii care se reduc la master după 2004.

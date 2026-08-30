@@ -13,9 +13,15 @@ import {
 // ── Numere de bază (re-expuse cu `raw`) ─────────────────────
 
 /** Life Path — metoda segmentată (lună, zi, an reduse separat, apoi însumate).
- *  Aceasta e convenția occidentală standard; varianta vedică (sumă plată) e în vedic.ts. */
+ *  Aceasta e convenția occidentală standard; varianta vedică (sumă plată) e în vedic.ts.
+ *
+ *  Segmentele se reduc la o cifră: un master apare doar în total. Asta e aceeași
+ *  convenție pe care challenges() o folosea deja — provocările sunt diferențe în
+ *  0..8, deci n-au încotro — iar lifePath() era singurul loc care păstra masterii
+ *  în segmente, ceea ce dădea două Drumuri ale Vieții pe aceeași pagină.
+ *  Consecință: totalul maxim e 9+9+9=27, deci un Life Path 33 nu mai e posibil. */
 export function lifePath(b: BirthDate): NumResult {
-  const m = reduce(b.month), d = reduce(b.day), y = reduce(digitSum(b.year));
+  const m = reduce(b.month, false), d = reduce(b.day, false), y = reduce(digitSum(b.year), false);
   return result(m + d + y);
 }
 
@@ -119,11 +125,21 @@ export function bridges(lp: NumResult, exp: NumResult, su: NumResult, pers: NumR
 // ── Cicluri temporale ────────────────────────────────────────
 
 /** Pinacle — 4 numere + intervale de vârstă dependente de Life Path. */
+/** Vârsta la care se încheie primul pinacle.
+ *
+ *  36 minus Drumul Vieții, dar minus *cifra*: cu un Life Path 11 formula dădea
+ *  25, iar cu 33 dădea 3 — toate cele patru pinacle se terminau înainte de 22 de
+ *  ani. Pinaclele, provocările și ciclurile de viață împart aceeași scară, deci
+ *  o citesc din același loc. */
+function firstPinnacleEnd(lp: NumResult): number {
+  return 36 - reduce(lp.value, false);
+}
+
 export function pinnacles(b: BirthDate, lp: NumResult) {
-  const m = reduce(b.month), d = reduce(b.day), y = reduce(digitSum(b.year));
+  const m = reduce(b.month, false), d = reduce(b.day, false), y = reduce(digitSum(b.year), false);
   const p1 = result(m + d), p2 = result(d + y);
   const p3 = result(p1.value + p2.value), p4 = result(m + y);
-  const end1 = 36 - lp.value;
+  const end1 = firstPinnacleEnd(lp);
   return [
     { index: 1, ...p1, fromAge: 0,        toAge: end1 },
     { index: 2, ...p2, fromAge: end1 + 1, toAge: end1 + 9 },
@@ -137,7 +153,7 @@ export function challenges(b: BirthDate, lp: NumResult) {
   const m = reduce(b.month, false), d = reduce(b.day, false), y = reduce(digitSum(b.year), false);
   const c1 = Math.abs(m - d), c2 = Math.abs(d - y);
   const c3 = Math.abs(c1 - c2), c4 = Math.abs(m - y);
-  const end1 = 36 - lp.value;
+  const end1 = firstPinnacleEnd(lp);
   return [
     { index: 1, value: c1, fromAge: 0,         toAge: end1 },
     { index: 2, value: c2, fromAge: end1 + 1,  toAge: end1 + 9 },
@@ -146,13 +162,14 @@ export function challenges(b: BirthDate, lp: NumResult) {
   ];
 }
 
-/** A4 Cicluri de Viață. Formative păstrează doar 11 (22 imposibil pentru lună). */
+/** A4 Cicluri de Viață. Aceleași segmente ca lifePath, deci reduse la o cifră —
+ *  `raw` rămâne valoarea brută, ca o zi de 13 să-și păstreze datoria karmică. */
 export function lifeCycles(b: BirthDate, lp: NumResult) {
-  const end1 = 36 - lp.value;
+  const end1 = firstPinnacleEnd(lp);
   return [
-    { name: 'formative',  ...result(b.month),           fromAge: 0,        toAge: end1 },
-    { name: 'productive', ...result(b.day),             fromAge: end1 + 1, toAge: end1 + 27 },
-    { name: 'harvest',    ...result(digitSum(b.year)),  fromAge: end1 + 28, toAge: null as number | null },
+    { name: 'formative',  ...result(b.month, false),          fromAge: 0,        toAge: end1 },
+    { name: 'productive', ...result(b.day, false),            fromAge: end1 + 1, toAge: end1 + 27 },
+    { name: 'harvest',    ...result(digitSum(b.year), false), fromAge: end1 + 28, toAge: null as number | null },
   ];
 }
 
@@ -302,8 +319,8 @@ export function dualitiesTimeline(name: string, b: BirthDate, fromAge: number, t
 
 export function detectKarmicDebts(parts: Record<string, NumResult>): Array<{ source: string; debt: number; reduced: number }> {
   return Object.entries(parts)
-    .filter(([, r]) => (KARMIC_DEBTS as readonly number[]).includes(r.raw))
-    .map(([source, r]) => ({ source, debt: r.raw, reduced: r.value }));
+    .filter(([, r]) => r.karmicDebt !== null)
+    .map(([source, r]) => ({ source, debt: r.karmicDebt as number, reduced: r.value }));
 }
 
 // ── Profil complet ───────────────────────────────────────────

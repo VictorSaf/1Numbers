@@ -1,4 +1,4 @@
-import { 
+import {
   reduceToSingleDigit,
   calculateLifePathNumber,
   calculateDestinyNumber,
@@ -6,6 +6,11 @@ import {
   calculatePersonalityNumber,
   calculateMaturityNumber
 } from "./numerology";
+// Imported from the module, not the barrel: the barrel re-exports the content
+// layer, which would drag arcana and archetypes into this chunk.
+import { lifePath, pinnacles, challenges } from './numerology-plus/pythagorean';
+
+const toBirthDate = (d: Date) => ({ day: d.getDate(), month: d.getMonth() + 1, year: d.getFullYear() });
 
 export interface PinnacleData {
   number: number;
@@ -20,63 +25,27 @@ export interface ChallengeData {
 }
 
 // Calculate the 4 Pinnacle Numbers
+//
+// The arithmetic lives in the engine. This module used to carry its own copy,
+// which reduced the month, day and year without preserving masters while
+// numerology-plus preserved them -- so the same page could show two different
+// Life Paths, and the pinnacle ages were computed from two different scales.
+// Both now come from one place; what stays here is the shape the cards expect.
 export const calculatePinnacles = (birthDate: Date): PinnacleData[] => {
-  const day = birthDate.getDate();
-  const month = birthDate.getMonth() + 1;
-  const year = birthDate.getFullYear();
-
-  const reducedDay = reduceToSingleDigit(day, false);
-  const reducedMonth = reduceToSingleDigit(month, false);
-  const reducedYear = reduceToSingleDigit(
-    String(year).split('').reduce((sum, digit) => sum + parseInt(digit), 0),
-    false
-  );
-
-  // Life Path Number determines the timing
-  const lifePath = reduceToSingleDigit(reducedDay + reducedMonth + reducedYear, false);
-  
-  // First pinnacle ends at age 36 - Life Path Number
-  const firstPinnacleEnd = 36 - lifePath;
-  
-  // Pinnacle calculations
-  const pinnacle1 = reduceToSingleDigit(reducedMonth + reducedDay, true);
-  const pinnacle2 = reduceToSingleDigit(reducedDay + reducedYear, true);
-  const pinnacle3 = reduceToSingleDigit(pinnacle1 + pinnacle2, true);
-  const pinnacle4 = reduceToSingleDigit(reducedMonth + reducedYear, true);
-
-  return [
-    { number: pinnacle1, startAge: 0, endAge: firstPinnacleEnd, period: 1 },
-    { number: pinnacle2, startAge: firstPinnacleEnd + 1, endAge: firstPinnacleEnd + 9, period: 2 },
-    { number: pinnacle3, startAge: firstPinnacleEnd + 10, endAge: firstPinnacleEnd + 18, period: 3 },
-    { number: pinnacle4, startAge: firstPinnacleEnd + 19, endAge: 99, period: 4 },
-  ];
+  const b = toBirthDate(birthDate);
+  return pinnacles(b, lifePath(b)).map((p) => ({
+    number: p.value,
+    startAge: p.fromAge,
+    // The engine leaves the last pinnacle open; the cards want a number.
+    endAge: p.toAge ?? 99,
+    period: p.index,
+  }));
 };
 
 // Calculate the 4 Challenge Numbers
 export const calculateChallenges = (birthDate: Date): ChallengeData[] => {
-  const day = birthDate.getDate();
-  const month = birthDate.getMonth() + 1;
-  const year = birthDate.getFullYear();
-
-  const reducedDay = reduceToSingleDigit(day, false);
-  const reducedMonth = reduceToSingleDigit(month, false);
-  const reducedYear = reduceToSingleDigit(
-    String(year).split('').reduce((sum, digit) => sum + parseInt(digit), 0),
-    false
-  );
-
-  // Challenge calculations (absolute differences)
-  const challenge1 = Math.abs(reducedMonth - reducedDay);
-  const challenge2 = Math.abs(reducedDay - reducedYear);
-  const challenge3 = Math.abs(challenge1 - challenge2);
-  const challenge4 = Math.abs(reducedMonth - reducedYear);
-
-  return [
-    { number: challenge1, period: 1 },
-    { number: challenge2, period: 2 },
-    { number: challenge3, period: 3 },
-    { number: challenge4, period: 4 },
-  ];
+  const b = toBirthDate(birthDate);
+  return challenges(b, lifePath(b)).map((c) => ({ number: c.value, period: c.index }));
 };
 
 // Get current pinnacle based on age

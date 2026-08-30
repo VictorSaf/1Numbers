@@ -4,6 +4,7 @@
 import { calculateDestinyNumber } from './numerology';
 import { calculateChaldeanNameNumber, calculateBusinessNameNumber, getCompoundMeaning } from './chaldean';
 import { getColorRecommendation, getRemedyForNumber } from './remedies';
+import { calculateUniversalDay } from './personalCycles';
 
 export interface BusinessFullAnalysis {
   name: string;
@@ -411,21 +412,11 @@ export function analyzeLaunchDate(
   const businessNumber = calculateDestinyNumber(businessName);
   const chaldean = calculateChaldeanNameNumber(businessName);
 
-  // Calculate universal day number
-  const day = date.getDate();
-  const month = date.getMonth() + 1;
-  const year = date.getFullYear();
-  let universalDay = day + month + year
-    .toString()
-    .split('')
-    .reduce((a, b) => a + parseInt(b), 0);
-
-  while (universalDay > 9 && ![11, 22, 33].includes(universalDay)) {
-    universalDay = universalDay
-      .toString()
-      .split('')
-      .reduce((a, b) => a + parseInt(b), 0);
-  }
+  // The universal day, from the one place that computes it. The copy that used
+  // to sit here preserved master numbers, and compatibleDays below is keyed
+  // 1..9 -- so an 11, 22 or 33 matched nothing and scored as incompatible
+  // without ever saying why.
+  const universalDay = calculateUniversalDay(date);
 
   // Calculate compatibility
   const compatibleDays: Record<number, number[]> = {
@@ -442,9 +433,6 @@ export function analyzeLaunchDate(
 
   const isCompatible = compatibleDays[chaldean.single]?.includes(universalDay);
   let compatibility = isCompatible ? 80 : 50;
-
-  // Master number day bonus
-  if ([11, 22, 33].includes(universalDay)) compatibility += 15;
 
   // Same number bonus
   if (universalDay === businessNumber) compatibility += 10;

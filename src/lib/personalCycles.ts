@@ -1,79 +1,61 @@
 import { 
-  reduceToSingleDigit,
   calculateLifePathNumber,
   calculateDestinyNumber,
   calculatePersonalYearNumber
 } from "./numerology";
+// Imported from the module, not the barrel: the barrel re-exports the content
+// layer, which would drag arcana and archetypes into this chunk.
+import {
+  personalYear as personalYearPlus,
+  personalMonth as personalMonthPlus,
+  personalDay as personalDayPlus,
+  universalYear as universalYearPlus,
+  universalMonth as universalMonthPlus,
+  universalDay as universalDayPlus,
+} from './numerology-plus/pythagorean';
+
+const toBirthDate = (d: Date) => ({ day: d.getDate(), month: d.getMonth() + 1, year: d.getFullYear() });
+
+// The personal and universal cycles.
+//
+// These were written out three times -- here, in predictions.ts and again in
+// businessNumerology.ts -- and the third copy preserved master numbers, which
+// its own compatibility lookup had no keys for, so a master universal day
+// scored as incompatible without saying so. One source now: the engine.
+// predictions.ts imports these rather than keeping its own.
 
 // Calculate Personal Month Number
 export const calculatePersonalMonthNumber = (
-  birthDate: Date, 
+  birthDate: Date,
   year: number = new Date().getFullYear(),
   month: number = new Date().getMonth() + 1
-): number => {
-  const day = birthDate.getDate();
-  const birthMonth = birthDate.getMonth() + 1;
-  
-  const reducedDay = reduceToSingleDigit(day, false);
-  const reducedBirthMonth = reduceToSingleDigit(birthMonth, false);
-  const reducedYear = reduceToSingleDigit(
-    String(year).split('').reduce((sum, digit) => sum + parseInt(digit), 0),
-    false
-  );
-  
-  // Personal Year
-  const personalYear = reduceToSingleDigit(reducedDay + reducedBirthMonth + reducedYear, false);
-  
-  // Personal Month = Personal Year + Calendar Month
-  const reducedMonth = reduceToSingleDigit(month, false);
-  return reduceToSingleDigit(personalYear + reducedMonth, false);
-};
+): number => personalMonthPlus(personalYearPlus(toBirthDate(birthDate), year), month).value;
 
 // Calculate Personal Day Number
 export const calculatePersonalDayNumber = (
   birthDate: Date,
   targetDate: Date = new Date()
 ): number => {
-  const year = targetDate.getFullYear();
-  const month = targetDate.getMonth() + 1;
-  const dayOfMonth = targetDate.getDate();
-  
-  // Get Personal Month
-  const personalMonth = calculatePersonalMonthNumber(birthDate, year, month);
-  
-  // Personal Day = Personal Month + Day of Month
-  const reducedDay = reduceToSingleDigit(dayOfMonth, false);
-  return reduceToSingleDigit(personalMonth + reducedDay, false);
+  const b = toBirthDate(birthDate);
+  const py = personalYearPlus(b, targetDate.getFullYear());
+  const pm = personalMonthPlus(py, targetDate.getMonth() + 1);
+  return personalDayPlus(pm, targetDate.getDate()).value;
 };
 
 // Calculate Universal Year
-export const calculateUniversalYear = (year: number = new Date().getFullYear()): number => {
-  return reduceToSingleDigit(
-    String(year).split('').reduce((sum, digit) => sum + parseInt(digit), 0),
-    false
-  );
-};
+export const calculateUniversalYear = (year: number = new Date().getFullYear()): number =>
+  universalYearPlus(year).value;
 
 // Calculate Universal Month
 export const calculateUniversalMonth = (
   year: number = new Date().getFullYear(),
   month: number = new Date().getMonth() + 1
-): number => {
-  const universalYear = calculateUniversalYear(year);
-  return reduceToSingleDigit(universalYear + month, false);
-};
+): number => universalMonthPlus(year, month).value;
 
 // Calculate Universal Day
-export const calculateUniversalDay = (date: Date = new Date()): number => {
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  
-  const universalMonth = calculateUniversalMonth(year, month);
-  return reduceToSingleDigit(universalMonth + day, false);
-};
+export const calculateUniversalDay = (date: Date = new Date()): number =>
+  universalDayPlus(date.getFullYear(), date.getMonth() + 1, date.getDate()).value;
 
-// Personal cycle meanings
 export const PERSONAL_CYCLE_MEANINGS: Record<number, {
   keywords: { ro: string; en: string; ru: string };
   dayMeaning: { ro: string; en: string; ru: string };

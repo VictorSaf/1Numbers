@@ -2,7 +2,10 @@ import { reduceToSingleDigit } from "./numerology";
 // Imported from the module, not the barrel: the barrel re-exports the content
 // layer, and karmic.ts sits inside the numerology-core manual chunk, so a
 // barrel import drags arcana and archetypes into a chunk that is preloaded.
-import { classifyFullName, sumLetters, PYTHAGOREAN } from './numerology-plus/core';
+import { classifyFullName, PYTHAGOREAN } from './numerology-plus/core';
+import {
+  lifePath, expression, soulUrge, personality, birthday, detectKarmicDebts,
+} from './numerology-plus/pythagorean';
 
 export interface KarmicDebtInfo {
   number: number;
@@ -27,51 +30,35 @@ export const hasKarmicDebt = (originalSum: number): number | null => {
 };
 
 // Calculate all potential karmic debts from birth date and name
+//
+// This used to redo the sums itself and then ask whether the total was one of
+// 13, 14, 16 or 19. For the Life Path that works -- three reduced segments
+// cannot pass 27 -- but a name's letter sum lands between 40 and 120, so the
+// name positions could never report a debt: expression('Ștefan Țîrlea') is 49,
+// and the 13 it reduces through was dropped in silence. The engine walks the
+// whole reduction chain, so the answer here is its answer.
+const SOURCES = ['lifePath', 'destiny', 'soulUrge', 'personality', 'birthday'] as const;
+
 export const calculateKarmicDebts = (
   birthDate: Date,
   fullName: string
 ): KarmicDebtInfo[] => {
-  const debts: KarmicDebtInfo[] = [];
-  
-  // Check Life Path (from birth date)
-  const day = birthDate.getDate();
-  const month = birthDate.getMonth() + 1;
-  const year = birthDate.getFullYear();
-  
-  const daySum = day;
-  const monthSum = month;
-  const yearSum = String(year).split('').reduce((sum, d) => sum + parseInt(d), 0);
-  const totalSum = reduceToSingleDigit(daySum, false) + reduceToSingleDigit(monthSum, false) + reduceToSingleDigit(yearSum, false);
-  
-  if (KARMIC_DEBT_NUMBERS.includes(totalSum)) {
-    debts.push({ number: totalSum, hasDebt: true, source: 'lifePath' });
-  }
-  
-  // Check Birthday
-  if (KARMIC_DEBT_NUMBERS.includes(day)) {
-    debts.push({ number: day, hasDebt: true, source: 'birthday' });
-  }
-  
-  // Letters come from the shared engine rather than a local table. The local copy
-  // stripped diacritics instead of transliterating them and treated Y as always a
-  // consonant, so this module disagreed with the main result for any name
-  // containing ș, ț, ă or Y -- on the same page, side by side.
-  const destinySum = sumLetters(fullName);
-  const soulUrgeSum = sumLetters(fullName, PYTHAGOREAN, (l) => l.vowel);
-  const personalitySum = sumLetters(fullName, PYTHAGOREAN, (l) => !l.vowel);
+  const b = { day: birthDate.getDate(), month: birthDate.getMonth() + 1, year: birthDate.getFullYear() };
 
-  
-  if (KARMIC_DEBT_NUMBERS.includes(destinySum)) {
-    debts.push({ number: destinySum, hasDebt: true, source: 'destiny' });
-  }
-  if (KARMIC_DEBT_NUMBERS.includes(soulUrgeSum)) {
-    debts.push({ number: soulUrgeSum, hasDebt: true, source: 'soulUrge' });
-  }
-  if (KARMIC_DEBT_NUMBERS.includes(personalitySum)) {
-    debts.push({ number: personalitySum, hasDebt: true, source: 'personality' });
-  }
-  
-  return debts;
+  const found = detectKarmicDebts({
+    lifePath: lifePath(b),
+    destiny: expression(fullName),
+    soulUrge: soulUrge(fullName),
+    personality: personality(fullName),
+    birthday: birthday(b),
+  });
+
+  // Ordered the way the cards read them, and the way calculateKarmicPath picks
+  // its primary debt -- Object.entries order is not something to lean on.
+  return SOURCES.flatMap((source) => {
+    const hit = found.find((d) => d.source === source);
+    return hit ? [{ number: hit.debt, hasDebt: true, source }] : [];
+  });
 };
 
 // Calculate Karmic Lessons (missing numbers from name)

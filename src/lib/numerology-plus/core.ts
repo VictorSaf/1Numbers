@@ -140,13 +140,35 @@ export interface NumResult {
   karmicDebt: number | null;
 }
 
+/**
+ * The karmic debt hiding in a reduction, not just the one sitting on top of it.
+ *
+ * This used to look only at `raw`, which works for a Life Path -- three reduced
+ * segments cannot exceed 27 -- but never fires for a name, where the letter sum
+ * lands somewhere between 40 and 120. expression('Ștefan Țîrlea') is 49, and
+ * 49 -> 4+9 = 13 is a debt that was dropped in silence.
+ *
+ * The walk stops where reduce() stops, so a chain that reaches a preserved
+ * master ends there. At most one debt can appear in a chain: none of 13, 14, 16
+ * or 19 has a digit sum that is itself a debt.
+ */
+function karmicDebtIn(raw: number, keepMasters: boolean): number | null {
+  let x = Math.abs(raw);
+  while (x > 9) {
+    if ((KARMIC_DEBTS as readonly number[]).includes(x)) return x;
+    if (keepMasters && isMaster(x)) break;
+    x = digitSum(x);
+  }
+  return null;
+}
+
 export function result(raw: number, keepMasters = true): NumResult {
   const value = reduce(raw, keepMasters);
   return {
     raw,
     value,
     isMaster: isMaster(value),
-    karmicDebt: (KARMIC_DEBTS as readonly number[]).includes(raw) ? raw : null,
+    karmicDebt: karmicDebtIn(raw, keepMasters),
   };
 }
 
