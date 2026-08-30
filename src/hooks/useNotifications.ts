@@ -6,7 +6,7 @@ import {
   isNotificationSupported,
   getNotificationPermission,
   requestNotificationPermission,
-  registerServiceWorker,
+  getServiceWorkerRegistration,
   subscribeToPush,
   unsubscribeFromPush,
   showLocalNotification,
@@ -63,7 +63,7 @@ export const useNotifications = (): UseNotificationsReturn => {
   // Initialize service worker on mount
   useEffect(() => {
     if (isSupported && permission === 'granted') {
-      registerServiceWorker().then((registration) => {
+      getServiceWorkerRegistration().then((registration) => {
         setSwRegistration(registration);
         if (registration) {
           // Check if already subscribed
@@ -91,7 +91,7 @@ export const useNotifications = (): UseNotificationsReturn => {
 
       if (result === 'granted') {
         // Register service worker after permission granted
-        const registration = await registerServiceWorker();
+        const registration = await getServiceWorkerRegistration();
         setSwRegistration(registration);
         return true;
       } else if (result === 'denied') {

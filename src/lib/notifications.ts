@@ -62,22 +62,23 @@ export const requestNotificationPermission = async (): Promise<NotificationPermi
   return permission;
 };
 
-// Register service worker for push notifications
-export const registerServiceWorker = async (): Promise<ServiceWorkerRegistration | null> => {
+// The registration push notifications attach to.
+//
+// This used to call register() itself, which was the only register() in the
+// codebase and was reached only through a component with no importer -- so the
+// PWA never installed. Registration now happens once, at startup, in
+// lib/serviceWorker.ts; this waits for that one rather than racing it with a
+// second call for the same scope.
+export const getServiceWorkerRegistration = async (): Promise<ServiceWorkerRegistration | null> => {
   if (!('serviceWorker' in navigator)) {
     console.warn('Service workers not supported');
     return null;
   }
 
   try {
-    const registration = await navigator.serviceWorker.register('/sw.js', {
-      scope: '/',
-    });
-
-    console.log('Service Worker registered:', registration.scope);
-    return registration;
+    return await navigator.serviceWorker.ready;
   } catch (error) {
-    console.error('Service Worker registration failed:', error);
+    console.error('Service Worker not available:', error);
     return null;
   }
 };

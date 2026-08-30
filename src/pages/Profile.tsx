@@ -30,6 +30,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useProfiles } from '@/hooks/use-profiles';
 import { ProfileSwitcher } from '@/components/ProfileSwitcher';
 import { ProfileComparison } from '@/components/ProfileComparison';
+import { NotificationSettings } from '@/components/NotificationSettings';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
 
@@ -456,6 +457,10 @@ const Profile = () => {
           {profiles.length >= 2 && (
             <ProfileComparison />
           )}
+
+          {/* Notification preferences. The component existed with no importer,
+              so the whole permission-and-preferences flow was unreachable. */}
+          <NotificationSettings />
         </div>
       </main>
 

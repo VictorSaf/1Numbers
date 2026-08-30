@@ -163,7 +163,11 @@ const server = createServer(async (req, res) => {
     return send(res, 403, "Forbidden", { head, proto, "Content-Type": MIME[".txt"] });
   }
 
-  if (rel === "" || rel.endsWith("/")) {
+  // Only the root itself short-circuits to the root shell. This used to accept
+  // any path ending in a slash, which ran before both the per-route lookup below
+  // and isKnownRoute: /guide/ was answered with the homepage's meta tags, and
+  // /nonsens/ was answered 200.
+  if (rel === "") {
     return await serveFile(res, join(ROOT, "index.html"), { immutable: false, head, proto });
   }
 

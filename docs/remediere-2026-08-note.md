@@ -146,3 +146,39 @@ Lucruri găsite în afara listei. Nimic din ce e aici n-a fost reparat; e doar c
 
 - **Sweep-ul acoperă 36.525 de date** (1930–2029), nu 27.216 din audit. Superset,
   ales ca să prindă și anii care se reduc la master după 2004.
+
+## Etapa 5
+
+- **`offline.html` avea nevoie de un fișier, nu de un script inline.** CSP-ul din
+  `serve-compass.mjs` e `script-src 'self'` fără `unsafe-inline`, iar comentariul
+  de deasupra lui spune explicit că build-ul nu emite script inline. Un `<script>`
+  inline plus `onclick=` ar fi fost blocate exact în momentul în care pagina e
+  singura care se vede. Copy-ul a ieșit în `public/offline.js`, precache-uit
+  alături de `offline.html`.
+
+- **Tokenurile sunt copiate în `offline.html`, nu importate.** Pagina e servită
+  când nimic altceva n-a putut fi adus, deci nu poate ajunge la un stylesheet cu
+  hash. Valorile sunt aceleași cu cele din `src/index.css`, light și dark. Dacă
+  paleta se schimbă, se schimbă în două locuri — dezavantaj acceptat, alternativa
+  e o pagină offline care nu se poate stiliza deloc.
+
+- **Limba pentru `offline.html` citește `localStorage.getItem('language')`.**
+  Cheia nu e scrisă de nimeni încă — persistarea limbii e Etapa 6. Până atunci
+  cade pe `navigator.language`. Etapa 6 trebuie să folosească exact cheia asta.
+
+- **`NotificationSettings` a fost cablat, nu șters.** Intră în `/profile`, sub
+  comparația de profiluri. Motivul: ruta `PUT /notifications/preferences` există
+  și a fost întărită în Etapa 3; ștergerea componentei ar fi lăsat ruta orfană.
+  Nu am verificat vizual randarea — vezi mai jos.
+
+- **`notifications.ts` nu mai înregistrează SW-ul.** `registerServiceWorker` a
+  devenit `getServiceWorkerRegistration`, care așteaptă `navigator.serviceWorker.ready`
+  în loc să facă un al doilea `register()` pe același scope. Înregistrarea e
+  acum într-un singur loc, `src/lib/serviceWorker.ts`, apelat la pornire.
+
+- **Verificarea în browser n-a putut fi făcută.** Extensia Chrome nu e conectată
+  („Browser extension is not connected"). Logica de update e verificată în schimb
+  rulând `public/sw.js` cu un `CacheStorage` fals, pe trei generații —
+  `src/lib/__tests__/sw-update.test.ts`. Rămâne de confirmat manual: DevTools →
+  Application arată SW activ, aplicația instalabilă, promptul de reîncărcare
+  apare la al doilea deploy.

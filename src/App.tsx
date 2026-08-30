@@ -3,11 +3,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { LanguageProvider } from "@/contexts/LanguageContext";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { LanguageProvider, useLanguage } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ChunkErrorBoundary } from "@/components/ChunkErrorBoundary";
+import { AppUpdatePrompt } from "@/components/AppUpdatePrompt";
 import { ProtectedAdminRoute } from "@/components/ProtectedAdminRoute";
 import { RouteMeta } from "@/components/RouteMeta";
 import { ROUTES, isRouteBuilt, INCLUDE_INTERNAL } from "@/lib/routes";
@@ -111,6 +113,57 @@ const PageLoader = () => (
   </div>
 );
 
+// Every page but the calculator arrives through React.lazy, so the failure that
+// matters most is a chunk that will not load -- after a deploy, or offline. The
+// boundary sits inside the router so the shell survives it, and it is keyed on
+// the path so walking away from a broken route clears it.
+const CHUNK_ERROR_COPY = {
+  ro: {
+    title: 'Pagina nu s-a încărcat',
+    body: 'O bucată din aplicație n-a putut fi adusă. De obicei se rezolvă din a doua încercare.',
+    retry: 'Încearcă din nou',
+  },
+  en: {
+    title: 'This page did not load',
+    body: 'Part of the app could not be fetched. A second try usually gets it.',
+    retry: 'Try again',
+  },
+  ru: {
+    title: 'Страница не загрузилась',
+    body: 'Часть приложения не удалось получить. Обычно помогает вторая попытка.',
+    retry: 'Попробовать снова',
+  },
+} as const;
+
+const RoutedPages = () => {
+  const location = useLocation();
+  const { language } = useLanguage();
+  const labels = CHUNK_ERROR_COPY[language as keyof typeof CHUNK_ERROR_COPY] ?? CHUNK_ERROR_COPY.en;
+
+  return (
+    <ChunkErrorBoundary resetKey={location.pathname} labels={labels}>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          {ROUTES.filter(isRouteBuilt).map((route) => {
+            const Page = PAGES[route.path];
+            if (!Page) return null;
+            const element = <Page />;
+            const wrap = GUARDS[route.path];
+            return (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={wrap ? wrap(element) : element}
+              />
+            );
+          })}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+    </ChunkErrorBoundary>
+  );
+};
+
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
@@ -120,26 +173,10 @@ const App = () => (
             <TooltipProvider>
             <Toaster />
             <Sonner />
+            <AppUpdatePrompt />
             <BrowserRouter>
               <RouteMeta />
-              <Suspense fallback={<PageLoader />}>
-                <Routes>
-                  {ROUTES.filter(isRouteBuilt).map((route) => {
-                    const Page = PAGES[route.path];
-                    if (!Page) return null;
-                    const element = <Page />;
-                    const wrap = GUARDS[route.path];
-                    return (
-                      <Route
-                        key={route.path}
-                        path={route.path}
-                        element={wrap ? wrap(element) : element}
-                      />
-                    );
-                  })}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Suspense>
+              <RoutedPages />
             </BrowserRouter>
             </TooltipProvider>
           </LanguageProvider>

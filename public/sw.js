@@ -13,6 +13,9 @@ const OFFLINE_URL = '/offline.html';
 // current when the worker installed -- no redeploy could ever reach them.
 const STATIC_ASSETS = [
   '/manifest.json',
+  // offline.html carries no inline script -- the static server sends
+  // script-src 'self' -- so its copy lives here and has to be cached with it.
+  '/offline.js',
   // The navigation handler below falls back to this when the network is
   // gone and nothing is cached. It has to be precached to be reachable --
   // and until now the file did not exist at all, so that branch resolved to
@@ -20,7 +23,21 @@ const STATIC_ASSETS = [
   OFFLINE_URL,
 ];
 
+// Records which cache the previous generation used, so activate can keep it one
+// more round instead of deleting the chunks an open tab is still importing.
+const PREVIOUS_CACHE_KEY = 'previous-cache-name';
+
 // Install event - cache static assets
+//
+// No skipWaiting here. The app is split with React.lazy, so a tab running build
+// N holds a document that names N's chunks by hash. Taking over immediately and
+// deleting N's cache -- which is what the two lines that used to be here did
+// together -- left that tab importing files that no longer exist in the cache
+// and no longer exist on disk either; the lazy import rejects and the only
+// ErrorBoundary is at the root, so the whole app goes blank.
+//
+// The new worker waits. The page is told, and the person decides when to
+// reload; that is what the SKIP_WAITING message below is for.
 self.addEventListener('install', (event) => {
   console.log('[SW] Installing service worker...');
   event.waitUntil(
@@ -29,25 +46,40 @@ self.addEventListener('install', (event) => {
       return cache.addAll(STATIC_ASSETS);
     })
   );
-  self.skipWaiting();
 });
 
-// Activate event - clean up old caches
+// Activate event - retire the generation before last, keep the one just behind
+//
+// Two caches are alive at any time: this build's, and the one it replaced. A
+// tab that has not reloaded yet still reads from the older one. It is deleted
+// on the *next* activate, by which point that tab has had a whole deploy cycle
+// to reload.
 self.addEventListener('activate', (event) => {
   console.log('[SW] Activating service worker...');
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames
-          .filter((cacheName) => cacheName !== CACHE_NAME)
-          .map((cacheName) => {
-            console.log('[SW] Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          })
-      );
-    })
+    (async () => {
+      const keep = new Set([CACHE_NAME]);
+
+      const meta = await caches.open('sw-meta');
+      const stored = await meta.match(PREVIOUS_CACHE_KEY);
+      const previous = stored ? await stored.text() : null;
+      if (previous && previous !== CACHE_NAME) keep.add(previous);
+
+      for (const name of await caches.keys()) {
+        if (name === 'sw-meta' || keep.has(name)) continue;
+        console.log('[SW] Deleting old cache:', name);
+        await caches.delete(name);
+      }
+
+      // Whichever cache was current before this worker took over becomes the one
+      // we protect through the next deploy.
+      if (previous !== CACHE_NAME) {
+        await meta.put(PREVIOUS_CACHE_KEY, new Response(CACHE_NAME));
+      }
+
+      await self.clients.claim();
+    })()
   );
-  self.clients.claim();
 });
 
 // Fetch event - serve from cache, fallback to network
@@ -222,6 +254,10 @@ async function syncGamificationData() {
 }
 
 // Message event - handle messages from the main app
+//
+// SKIP_WAITING is the only way a new worker takes over now: the page asks for
+// it after the person accepts the reload prompt. It sat here unreachable while
+// install() called skipWaiting() unconditionally.
 self.addEventListener('message', (event) => {
   console.log('[SW] Message received:', event.data);
 
