@@ -1,6 +1,9 @@
 // pm2 process topology.
 //
-// This existed only in the memory of the host that runs it: ci.yml and the
+// Names verified against `pm2 list` on the host that runs it on 2026-08-30;
+// the first version of this file guessed 'compass-web' and was wrong.
+//
+// This existed only in the memory of that host: ci.yml and the
 // header of scripts/serve-compass.mjs both refer to pm2, and nothing in the
 // repository said what it starts. A machine rebuild would have had to guess.
 //
@@ -12,7 +15,7 @@
 module.exports = {
   apps: [
     {
-      name: 'compass-web',
+      name: 'compass',
       script: 'scripts/serve-compass.mjs',
       cwd: __dirname,
       // Zero dependencies and no state, so a single process is enough and a

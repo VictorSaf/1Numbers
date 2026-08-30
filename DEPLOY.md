@@ -11,7 +11,7 @@ Două procese, pe aceeași mașină, pornite de pm2:
 
 | Proces | Comandă | Port | Rol |
 |---|---|---|---|
-| `compass-web` | `node scripts/serve-compass.mjs` | 8090 (loopback) | servește `dist/` |
+| `compass` | `node scripts/serve-compass.mjs` | 8090 (loopback) | servește `dist/` |
 | `compass-api` | `node server/dist/index.js` | 3001 (loopback) | API-ul Express |
 
 Amândouă ascultă pe `127.0.0.1`. Nimic nu e expus pe LAN.
@@ -38,8 +38,14 @@ Deploy-ul e manual, pe mașina care servește:
 git pull
 npm ci && npm run build            # frontend → dist/
 cd server && npm ci && npm run build && npm run migrate && cd ..
-pm2 restart ecosystem.config.cjs   # sau: pm2 reload compass-web compass-api
+pm2 restart compass compass-api
 ```
+
+Apoi, în browser: **`DevTools → Application → Service Workers → Unregister`.**
+Nu e opțional. Workerul înregistrat anterior servește shell-ul vechi de pe origin
+indiferent ce s-a deployat, iar un `Cmd+Shift+R` nu-l scoate. Verifici că te uiți
+la build-ul nou comparând hash-ul lui `index-*.js` din `Network` cu cel tipărit
+de `npm run build`.
 
 `npm run build` rulează și `prerender-meta`, `stamp-sw` și `emit-routes`, deci
 sitemap-ul, meta-ul per rută și numele cache-ului service workerului se
