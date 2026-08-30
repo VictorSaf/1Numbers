@@ -46,7 +46,7 @@ export const PersonalCycleCard = ({ birthDate, delay = 0 }: PersonalCycleCardPro
     >
       <div className="flex items-center gap-2 mb-4">
         <Calendar className="h-5 w-5 text-primary" />
-        <h3 className="font-cinzel text-lg text-foreground">
+        <h3 className="font-heading text-lg text-foreground">
           {language === 'ro' ? 'Ciclurile Personale' : language === 'ru' ? 'Личные Циклы' : 'Personal Cycles'}
         </h3>
       </div>
@@ -56,7 +56,7 @@ export const PersonalCycleCard = ({ birthDate, delay = 0 }: PersonalCycleCardPro
         <div className="text-center p-3 rounded-xl bg-primary/10 border border-primary/20">
           <Sun className="h-4 w-4 mx-auto text-primary mb-1" />
           <p className="text-xs text-muted-foreground">{labels.personalDay[language]}</p>
-          <p className="font-cinzel text-2xl text-primary">{personalDay}</p>
+          <p className="num text-2xl text-primary">{personalDay}</p>
           <p className="text-xs text-primary/70">{dayInfo?.keywords[language]}</p>
         </div>
 
@@ -64,7 +64,7 @@ export const PersonalCycleCard = ({ birthDate, delay = 0 }: PersonalCycleCardPro
         <div className="text-center p-3 rounded-xl bg-primary/10 border border-primary/20">
           <Moon className="h-4 w-4 mx-auto text-primary mb-1" />
           <p className="text-xs text-muted-foreground">{labels.personalMonth[language]}</p>
-          <p className="font-cinzel text-2xl text-primary">{personalMonth}</p>
+          <p className="num text-2xl text-primary">{personalMonth}</p>
           <p className="text-xs text-primary/70">{monthInfo?.keywords[language]}</p>
         </div>
 
@@ -72,14 +72,14 @@ export const PersonalCycleCard = ({ birthDate, delay = 0 }: PersonalCycleCardPro
         <div className="text-center p-3 rounded-xl bg-muted/50 border border-border/50">
           <Sun className="h-4 w-4 mx-auto text-muted-foreground mb-1" />
           <p className="text-xs text-muted-foreground">{labels.universalDay[language]}</p>
-          <p className="font-cinzel text-2xl text-foreground">{universalDay}</p>
+          <p className="num text-2xl text-foreground">{universalDay}</p>
         </div>
 
         {/* Universal Month */}
         <div className="text-center p-3 rounded-xl bg-muted/50 border border-border/50">
           <Moon className="h-4 w-4 mx-auto text-muted-foreground mb-1" />
           <p className="text-xs text-muted-foreground">{labels.universalMonth[language]}</p>
-          <p className="font-cinzel text-2xl text-foreground">{universalMonth}</p>
+          <p className="num text-2xl text-foreground">{universalMonth}</p>
         </div>
       </div>
 

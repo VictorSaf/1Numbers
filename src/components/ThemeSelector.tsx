@@ -1,5 +1,6 @@
-import { Palette, Sun, Moon, Sparkles, Star } from 'lucide-react';
+import { Sun, Moon, Monitor } from 'lucide-react';
 import { useTheme, ThemeName } from '@/contexts/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   Select,
   SelectContent,
@@ -7,44 +8,45 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
 
 const themeIcons: Record<ThemeName, typeof Sun> = {
-  twilight: Sun,
-  dawn: Sun,
-  midnight: Moon,
-  celestial: Sparkles,
-  custom: Palette,
+  light: Sun,
+  dark: Moon,
+  system: Monitor,
 };
 
-const themeLabels: Record<ThemeName, string> = {
-  twilight: 'Twilight',
-  dawn: 'Dawn',
-  midnight: 'Midnight',
-  celestial: 'Celestial',
-  custom: 'Custom',
+// Named for what they do, not for a mood. "Twilight", "Dawn", "Midnight" and
+// "Celestial" were four words for two palettes, and none of them told a reader
+// which one was the dark one -- the admin panel had even mislabelled two of them
+// as the opposite of what they were.
+const THEME_LABELS: Record<string, Record<ThemeName, string>> = {
+  ro: { light: 'Luminos', dark: 'Întunecat', system: 'Ca sistemul' },
+  en: { light: 'Light', dark: 'Dark', system: 'System' },
+  ru: { light: 'Светлая', dark: 'Тёмная', system: 'Как в системе' },
 };
 
 export const ThemeSelector = () => {
   const { theme, setTheme } = useTheme();
+  const { language } = useLanguage();
+  const labels = THEME_LABELS[language] ?? THEME_LABELS.en;
   const Icon = themeIcons[theme];
 
   return (
     <Select value={theme} onValueChange={(value) => setTheme(value as ThemeName)}>
-      <SelectTrigger className="w-[140px] input-mystic">
+      <SelectTrigger className="w-[150px] input-mystic">
         <div className="flex items-center gap-2">
           <Icon className="h-4 w-4 text-primary" />
-          <SelectValue>{themeLabels[theme]}</SelectValue>
+          <SelectValue>{labels[theme]}</SelectValue>
         </div>
       </SelectTrigger>
       <SelectContent>
-        {Object.entries(themeLabels).map(([value, label]) => {
-          const ThemeIcon = themeIcons[value as ThemeName];
+        {(Object.keys(themeIcons) as ThemeName[]).map((value) => {
+          const ThemeIcon = themeIcons[value];
           return (
             <SelectItem key={value} value={value}>
               <div className="flex items-center gap-2">
                 <ThemeIcon className="h-4 w-4" />
-                <span>{label}</span>
+                <span>{labels[value]}</span>
               </div>
             </SelectItem>
           );
@@ -53,4 +55,3 @@ export const ThemeSelector = () => {
     </Select>
   );
 };
-

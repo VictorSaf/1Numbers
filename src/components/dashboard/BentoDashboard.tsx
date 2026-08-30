@@ -205,7 +205,7 @@ export const BentoDashboard = ({
     <div className="w-full max-w-7xl mx-auto px-4 py-6">
       {/* Greeting */}
       <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-cinzel font-bold text-foreground">
+        <h1 className="text-2xl md:text-3xl font-heading font-bold text-foreground">
           {text.greeting}
           {userName && <span className="text-primary">, {userName.split(' ')[0]}</span>}
         </h1>
@@ -242,13 +242,13 @@ export const BentoDashboard = ({
               <div className="flex flex-col items-end gap-2">
                 <div className="flex items-center gap-3">
                   <div className="text-center">
-                    <span className="text-2xl font-cinzel font-bold text-primary">
+                    <span className="text-2xl num font-bold text-primary">
                       {numbers.personalMonth}
                     </span>
                     <p className="text-xs text-muted-foreground">{text.personalMonth}</p>
                   </div>
                   <div className="text-center">
-                    <span className="text-2xl font-cinzel font-bold text-primary">
+                    <span className="text-2xl num font-bold text-primary">
                       {numbers.personalYear}
                     </span>
                     <p className="text-xs text-muted-foreground">{text.personalYear}</p>

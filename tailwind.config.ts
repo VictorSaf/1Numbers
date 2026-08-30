@@ -23,7 +23,7 @@ export default {
         // Any column of numbers uses this; tabular-nums is applied by the
         // .num utility so figures line up down the column.
         mono: ["var(--font-mono)"],
-        cinzel: ["var(--font-heading)", "serif"],
+        heading: ["var(--font-heading)", "Georgia", "serif"],
         raleway: ["var(--font-body)", "sans-serif"],
       },
       colors: {
@@ -39,6 +39,17 @@ export default {
         ink: { DEFAULT: "hsl(var(--ink))", 2: "hsl(var(--ink-2))" },
         faint: "hsl(var(--faint))",
         line: { DEFAULT: "hsl(var(--line))", 2: "hsl(var(--line-2))" },
+        // The relations between numbers: a bridge that is wide, a plane that is
+        // unbalanced, a year of duality. They used to be drawn in the accent like
+        // everything else, so nothing on the page could tell agreement from strain.
+        tension: {
+          DEFAULT: "hsl(var(--tension))",
+          soft: "hsl(var(--tension-soft))",
+        },
+        harmony: {
+          DEFAULT: "hsl(var(--harmony))",
+          soft: "hsl(var(--harmony-soft))",
+        },
         ok: { DEFAULT: "hsl(var(--ok))", soft: "hsl(var(--ok-soft))", ink: "hsl(var(--ok-ink))" },
         warn: { DEFAULT: "hsl(var(--warn))", soft: "hsl(var(--warn-soft))", ink: "hsl(var(--warn-ink))" },
         crit: { DEFAULT: "hsl(var(--crit))", soft: "hsl(var(--crit-soft))", ink: "hsl(var(--crit-ink))" },

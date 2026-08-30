@@ -19,7 +19,7 @@ export const PersonalStatistics = ({ statistics, className }: PersonalStatistics
               <BarChart3 className="h-4 w-4 text-primary" />
               <span className="text-sm text-muted-foreground">Total</span>
             </div>
-            <p className="text-2xl font-cinzel font-bold text-foreground">
+            <p className="text-2xl font-heading font-bold text-foreground">
               {statistics.totalEntries}
             </p>
           </CardContent>
@@ -31,7 +31,7 @@ export const PersonalStatistics = ({ statistics, className }: PersonalStatistics
               <Calendar className="h-4 w-4 text-primary" />
               <span className="text-sm text-muted-foreground">Jurnal</span>
             </div>
-            <p className="text-2xl font-cinzel font-bold text-foreground">
+            <p className="text-2xl font-heading font-bold text-foreground">
               {statistics.entriesByType.journal || 0}
             </p>
           </CardContent>
@@ -43,7 +43,7 @@ export const PersonalStatistics = ({ statistics, className }: PersonalStatistics
               <TrendingUp className="h-4 w-4 text-primary" />
               <span className="text-sm text-muted-foreground">Previziuni</span>
             </div>
-            <p className="text-2xl font-cinzel font-bold text-foreground">
+            <p className="text-2xl font-heading font-bold text-foreground">
               {statistics.entriesByType.prediction || 0}
             </p>
           </CardContent>
@@ -55,7 +55,7 @@ export const PersonalStatistics = ({ statistics, className }: PersonalStatistics
               <Tag className="h-4 w-4 text-primary" />
               <span className="text-sm text-muted-foreground">Tag-uri</span>
             </div>
-            <p className="text-2xl font-cinzel font-bold text-foreground">
+            <p className="text-2xl font-heading font-bold text-foreground">
               {statistics.topTags.length}
             </p>
           </CardContent>

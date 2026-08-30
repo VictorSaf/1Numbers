@@ -95,7 +95,7 @@ export const DashboardSection = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-cinzel font-bold mb-2">Dashboard</h2>
+        <h2 className="text-2xl font-heading font-bold mb-2">Dashboard</h2>
         <p className="text-muted-foreground">Overview of your platform metrics</p>
       </div>
 

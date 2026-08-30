@@ -38,7 +38,7 @@ export const RelationshipDynamicsCard = ({ compatibility }: RelationshipDynamics
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="font-cinzel text-primary">
+            <CardTitle className="font-heading text-primary">
               {t.compatibility?.relationshipDynamics || "Dinamica Relației"}
             </CardTitle>
             <CardDescription>
@@ -56,7 +56,7 @@ export const RelationshipDynamicsCard = ({ compatibility }: RelationshipDynamics
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-ok">
               <Shield className="h-5 w-5" />
-              <h3 className="font-cinzel text-lg text-foreground">
+              <h3 className="font-heading text-lg text-foreground">
                 {t.compatibility?.strengths || "Puncte Forte"}
               </h3>
             </div>
@@ -81,7 +81,7 @@ export const RelationshipDynamicsCard = ({ compatibility }: RelationshipDynamics
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-warn">
               <AlertTriangle className="h-5 w-5" />
-              <h3 className="font-cinzel text-lg text-foreground">
+              <h3 className="font-heading text-lg text-foreground">
                 {t.compatibility?.challenges || "Provocări"}
               </h3>
             </div>
@@ -103,7 +103,7 @@ export const RelationshipDynamicsCard = ({ compatibility }: RelationshipDynamics
 
         {/* Dynamics */}
         <div className="space-y-4">
-          <h3 className="font-cinzel text-lg text-foreground flex items-center gap-2">
+          <h3 className="font-heading text-lg text-foreground flex items-center gap-2">
             <MessageSquare className="h-5 w-5 text-primary" />
             {t.compatibility?.dynamics || "Dinamica"}
           </h3>
@@ -151,7 +151,7 @@ export const RelationshipDynamicsCard = ({ compatibility }: RelationshipDynamics
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-primary">
               <Lightbulb className="h-5 w-5" />
-              <h3 className="font-cinzel text-lg text-foreground">
+              <h3 className="font-heading text-lg text-foreground">
                 {t.compatibility?.recommendations || "Recomandări"}
               </h3>
             </div>

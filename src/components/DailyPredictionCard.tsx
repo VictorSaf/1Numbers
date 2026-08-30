@@ -48,7 +48,7 @@ export const DailyPredictionCard = ({ prediction, birthDate, date }: DailyPredic
     <Card className="card-mystic">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="font-cinzel text-xl text-gradient-gold">
+          <CardTitle className="font-heading text-xl text-gradient-gold">
             {predExt.daily}
           </CardTitle>
           <div 
@@ -63,7 +63,7 @@ export const DailyPredictionCard = ({ prediction, birthDate, date }: DailyPredic
         <div>
           <div className="flex items-center gap-2 mb-3">
             <Lightbulb className="h-5 w-5 text-primary" />
-            <h3 className="font-cinzel text-lg text-foreground">{labels.recommendations}</h3>
+            <h3 className="font-heading text-lg text-foreground">{labels.recommendations}</h3>
           </div>
           <ul className="space-y-2">
             {recommendations.map((rec, index) => (
@@ -79,7 +79,7 @@ export const DailyPredictionCard = ({ prediction, birthDate, date }: DailyPredic
         <div>
           <div className="flex items-center gap-2 mb-2">
             <Palette className="h-5 w-5 text-primary" />
-            <h3 className="font-cinzel text-sm text-foreground">{labels.color}</h3>
+            <h3 className="font-heading text-sm text-foreground">{labels.color}</h3>
           </div>
           <Badge className="bg-primary/20 text-primary border-primary/30">
             {color.name}
@@ -90,7 +90,7 @@ export const DailyPredictionCard = ({ prediction, birthDate, date }: DailyPredic
         <div>
           <div className="flex items-center gap-2 mb-2">
             <Music className="h-5 w-5 text-primary" />
-            <h3 className="font-cinzel text-sm text-foreground">{labels.music}</h3>
+            <h3 className="font-heading text-sm text-foreground">{labels.music}</h3>
           </div>
           <div className="flex flex-wrap gap-2">
             {music.map((genre, index) => (
@@ -105,7 +105,7 @@ export const DailyPredictionCard = ({ prediction, birthDate, date }: DailyPredic
         <div>
           <div className="flex items-center gap-2 mb-2">
             <Clock className="h-5 w-5 text-primary" />
-            <h3 className="font-cinzel text-sm text-foreground">{labels.luckyHours}</h3>
+            <h3 className="font-heading text-sm text-foreground">{labels.luckyHours}</h3>
           </div>
           <div className="flex flex-wrap gap-2">
             {prediction.luckyHours.map((hour, index) => (

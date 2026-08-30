@@ -88,7 +88,7 @@ export const ArticleLibrary = ({ articles, onArticleSelect, className }: Article
             >
               <CardHeader>
                 <div className="flex items-start justify-between mb-2">
-                  <CardTitle className="font-cinzel text-lg text-foreground line-clamp-2">
+                  <CardTitle className="font-heading text-lg text-foreground line-clamp-2">
                     {article.title[language] ?? article.title.en}
                   </CardTitle>
                   {article.featured && (

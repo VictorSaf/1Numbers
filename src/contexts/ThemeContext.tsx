@@ -1,43 +1,33 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-export type ThemeName = 'twilight' | 'dawn' | 'midnight' | 'celestial' | 'custom';
-
-export interface CustomTheme {
-  name: string;
-  primary: string;
-  secondary: string;
-  accent: string;
-  background: string;
-  foreground: string;
-}
-
-export interface DisplaySettings {
-  fontSize: 'small' | 'medium' | 'large';
-  contrast: 'normal' | 'high';
-  animations: boolean;
-  layout: 'compact' | 'comfortable' | 'spacious';
-}
+/**
+ * Light, dark, or whatever the system says.
+ *
+ * There used to be four named themes and a fifth "custom" one. Three of the
+ * four -- twilight, midnight, celestial -- were byte-identical across all
+ * thirty-seven palette tokens and differed only in --accent and --accent-ink;
+ * twilight was itself a verbatim copy of the dark block, dawn of the light one.
+ * Four names for two palettes and a hue dial.
+ *
+ * The dial is gone with them. An accent that changes per theme is a logo that
+ * changes per page, and the numbers this product is about are easier to read
+ * against one identity than four.
+ *
+ * Gone with them too: customTheme, setCustomTheme and saveThemePreference, none
+ * of which had a single caller anywhere in the application; and the display
+ * settings, whose only screen had no importer -- see the note on Settings in
+ * docs/remediere-2026-08-note.md.
+ */
+export type ThemeName = 'light' | 'dark' | 'system';
 
 interface ThemeContextType {
   theme: ThemeName;
-  customTheme: CustomTheme | null;
-  displaySettings: DisplaySettings;
   setTheme: (theme: ThemeName) => void;
-  setCustomTheme: (theme: CustomTheme | null) => void;
-  updateDisplaySettings: (settings: Partial<DisplaySettings>) => void;
-  saveThemePreference: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-const defaultDisplaySettings: DisplaySettings = {
-  fontSize: 'medium',
-  contrast: 'normal',
-  animations: true,
-  layout: 'comfortable',
-};
-
-const THEME_NAMES: ThemeName[] = ['twilight', 'dawn', 'midnight', 'celestial', 'custom'];
+const THEME_NAMES: ThemeName[] = ['light', 'dark', 'system'];
 
 /** localStorage throws in some privacy modes, so every read is guarded. */
 function read<T>(key: string, parse: (raw: string) => T | null, fallback: T): T {
@@ -52,102 +42,32 @@ function read<T>(key: string, parse: (raw: string) => T | null, fallback: T): T 
 }
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  // Read during the first render, not in an effect afterwards.
-  //
-  // The effect that used to do this ran after the first paint, so every load
-  // showed the default theme for a frame and then swapped -- a visible flash on
-  // every single page view for anyone whose theme was not 'twilight'.
+  // Read during the first render, not in an effect afterwards. The effect that
+  // used to do this ran after the first paint, so every load showed the default
+  // for a frame and then swapped -- a visible flash on every page view.
   const [theme, setThemeState] = useState<ThemeName>(() =>
-    read('theme', (raw) => (THEME_NAMES.includes(raw as ThemeName) ? (raw as ThemeName) : null), 'twilight'),
-  );
-  const [customTheme, setCustomThemeState] = useState<CustomTheme | null>(() =>
-    read<CustomTheme | null>('customTheme', (raw) => JSON.parse(raw) as CustomTheme, null),
-  );
-  const [displaySettings, setDisplaySettingsState] = useState<DisplaySettings>(() =>
-    read('displaySettings', (raw) => ({ ...defaultDisplaySettings, ...JSON.parse(raw) }), defaultDisplaySettings),
+    read('theme', (raw) => (THEME_NAMES.includes(raw as ThemeName) ? (raw as ThemeName) : null), 'system'),
   );
 
-  // Apply theme to document
   useEffect(() => {
     const root = document.documentElement;
-    
-    // Remove all theme classes
-    root.classList.remove('theme-twilight', 'theme-dawn', 'theme-midnight', 'theme-celestial', 'theme-custom');
-    
-    // Add current theme class
-    root.classList.add(`theme-${theme}`);
+    // 'system' means: say nothing, and let the prefers-color-scheme block in
+    // index.css answer. The attribute is what the two explicit choices set.
+    if (theme === 'system') root.removeAttribute('data-theme');
+    else root.setAttribute('data-theme', theme);
+  }, [theme]);
 
-    // Apply custom theme if active
-    if (theme === 'custom' && customTheme) {
-      applyCustomTheme(customTheme);
+  const setTheme = (next: ThemeName) => {
+    setThemeState(next);
+    try {
+      localStorage.setItem('theme', next);
+    } catch {
+      // A choice that cannot be stored still applies to this session.
     }
-  }, [theme, customTheme]);
-
-  // Apply display settings
-  useEffect(() => {
-    const root = document.documentElement;
-    
-    // Font size
-    root.style.setProperty('--font-size-multiplier', getFontSizeMultiplier(displaySettings.fontSize));
-    
-    // Contrast
-    if (displaySettings.contrast === 'high') {
-      root.classList.add('high-contrast');
-    } else {
-      root.classList.remove('high-contrast');
-    }
-    
-    // Animations
-    if (!displaySettings.animations) {
-      root.classList.add('no-animations');
-    } else {
-      root.classList.remove('no-animations');
-    }
-    
-    // Layout
-    root.setAttribute('data-layout', displaySettings.layout);
-  }, [displaySettings]);
-
-  const setTheme = (newTheme: ThemeName) => {
-    setThemeState(newTheme);
-    localStorage.setItem('theme', newTheme);
-  };
-
-  const setCustomTheme = (theme: CustomTheme | null) => {
-    setCustomThemeState(theme);
-    if (theme) {
-      localStorage.setItem('customTheme', JSON.stringify(theme));
-      setThemeState('custom');
-    } else {
-      localStorage.removeItem('customTheme');
-    }
-  };
-
-  const updateDisplaySettings = (settings: Partial<DisplaySettings>) => {
-    setDisplaySettingsState(prev => ({ ...prev, ...settings }));
-    localStorage.setItem('displaySettings', JSON.stringify({ ...displaySettings, ...settings }));
-  };
-
-  const saveThemePreference = () => {
-    localStorage.setItem('theme', theme);
-    if (customTheme) {
-      localStorage.setItem('customTheme', JSON.stringify(customTheme));
-    }
-    localStorage.setItem('displaySettings', JSON.stringify(displaySettings));
   };
 
   return (
-    <ThemeContext.Provider
-      value={{
-        theme,
-        customTheme,
-        displaySettings,
-        setTheme,
-        setCustomTheme,
-        updateDisplaySettings,
-        saveThemePreference,
-      }}
-    >
+    <ThemeContext.Provider value={{ theme, setTheme }}>
       {children}
     </ThemeContext.Provider>
   );
@@ -160,36 +80,3 @@ export const useTheme = () => {
   }
   return context;
 };
-
-// Helper functions
-const getFontSizeMultiplier = (size: DisplaySettings['fontSize']): string => {
-  switch (size) {
-    case 'small':
-      return '0.875';
-    case 'large':
-      return '1.125';
-    default:
-      return '1';
-  }
-};
-
-const applyCustomTheme = (theme: CustomTheme) => {
-  const root = document.documentElement;
-  
-  // Parse HSL values from theme
-  const parseHSL = (hsl: string) => {
-    // Expected format: "hue saturation% lightness%"
-    const match = hsl.match(/(\d+)\s+(\d+)%\s+(\d+)%/);
-    if (match) {
-      return `${match[1]} ${match[2]}% ${match[3]}%`;
-    }
-    return hsl;
-  };
-
-  root.style.setProperty('--primary', parseHSL(theme.primary));
-  root.style.setProperty('--secondary', parseHSL(theme.secondary));
-  root.style.setProperty('--accent', parseHSL(theme.accent));
-  root.style.setProperty('--background', parseHSL(theme.background));
-  root.style.setProperty('--foreground', parseHSL(theme.foreground));
-};
-

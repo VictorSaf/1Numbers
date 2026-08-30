@@ -72,7 +72,7 @@ export const WeeklyMonthlyPredictionCard = ({
     return (
       <Card className="card-mystic">
         <CardHeader>
-          <CardTitle className="font-cinzel text-xl text-gradient-gold flex items-center gap-2">
+          <CardTitle className="font-heading text-xl text-gradient-gold flex items-center gap-2">
             <Calendar className="h-5 w-5" />
             {labels.weekly}
           </CardTitle>
@@ -82,12 +82,12 @@ export const WeeklyMonthlyPredictionCard = ({
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <h3 className="font-cinzel text-sm text-primary mb-2">{labels.theme}</h3>
+            <h3 className="font-heading text-sm text-primary mb-2">{labels.theme}</h3>
             <p className="text-foreground font-medium">{weeklyData.theme}</p>
           </div>
           
           <div>
-            <h3 className="font-cinzel text-sm text-primary mb-2">{labels.energy}</h3>
+            <h3 className="font-heading text-sm text-primary mb-2">{labels.energy}</h3>
             <Badge className="bg-primary/20 text-primary border-primary/30">
               {weeklyData.overallEnergy}
             </Badge>
@@ -95,7 +95,7 @@ export const WeeklyMonthlyPredictionCard = ({
           
           {weeklyData.keyEvents.length > 0 && (
             <div>
-              <h3 className="font-cinzel text-sm text-primary mb-2 flex items-center gap-2">
+              <h3 className="font-heading text-sm text-primary mb-2 flex items-center gap-2">
                 <Sparkles className="h-4 w-4" />
                 {labels.events}
               </h3>
@@ -112,7 +112,7 @@ export const WeeklyMonthlyPredictionCard = ({
           
           {weeklyData.focusAreas.length > 0 && (
             <div>
-              <h3 className="font-cinzel text-sm text-primary mb-2 flex items-center gap-2">
+              <h3 className="font-heading text-sm text-primary mb-2 flex items-center gap-2">
                 <Target className="h-4 w-4" />
                 {labels.focus}
               </h3>
@@ -127,7 +127,7 @@ export const WeeklyMonthlyPredictionCard = ({
           )}
           
           <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
-            <h3 className="font-cinzel text-sm text-primary mb-1">{labels.advice}</h3>
+            <h3 className="font-heading text-sm text-primary mb-1">{labels.advice}</h3>
             <p className="text-sm text-foreground/90">{weeklyData.advice}</p>
           </div>
         </CardContent>
@@ -142,20 +142,20 @@ export const WeeklyMonthlyPredictionCard = ({
     return (
       <Card className="card-mystic">
         <CardHeader>
-          <CardTitle className="font-cinzel text-xl text-gradient-gold flex items-center gap-2">
+          <CardTitle className="font-heading text-xl text-gradient-gold flex items-center gap-2">
             <Calendar className="h-5 w-5" />
             {labels.monthly}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <h3 className="font-cinzel text-sm text-primary mb-2">{labels.theme}</h3>
+            <h3 className="font-heading text-sm text-primary mb-2">{labels.theme}</h3>
             <p className="text-foreground font-medium">{monthlyData.theme}</p>
           </div>
           
           {focusAreas.length > 0 && (
             <div>
-              <h3 className="font-cinzel text-sm text-primary mb-2 flex items-center gap-2">
+              <h3 className="font-heading text-sm text-primary mb-2 flex items-center gap-2">
                 <Target className="h-4 w-4" />
                 {labels.focus}
               </h3>
@@ -171,7 +171,7 @@ export const WeeklyMonthlyPredictionCard = ({
           
           {recommendations.length > 0 && (
             <div>
-              <h3 className="font-cinzel text-sm text-primary mb-2 flex items-center gap-2">
+              <h3 className="font-heading text-sm text-primary mb-2 flex items-center gap-2">
                 <TrendingUp className="h-4 w-4" />
                 {labels.recommendations}
               </h3>

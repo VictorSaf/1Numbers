@@ -385,7 +385,7 @@ const Tools = () => {
             <TabsContent value="calendar">
               <Card className="card-mystic">
                 <CardHeader>
-                  <CardTitle className="font-cinzel text-primary">{t.calendar}</CardTitle>
+                  <CardTitle className="font-heading text-primary">{t.calendar}</CardTitle>
                   <CardDescription>{t.calendarSubtitle}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -433,7 +433,7 @@ const Tools = () => {
             <TabsContent value="loshu">
               <Card className="card-mystic">
                 <CardHeader>
-                  <CardTitle className="font-cinzel text-primary">{t.loShuGrid}</CardTitle>
+                  <CardTitle className="font-heading text-primary">{t.loShuGrid}</CardTitle>
                   <CardDescription>{t.loShuSubtitle}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -467,7 +467,7 @@ const Tools = () => {
             <TabsContent value="name-change">
               <Card className="card-mystic">
                 <CardHeader>
-                  <CardTitle className="font-cinzel text-primary">{t.nameChange}</CardTitle>
+                  <CardTitle className="font-heading text-primary">{t.nameChange}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -520,7 +520,7 @@ const Tools = () => {
             <TabsContent value="business">
               <Card className="card-mystic">
                 <CardHeader>
-                  <CardTitle className="font-cinzel text-primary">{t.businessName}</CardTitle>
+                  <CardTitle className="font-heading text-primary">{t.businessName}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
@@ -534,7 +534,7 @@ const Tools = () => {
                       <div className="flex items-center gap-4">
                         <div className="number-display">{businessAnalysis.destinyNumber}</div>
                         <div>
-                          <div className="text-lg font-cinzel text-foreground">{businessAnalysis.name}</div>
+                          <div className="text-lg font-heading text-foreground">{businessAnalysis.name}</div>
                           <Badge className={businessAnalysis.vibrationalEnergy === 'strong' ? 'bg-ok/20 text-ok' : businessAnalysis.vibrationalEnergy === 'moderate' ? 'bg-warn/20 text-warn' : 'bg-crit/20 text-crit'}>
                             {t.vibrationalEnergy}: {t[businessAnalysis.vibrationalEnergy]}
                           </Badge>
@@ -565,7 +565,7 @@ const Tools = () => {
             <TabsContent value="forecast">
               <Card className="card-mystic">
                 <CardHeader>
-                  <CardTitle className="font-cinzel text-primary">{t.yearForecast}</CardTitle>
+                  <CardTitle className="font-heading text-primary">{t.yearForecast}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -585,7 +585,7 @@ const Tools = () => {
                       <div className="flex items-center gap-4">
                         <div className="number-display-large">{yearForecast.personalYearNumber}</div>
                         <div>
-                          <div className="text-lg font-cinzel text-foreground">{yearForecast.year}</div>
+                          <div className="text-lg num text-foreground">{yearForecast.year}</div>
                           <p className="text-sm text-muted-foreground">{t.overallTheme}</p>
                         </div>
                       </div>
@@ -601,7 +601,7 @@ const Tools = () => {
                       )}
                       
                       <div className="space-y-2">
-                        <h4 className="font-cinzel text-foreground">{t.monthlyForecast}</h4>
+                        <h4 className="font-heading text-foreground">{t.monthlyForecast}</h4>
                         {yearForecast.monthlyForecasts.map((month) => (
                           <Card key={month.month} className="bg-card/30 cursor-pointer" onClick={() => setExpandedMonth(expandedMonth === month.month ? null : month.month)}>
                             <CardHeader className="py-3 flex flex-row items-center justify-between">
@@ -633,7 +633,7 @@ const Tools = () => {
             <TabsContent value="optimizer">
               <Card className="card-mystic">
                 <CardHeader>
-                  <CardTitle className="font-cinzel text-primary">{t.nameOptimizer}</CardTitle>
+                  <CardTitle className="font-heading text-primary">{t.nameOptimizer}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
@@ -659,7 +659,7 @@ const Tools = () => {
                   
                   {nameSuggestions && (
                     <div className="mt-6 space-y-3 animate-fade-in">
-                      <h4 className="font-cinzel text-foreground">{t.suggestions}</h4>
+                      <h4 className="font-heading text-foreground">{t.suggestions}</h4>
                       {nameSuggestions.length === 0 ? (
                         <p className="text-muted-foreground text-sm">{t.noSuggestions}</p>
                       ) : (
@@ -685,7 +685,7 @@ const Tools = () => {
             <TabsContent value="matrix">
               <Card className="card-mystic">
                 <CardHeader>
-                  <CardTitle className="font-cinzel text-primary">{t.compatMatrix}</CardTitle>
+                  <CardTitle className="font-heading text-primary">{t.compatMatrix}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
@@ -703,7 +703,7 @@ const Tools = () => {
                             onClick={() => setSelectedCompatNumber(selectedCompatNumber === number ? null : number)}
                             className={`p-3 rounded-lg border transition-all ${selectedCompatNumber === number ? 'border-primary bg-primary/20' : 'border-border/30 bg-card/30 hover:bg-card/50'}`}
                           >
-                            <div className="text-2xl font-cinzel text-primary">{number}</div>
+                            <div className="text-2xl num text-primary">{number}</div>
                             <div className={`text-sm font-bold ${getScoreColor(detail.score)}`}>{detail.score}%</div>
                           </button>
                         ))}

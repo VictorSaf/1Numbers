@@ -133,7 +133,19 @@ export const Component = ({ ... }: Props) => {
 
 ### Styling
 
-Custom `mystic-*` colors (gold, purple, violet, indigo). Fonts: Cinzel (headings), Raleway (body). CSS variables in `index.css`.
+Every colour is a token in `src/index.css`; nothing in `src/components` or
+`src/pages` names an `hsl()` of its own, and a test enforces that. Two palettes,
+light and dark, chosen with `data-theme` or followed from `prefers-color-scheme`
+— there is no theme switcher beyond those and no named themes.
+
+Three faces, each with a job: **Literata** for headings and interpretation prose
+(`font-heading`), **IBM Plex Mono** for every numeral, label and coordinate
+(`.num`, which also turns on tabular figures), **Raleway** for interface chrome
+(`font-raleway`). Self-hosted from `public/fonts/`, one file per subset.
+
+`--tension` and `--harmony` carry the relations between numbers — a wide bridge,
+an unbalanced plane. They are deliberately not `--crit`/`--ok`: a bridge of 6 is
+a distance, not an error.
 
 Custom utilities: `.text-gradient-gold`, `.glow-gold`, `.card-mystic`, `.number-display`, `.btn-mystic`
 

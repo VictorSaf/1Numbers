@@ -150,9 +150,9 @@ const Compatibility = () => {
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 mb-4">
                     <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
-                      <span className="text-primary font-cinzel text-sm">1</span>
+                      <span className="text-primary num text-sm">1</span>
                     </div>
-                    <h3 className="font-cinzel text-lg text-foreground">{t.person1}</h3>
+                    <h3 className="font-heading text-lg text-foreground">{t.person1}</h3>
                   </div>
                   
                   <div className="space-y-2">
@@ -175,9 +175,9 @@ const Compatibility = () => {
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 mb-4">
                     <div className="w-8 h-8 rounded-full bg-accent/20 border border-accent/30 flex items-center justify-center">
-                      <span className="text-accent-foreground font-cinzel text-sm">2</span>
+                      <span className="text-accent-foreground num text-sm">2</span>
                     </div>
-                    <h3 className="font-cinzel text-lg text-foreground">{t.person2}</h3>
+                    <h3 className="font-heading text-lg text-foreground">{t.person2}</h3>
                   </div>
                   
                   <div className="space-y-2">
@@ -226,9 +226,9 @@ const Compatibility = () => {
               {/* Names Header */}
               <div className="text-center space-y-4">
                 <div className="flex items-center justify-center gap-4 flex-wrap">
-                  <span className="font-cinzel text-xl md:text-2xl text-foreground">{person1.fullName}</span>
+                  <span className="font-heading text-xl md:text-2xl text-foreground">{person1.fullName}</span>
                   <Heart className="h-6 w-6 text-primary animate-pulse-glow" />
-                  <span className="font-cinzel text-xl md:text-2xl text-foreground">{person2.fullName}</span>
+                  <span className="font-heading text-xl md:text-2xl text-foreground">{person2.fullName}</span>
                 </div>
               </div>
 
@@ -242,12 +242,12 @@ const Compatibility = () => {
                   {t.overallCompatibility}
                 </span>
                 <div className={cn(
-                  "font-cinzel text-7xl md:text-8xl font-bold my-4",
+                  "num text-7xl md:text-8xl font-bold my-4",
                   getScoreColor(result.overallScore)
                 )}>
                   {result.overallScore}%
                 </div>
-                <span className="font-cinzel text-xl text-foreground">
+                <span className="font-heading text-xl text-foreground">
                   {t.compatibilityLevels[getCompatibilityLevel(result.overallScore)]}
                 </span>
                 <p className="text-muted-foreground mt-4 max-w-lg mx-auto">
@@ -279,15 +279,15 @@ const Compatibility = () => {
                       {item.title}
                     </span>
                     <div className="flex items-center justify-center gap-3 my-4">
-                      <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center font-cinzel text-lg text-primary">
+                      <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center num text-lg text-primary">
                         {item.data.person1}
                       </div>
                       <span className="text-muted-foreground">+</span>
-                      <div className="w-12 h-12 rounded-full bg-accent/10 border border-accent/30 flex items-center justify-center font-cinzel text-lg text-accent-foreground">
+                      <div className="w-12 h-12 rounded-full bg-accent/10 border border-accent/30 flex items-center justify-center num text-lg text-accent-foreground">
                         {item.data.person2}
                       </div>
                     </div>
-                    <div className={cn("font-cinzel text-2xl font-bold", getScoreColor(item.data.score))}>
+                    <div className={cn("num text-2xl font-bold", getScoreColor(item.data.score))}>
                       {item.data.score}%
                     </div>
                     <span className="text-xs text-muted-foreground">

@@ -181,7 +181,7 @@ const Predictions = () => {
           <div className="card-mystic rounded-xl p-6 text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
               <Sun className="h-6 w-6 text-primary" />
-              <h2 className="font-cinzel text-xl text-foreground">{l.universalDay}</h2>
+              <h2 className="font-heading text-xl text-foreground">{l.universalDay}</h2>
             </div>
             <div className="number-display mx-auto mb-4">
               {universalEnergy.number}
@@ -196,7 +196,7 @@ const Predictions = () => {
           {!birthDate && (
             <div className="card-mystic rounded-xl p-8 text-center">
               <Sparkles className="h-12 w-12 text-primary mx-auto mb-4" />
-              <h3 className="font-cinzel text-xl text-foreground mb-2">{l.enterBirthDate}</h3>
+              <h3 className="font-heading text-xl text-foreground mb-2">{l.enterBirthDate}</h3>
               <BirthDateSelect value={birthDate} onChange={setBirthDate} />
             </div>
           )}
@@ -226,36 +226,36 @@ const Predictions = () => {
                     />
                     <div className="card-mystic rounded-xl p-6 space-y-6">
                       <div className="text-center">
-                        <h3 className="font-cinzel text-lg text-muted-foreground">{l.personalDay}</h3>
+                        <h3 className="font-heading text-lg text-muted-foreground">{l.personalDay}</h3>
                         <div className="number-display-large mx-auto my-4 animate-float">
                           {dailyPrediction.number}
                         </div>
-                        <p className="text-primary font-cinzel text-xl capitalize">{dailyPrediction.energy}</p>
+                        <p className="text-primary font-heading text-xl capitalize">{dailyPrediction.energy}</p>
                       </div>
 
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                          <h4 className="font-cinzel text-sm text-primary mb-2">{l.focus}</h4>
+                          <h4 className="font-heading text-sm text-primary mb-2">{l.focus}</h4>
                           <p className="text-foreground/90 capitalize">{dailyPrediction.focus}</p>
                         </div>
                         <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                          <h4 className="font-cinzel text-sm text-primary mb-2">{l.luckyHours}</h4>
+                          <h4 className="font-heading text-sm text-primary mb-2">{l.luckyHours}</h4>
                           <p className="text-foreground/90">{dailyPrediction.luckyHours.join(', ')}</p>
                         </div>
                       </div>
 
                       <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
-                        <h4 className="font-cinzel text-sm text-primary mb-2">{l.advice}</h4>
+                        <h4 className="font-heading text-sm text-primary mb-2">{l.advice}</h4>
                         <p className="text-foreground/90">{dailyPrediction.advice}</p>
                       </div>
 
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                          <h4 className="font-cinzel text-sm text-destructive/80 mb-2">{l.challenges}</h4>
+                          <h4 className="font-heading text-sm text-destructive/80 mb-2">{l.challenges}</h4>
                           <p className="text-foreground/80 text-sm">{dailyPrediction.challenges}</p>
                         </div>
                         <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                          <h4 className="font-cinzel text-sm text-ok mb-2">{l.opportunities}</h4>
+                          <h4 className="font-heading text-sm text-ok mb-2">{l.opportunities}</h4>
                           <p className="text-foreground/80 text-sm">{dailyPrediction.opportunities}</p>
                         </div>
                       </div>
@@ -284,14 +284,14 @@ const Predictions = () => {
                     )}
                     {annualTheme && (
                       <div className="card-mystic rounded-xl p-6 space-y-4">
-                        <h3 className="font-cinzel text-xl text-gradient-gold">{l.personalMonth} - {selectedYear}</h3>
+                        <h3 className="font-heading text-xl text-gradient-gold">{l.personalMonth} - {selectedYear}</h3>
                         <div>
-                          <h4 className="font-cinzel text-sm text-primary mb-2">{annualTheme.theme}</h4>
+                          <h4 className="font-heading text-sm text-primary mb-2">{annualTheme.theme}</h4>
                           <p className="text-foreground/90">{annualTheme.description}</p>
                         </div>
                         {annualOpportunities && annualOpportunities.length > 0 && (
                           <div>
-                            <h4 className="font-cinzel text-sm text-primary mb-2">Oportunități</h4>
+                            <h4 className="font-heading text-sm text-primary mb-2">Oportunități</h4>
                             <ul className="space-y-1">
                               {annualOpportunities.slice(0, 5).map((opp, index) => (
                                 <li key={index} className="text-sm text-foreground/90 flex items-start gap-2">
@@ -304,7 +304,7 @@ const Predictions = () => {
                         )}
                         {annualChallenges && annualChallenges.length > 0 && (
                           <div>
-                            <h4 className="font-cinzel text-sm text-destructive/80 mb-2">Provocări</h4>
+                            <h4 className="font-heading text-sm text-destructive/80 mb-2">Provocări</h4>
                             <ul className="space-y-1">
                               {annualChallenges.slice(0, 5).map((challenge, index) => (
                                 <li key={index} className="text-sm text-foreground/80 flex items-start gap-2">
@@ -319,47 +319,47 @@ const Predictions = () => {
                     )}
                     <div className="card-mystic rounded-xl p-6 space-y-6">
                     <div className="text-center">
-                      <h3 className="font-cinzel text-lg text-muted-foreground">{l.personalMonth}</h3>
+                      <h3 className="font-heading text-lg text-muted-foreground">{l.personalMonth}</h3>
                       <div className="number-display-large mx-auto my-4 animate-float">
                         {monthlyPrediction.number}
                       </div>
-                      <p className="text-primary font-cinzel text-xl">{monthlyPrediction.theme}</p>
+                      <p className="text-primary font-heading text-xl">{monthlyPrediction.theme}</p>
                     </div>
 
                     <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
-                      <h4 className="font-cinzel text-sm text-primary mb-2">{l.overview}</h4>
+                      <h4 className="font-heading text-sm text-primary mb-2">{l.overview}</h4>
                       <p className="text-foreground/90">{monthlyPrediction.overview}</p>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                        <h4 className="font-cinzel text-sm text-primary mb-2">{l.career}</h4>
+                        <h4 className="font-heading text-sm text-primary mb-2">{l.career}</h4>
                         <p className="text-foreground/80 text-sm">{monthlyPrediction.career}</p>
                       </div>
                       <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                        <h4 className="font-cinzel text-sm text-primary mb-2">{l.relationships}</h4>
+                        <h4 className="font-heading text-sm text-primary mb-2">{l.relationships}</h4>
                         <p className="text-foreground/80 text-sm">{monthlyPrediction.relationships}</p>
                       </div>
                       <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                        <h4 className="font-cinzel text-sm text-primary mb-2">{l.health}</h4>
+                        <h4 className="font-heading text-sm text-primary mb-2">{l.health}</h4>
                         <p className="text-foreground/80 text-sm">{monthlyPrediction.health}</p>
                       </div>
                       <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                        <h4 className="font-cinzel text-sm text-primary mb-2">{l.finances}</h4>
+                        <h4 className="font-heading text-sm text-primary mb-2">{l.finances}</h4>
                         <p className="text-foreground/80 text-sm">{monthlyPrediction.finances}</p>
                       </div>
                     </div>
 
                     <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                      <h4 className="font-cinzel text-sm text-primary mb-2">{l.spirituality}</h4>
+                      <h4 className="font-heading text-sm text-primary mb-2">{l.spirituality}</h4>
                       <p className="text-foreground/80 text-sm">{monthlyPrediction.spirituality}</p>
                     </div>
 
                     <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                      <h4 className="font-cinzel text-sm text-primary mb-2">{l.keyDays}</h4>
+                      <h4 className="font-heading text-sm text-primary mb-2">{l.keyDays}</h4>
                       <div className="flex flex-wrap gap-2">
                         {monthlyPrediction.keyDays.map(day => (
-                          <span key={day} className="px-3 py-1 rounded-full bg-primary/20 text-primary text-sm font-cinzel">
+                          <span key={day} className="px-3 py-1 rounded-full bg-primary/20 text-primary text-sm num">
                             {day}
                           </span>
                         ))}

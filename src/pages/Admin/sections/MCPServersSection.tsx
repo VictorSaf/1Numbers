@@ -55,7 +55,7 @@ export const MCPServersSection = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-cinzel font-bold mb-2">MCP Servers</h2>
+        <h2 className="text-2xl font-heading font-bold mb-2">MCP Servers</h2>
         <p className="text-muted-foreground">
           Model Context Protocol server configuration
         </p>

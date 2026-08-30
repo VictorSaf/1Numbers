@@ -115,7 +115,7 @@ const DestinyMatrix = ({ birthDate }: DestinyMatrixProps) => {
         <div className="space-y-3 rounded-xl border border-line bg-surface/60 p-4">
           <div className="flex flex-wrap items-baseline gap-x-2">
             <span className="num text-2xl text-primary">{point.arcana}</span>
-            <h4 className="font-cinzel text-lg text-foreground">
+            <h4 className="font-heading text-lg text-foreground">
               {arcana.title[language as "ro" | "en" | "ru"]}
             </h4>
           </div>

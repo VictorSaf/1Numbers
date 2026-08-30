@@ -137,7 +137,7 @@ const Index = () => {
                   <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 border border-primary/20 mb-4">
                     <Sparkles className="h-8 w-8 text-primary" />
                   </div>
-                  <h2 className="font-cinzel text-2xl text-foreground mb-2">
+                  <h2 className="font-heading text-2xl text-foreground mb-2">
                     {t.formTitle}
                   </h2>
                   <p className="text-sm text-muted-foreground">
@@ -165,7 +165,7 @@ const Index = () => {
                     key={i}
                     className="text-center p-4 rounded-xl bg-card/30 border border-border/30"
                   >
-                    <h3 className="font-cinzel text-sm text-primary mb-1">{item.title}</h3>
+                    <h3 className="font-heading text-sm text-primary mb-1">{item.title}</h3>
                     <p className="text-xs text-muted-foreground">{item.desc}</p>
                   </div>
                 ))}

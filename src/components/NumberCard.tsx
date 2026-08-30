@@ -5,16 +5,24 @@ import { useState } from "react";
 import { ChevronDown, ChevronUp, Briefcase, Heart, Lightbulb, Shield, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getDelayClass } from "@/components/design-system";
+import { ResolveNumber } from "@/components/numerology/ResolveNumber";
 
 interface NumberCardProps {
   title: string;
   number: number;
+  /**
+   * The unreduced total this number came from, when the caller has it. Only
+   * used to replay the reduction; the displayed value is always `number`.
+   */
+  raw?: number;
+  /** Play that replay. Off everywhere except the first reading a visitor sees. */
+  resolve?: boolean;
   delay?: number;
   isMain?: boolean;
   showDetails?: boolean;
 }
 
-export const NumberCard = ({ title, number, delay = 0, isMain = false, showDetails = true }: NumberCardProps) => {
+export const NumberCard = ({ title, number, raw, resolve = false, delay = 0, isMain = false, showDetails = true }: NumberCardProps) => {
   const { t } = useLanguage();
   const [isExpanded, setIsExpanded] = useState(false);
   
@@ -37,10 +45,10 @@ export const NumberCard = ({ title, number, delay = 0, isMain = false, showDetai
         </span>
         
         <div className={cn("number-display", isMain && "number-display-large")}>
-          {number}
+          <ResolveNumber value={number} raw={raw} play={resolve} />
         </div>
         
-        <h3 className="font-cinzel text-xl text-foreground">
+        <h3 className="font-heading text-xl text-foreground">
           {meaning.title}
         </h3>
         

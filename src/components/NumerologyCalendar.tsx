@@ -200,7 +200,7 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="font-cinzel text-xl md:text-2xl text-gradient-gold flex items-center gap-2">
+            <CardTitle className="font-heading text-xl md:text-2xl text-gradient-gold flex items-center gap-2">
               <CalendarIcon className="h-5 w-5 md:h-6 md:w-6" />
               {t.title}
             </CardTitle>
@@ -215,7 +215,7 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className="font-cinzel text-lg min-w-[140px] text-center capitalize">
+            <span className="font-heading text-lg min-w-[140px] text-center capitalize">
               {format(currentMonth, "MMMM yyyy", { locale })}
             </span>
             <Button
@@ -291,7 +291,7 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
                   
                   <DialogContent className="sm:max-w-md bg-card border-primary/20">
                     <DialogHeader>
-                      <DialogTitle className="font-cinzel text-xl text-gradient-gold">
+                      <DialogTitle className="font-heading text-xl text-gradient-gold">
                         {format(day.date, "EEEE, d MMMM yyyy", { locale })}
                       </DialogTitle>
                     </DialogHeader>
@@ -301,12 +301,12 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
                       <div className="grid grid-cols-2 gap-4">
                         <div className="bg-primary/10 rounded-lg p-3 text-center">
                           <Sun className="h-5 w-5 text-primary mx-auto mb-1" />
-                          <div className="text-2xl font-cinzel text-primary font-bold">{day.personalDay}</div>
+                          <div className="text-2xl num text-primary font-bold">{day.personalDay}</div>
                           <div className="text-xs text-muted-foreground">{t.personalDay}</div>
                         </div>
                         <div className="bg-warn/10 rounded-lg p-3 text-center">
                           <Moon className="h-5 w-5 text-warn mx-auto mb-1" />
-                          <div className="text-2xl font-cinzel text-warn font-bold">{day.universalDay}</div>
+                          <div className="text-2xl num text-warn font-bold">{day.universalDay}</div>
                           <div className="text-xs text-muted-foreground">{t.universalDay}</div>
                         </div>
                       </div>

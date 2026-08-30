@@ -59,7 +59,7 @@ export const NumberCard = ({
 
         <span className="min-w-0 flex-1">
           <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-            <span className="font-cinzel text-base text-foreground">{label}</span>
+            <span className="font-heading text-base text-foreground">{label}</span>
             {isMaster && (
               <span className="num text-[10px] uppercase tracking-wider text-primary">master</span>
             )}

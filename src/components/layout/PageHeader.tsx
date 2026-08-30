@@ -50,7 +50,7 @@ export const PageHeader = ({
             </div>
           )}
 
-          <h1 className="font-cinzel text-3xl md:text-4xl lg:text-5xl text-gradient-gold mb-3 font-bold">
+          <h1 className="font-heading text-3xl md:text-4xl lg:text-5xl text-gradient-gold mb-3 font-bold">
             {title}
           </h1>
 

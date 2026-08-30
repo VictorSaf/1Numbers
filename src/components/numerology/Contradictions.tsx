@@ -40,7 +40,7 @@ const Contradictions = ({ fullName, birthDate }: ContradictionsProps) => {
           className="rounded-xl border border-border/50 bg-card/50 p-5 space-y-3"
         >
           <div className="flex items-baseline justify-between gap-4">
-            <h4 className="font-cinzel text-base text-foreground">{c.label}</h4>
+            <h4 className="font-heading text-base text-foreground">{c.label}</h4>
             <span
               className="num shrink-0 text-2xl text-primary"
               aria-label={`${c.label}: ${c.distance}`}

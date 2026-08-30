@@ -25,7 +25,7 @@ export const CourseCard = ({ course, progress, className }: CourseCardProps) => 
       )}>
         <CardHeader>
           <div className="flex items-start justify-between mb-2">
-            <CardTitle className="font-cinzel text-xl text-foreground">
+            <CardTitle className="font-heading text-xl text-foreground">
               {course.title}
             </CardTitle>
             {isCompleted && (

@@ -122,7 +122,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
             <Calendar className="h-4 w-4 text-primary" />
-            <span className="font-cinzel text-foreground">
+            <span className="font-heading text-foreground">
               {format(luckyDate.date, "EEEE, d MMMM", { locale })}
             </span>
           </div>
@@ -142,7 +142,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
           </div>
         </div>
         <div className={cn("px-3 py-2 rounded-lg border text-center", getScoreBg(luckyDate.score))}>
-          <div className={cn("font-cinzel text-lg", getScoreColor(luckyDate.score))}>
+          <div className={cn("num text-lg", getScoreColor(luckyDate.score))}>
             {luckyDate.score}
           </div>
           <div className="text-xs text-muted-foreground">{t.score}</div>
@@ -160,7 +160,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
     >
       <div className="flex items-center gap-2 mb-2">
         <Sparkles className="h-5 w-5 text-primary" />
-        <h3 className="font-cinzel text-lg text-foreground">{t.title}</h3>
+        <h3 className="font-heading text-lg text-foreground">{t.title}</h3>
       </div>
       <p className="text-sm text-muted-foreground mb-6">{t.subtitle}</p>
 

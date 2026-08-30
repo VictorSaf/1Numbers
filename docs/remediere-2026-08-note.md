@@ -392,3 +392,69 @@ Lucruri găsite în afara listei. Nimic din ce e aici n-a fost reparat; e doar c
   de `NewNumbers` și `Contradictions`. Nu e preîncărcat în `index.html`, deci
   ajunge tot lazy — dar acum o singură dată pentru amândouă, în loc de duplicat.
   Total 2860 KB → 2868 KB; `Contradictions.js` are 3,2 KB.
+
+## Plan de implementare — Etapa 4
+
+- **Cinzel nu erau opt fișiere, erau două.** `cinzel-400-latin.woff2` până la
+  `cinzel-700-latin.woff2` sunt **byte-identice** (md5 `7a5ca920…`) — același font
+  variabil, redenumit de patru ori și declarat ca patru greutăți statice. La fel
+  cele patru `latin-ext`. Deci comparația onestă nu e 176 KB → 204 KB, ci: un
+  cititor român aducea 40 KB de Cinzel distinct (latin + latin-ext) și aduce acum
+  156 KB de Literata. **+116 KB reali**, în schimbul chirilicului, pe care Cinzel
+  nu-l avea deloc — fiecare titlu rusesc cădea pe un serif de sistem.
+
+- **Cele trei teme întunecate erau una singură.** `twilight`, `midnight` și
+  `celestial` sunt identice pe toate cele 37 de tokenuri și diferă doar prin
+  `--accent` și `--accent-ink`. Mai mult: `.theme-twilight` era o copie verbatim
+  a lui `:root[data-theme="dark"]`, iar `.theme-dawn` a blocului luminos. Patru
+  nume pentru două palete și un buton de nuanță. Șterse toate patru; perechea
+  luminos/întunecat exista deja sub `[data-theme]`.
+
+  Fiecare bloc declara `--accent` și `--accent-ink` **de două ori** — prima
+  declarație moartă, suprascrisă 25 de linii mai jos în același bloc.
+
+- **Panoul de admin descria temele pe dinafară.** `celestial` era „Light ethereal
+  theme" cu eșantion `#f5f5f5` — în CSS e întunecată; `dawn` era „Warm sunrise"
+  cu eșantion `#1f1a24` — e singura luminoasă. Ambele etichete erau inversate.
+
+- **Am ales ștergerea la 4d.** Motivele: selectorul de temă din `Settings` e deja
+  în antet, deci nu se pierde nimic real; `--font-size-multiplier` n-avea **zero**
+  cititori, iar a-l face real înseamnă `calc()` peste toată scara tipografică
+  pentru un control pe care browserul îl oferă deja prin zoom; iar
+  `.high-contrast` suprascria patru tokenuri, dintre care unul
+  (`--foreground-muted`) **n-are niciun consumator**, și rata `--muted-foreground`,
+  care are **366**. Un contrast ridicat pe bune e un proiect de design system, nu
+  un petic de tokenuri — iar unul pe jumătate care *arată* ca accesibilitate e mai
+  rău decât niciunul.
+
+  Ce s-a dus odată cu ecranul: `customTheme`, `setCustomTheme`,
+  `saveThemePreference`, `applyCustomTheme` și ramura `'custom'` — toate deja
+  fără apelant înainte de etapa asta.
+
+- **`.no-animations` a devenit `prefers-reduced-motion`.** Comutatorul era pe un
+  ecran fără importator, deci singurii care primeau reducerea erau cei care nu
+  puteau s-o ceară. Acum o primesc toți cei care au cerut-o sistemului.
+
+- **`.star-pattern` era mort separat de `StarField`.** Componenta randează 50 de
+  div-uri cu `animate-pulse-glow`; clasa `.star-pattern` nu era folosită de
+  nimeni. Amândouă șterse. `pulse-glow` animează acum doar `opacity` —
+  `box-shadow` într-un keyframe forțează un paint pe cadru.
+
+- **Tensiune și armonie nu sunt roșu și verde.** Paleta are deja `--crit`,
+  `--warn` și `--ok` pentru ce a mers prost, iar o punte de 6 nu e o eroare, e o
+  distanță. Armonia e nuanța accentului cu un pas mai calmă — acordul e același
+  lucru spus de două ori. Tensiunea e prună (322°), destul de departe de ok
+  (162°), warn (34°) și crit (4°) cât să nu poată fi citită ca alarmă. Un test
+  verifică distanța de nuanță.
+
+- **25 de locuri puneau titlul serif pe cifre.** Cinzel nu e tabular, deci
+  coloanele de numere nu se aliniau — într-un produs al cărui conținut sunt
+  numerele. Au trecut pe `.num`, plus patru clase din `index.css`
+  (`.number-display`, `.bento-card-title` și celelalte).
+
+- **Clasa se numește `font-heading`, nu `font-cinzel`.** 150 de apariții numeau
+  un font care nu mai există. Utilitarul își numește acum rolul.
+
+- **Build:** CSS 148 KB → 132 KB, fonturi 35 → 27 de fișiere. `ResolveNumber` are
+  un warning `react-refresh` fiindcă exportă și `reductionChain` pentru teste —
+  aceeași categorie cu cele 16 preexistente.

@@ -1,4 +1,4 @@
-import { useMemo, lazy, Suspense, useEffect } from "react";
+import { useMemo, useState, lazy, Suspense, useEffect } from "react";
 import { ArrowLeft, Star, BarChart3, Target, Mountain, AlertTriangle, Sparkles, CalendarCheck, Type, Grid3x3, Compass, CalendarRange, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NumberCard } from "./NumberCard";
@@ -8,6 +8,7 @@ import { PersonalCycleCard } from "./PersonalCycleCard";
 import { LuckyDatesCard } from "./LuckyDatesCard";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
+import { lifePath as lifePathPlus } from "@/lib/numerology-plus/pythagorean";
 import {
   calculateLifePathNumber,
   calculateDestinyNumber,
@@ -56,8 +57,30 @@ interface NumerologyResultsProps {
   onReset: () => void;
 }
 
+// Once per device, not once per page view.
+//
+// The reduction is worth watching the first time and tiresome every time after,
+// so the flag is written the moment the first reading renders. A visitor who
+// cannot write to localStorage simply never sees it, which is the right way for
+// this to fail.
+const SEEN_KEY = 'seen-first-reading';
+
+const useFirstReading = () => {
+  const [first] = useState(() => {
+    try {
+      if (localStorage.getItem(SEEN_KEY)) return false;
+      localStorage.setItem(SEEN_KEY, '1');
+      return true;
+    } catch {
+      return false;
+    }
+  });
+  return first;
+};
+
 export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyResultsProps) => {
   useEffect(() => { track('result_viewed'); }, []);
+  const isFirstReading = useFirstReading();
   const { t, language } = useLanguage();
   
   const results = useMemo(() => ({
@@ -67,6 +90,13 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     personality: calculatePersonalityNumber(fullName),
     personalYear: calculatePersonalYearNumber(birthDate),
   }), [fullName, birthDate]);
+
+  // Same call the value came from, kept whole. lifePath() returns { raw, value }
+  // and calculateLifePathNumber discards the raw.
+  const lifePathRaw = useMemo(
+    () => lifePathPlus({ day: birthDate.getDate(), month: birthDate.getMonth() + 1, year: birthDate.getFullYear() }).raw,
+    [birthDate],
+  );
 
   const pinnacles = useMemo(() => calculatePinnacles(birthDate), [birthDate]);
   const challenges = useMemo(() => calculateChallenges(birthDate), [birthDate]);
@@ -221,7 +251,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
             <Star className="h-4 w-4 text-primary" />
             <span className="text-sm font-raleway text-primary">{t.profileTitle}</span>
           </div>
-          <h2 className="font-cinzel text-2xl md:text-3xl text-foreground">{fullName}</h2>
+          <h2 className="font-heading text-2xl md:text-3xl text-foreground">{fullName}</h2>
           <p className="text-muted-foreground">{t.profileSubtitle}</p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
@@ -241,7 +271,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
         <Chapter meta={chapters[0]} index={1}>
           <Block title={sectionLabels.core[language]} icon={<Star className="h-5 w-5 text-primary" />}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <NumberCard title={t.lifePathTitle} number={results.lifePath} delay={100} isMain />
+              <NumberCard title={t.lifePathTitle} number={results.lifePath} raw={lifePathRaw} resolve={isFirstReading} delay={100} isMain />
               <NumberCard title={t.destinyTitle} number={results.destiny} delay={200} />
               <NumberCard title={t.soulUrgeTitle} number={results.soulUrge} delay={300} />
               <NumberCard title={t.personalityTitle} number={results.personality} delay={400} />
@@ -303,7 +333,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
               <div className="flex flex-wrap gap-2">
                 {karmicLessons.map((num) => (
                   <div key={num} className="px-3 py-2 rounded-lg bg-muted/50 border border-border/50">
-                    <span className="font-cinzel text-primary mr-2">{num}</span>
+                    <span className="num text-primary mr-2">{num}</span>
                     <span className="text-xs text-muted-foreground">{KARMIC_LESSON_MEANINGS[num]?.title[language]}</span>
                   </div>
                 ))}

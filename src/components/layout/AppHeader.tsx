@@ -71,10 +71,10 @@ const AppHeader = () => {
             <div className="relative">
               <div className="absolute inset-0 bg-primary/20 rounded-full blur-md group-hover:bg-primary/30 transition-colors" />
               <div className="relative w-8 h-8 rounded-full bg-gradient-to-br from-primary to-warn flex items-center justify-center">
-                <span className="text-primary-foreground font-cinzel font-bold text-lg">N</span>
+                <span className="text-primary-foreground font-heading font-bold text-lg">N</span>
               </div>
             </div>
-            <span className="hidden sm:inline font-cinzel text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
+            <span className="hidden sm:inline font-heading text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
               {t.title}
             </span>
           </Link>

@@ -47,7 +47,7 @@ export const MultiPersonComparison = ({ comparison }: MultiPersonComparisonProps
   return (
     <Card className="card-mystic">
       <CardHeader>
-        <CardTitle className="font-cinzel text-primary flex items-center gap-2">
+        <CardTitle className="font-heading text-primary flex items-center gap-2">
           <Users className="h-5 w-5" />
           {t.compatibility?.multiPersonComparison || "Comparație Multi-Persoană"}
         </CardTitle>
@@ -85,7 +85,7 @@ export const MultiPersonComparison = ({ comparison }: MultiPersonComparisonProps
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-ok">
               <TrendingUp className="h-5 w-5" />
-              <h3 className="font-cinzel text-lg text-foreground">
+              <h3 className="font-heading text-lg text-foreground">
                 {t.compatibility?.strongestPairs || "Perechi Cele Mai Puternice"}
               </h3>
             </div>
@@ -150,7 +150,7 @@ export const MultiPersonComparison = ({ comparison }: MultiPersonComparisonProps
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-warn">
               <TrendingDown className="h-5 w-5" />
-              <h3 className="font-cinzel text-lg text-foreground">
+              <h3 className="font-heading text-lg text-foreground">
                 {t.compatibility?.weakestPairs || "Perechi Care Necesită Atenție"}
               </h3>
             </div>
@@ -215,7 +215,7 @@ export const MultiPersonComparison = ({ comparison }: MultiPersonComparisonProps
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-primary">
               <Sparkles className="h-5 w-5" />
-              <h3 className="font-cinzel text-lg text-foreground">
+              <h3 className="font-heading text-lg text-foreground">
                 {t.compatibility?.groupRecommendations || "Recomandări pentru Grup"}
               </h3>
             </div>

@@ -265,7 +265,7 @@ const FAQ = () => {
                   <div className="p-2 rounded-lg bg-primary/10">
                     <Icon className="h-5 w-5 text-primary" />
                   </div>
-                  <h2 className="font-cinzel text-xl text-foreground">
+                  <h2 className="font-heading text-xl text-foreground">
                     {l.categories[category as keyof typeof l.categories]}
                   </h2>
                 </div>

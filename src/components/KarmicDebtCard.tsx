@@ -39,7 +39,7 @@ export const KarmicDebtCard = ({ debt, delay = 0 }: KarmicDebtCardProps) => {
         
         <div className="flex-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <h4 className="font-cinzel text-lg text-warn">{debtInfo.title[language]}</h4>
+            <h4 className="font-heading text-lg text-warn">{debtInfo.title[language]}</h4>
             <span className="px-2 py-0.5 text-xs rounded-full bg-warn/20 text-warn">
               {sourceLabels[debt.source][language]}
             </span>

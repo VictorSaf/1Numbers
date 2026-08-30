@@ -12,37 +12,29 @@ interface UISettings {
   availableThemes: string[];
 }
 
+// Two themes, and the swatches are the tokens they actually set. The four this
+// replaced were labelled from memory rather than from the stylesheet: celestial
+// was described as "light ethereal" and is dark, dawn as "warm sunrise" and is
+// the only light one. Three of the four were the same palette.
 const themes = [
   {
-    id: 'twilight',
-    name: 'Twilight',
-    description: 'Deep purple mystical theme',
-    colors: ['#1a0f2e', '#7c3aed', '#fbbf24'],
+    id: 'light',
+    name: 'Light',
+    description: 'Ink blue on paper',
+    colors: ['#f2f3f7', '#22406b', '#8c3b6b'],
   },
   {
-    id: 'dawn',
-    name: 'Dawn',
-    description: 'Warm sunrise colors',
-    colors: ['#1f1a24', '#f97316', '#fcd34d'],
-  },
-  {
-    id: 'midnight',
-    name: 'Midnight',
-    description: 'Dark blue cosmic theme',
-    colors: ['#0a0f1a', '#3b82f6', '#60a5fa'],
-  },
-  {
-    id: 'celestial',
-    name: 'Celestial',
-    description: 'Light ethereal theme',
-    colors: ['#f5f5f5', '#8b5cf6', '#c084fc'],
+    id: 'dark',
+    name: 'Dark',
+    description: 'Ink blue on slate',
+    colors: ['#0e1017', '#8fb4e0', '#dd90bf'],
   },
 ];
 
 export const UISettingsSection = () => {
   const [settings, setSettings] = useState<UISettings>({
-    defaultTheme: 'twilight',
-    availableThemes: ['twilight', 'dawn', 'midnight', 'celestial'],
+    defaultTheme: 'system',
+    availableThemes: ['light', 'dark', 'system'],
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -132,7 +124,7 @@ export const UISettingsSection = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-cinzel font-bold mb-2">UI Settings</h2>
+        <h2 className="text-2xl font-heading font-bold mb-2">UI Settings</h2>
         <p className="text-muted-foreground">Customize the visual appearance</p>
       </div>
 

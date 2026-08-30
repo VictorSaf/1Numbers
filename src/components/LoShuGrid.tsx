@@ -182,7 +182,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
                         >
                           <span
                             className={cn(
-                              "font-cinzel text-2xl md:text-3xl",
+                              "num text-2xl md:text-3xl",
                               isMissing && "text-muted-foreground/50",
                               !isMissing && "text-primary",
                               isRepeated && "text-gradient-gold"
@@ -481,7 +481,7 @@ const RemedyCard = ({ remedy, language }: RemedyCardProps) => {
   return (
     <div className="p-3 rounded-lg bg-muted/30 border border-border/30 space-y-3">
       <div className="flex items-center gap-3">
-        <span className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center font-cinzel text-lg text-primary">
+        <span className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center num text-lg text-primary">
           {remedy.number}
         </span>
         <div>

@@ -55,7 +55,7 @@ export const AngelNumberCard = ({
           {/* Number Display */}
           <div className="relative flex-shrink-0">
             <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary/20 to-accent-ink/20 border border-primary/30 flex items-center justify-center">
-              <span className="font-cinzel text-2xl text-gradient-gold">
+              <span className="num text-2xl text-gradient-gold">
                 {meaning.number}
               </span>
             </div>
@@ -65,7 +65,7 @@ export const AngelNumberCard = ({
           {/* Title and Message */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-cinzel text-lg text-foreground truncate">
+              <h3 className="font-heading text-lg text-foreground truncate">
                 {meaning.title[language]}
               </h3>
               <Badge className={cn("text-[10px]", frequencyColors[meaning.frequency])}>
@@ -193,7 +193,7 @@ export const AngelNumberCompact = ({
       className="w-full p-3 rounded-xl bg-card/50 border border-border/50 hover:bg-card/70 transition-colors text-left"
     >
       <div className="flex items-center gap-3">
-        <span className="font-cinzel text-xl text-primary">{meaning.number}</span>
+        <span className="num text-xl text-primary">{meaning.number}</span>
         <div className="flex-1 min-w-0">
           <h4 className="text-sm font-medium text-foreground truncate">
             {meaning.title[language]}

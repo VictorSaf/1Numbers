@@ -25,7 +25,7 @@ const Articles = () => {
               </button>
               <Card className="card-mystic">
                 <CardContent className="p-8">
-                  <h1 className="font-cinzel text-3xl text-foreground mb-4">
+                  <h1 className="font-heading text-3xl text-foreground mb-4">
                     {selectedArticle.title[language] ?? selectedArticle.title.en}
                   </h1>
                   <div className="prose prose-invert max-w-none">

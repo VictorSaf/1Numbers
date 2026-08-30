@@ -23,7 +23,7 @@ export const JournalEntry = ({ entry, onEdit, onDelete, className }: JournalEntr
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <CardTitle className="font-cinzel text-lg text-foreground mb-2">
+            <CardTitle className="font-heading text-lg text-foreground mb-2">
               {entry.title}
             </CardTitle>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">

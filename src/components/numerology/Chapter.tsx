@@ -30,7 +30,7 @@ export const Chapter = ({
         <span className="font-mono text-sm tabular-nums text-muted-foreground">
           {String(index).padStart(2, "0")}
         </span>
-        <h2 className="font-cinzel text-2xl text-foreground">{meta.title}</h2>
+        <h2 className="font-heading text-2xl text-foreground">{meta.title}</h2>
       </div>
       <p className="pl-9 text-muted-foreground">{meta.question}</p>
     </header>
@@ -52,7 +52,7 @@ export const Block = ({
     <div className="space-y-1">
       <div className="flex items-center gap-2">
         {icon}
-        <h3 className="font-cinzel text-lg text-foreground">{title}</h3>
+        <h3 className="font-heading text-lg text-foreground">{title}</h3>
       </div>
       {note && <p className="text-sm text-muted-foreground">{note}</p>}
     </div>

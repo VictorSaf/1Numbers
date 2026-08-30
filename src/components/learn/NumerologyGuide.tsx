@@ -26,7 +26,7 @@ const NumerologyGuide = () => {
           <section className="space-y-6">
             <div className="flex items-center gap-3">
               <Star className="h-6 w-6 text-primary" />
-              <h2 className="font-cinzel text-2xl text-foreground">{t.coreNumbersTitle}</h2>
+              <h2 className="font-heading text-2xl text-foreground">{t.coreNumbersTitle}</h2>
             </div>
             <p className="text-muted-foreground max-w-3xl">
               {t.coreNumbersDesc}
@@ -52,7 +52,7 @@ const NumerologyGuide = () => {
           <section className="space-y-6">
             <div className="flex items-center gap-3">
               <Crown className="h-6 w-6 text-primary" />
-              <h2 className="font-cinzel text-2xl text-foreground">{t.masterNumbersTitle}</h2>
+              <h2 className="font-heading text-2xl text-foreground">{t.masterNumbersTitle}</h2>
             </div>
             <p className="text-muted-foreground max-w-3xl">
               {t.masterNumbersDesc}
@@ -88,7 +88,7 @@ const NumerologyGuide = () => {
                     <span className="text-xs uppercase tracking-[0.2em] text-primary/70">
                       {masterNumbers.includes(selectedNumber) ? t.masterNumber : t.coreNumber}
                     </span>
-                    <h3 className="font-cinzel text-3xl text-foreground mt-1">
+                    <h3 className="font-heading text-3xl text-foreground mt-1">
                       {getMeaning(selectedNumber).title}
                     </h3>
                   </div>
@@ -110,7 +110,7 @@ const NumerologyGuide = () => {
 
                   {/* Extended description */}
                   <div className="pt-4 border-t border-border/30 space-y-3">
-                    <h4 className="font-cinzel text-lg text-primary">{t.detailedAnalysis}</h4>
+                    <h4 className="font-heading text-lg text-primary">{t.detailedAnalysis}</h4>
                     <p className="text-muted-foreground leading-relaxed">
                       {t.extendedMeanings[selectedNumber as keyof typeof t.extendedMeanings]}
                     </p>
@@ -122,7 +122,7 @@ const NumerologyGuide = () => {
 
           {/* All Numbers Grid */}
           <section className="space-y-6">
-            <h2 className="font-cinzel text-2xl text-foreground text-center">{t.allNumbersTitle}</h2>
+            <h2 className="font-heading text-2xl text-foreground text-center">{t.allNumbersTitle}</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[...coreNumbers, ...masterNumbers].map((num, index) => {
@@ -144,7 +144,7 @@ const NumerologyGuide = () => {
                       <div className={cn(
                         "w-14 h-14 rounded-full flex items-center justify-center",
                         "bg-gradient-to-br from-primary/20 to-accent/20",
-                        "border border-primary/30 font-cinzel text-xl text-primary",
+                        "border border-primary/30 font-heading text-xl text-primary",
                         isMaster && "border-2 border-primary/60"
                       )}>
                         {num}
@@ -152,7 +152,7 @@ const NumerologyGuide = () => {
                       
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <h3 className="font-cinzel text-lg text-foreground truncate">
+                          <h3 className="font-heading text-lg text-foreground truncate">
                             {meaning.title}
                           </h3>
                           {isMaster && (

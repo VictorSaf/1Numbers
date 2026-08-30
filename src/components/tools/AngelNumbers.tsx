@@ -218,7 +218,7 @@ const AngelNumbers = () => {
           {!searchInput && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="card-mystic rounded-xl p-6">
-                <h3 className="font-cinzel text-lg text-primary mb-3">
+                <h3 className="font-heading text-lg text-primary mb-3">
                   {t.whatAreAngelNumbers}
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
@@ -227,7 +227,7 @@ const AngelNumbers = () => {
               </div>
 
               <div className="card-mystic rounded-xl p-6">
-                <h3 className="font-cinzel text-lg text-primary mb-3">
+                <h3 className="font-heading text-lg text-primary mb-3">
                   {t.howToUse}
                 </h3>
                 <ol className="space-y-2">
@@ -245,7 +245,7 @@ const AngelNumbers = () => {
           {/* All Numbers Grid */}
           {!searchInput && (
             <div className="space-y-4">
-              <h3 className="font-cinzel text-lg text-foreground">{t.allNumbers}</h3>
+              <h3 className="font-heading text-lg text-foreground">{t.allNumbers}</h3>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {allNumbers.map((meaning) => (
                   <AngelNumberCompact

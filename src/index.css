@@ -85,84 +85,49 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-/* Self-hosted Cinzel and Raleway.
+/* Self-hosted Literata, Raleway and IBM Plex Mono.
    The Google Fonts @import was a render-blocking request to a third party on
    every page load, and sent visitor IPs to Google without consent. Subsets are
    latin, latin-ext and cyrillic; unicode-range means a Romanian visitor only
    fetches the first two. Serving them from this origin also lets the CSP drop
    both Google font domains. */
-/* latin-ext */
+/* Literata, variable 400..700, three subsets.
+ *
+ * Replaces Cinzel, which had no Cyrillic at all -- every Russian heading fell
+ * through to a system serif -- and which shipped as eight files that were two
+ * distinct fonts: cinzel-400-latin.woff2 through cinzel-700-latin.woff2 are
+ * byte-identical, the same variable file renamed four times and declared as
+ * four static weights.
+ *
+ * One file per subset, and the weight axis is real: font-weight 400..700
+ * interpolates rather than snapping to the nearest of four copies. */
 @font-face {
-  font-family: 'Cinzel';
+  font-family: 'Literata';
   font-style: normal;
-  font-weight: 400;
+  font-weight: 400 700;
   font-display: swap;
-  src: url(/fonts/cinzel-400-latin-ext.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Cinzel';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url(/fonts/cinzel-400-latin.woff2) format('woff2');
+  src: url(/fonts/literata-variable-latin.woff2) format('woff2-variations');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
-/* latin-ext */
+
 @font-face {
-  font-family: 'Cinzel';
+  font-family: 'Literata';
   font-style: normal;
-  font-weight: 500;
+  font-weight: 400 700;
   font-display: swap;
-  src: url(/fonts/cinzel-500-latin-ext.woff2) format('woff2');
+  src: url(/fonts/literata-variable-latin-ext.woff2) format('woff2-variations');
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
-/* latin */
+
 @font-face {
-  font-family: 'Cinzel';
+  font-family: 'Literata';
   font-style: normal;
-  font-weight: 500;
+  font-weight: 400 700;
   font-display: swap;
-  src: url(/fonts/cinzel-500-latin.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url(/fonts/literata-variable-cyrillic.woff2) format('woff2-variations');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
 }
-/* latin-ext */
-@font-face {
-  font-family: 'Cinzel';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url(/fonts/cinzel-600-latin-ext.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Cinzel';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url(/fonts/cinzel-600-latin.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Cinzel';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url(/fonts/cinzel-700-latin-ext.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Cinzel';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url(/fonts/cinzel-700-latin.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
+
 /* cyrillic */
 @font-face {
   font-family: 'Raleway';
@@ -324,9 +289,13 @@
     --faint: 232 10% 45%;
     --line: 228 19% 89%;
     --line-2: 228 17% 83%;
-    --accent: 256 45% 45%;
-    --accent-soft: 256 52% 94%;
-    --accent-ink: 256 49% 38%;
+    --accent: 218 58% 33%;
+    --accent-soft: 218 42% 94%;
+    --accent-ink: 218 64% 26%;
+    --tension-soft: 322 40% 95%;
+    --tension: 322 42% 40%;
+    --harmony-soft: 218 36% 94%;
+    --harmony: 218 34% 44%;
     --ok: 162 57% 27%;
     --ok-soft: 159 35% 92%;
     --warn: 34 91% 30%;
@@ -345,12 +314,12 @@
     --chart-4: 214 70% 45%;
     --chart-5: 150 58% 28%;
     --chart-6: 338 62% 46%;
-    --ramp-1: 256 52% 94%;
-    --ramp-2: 256 55% 87%;
-    --ramp-3: 256 55% 76%;
-    --ramp-4: 256 52% 64%;
-    --ramp-5: 259 48% 51%;
-    --ramp-6: 257 52% 38%;
+    --ramp-1: 218 42% 94%;
+    --ramp-2: 218 46% 86%;
+    --ramp-3: 218 46% 74%;
+    --ramp-4: 218 46% 60%;
+    --ramp-5: 219 50% 45%;
+    --ramp-6: 219 56% 31%;
 
     /* Bridge: the names Tailwind already consumes, resolved from the palette
        above. Components keep writing bg-background and text-foreground; only the
@@ -405,7 +374,7 @@
     --sidebar-background: 240 20% 8%;
     --sidebar-foreground: 45 25% 96%;
     --sidebar-border: 260 30% 20%;
-    --font-heading: 'Cinzel', serif;
+    --font-heading: 'Literata', Georgia, serif;
     --font-body: 'Raleway', sans-serif;
     --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
     --space-xs: 0.25rem;    /* 4px */
@@ -429,7 +398,7 @@
 
   /* System preference, only where no theme was chosen. */
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]):not([class*="theme-"]) {
+    :root:not([data-theme="light"]) {
       --bg: 231 19% 7%;
       --surface: 229 19% 12%;
       --surface-2: 227 19% 15%;
@@ -440,9 +409,13 @@
       --faint: 230 10% 56%;
       --line: 229 17% 19%;
       --line-2: 228 16% 25%;
-      --accent: 252 73% 75%;
-      --accent-soft: 250 33% 18%;
-      --accent-ink: 252 80% 82%;
+      --accent: 212 64% 72%;
+      --accent-soft: 216 34% 18%;
+      --accent-ink: 212 72% 80%;
+      --tension-soft: 320 28% 17%;
+      --tension: 320 58% 74%;
+      --harmony-soft: 214 30% 17%;
+      --harmony: 212 40% 70%;
       --ok: 161 46% 53%;
       --ok-soft: 160 36% 12%;
       --warn: 35 74% 59%;
@@ -461,12 +434,12 @@
       --chart-4: 212 70% 66%;
       --chart-5: 150 46% 56%;
       --chart-6: 338 66% 70%;
-      --ramp-1: 250 33% 18%;
-      --ramp-2: 253 39% 26%;
-      --ramp-3: 252 40% 35%;
-      --ramp-4: 252 40% 46%;
-      --ramp-5: 252 47% 58%;
-      --ramp-6: 250 61% 69%;
+      --ramp-1: 216 34% 18%;
+      --ramp-2: 216 38% 26%;
+      --ramp-3: 215 40% 35%;
+      --ramp-4: 214 42% 46%;
+      --ramp-5: 213 48% 58%;
+      --ramp-6: 212 58% 69%;
     }
   }
 
@@ -482,9 +455,13 @@
     --faint: 232 10% 45%;
     --line: 228 19% 89%;
     --line-2: 228 17% 83%;
-    --accent: 256 45% 45%;
-    --accent-soft: 256 52% 94%;
-    --accent-ink: 256 49% 38%;
+    --accent: 218 58% 33%;
+    --accent-soft: 218 42% 94%;
+    --accent-ink: 218 64% 26%;
+    --tension-soft: 322 40% 95%;
+    --tension: 322 42% 40%;
+    --harmony-soft: 218 36% 94%;
+    --harmony: 218 34% 44%;
     --ok: 162 57% 27%;
     --ok-soft: 159 35% 92%;
     --warn: 34 91% 30%;
@@ -503,12 +480,12 @@
     --chart-4: 214 70% 45%;
     --chart-5: 150 58% 28%;
     --chart-6: 338 62% 46%;
-    --ramp-1: 256 52% 94%;
-    --ramp-2: 256 55% 87%;
-    --ramp-3: 256 55% 76%;
-    --ramp-4: 256 52% 64%;
-    --ramp-5: 259 48% 51%;
-    --ramp-6: 257 52% 38%;
+    --ramp-1: 218 42% 94%;
+    --ramp-2: 218 46% 86%;
+    --ramp-3: 218 46% 74%;
+    --ramp-4: 218 46% 60%;
+    --ramp-5: 219 50% 45%;
+    --ramp-6: 219 56% 31%;
   }
 
   :root[data-theme="dark"] {
@@ -522,9 +499,13 @@
     --faint: 230 10% 56%;
     --line: 229 17% 19%;
     --line-2: 228 16% 25%;
-    --accent: 252 73% 75%;
-    --accent-soft: 250 33% 18%;
-    --accent-ink: 252 80% 82%;
+    --accent: 212 64% 72%;
+    --accent-soft: 216 34% 18%;
+    --accent-ink: 212 72% 80%;
+    --tension-soft: 320 28% 17%;
+    --tension: 320 58% 74%;
+    --harmony-soft: 214 30% 17%;
+    --harmony: 212 40% 70%;
     --ok: 161 46% 53%;
     --ok-soft: 160 36% 12%;
     --warn: 35 74% 59%;
@@ -543,215 +524,35 @@
     --chart-4: 212 70% 66%;
     --chart-5: 150 46% 56%;
     --chart-6: 338 66% 70%;
-    --ramp-1: 250 33% 18%;
-    --ramp-2: 253 39% 26%;
-    --ramp-3: 252 40% 35%;
-    --ramp-4: 252 40% 46%;
-    --ramp-5: 252 47% 58%;
-    --ramp-6: 250 61% 69%;
+    --ramp-1: 216 34% 18%;
+    --ramp-2: 216 38% 26%;
+    --ramp-3: 215 40% 35%;
+    --ramp-4: 214 42% 46%;
+    --ramp-5: 213 48% 58%;
+    --ramp-6: 212 58% 69%;
   }
 
-  /* Named themes shift the palette only. Each keeps its own accent so the
-     product identity survives, while neutrals, lines and semantic colours stay
-     common -- that shared set is where the contrast guarantees live. */
-  .theme-dawn {
-    --bg: 225 17% 95%;
-    --surface: 0 0% 100%;
-    --surface-2: 220 23% 97%;
-    --sunken: 230 16% 93%;
-    --ink: 232 16% 10%;
-    --ink-2: 228 11% 26%;
-    --muted-ink: 232 10% 43%;
-    --faint: 232 10% 45%;
-    --line: 228 19% 89%;
-    --line-2: 228 17% 83%;
-    --accent: 256 45% 45%;
-    --accent-soft: 256 52% 94%;
-    --accent-ink: 256 49% 38%;
-    --ok: 162 57% 27%;
-    --ok-soft: 159 35% 92%;
-    --warn: 34 91% 30%;
-    --warn-soft: 34 76% 94%;
-    --crit: 4 66% 39%;
-    --crit-soft: 7 60% 94%;
-    --info: 214 72% 36%;
-    --info-soft: 213 62% 94%;
-    --ok-ink: 162 60% 20%;
-    --warn-ink: 30 92% 26%;
-    --crit-ink: 4 70% 30%;
-    --info-ink: 214 76% 28%;
-    --chart-1: 268 64% 50%;
-    --chart-2: 176 86% 30%;
-    --chart-3: 27 100% 38%;
-    --chart-4: 214 70% 45%;
-    --chart-5: 150 58% 28%;
-    --chart-6: 338 62% 46%;
-    --ramp-1: 256 52% 94%;
-    --ramp-2: 256 55% 87%;
-    --ramp-3: 256 55% 76%;
-    --ramp-4: 256 52% 64%;
-    --ramp-5: 259 48% 51%;
-    --ramp-6: 257 52% 38%;
-    --accent: 35 90% 40%;
-    --accent-ink: 35 90% 32%;
-  }
+  /* Two themes: light and dark, chosen or followed from the system.
+     There used to be four named ones. twilight, midnight and celestial were
+     byte-identical across all thirty-seven tokens and differed only in --accent
+     and --accent-ink -- and .theme-twilight was itself a verbatim copy of
+     :root[data-theme="dark"], as .theme-dawn was of the light block. Four names
+     for two palettes and one hue dial. The dial is gone with them: an accent
+     that changes per theme is a logo that changes per page. */
 
-  .theme-twilight {
-    --bg: 231 19% 7%;
-    --surface: 229 19% 12%;
-    --surface-2: 227 19% 15%;
-    --sunken: 228 20% 10%;
-    --ink: 231 23% 94%;
-    --ink-2: 229 17% 80%;
-    --muted-ink: 232 11% 62%;
-    --faint: 230 10% 56%;
-    --line: 229 17% 19%;
-    --line-2: 228 16% 25%;
-    --accent: 252 73% 75%;
-    --accent-soft: 250 33% 18%;
-    --accent-ink: 252 80% 82%;
-    --ok: 161 46% 53%;
-    --ok-soft: 160 36% 12%;
-    --warn: 35 74% 59%;
-    --warn-soft: 36 40% 12%;
-    --crit: 6 82% 68%;
-    --crit-soft: 5 31% 14%;
-    --info: 211 80% 68%;
-    --info-soft: 213 38% 13%;
-    --ok-ink: 160 42% 68%;
-    --warn-ink: 36 70% 72%;
-    --crit-ink: 6 78% 78%;
-    --info-ink: 211 74% 80%;
-    --chart-1: 252 62% 64%;
-    --chart-2: 165 80% 35%;
-    --chart-3: 33 62% 48%;
-    --chart-4: 212 70% 66%;
-    --chart-5: 150 46% 56%;
-    --chart-6: 338 66% 70%;
-    --ramp-1: 250 33% 18%;
-    --ramp-2: 253 39% 26%;
-    --ramp-3: 252 40% 35%;
-    --ramp-4: 252 40% 46%;
-    --ramp-5: 252 47% 58%;
-    --ramp-6: 250 61% 69%;
-    --accent: 45 85% 58%;
-    --accent-ink: 45 85% 68%;
-  }
-
-  .theme-midnight {
-    --bg: 231 19% 7%;
-    --surface: 229 19% 12%;
-    --surface-2: 227 19% 15%;
-    --sunken: 228 20% 10%;
-    --ink: 231 23% 94%;
-    --ink-2: 229 17% 80%;
-    --muted-ink: 232 11% 62%;
-    --faint: 230 10% 56%;
-    --line: 229 17% 19%;
-    --line-2: 228 16% 25%;
-    --accent: 252 73% 75%;
-    --accent-soft: 250 33% 18%;
-    --accent-ink: 252 80% 82%;
-    --ok: 161 46% 53%;
-    --ok-soft: 160 36% 12%;
-    --warn: 35 74% 59%;
-    --warn-soft: 36 40% 12%;
-    --crit: 6 82% 68%;
-    --crit-soft: 5 31% 14%;
-    --info: 211 80% 68%;
-    --info-soft: 213 38% 13%;
-    --ok-ink: 160 42% 68%;
-    --warn-ink: 36 70% 72%;
-    --crit-ink: 6 78% 78%;
-    --info-ink: 211 74% 80%;
-    --chart-1: 252 62% 64%;
-    --chart-2: 165 80% 35%;
-    --chart-3: 33 62% 48%;
-    --chart-4: 212 70% 66%;
-    --chart-5: 150 46% 56%;
-    --chart-6: 338 66% 70%;
-    --ramp-1: 250 33% 18%;
-    --ramp-2: 253 39% 26%;
-    --ramp-3: 252 40% 35%;
-    --ramp-4: 252 40% 46%;
-    --ramp-5: 252 47% 58%;
-    --ramp-6: 250 61% 69%;
-    --accent: 220 80% 62%;
-    --accent-ink: 220 80% 72%;
-  }
-
-  .theme-celestial {
-    --bg: 231 19% 7%;
-    --surface: 229 19% 12%;
-    --surface-2: 227 19% 15%;
-    --sunken: 228 20% 10%;
-    --ink: 231 23% 94%;
-    --ink-2: 229 17% 80%;
-    --muted-ink: 232 11% 62%;
-    --faint: 230 10% 56%;
-    --line: 229 17% 19%;
-    --line-2: 228 16% 25%;
-    --accent: 252 73% 75%;
-    --accent-soft: 250 33% 18%;
-    --accent-ink: 252 80% 82%;
-    --ok: 161 46% 53%;
-    --ok-soft: 160 36% 12%;
-    --warn: 35 74% 59%;
-    --warn-soft: 36 40% 12%;
-    --crit: 6 82% 68%;
-    --crit-soft: 5 31% 14%;
-    --info: 211 80% 68%;
-    --info-soft: 213 38% 13%;
-    --ok-ink: 160 42% 68%;
-    --warn-ink: 36 70% 72%;
-    --crit-ink: 6 78% 78%;
-    --info-ink: 211 74% 80%;
-    --chart-1: 252 62% 64%;
-    --chart-2: 165 80% 35%;
-    --chart-3: 33 62% 48%;
-    --chart-4: 212 70% 66%;
-    --chart-5: 150 46% 56%;
-    --chart-6: 338 66% 70%;
-    --ramp-1: 250 33% 18%;
-    --ramp-2: 253 39% 26%;
-    --ramp-3: 252 40% 35%;
-    --ramp-4: 252 40% 46%;
-    --ramp-5: 252 47% 58%;
-    --ramp-6: 250 61% 69%;
-    --accent: 50 95% 60%;
-    --accent-ink: 50 95% 70%;
-  }
-
-  /* === DISPLAY SETTINGS === */
-  :root {
-    --font-size-multiplier: 1;
-  }
-
-  .high-contrast {
-    --foreground: 0 0% 100%;
-    --foreground-muted: 0 0% 85%;
-    --border: 0 0% 50%;
-    --card-border: 0 0% 40%;
-  }
-
-  .no-animations *,
-  .no-animations *::before,
-  .no-animations *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-
-  [data-layout="compact"] {
-    --space-md: 0.75rem;
-    --space-lg: 1.25rem;
-    --space-xl: 1.5rem;
-  }
-
-  [data-layout="spacious"] {
-    --space-md: 1.25rem;
-    --space-lg: 2rem;
-    --space-xl: 2.5rem;
+  /* Reduced motion, from the system rather than from a switch.
+     This was `.no-animations`, toggled by a settings screen with no importer --
+     so the only people who got it were the ones who had never been able to ask.
+     Everyone who has asked their operating system now gets it. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
@@ -773,7 +574,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-cinzel;
+    @apply font-heading;
     font-feature-settings: "kern" 1, "liga" 1;
     letter-spacing: -0.02em;
   }
@@ -888,7 +689,7 @@
   .btn-primary {
     @apply relative overflow-hidden;
     @apply bg-gradient-to-r from-primary to-primary-dark;
-    @apply text-primary-foreground font-cinzel font-medium tracking-wider;
+    @apply text-primary-foreground font-heading font-medium tracking-wider;
     @apply px-6 py-3 rounded-lg;
     @apply transition-all duration-200 ease-out;
     @apply hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02];
@@ -908,7 +709,7 @@
 
   .btn-secondary {
     @apply relative;
-    @apply bg-secondary text-secondary-foreground font-cinzel font-medium;
+    @apply bg-secondary text-secondary-foreground font-heading font-medium;
     @apply px-6 py-3 rounded-lg border border-secondary-light;
     @apply transition-all duration-200;
     @apply hover:bg-secondary-hover hover:border-secondary;
@@ -981,7 +782,7 @@
     @apply w-20 h-20 rounded-full;
     @apply bg-gradient-to-br from-primary/20 via-primary/15 to-accent/20;
     @apply border-2 border-primary/40;
-    @apply font-cinzel text-3xl font-bold text-primary;
+    @apply num text-3xl font-bold text-primary;
     @apply glow-primary-subtle;
     @apply transition-all duration-300;
   }
@@ -1065,14 +866,15 @@
   }
 }
 
+/* Opacity only. This used to animate box-shadow as well, which forces a paint
+   on every frame for every element carrying the class -- and StarField carried
+   it on fifty fixed-position divs, on every route. */
 @keyframes pulse-glow {
   0%, 100% { 
     opacity: 0.6;
-    box-shadow: var(--glow-primary-subtle);
   }
   50% { 
     opacity: 1;
-    box-shadow: var(--glow-primary);
   }
 }
 
@@ -1428,179 +1230,19 @@ html * {
   transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Theme-specific star patterns */
-.theme-twilight .star-pattern,
-:root .star-pattern {
-  background-image:
-    radial-gradient(circle at 20% 30%, hsl(45 85% 70% / 0.04) 1px, transparent 1px),
-    radial-gradient(circle at 80% 20%, hsl(280 50% 60% / 0.05) 1px, transparent 1px),
-    radial-gradient(circle at 40% 70%, hsl(45 85% 70% / 0.05) 1px, transparent 1px),
-    radial-gradient(circle at 90% 80%, hsl(260 55% 50% / 0.04) 1px, transparent 1px),
-    radial-gradient(circle at 10% 90%, hsl(45 85% 70% / 0.06) 1px, transparent 1px);
-}
-
-.theme-dawn .star-pattern {
-  background-image:
-    radial-gradient(circle at 20% 30%, hsl(35 90% 50% / 0.08) 1px, transparent 1px),
-    radial-gradient(circle at 80% 20%, hsl(350 60% 50% / 0.06) 1px, transparent 1px),
-    radial-gradient(circle at 40% 70%, hsl(25 80% 55% / 0.07) 1px, transparent 1px),
-    radial-gradient(circle at 90% 80%, hsl(35 90% 50% / 0.05) 1px, transparent 1px),
-    radial-gradient(circle at 10% 90%, hsl(350 60% 50% / 0.08) 1px, transparent 1px);
-}
-
-.theme-midnight .star-pattern {
-  background-image:
-    radial-gradient(circle at 20% 30%, hsl(220 80% 70% / 0.06) 1px, transparent 1px),
-    radial-gradient(circle at 80% 20%, hsl(190 80% 60% / 0.08) 1px, transparent 1px),
-    radial-gradient(circle at 40% 70%, hsl(220 80% 70% / 0.07) 1px, transparent 1px),
-    radial-gradient(circle at 90% 80%, hsl(250 60% 60% / 0.05) 1px, transparent 1px),
-    radial-gradient(circle at 10% 90%, hsl(190 80% 60% / 0.09) 1px, transparent 1px);
-}
-
-.theme-celestial .star-pattern {
-  background-image:
-    radial-gradient(circle at 20% 30%, hsl(50 95% 70% / 0.08) 1px, transparent 1px),
-    radial-gradient(circle at 80% 20%, hsl(320 70% 65% / 0.09) 1px, transparent 1px),
-    radial-gradient(circle at 40% 70%, hsl(270 70% 60% / 0.07) 1px, transparent 1px),
-    radial-gradient(circle at 90% 80%, hsl(50 95% 70% / 0.06) 1px, transparent 1px),
-    radial-gradient(circle at 10% 90%, hsl(320 70% 65% / 0.1) 1px, transparent 1px),
-    radial-gradient(circle at 60% 50%, hsl(270 70% 60% / 0.05) 2px, transparent 2px);
-}
-
 /* Theme-specific glow effects for cards */
-.theme-dawn .glow-primary {
-  box-shadow: 0 4px 20px hsl(35 90% 50% / 0.2), 0 0 40px hsl(35 90% 50% / 0.08);
-}
-
-.theme-midnight .glow-primary {
-  box-shadow: 0 0 20px hsl(220 80% 55% / 0.35), 0 0 40px hsl(220 80% 55% / 0.15);
-}
-
-.theme-celestial .glow-primary {
-  box-shadow: 0 0 25px hsl(50 95% 60% / 0.35), 0 0 50px hsl(50 95% 60% / 0.15), 0 0 75px hsl(50 95% 60% / 0.08);
-}
-
 /* Theme-specific number display enhancements */
-.theme-dawn .number-display {
-  @apply bg-gradient-to-br from-amber-100/80 via-amber-50/60 to-orange-100/50;
-  @apply border-amber-400/60;
-  @apply text-amber-700;
-}
-
-.theme-midnight .number-display {
-  @apply bg-gradient-to-br from-blue-500/25 via-blue-400/20 to-cyan-500/25;
-  @apply border-blue-400/50;
-  @apply text-blue-300;
-}
-
-.theme-celestial .number-display {
-  @apply bg-gradient-to-br from-yellow-400/25 via-amber-400/20 to-purple-500/20;
-  @apply border-yellow-400/60;
-  @apply text-yellow-300;
-}
-
 /* Theme-specific card enhancements */
-.theme-dawn .card-mystic {
-  @apply bg-gradient-to-br from-amber-50/90 via-white to-orange-50/80;
-  @apply border-amber-200/60;
-  box-shadow: 0 4px 20px hsl(35 90% 50% / 0.1), 0 1px 3px hsl(0 0% 0% / 0.05);
-}
-
-.theme-midnight .card-mystic {
-  @apply bg-gradient-to-br from-slate-900/95 via-slate-900/90 to-blue-950/95;
-  @apply border-blue-500/30;
-  box-shadow: 0 0 20px hsl(220 80% 55% / 0.15), 0 4px 12px hsl(0 0% 0% / 0.3);
-}
-
-.theme-celestial .card-mystic {
-  @apply bg-gradient-to-br from-purple-950/90 via-purple-900/85 to-violet-950/90;
-  @apply border-purple-500/30;
-  box-shadow: 0 0 25px hsl(270 70% 50% / 0.15), 0 4px 12px hsl(0 0% 0% / 0.3);
-}
-
-/* Theme-specific button enhancements */
-.theme-dawn .btn-primary {
-  @apply bg-gradient-to-r from-amber-500 to-orange-500;
-  @apply shadow-amber-500/25;
-}
-
-.theme-midnight .btn-primary {
-  @apply bg-gradient-to-r from-blue-500 to-cyan-500;
-  @apply shadow-blue-500/25;
-}
-
-.theme-celestial .btn-primary {
-  @apply bg-gradient-to-r from-yellow-400 to-amber-500;
-  @apply shadow-yellow-500/30;
-}
-
-/* Badge enhancements per theme */
-.theme-dawn .badge-primary {
-  @apply bg-amber-100 text-amber-800 border-amber-300;
-}
-
-.theme-midnight .badge-primary {
-  @apply bg-blue-900/50 text-blue-300 border-blue-500/40;
-}
-
-.theme-celestial .badge-primary {
-  @apply bg-yellow-900/30 text-yellow-300 border-yellow-500/40;
-}
-
-/* Master number special styling per theme */
-.theme-twilight .number-display-master,
 :root .number-display-master {
-  animation: master-pulse-twilight 3s ease-in-out infinite;
+  animation: master-pulse 3s ease-in-out infinite;
 }
 
-.theme-dawn .number-display-master {
-  animation: master-pulse-dawn 3s ease-in-out infinite;
-  @apply border-amber-500;
-}
-
-.theme-midnight .number-display-master {
-  animation: master-pulse-midnight 3s ease-in-out infinite;
-  @apply border-blue-400;
-}
-
-.theme-celestial .number-display-master {
-  animation: master-pulse-celestial 3s ease-in-out infinite;
-  @apply border-yellow-400;
-}
-
-@keyframes master-pulse-twilight {
+@keyframes master-pulse {
   0%, 100% {
-    box-shadow: 0 0 15px hsl(45 85% 58% / 0.4), 0 0 30px hsl(45 85% 58% / 0.2);
+    box-shadow: 0 0 15px hsl(var(--accent) / 0.4), 0 0 30px hsl(var(--accent) / 0.2);
   }
   50% {
-    box-shadow: 0 0 25px hsl(45 85% 58% / 0.6), 0 0 50px hsl(45 85% 58% / 0.3);
-  }
-}
-
-@keyframes master-pulse-dawn {
-  0%, 100% {
-    box-shadow: 0 4px 15px hsl(35 90% 50% / 0.3), 0 0 20px hsl(35 90% 50% / 0.15);
-  }
-  50% {
-    box-shadow: 0 4px 25px hsl(35 90% 50% / 0.5), 0 0 35px hsl(35 90% 50% / 0.25);
-  }
-}
-
-@keyframes master-pulse-midnight {
-  0%, 100% {
-    box-shadow: 0 0 15px hsl(220 80% 55% / 0.5), 0 0 30px hsl(220 80% 55% / 0.25);
-  }
-  50% {
-    box-shadow: 0 0 25px hsl(220 80% 55% / 0.7), 0 0 50px hsl(220 80% 55% / 0.35);
-  }
-}
-
-@keyframes master-pulse-celestial {
-  0%, 100% {
-    box-shadow: 0 0 20px hsl(50 95% 60% / 0.5), 0 0 40px hsl(50 95% 60% / 0.25), 0 0 60px hsl(270 70% 50% / 0.15);
-  }
-  50% {
-    box-shadow: 0 0 30px hsl(50 95% 60% / 0.7), 0 0 60px hsl(50 95% 60% / 0.35), 0 0 80px hsl(270 70% 50% / 0.2);
+    box-shadow: 0 0 25px hsl(var(--accent) / 0.6), 0 0 50px hsl(var(--accent) / 0.3);
   }
 }
 
@@ -1732,7 +1374,7 @@ html {
 }
 
 .bento-card-title {
-  @apply font-cinzel text-lg font-semibold text-foreground;
+  @apply font-heading text-lg font-semibold text-foreground;
   @apply leading-tight;
 }
 
@@ -1746,41 +1388,6 @@ html {
 }
 
 /* Theme-specific Bento Cards */
-.theme-dawn .bento-card {
-  background: rgba(0, 0, 0, 0.02);
-  border-color: rgba(0, 0, 0, 0.08);
-}
-
-.theme-dawn .bento-card:hover {
-  background: rgba(0, 0, 0, 0.04);
-  border-color: rgba(0, 0, 0, 0.12);
-  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.1);
-}
-
-.theme-dawn .bento-card-icon {
-  background: hsl(var(--primary) / 0.12);
-}
-
-.theme-midnight .bento-card {
-  background: rgba(100, 150, 255, 0.03);
-  border-color: rgba(100, 150, 255, 0.1);
-}
-
-.theme-midnight .bento-card:hover {
-  background: rgba(100, 150, 255, 0.06);
-  border-color: rgba(100, 150, 255, 0.15);
-}
-
-.theme-celestial .bento-card {
-  background: rgba(200, 150, 255, 0.04);
-  border-color: rgba(200, 150, 255, 0.1);
-}
-
-.theme-celestial .bento-card:hover {
-  background: rgba(200, 150, 255, 0.07);
-  border-color: rgba(200, 150, 255, 0.15);
-}
-
 /* Number Spotlight */
 .number-spotlight {
   @apply relative flex flex-col items-center justify-center;
@@ -1788,7 +1395,7 @@ html {
 }
 
 .number-spotlight-value {
-  @apply font-cinzel font-bold;
+  @apply num font-bold;
   font-size: 3.5rem;
   line-height: 1;
   background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-light)) 100%);
@@ -1856,7 +1463,7 @@ html {
 .mini-loshu-cell {
   @apply flex items-center justify-center;
   @apply aspect-square rounded-lg;
-  @apply text-lg font-cinzel font-bold;
+  @apply text-lg num font-bold;
   @apply transition-all duration-200;
   background: hsl(var(--muted) / 0.5);
 }
@@ -1945,7 +1552,7 @@ html {
 }
 
 .cycle-progress-number {
-  @apply font-cinzel text-2xl font-bold text-primary;
+  @apply num text-2xl font-bold text-primary;
 }
 
 .cycle-progress-label {

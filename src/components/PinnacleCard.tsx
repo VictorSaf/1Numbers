@@ -42,7 +42,7 @@ export const PinnacleCard = ({ pinnacle, challenge, isCurrentPeriod, delay = 0 }
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
           <div className={cn(
-            "w-10 h-10 rounded-full flex items-center justify-center text-lg font-cinzel font-bold",
+            "w-10 h-10 rounded-full flex items-center justify-center text-lg num font-bold",
             isCurrentPeriod ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
           )}>
             {pinnacle.number}

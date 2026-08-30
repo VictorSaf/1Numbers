@@ -60,7 +60,7 @@ const TransitCell = ({ t, hint, none }: { t: Transit; hint: string; none: string
   if (!t) return <td className="p-2 text-center text-faint">{none}</td>;
   return (
     <td className="p-2 text-center">
-      <span className="font-cinzel text-base text-foreground">{t.letter}</span>
+      <span className="num text-base text-foreground">{t.letter}</span>
       <span className="num ml-1 text-xs text-muted-foreground">{t.value}</span>
       <span className="block text-[10px] text-faint">
         {hint.replace("{a}", String(t.yearInLetter)).replace("{b}", String(t.value))}

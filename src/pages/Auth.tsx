@@ -172,7 +172,7 @@ const Auth = () => {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 border border-primary/20 mb-4">
               <Sparkles className="h-8 w-8 text-primary" />
             </div>
-            <h1 className="font-cinzel text-2xl text-foreground mb-2">
+            <h1 className="font-heading text-2xl text-foreground mb-2">
               {isLoginMode ? l.welcome : l.createAccount}
             </h1>
             <p className="text-sm text-muted-foreground">

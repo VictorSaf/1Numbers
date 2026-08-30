@@ -68,7 +68,7 @@ export const LetterMap = ({ fullName }: { fullName: string }) => {
                 key={`${letter.letter}-${i}`}
                 className="rounded-md border border-primary/10 bg-primary/5 p-2 text-center"
               >
-                <div className="font-cinzel text-lg text-primary">{letter.letter}</div>
+                <div className="num text-lg text-primary">{letter.letter}</div>
                 <div className="num text-xs text-muted-foreground">
                   {labels.value} {letter.value}
                 </div>

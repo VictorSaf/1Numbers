@@ -27,15 +27,15 @@ export const PredictionHistory = ({ predictions, className }: PredictionHistoryP
           <div className="grid grid-cols-3 gap-4">
             <div>
               <p className="text-sm text-muted-foreground mb-1">Total</p>
-              <p className="text-2xl font-cinzel font-bold">{accuracy.totalPredictions}</p>
+              <p className="text-2xl num font-bold">{accuracy.totalPredictions}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground mb-1">Evaluate</p>
-              <p className="text-2xl font-cinzel font-bold">{accuracy.ratedPredictions}</p>
+              <p className="text-2xl num font-bold">{accuracy.ratedPredictions}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground mb-1">Medie</p>
-              <p className="text-2xl font-cinzel font-bold">{accuracy.averageAccuracy}%</p>
+              <p className="text-2xl num font-bold">{accuracy.averageAccuracy}%</p>
             </div>
           </div>
 
@@ -73,7 +73,7 @@ export const PredictionHistory = ({ predictions, className }: PredictionHistoryP
 
       {/* Recent Predictions */}
       <div className="space-y-4">
-        <h3 className="font-cinzel text-xl text-foreground">Previziuni Recente</h3>
+        <h3 className="font-heading text-xl text-foreground">Previziuni Recente</h3>
         {predictions.length > 0 ? (
           <div className="space-y-3">
             {predictions.slice(0, 5).map((prediction) => (

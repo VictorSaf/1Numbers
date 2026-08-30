@@ -354,7 +354,7 @@ const Journal = () => {
 
           {/* Journal Entries */}
           <div className="space-y-4">
-            <h2 className="font-cinzel text-2xl text-foreground">
+            <h2 className="font-heading text-2xl text-foreground">
               {filterType === 'all' ? 'Toate Intrările' : filterType === 'journal' ? 'Jurnal' : 'Previziuni'}
             </h2>
             {entries.length > 0 ? (
