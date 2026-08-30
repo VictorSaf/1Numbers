@@ -99,3 +99,21 @@ describe("two themes, not four names for two", () => {
     expect(RULES).not.toContain(".no-animations");
   });
 });
+
+describe("reduced motion does not hide the page", () => {
+  const RULES = readFileSync(join(ROOT, "src/index.css"), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+  const block = RULES.slice(RULES.indexOf("@media (prefers-reduced-motion: reduce)"));
+
+  it("shows what an entrance animation was going to reveal", () => {
+    // Almost every block on the reading page is `opacity-0 animate-fade-in`:
+    // invisible until an animation brings it in. Shortening that animation to
+    // 0.01ms does not reliably leave the forwards fill applied, so the entire
+    // result page rendered blank for anyone who had asked for less motion.
+    // Measured in Chromium: five cards and thirteen blocks at opacity 0.
+    for (const utility of [".animate-fade-in", ".animate-slide-up", ".animate-scale-in"]) {
+      expect(block, utility).toContain(utility);
+    }
+    expect(block).toMatch(/opacity: 1 !important/);
+    expect(block).toMatch(/animation: none !important/);
+  });
+});

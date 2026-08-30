@@ -553,6 +553,20 @@
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
+
+    /* Content that starts at opacity 0 and is revealed by an animation must not
+       depend on that animation ever running. Shortening the duration to nothing
+       does not reliably leave the forwards fill applied, so the entire result
+       page rendered blank for anyone who had asked their system for less
+       motion -- the readers least able to work around it. Cancel the animation
+       and show the content instead of racing it. */
+    .animate-fade-in,
+    .animate-slide-up,
+    .animate-scale-in {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
   }
 }
 
