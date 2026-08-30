@@ -387,7 +387,7 @@ class ApiService {
     return this.request<{ users: Array<{ id: number; email: string; name: string; role: string; createdAt: string }> }>('/admin/users');
   }
 
-  async updateAdminUser(userId: number, data: { role?: string; status?: string }) {
+  async updateAdminUser(userId: number, data: { role?: string }) {
     return this.request<{ user: unknown }>(`/admin/users/${userId}`, {
       method: 'PATCH',
       body: data,

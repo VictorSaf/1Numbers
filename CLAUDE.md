@@ -24,7 +24,8 @@ npm run test:run -- src/lib/__tests__/numerology.test.ts
 cd server
 npm run dev           # Start Express server with nodemon
 npm run build         # TypeScript compilation
-npm run migrate       # Run database migrations
+npm run migrate       # Apply every pending migration, in filename order
+npm run migrate -- --baseline   # Record them as applied WITHOUT running them
 npm run test          # Run backend tests once
 npm run test:watch    # Run backend tests in watch mode
 ```
@@ -80,6 +81,19 @@ Each route has a `kind`:
   them back for the copy served locally on :8090.
 
 Adding a route means editing `routes.json` și `PAGES` in `App.tsx`. Nothing else.
+
+### Migrations
+
+`server/src/migrations/` holds the schema, `001_create_users.sql` first. Every
+`.sql` file is applied once, in filename order, each in its own transaction, and
+recorded in `schema_migrations`; `npm run migrate` is a no-op once they are all
+in. A failing migration rolls back alone and stops the run.
+
+They are not replayable: `CREATE TRIGGER` in 004, 006 and 007 has no
+`IF NOT EXISTS`, and 005 and 009 seed `subscription_plans` without
+`ON CONFLICT`. Against a database that already carries the schema but has no
+`schema_migrations` — which is what the live one was until 2026-08-30 — run
+`npm run migrate -- --baseline` once, then migrate normally from there.
 
 ### Auth
 

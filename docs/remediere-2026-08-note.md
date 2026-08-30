@@ -49,3 +49,35 @@ Lucruri găsite în afara listei. Nimic din ce e aici n-a fost reparat; e doar c
 - **`ALLOW_BILLING` e documentat doar în `server/.env`**, care e în `.gitignore`,
   deci nu ajunge în repo. Nu există `.env.example` în `server/` — aceeași lipsă
   o are și `ALLOW_REGISTRATION`. Merită unul, dar e curățenie de Etapa 7.
+
+## Etapa 2
+
+- **Migrațiile nu sunt reluabile — de-asta runner-ul are `--baseline`.**
+  Directiva cere doar „sare peste ce e deja aplicat", ceea ce presupune
+  `schema_migrations`. Baza vie n-avea tabelul, dar avea toate cele 23 de
+  tabele, deci prima rulare ar fi încercat să le recreeze. Verificat empiric:
+  pe o bază care are deja schema, `npm run migrate` aplică 000–003 (sunt
+  idempotente) și pică pe 004, la `CREATE TRIGGER update_journal_entries_updated_at
+  ... already exists`. `CREATE TRIGGER` n-are `IF NOT EXISTS` în 004, 006 și 007,
+  iar 005 și 009 fac seed în `subscription_plans` fără `ON CONFLICT`.
+  `--baseline` e minimul care nu strică baza existentă. N-am atins 002–009 ca să
+  le fac idempotente — ar fi fost rescriere de istoric, în afara listei.
+
+- **FK-ul circular s-a rezolvat singur.** `005:60` adaugă deja
+  `users.current_subscription_id` cu `REFERENCES subscriptions(id)`, deci `001`
+  creează `users` fără coloana aia și ordinea numerotării face restul. Numele
+  constrângerilor generate de Postgres (`users_pkey`, `users_email_key`,
+  `users_role_check`, `users_current_subscription_id_fkey`) coincid cu cele din
+  producție fără să fie scrise de mână.
+
+- **`users` n-are trigger pe `updated_at`.** Coloana are `DEFAULT now()` și nu
+  se mai atinge niciodată. 004, 006 și 007 leagă `update_updated_at_column()` de
+  tabelele lor; `users` n-a primit unul. Nu i-am pus — ar fi fost schimbare de
+  comportament strecurată într-o captură.
+
+- **`updateAdminUser` n-are niciun apelant** în `src/`. Am scos `status` din
+  semnătură oricum, cum cere directiva, dar ruta `PATCH /admin/users/:id` e
+  cablată doar dinspre server. Candidat pentru Etapa 7.
+
+- **Captura schemei a venit prin WhatsApp, dintr-o sesiune CC de pe mașina cu
+  baza.** Nu e în repo. Dacă o vrei ca dovadă, `docs/` e locul.

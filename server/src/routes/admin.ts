@@ -134,11 +134,16 @@ router.get('/users', async (req: AuthRequest, res: Response) => {
   }
 });
 
-// PATCH /api/admin/users/:id - Update user (role, status)
+// PATCH /api/admin/users/:id - Update user role
+//
+// This used to accept a `status` as well and write it to users.status, a column
+// no migration creates and the live database does not have -- so every request
+// carrying one failed on an undefined column. Role is the only thing here that
+// exists.
 router.patch('/users/:id', async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const { role, status } = req.body;
+    const { role } = req.body;
 
     // Don't allow admin to demote themselves
     if (id === req.userId && role && role !== 'admin') {
@@ -152,11 +157,6 @@ router.patch('/users/:id', async (req: AuthRequest, res: Response) => {
     if (role) {
       updates.push(`role = $${paramCount++}`);
       values.push(role);
-    }
-
-    if (status !== undefined) {
-      updates.push(`status = $${paramCount++}`);
-      values.push(status);
     }
 
     if (updates.length === 0) {
