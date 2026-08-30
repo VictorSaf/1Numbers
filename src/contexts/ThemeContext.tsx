@@ -37,37 +37,35 @@ const defaultDisplaySettings: DisplaySettings = {
   layout: 'comfortable',
 };
 
+const THEME_NAMES: ThemeName[] = ['twilight', 'dawn', 'midnight', 'celestial', 'custom'];
+
+/** localStorage throws in some privacy modes, so every read is guarded. */
+function read<T>(key: string, parse: (raw: string) => T | null, fallback: T): T {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw === null) return fallback;
+    return parse(raw) ?? fallback;
+  } catch (e) {
+    console.error(`Error loading ${key}:`, e);
+    return fallback;
+  }
+}
+
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [theme, setThemeState] = useState<ThemeName>('twilight');
-  const [customTheme, setCustomThemeState] = useState<CustomTheme | null>(null);
-  const [displaySettings, setDisplaySettingsState] = useState<DisplaySettings>(defaultDisplaySettings);
-
-  // Load preferences from localStorage
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as ThemeName | null;
-    const savedCustomTheme = localStorage.getItem('customTheme');
-    const savedDisplaySettings = localStorage.getItem('displaySettings');
-
-    if (savedTheme && ['twilight', 'dawn', 'midnight', 'celestial', 'custom'].includes(savedTheme)) {
-      setThemeState(savedTheme);
-    }
-
-    if (savedCustomTheme) {
-      try {
-        setCustomThemeState(JSON.parse(savedCustomTheme));
-      } catch (e) {
-        console.error('Error loading custom theme:', e);
-      }
-    }
-
-    if (savedDisplaySettings) {
-      try {
-        setDisplaySettingsState({ ...defaultDisplaySettings, ...JSON.parse(savedDisplaySettings) });
-      } catch (e) {
-        console.error('Error loading display settings:', e);
-      }
-    }
-  }, []);
+  // Read during the first render, not in an effect afterwards.
+  //
+  // The effect that used to do this ran after the first paint, so every load
+  // showed the default theme for a frame and then swapped -- a visible flash on
+  // every single page view for anyone whose theme was not 'twilight'.
+  const [theme, setThemeState] = useState<ThemeName>(() =>
+    read('theme', (raw) => (THEME_NAMES.includes(raw as ThemeName) ? (raw as ThemeName) : null), 'twilight'),
+  );
+  const [customTheme, setCustomThemeState] = useState<CustomTheme | null>(() =>
+    read<CustomTheme | null>('customTheme', (raw) => JSON.parse(raw) as CustomTheme, null),
+  );
+  const [displaySettings, setDisplaySettingsState] = useState<DisplaySettings>(() =>
+    read('displaySettings', (raw) => ({ ...defaultDisplaySettings, ...JSON.parse(raw) }), defaultDisplaySettings),
+  );
 
   // Apply theme to document
   useEffect(() => {
