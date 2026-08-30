@@ -1,7 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { fullProfile } from "@/lib/numerology-plus";
+import { interpretProfile } from "@/lib/numerology-plus/content/interpret";
 import NewNumbers from "../NewNumbers";
+import { ALL_CHAPTER_KEYS } from "../chapterKeys";
 
 /**
  * Renders the section the way the results page does. The engine's own suite
@@ -12,7 +15,7 @@ import NewNumbers from "../NewNumbers";
 const renderSection = () =>
   render(
     <LanguageProvider>
-      <NewNumbers fullName="Victor Ion Safta" birthDate={new Date(1990, 7, 25)} />
+      <NewNumbers fullName="Victor Ion Safta" birthDate={new Date(1990, 7, 25)} keys={ALL_CHAPTER_KEYS} />
     </LanguageProvider>,
   );
 
@@ -20,7 +23,7 @@ describe("NewNumbers", () => {
   it("renders a card per interpretation", () => {
     renderSection();
     // Eleven frames are wired in interpretProfile; each becomes one article.
-    expect(screen.getAllByRole("article").length).toBeGreaterThanOrEqual(10);
+    expect(screen.getAllByRole("article").length).toBe(ALL_CHAPTER_KEYS.length);
   });
 
   it("labels every card and asks its question", () => {
@@ -46,5 +49,13 @@ describe("NewNumbers", () => {
   it("renders numerals through the tabular class so columns align", () => {
     const { container } = renderSection();
     expect(container.querySelectorAll(".num").length).toBeGreaterThan(0);
+  });
+
+  it("distributes every interpretation the engine emits across the chapters", () => {
+    // A key added to interpretProfile and forgotten in chapterKeys.ts would
+    // simply stop being rendered, with nothing to say so.
+    const profile = fullProfile("Victor Ion Safta", { day: 25, month: 8, year: 1990 });
+    const emitted = interpretProfile(profile.pythagorean, "ro").map((i) => i.key).sort();
+    expect([...ALL_CHAPTER_KEYS].sort()).toEqual(emitted);
   });
 });

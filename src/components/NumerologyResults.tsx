@@ -6,7 +6,6 @@ import { PinnacleCard } from "./PinnacleCard";
 import { KarmicDebtCard } from "./KarmicDebtCard";
 import { PersonalCycleCard } from "./PersonalCycleCard";
 import { LuckyDatesCard } from "./LuckyDatesCard";
-import { NameAnalysisCard } from "./NameAnalysisCard";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import {
@@ -22,7 +21,14 @@ import { generateShareableLink } from "@/lib/sharing";
 import { ExportMenu } from "./ExportMenu";
 import { ShareButtons } from "./ShareButtons";
 import { track } from '@/lib/analytics';
-import { ResultSection } from "@/components/ResultSection";
+import { Chapter, Block, type ChapterMeta } from "@/components/numerology/Chapter";
+import { LetterMap } from "@/components/numerology/LetterMap";
+import { ChapterNav } from "@/components/numerology/ChapterNav";
+import { SaveMapButton } from "@/components/numerology/SaveMapButton";
+import { WhenVisible } from "@/components/WhenVisible";
+import {
+  CHAPTER_SELF, CHAPTER_TENSION, CHAPTER_LESSONS, CHAPTER_NOW,
+} from "@/components/numerology/chapterKeys";
 
 // Lazy load heavy chart components (Recharts)
 const ExpressionPlanes = lazy(() => import("@/components/numerology/ExpressionPlanes"));
@@ -31,7 +37,6 @@ const Biorhythms = lazy(() => import("@/components/numerology/Biorhythms"));
 const DestinyMatrix = lazy(() => import("@/components/numerology/DestinyMatrix"));
 const NewNumbers = lazy(() => import("@/components/numerology/NewNumbers"));
 const NumerologyRadarChart = lazy(() => import("./charts/NumerologyRadarChart").then(m => ({ default: m.NumerologyRadarChart })));
-const NumberDistributionChart = lazy(() => import("./charts/NumberDistributionChart").then(m => ({ default: m.NumberDistributionChart })));
 
 // Chart loading skeleton
 const ChartSkeleton = () => (
@@ -69,6 +74,58 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
   const currentYear = new Date().getFullYear();
   const currentAge = currentYear - birthDate.getFullYear();
 
+  // The five questions the reading answers, in order. The chapter is the unit
+  // now: the page used to be fifteen blocks in the order they were written, ten
+  // of them folded behind ten identical "Show" buttons.
+  const CHAPTERS: Record<string, { title: Record<string, string>; question: Record<string, string> }> = {
+    self: {
+      title: { ro: "Cine ești", en: "Who you are", ru: "Кто вы" },
+      question: {
+        ro: "Din ce ești făcut, indiferent de an.",
+        en: "What you are made of, whatever the year.",
+        ru: "Из чего вы состоите, независимо от года.",
+      },
+    },
+    tension: {
+      title: { ro: "Ce se contrazice în tine", en: "What contradicts itself in you", ru: "Что в вас противоречит" },
+      question: {
+        ro: "Cele două lucruri din harta ta care nu se potrivesc.",
+        en: "The two things in your map that do not fit together.",
+        ru: "Две вещи в вашей карте, которые не сходятся.",
+      },
+    },
+    lessons: {
+      title: { ro: "Ce ai de învățat", en: "What you have to learn", ru: "Чему вам предстоит учиться" },
+      question: {
+        ro: "Ce lipsește din harta ta și de ce contează.",
+        en: "What is missing from your map, and why it matters.",
+        ru: "Чего не хватает в вашей карте и почему это важно.",
+      },
+    },
+    now: {
+      title: { ro: "Unde ești acum", en: "Where you are now", ru: "Где вы сейчас" },
+      question: {
+        ro: "Ce se întâmplă anul ăsta, luna asta, azi.",
+        en: "What is happening this year, this month, today.",
+        ru: "Что происходит в этом году, в этом месяце, сегодня.",
+      },
+    },
+    ahead: {
+      title: { ro: "Ce urmează", en: "What comes next", ru: "Что дальше" },
+      question: {
+        ro: "Harta întregii vieți, pe etape.",
+        en: "The map of a whole life, in stages.",
+        ru: "Карта всей жизни, по этапам.",
+      },
+    },
+  };
+
+  const chapters: ChapterMeta[] = Object.entries(CHAPTERS).map(([id, c]) => ({
+    id,
+    title: c.title[language] ?? c.title.en,
+    question: c.question[language] ?? c.question.en,
+  }));
+
   const sectionLabels = {
     pinnacles: { ro: "Pinnacle-uri și Provocări", en: "Pinnacles & Challenges", ru: "Пиннакли и Вызовы" },
     karmic: { ro: "Datorii Karmice", en: "Karmic Debts", ru: "Кармические Долги" },
@@ -81,7 +138,13 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     planes: { ro: "Planurile de Expresie", en: "Planes of Expression", ru: "Планы Выражения" },
     matrix: { ro: "Matrița Destinului", en: "Destiny Matrix", ru: "Матрица Судьбы" },
     transits: { ro: "Tranzite și Esență", en: "Transits and Essence", ru: "Транзиты и Сущность" },
-    biorhythms: { ro: "Biorritmuri", en: "Biorhythms", ru: "Биоритмы" }
+    biorhythms: { ro: "Biorritmuri", en: "Biorhythms", ru: "Биоритмы" },
+    core: { ro: "Numerele de bază", en: "The core numbers", ru: "Основные числа" },
+    profile: { ro: "Profilul numerologic", en: "Numerology profile", ru: "Нумерологический профиль" },
+    distribution: { ro: "Distribuția cifrelor", en: "Number distribution", ru: "Распределение чисел" },
+    cycles: { ro: "Ciclurile personale", en: "Personal cycles", ru: "Личные циклы" },
+    tension: { ro: "Punțile și echilibrul", en: "The bridges and the balance", ru: "Мосты и равновесие" },
+    depth: { ro: "Ce e sub suprafață", en: "What sits under the surface", ru: "Что лежит под поверхностью" }
   };
 
   // One line per section, shown under its title whether it is open or closed.
@@ -95,7 +158,11 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     planes: { ro: "Cum se distribuie literele numelui tău pe patru planuri și trei naturi.", en: "How the letters of your name spread across four planes and three natures.", ru: "Как буквы вашего имени распределяются по четырём планам и трём натурам." },
     matrix: { ro: "Cele nouă puncte ale octagramei, calculate din data nașterii.", en: "The nine points of the octagram, drawn from your birth date.", ru: "Девять точек октаграммы, рассчитанных по дате рождения." },
     transits: { ro: "Ce literă îți guvernează fiecare an și când Esența întâlnește Anul Personal.", en: "Which letter governs each year, and when Essence meets the Personal Year.", ru: "Какая буква управляет каждым годом и когда Сущность встречает Личный год." },
-    biorhythms: { ro: "Ciclurile fizic, emoțional și intelectual pe o lună în jurul zilei de azi.", en: "Physical, emotional and intellectual cycles across a month around today.", ru: "Физический, эмоциональный и интеллектуальный циклы за месяц вокруг сегодняшнего дня." }
+    biorhythms: { ro: "Ciclurile fizic, emoțional și intelectual pe o lună în jurul zilei de azi.", en: "Physical, emotional and intellectual cycles across a month around today.", ru: "Физический, эмоциональный и интеллектуальный циклы за месяц вокруг сегодняшнего дня." },
+    distribution: { ro: "Câte litere din numele tău cad pe fiecare cifră.", en: "How many letters of your name land on each digit.", ru: "Сколько букв вашего имени приходится на каждую цифру." },
+    profile: { ro: "Cele cinci numere de bază, pe aceeași scară.", en: "The five core numbers, on one scale.", ru: "Пять основных чисел на одной шкале." },
+    tension: { ro: "Distanța dintre cine ești pe dinăuntru și cine pari pe dinafară.", en: "The distance between who you are inside and who you appear to be.", ru: "Расстояние между тем, кто вы внутри, и тем, кем кажетесь." },
+    depth: { ro: "Pasiunea ascunsă și cifrele care lipsesc cu totul din nume.", en: "The hidden passion, and the digits missing from your name entirely.", ru: "Скрытая страсть и цифры, которых в имени нет вовсе." }
   };
 
   // Generate share data
@@ -135,203 +202,194 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     language
   };
 
+  const chartSkeleton = <ChartSkeleton />;
+
   return (
-    <div className="space-y-8">
-      <div className="text-center space-y-4 opacity-0 animate-fade-in">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-          <Star className="h-4 w-4 text-primary" />
-          <span className="text-sm font-raleway text-primary">{t.profileTitle}</span>
-        </div>
-        <h2 className="font-cinzel text-2xl md:text-3xl text-foreground">{fullName}</h2>
-        <p className="text-muted-foreground">{t.profileSubtitle}</p>
-        
-        {/* Export and Share Buttons */}
-        <div className="flex items-center justify-center gap-3 pt-4">
-          <ExportMenu reportData={reportData} />
-          <ShareButtons shareData={shareData} />
-        </div>
-      </div>
+    <div className="lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-10">
+      <ChapterNav chapters={chapters} />
 
-      {/* Core Numbers */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <NumberCard title={t.lifePathTitle} number={results.lifePath} description={t.lifePathDesc} delay={100} isMain />
-        <NumberCard title={t.destinyTitle} number={results.destiny} description={t.destinyDesc} delay={200} />
-        <NumberCard title={t.soulUrgeTitle} number={results.soulUrge} description={t.soulUrgeDesc} delay={300} />
-        <NumberCard title={t.personalityTitle} number={results.personality} description={t.personalityDesc} delay={400} />
-        <NumberCard title={`${t.personalYearTitle} ${currentYear}`} number={results.personalYear} description={t.personalYearDesc} delay={500} />
-      </div>
-
-      {/* Personal Cycles */}
-      <PersonalCycleCard birthDate={birthDate} delay={550} />
-
-      {/* Pinnacles & Challenges */}
-      <ResultSection
-        className="opacity-0 animate-fade-in ds-delay-600"
-        title={sectionLabels.pinnacles[language]}
-        icon={<Mountain className="h-5 w-5 text-primary" />}
-        teaser={teasers.pinnacles[language]}
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {pinnacles.map((pinnacle, i) => (
-            <PinnacleCard
-              key={i}
-              pinnacle={pinnacle}
-              challenge={challenges[i]}
-              isCurrentPeriod={currentAge >= pinnacle.startAge && currentAge <= pinnacle.endAge}
-              delay={650 + i * 50}
-            />
-          ))}
-        </div>
-      </ResultSection>
-
-      {/* Karmic Debts */}
-      <ResultSection
-        className="opacity-0 animate-fade-in ds-delay-900"
-        title={sectionLabels.karmic[language]}
-        icon={<AlertTriangle className="h-5 w-5 text-warn" />}
-        teaser={teasers.karmic[language]}
-      >
-        {karmicDebts.length > 0 ? (
-          <div className="space-y-4">
-            {karmicDebts.map((debt, i) => (
-              <KarmicDebtCard key={i} debt={debt} delay={900 + i * 50} />
-            ))}
+      <div className="space-y-14">
+        <div className="text-center space-y-4 opacity-0 animate-fade-in">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+            <Star className="h-4 w-4 text-primary" />
+            <span className="text-sm font-raleway text-primary">{t.profileTitle}</span>
           </div>
-        ) : (
-          <p className="text-sm text-muted-foreground p-4 rounded-xl bg-ok/10 border border-ok/20">
-            ✓ {sectionLabels.noDebts[language]}
-          </p>
-        )}
-      </ResultSection>
+          <h2 className="font-cinzel text-2xl md:text-3xl text-foreground">{fullName}</h2>
+          <p className="text-muted-foreground">{t.profileSubtitle}</p>
 
-      {/* Karmic Lessons */}
-      {karmicLessons.length > 0 && (
-        <ResultSection
-          className="opacity-0 animate-fade-in ds-delay-1000"
-          title={sectionLabels.lessons[language]}
-          icon={<Sparkles className="h-5 w-5 text-primary" />}
-          teaser={teasers.lessons[language]}
-        >
-          <div className="flex flex-wrap gap-2">
-            {karmicLessons.map((num) => (
-              <div key={num} className="px-3 py-2 rounded-lg bg-muted/50 border border-border/50">
-                <span className="font-cinzel text-primary mr-2">{num}</span>
-                <span className="text-xs text-muted-foreground">{KARMIC_LESSON_MEANINGS[num]?.title[language]}</span>
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
+            <ExportMenu reportData={reportData} />
+            <ShareButtons shareData={shareData} />
+            {/* Starting over belongs beside the other things you can do with a
+                reading, not at the end of it. The last thing on the page is the
+                offer to keep the map. */}
+            <Button onClick={onReset} variant="ghost" size="sm" className="text-muted-foreground">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              {t.calculateAgain}
+            </Button>
+          </div>
+        </div>
+
+        {/* 1 — Cine ești */}
+        <Chapter meta={chapters[0]} index={1}>
+          <Block title={sectionLabels.core[language]} icon={<Star className="h-5 w-5 text-primary" />}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <NumberCard title={t.lifePathTitle} number={results.lifePath} description={t.lifePathDesc} delay={100} isMain />
+              <NumberCard title={t.destinyTitle} number={results.destiny} description={t.destinyDesc} delay={200} />
+              <NumberCard title={t.soulUrgeTitle} number={results.soulUrge} description={t.soulUrgeDesc} delay={300} />
+              <NumberCard title={t.personalityTitle} number={results.personality} description={t.personalityDesc} delay={400} />
+            </div>
+          </Block>
+
+          <Block title={sectionLabels.newNumbers[language]} icon={<Sparkles className="h-5 w-5 text-primary" />}>
+            <Suspense fallback={chartSkeleton}>
+              <NewNumbers fullName={fullName} birthDate={birthDate} keys={CHAPTER_SELF} />
+            </Suspense>
+          </Block>
+
+          {/* The one diagram of this chapter: the five core numbers on one
+              scale, which is the only place they can be seen against each
+              other. It used to sit orphaned at the very bottom of the page. */}
+          <Block title={sectionLabels.profile[language]} icon={<Target className="h-5 w-5 text-primary" />} note={teasers.profile[language]}>
+            <WhenVisible fallback={chartSkeleton}>
+              <Suspense fallback={chartSkeleton}>
+                <NumerologyRadarChart lifePath={results.lifePath} destiny={results.destiny} soulUrge={results.soulUrge} personality={results.personality} personalYear={results.personalYear} />
+              </Suspense>
+            </WhenVisible>
+          </Block>
+        </Chapter>
+
+        {/* 2 — Ce se contrazice în tine */}
+        <Chapter meta={chapters[1]} index={2}>
+          <Block title={sectionLabels.tension[language]} icon={<AlertTriangle className="h-5 w-5 text-warn" />} note={teasers.tension[language]}>
+            <Suspense fallback={chartSkeleton}>
+              <NewNumbers fullName={fullName} birthDate={birthDate} keys={CHAPTER_TENSION} />
+            </Suspense>
+          </Block>
+        </Chapter>
+
+        {/* 3 — Ce ai de învățat */}
+        <Chapter meta={chapters[2]} index={3}>
+          <Block title={sectionLabels.karmic[language]} icon={<AlertTriangle className="h-5 w-5 text-warn" />} note={teasers.karmic[language]}>
+            {karmicDebts.length > 0 ? (
+              <div className="space-y-4">
+                {karmicDebts.map((debt, i) => (
+                  <KarmicDebtCard key={i} debt={debt} delay={i * 50} />
+                ))}
               </div>
-            ))}
-          </div>
-        </ResultSection>
-      )}
+            ) : (
+              <p className="text-sm text-muted-foreground p-4 rounded-xl bg-ok/10 border border-ok/20">
+                ✓ {sectionLabels.noDebts[language]}
+              </p>
+            )}
+          </Block>
 
-      {/* Lucky Dates */}
-      <ResultSection
-        title={sectionLabels.luckyDates[language]}
-        icon={<CalendarCheck className="h-5 w-5 text-primary" />}
-        teaser={teasers.luckyDates[language]}
-      >
-        <LuckyDatesCard birthDate={birthDate} fullName={fullName} delay={1000} />
-      </ResultSection>
+          <Block title={sectionLabels.lessons[language]} icon={<Sparkles className="h-5 w-5 text-primary" />} note={teasers.lessons[language]}>
+            {karmicLessons.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {karmicLessons.map((num) => (
+                  <div key={num} className="px-3 py-2 rounded-lg bg-muted/50 border border-border/50">
+                    <span className="font-cinzel text-primary mr-2">{num}</span>
+                    <span className="text-xs text-muted-foreground">{KARMIC_LESSON_MEANINGS[num]?.title[language]}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground p-4 rounded-xl bg-ok/10 border border-ok/20">
+                ✓ {sectionLabels.noLessons[language]}
+              </p>
+            )}
+          </Block>
 
-      {/* Name Analysis */}
-      <ResultSection
-        className="opacity-0 animate-fade-in ds-delay-1100"
-        title={sectionLabels.nameAnalysis[language]}
-        icon={<Type className="h-5 w-5 text-primary" />}
-        teaser={teasers.nameAnalysis[language]}
-      >
-        <NameAnalysisCard fullName={fullName} />
-      </ResultSection>
+          <Block title={sectionLabels.depth[language]} icon={<Grid3x3 className="h-5 w-5 text-primary" />} note={teasers.depth[language]}>
+            <Suspense fallback={chartSkeleton}>
+              <NewNumbers fullName={fullName} birthDate={birthDate} keys={CHAPTER_LESSONS} />
+            </Suspense>
+          </Block>
 
-      {/* The fourteen new numbers. Lazily loaded: this is the only import of the
-          engine's content layer, which carries archetypes, frames and arcana in
-          three languages and has no business in the initial bundle. */}
-      <ResultSection
-        title={sectionLabels.newNumbers[language]}
-        icon={<Sparkles className="h-5 w-5 text-primary" />}
-        teaser={teasers.newNumbers[language]}
-      >
-        <Suspense fallback={<ChartSkeleton />}>
-          <NewNumbers fullName={fullName} birthDate={birthDate} />
-        </Suspense>
-      </ResultSection>
+          {/* This chapter's one diagram: the inclusion table drawn, split by
+              vowel and consonant. The plain distribution chart that used to sit
+              at the foot of the page showed the same counts without the split,
+              so it is gone rather than duplicated. Behind the visibility gate --
+              it is the only Recharts mount in this chapter. */}
+          <Block title={sectionLabels.distribution[language]} icon={<BarChart3 className="h-5 w-5 text-primary" />} note={teasers.distribution[language]}>
+            <WhenVisible fallback={chartSkeleton}>
+              <LetterMap fullName={fullName} />
+            </WhenVisible>
+          </Block>
 
-      {/* Planes of Expression. Lazy on the same pattern as the new numbers. */}
-      <ResultSection
-        title={sectionLabels.planes[language]}
-        icon={<Grid3x3 className="h-5 w-5 text-primary" />}
-        teaser={teasers.planes[language]}
-      >
-        <Suspense fallback={<ChartSkeleton />}>
-          <ExpressionPlanes fullName={fullName} />
-        </Suspense>
-      </ResultSection>
+          <Block title={sectionLabels.planes[language]} icon={<Grid3x3 className="h-5 w-5 text-primary" />} note={teasers.planes[language]}>
+            <Suspense fallback={chartSkeleton}>
+              <ExpressionPlanes fullName={fullName} />
+            </Suspense>
+          </Block>
+        </Chapter>
 
-      {/* The Destiny Matrix octagram. Only the nine base points the engine marks
-          confidence:'high'; the derived layers stay out of the reading. */}
-      <ResultSection
-        title={sectionLabels.matrix[language]}
-        icon={<Compass className="h-5 w-5 text-primary" />}
-        teaser={teasers.matrix[language]}
-      >
-        <Suspense fallback={<ChartSkeleton />}>
-          <DestinyMatrix birthDate={birthDate} />
-        </Suspense>
-      </ResultSection>
+        {/* 4 — Unde ești acum */}
+        <Chapter meta={chapters[3]} index={4}>
+          <Block title={sectionLabels.cycles[language]} icon={<CalendarCheck className="h-5 w-5 text-primary" />}>
+            <div className="space-y-6">
+              <NumberCard title={`${t.personalYearTitle} ${currentYear}`} number={results.personalYear} description={t.personalYearDesc} delay={100} />
+              <PersonalCycleCard birthDate={birthDate} delay={150} />
+            </div>
+          </Block>
 
-      {/* Transits and Essence, with the Duality years highlighted. */}
-      <ResultSection
-        title={sectionLabels.transits[language]}
-        icon={<CalendarRange className="h-5 w-5 text-primary" />}
-        teaser={teasers.transits[language]}
-      >
-        <Suspense fallback={<ChartSkeleton />}>
-          <TransitsTimeline fullName={fullName} birthDate={birthDate} />
-        </Suspense>
-      </ResultSection>
+          <Block title={sectionLabels.transits[language]} icon={<CalendarRange className="h-5 w-5 text-primary" />} note={teasers.transits[language]}>
+            <Suspense fallback={chartSkeleton}>
+              <NewNumbers fullName={fullName} birthDate={birthDate} keys={CHAPTER_NOW} />
+            </Suspense>
+          </Block>
 
-      {/* Biorhythms. Recharts is already on this page, so this is a lazy chunk
-          rather than a new dependency. */}
-      <ResultSection
-        title={sectionLabels.biorhythms[language]}
-        icon={<Activity className="h-5 w-5 text-primary" />}
-        teaser={teasers.biorhythms[language]}
-      >
-        <Suspense fallback={<ChartSkeleton />}>
-          <Biorhythms birthDate={birthDate} />
-        </Suspense>
-      </ResultSection>
+          <Block title={sectionLabels.luckyDates[language]} icon={<CalendarCheck className="h-5 w-5 text-primary" />} note={teasers.luckyDates[language]}>
+            <LuckyDatesCard birthDate={birthDate} fullName={fullName} delay={200} />
+          </Block>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 opacity-0 animate-fade-in ds-delay-1100">
-        <div className="p-6 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm">
-          <div className="flex items-center gap-2 mb-4">
-            <Target className="h-5 w-5 text-primary" />
-            <h3 className="font-cinzel text-lg text-foreground">
-              {language === 'ro' ? 'Profilul Numerologic' : language === 'ru' ? 'Нумерологический Профиль' : 'Numerology Profile'}
-            </h3>
-          </div>
-          <Suspense fallback={<ChartSkeleton />}>
-            <NumerologyRadarChart lifePath={results.lifePath} destiny={results.destiny} soulUrge={results.soulUrge} personality={results.personality} personalYear={results.personalYear} />
-          </Suspense>
+          {/* This chapter's diagram. Recharts lives inside it, so it stays behind
+              the visibility gate like the other two. */}
+          <Block title={sectionLabels.biorhythms[language]} icon={<Activity className="h-5 w-5 text-primary" />} note={teasers.biorhythms[language]}>
+            <WhenVisible fallback={chartSkeleton}>
+              <Suspense fallback={chartSkeleton}>
+                <Biorhythms birthDate={birthDate} />
+              </Suspense>
+            </WhenVisible>
+          </Block>
+        </Chapter>
+
+        {/* 5 — Ce urmează */}
+        <Chapter meta={chapters[4]} index={5}>
+          <Block title={sectionLabels.pinnacles[language]} icon={<Mountain className="h-5 w-5 text-primary" />} note={teasers.pinnacles[language]}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {pinnacles.map((pinnacle, i) => (
+                <PinnacleCard
+                  key={i}
+                  pinnacle={pinnacle}
+                  challenge={challenges[i]}
+                  isCurrentPeriod={currentAge >= pinnacle.startAge && currentAge <= pinnacle.endAge}
+                  delay={i * 50}
+                />
+              ))}
+            </div>
+          </Block>
+
+          <Block title={sectionLabels.transits[language]} icon={<CalendarRange className="h-5 w-5 text-primary" />} note={teasers.transits[language]}>
+            <Suspense fallback={chartSkeleton}>
+              <TransitsTimeline fullName={fullName} birthDate={birthDate} />
+            </Suspense>
+          </Block>
+
+          {/* The octagram, this chapter's one diagram. Inline SVG, not Recharts,
+              so it needs no visibility gate. */}
+          <Block title={sectionLabels.matrix[language]} icon={<Compass className="h-5 w-5 text-primary" />} note={teasers.matrix[language]}>
+            <Suspense fallback={chartSkeleton}>
+              <DestinyMatrix birthDate={birthDate} />
+            </Suspense>
+          </Block>
+        </Chapter>
+
+        {/* The reading ends by offering to keep it, not to throw it away. */}
+        <div className="flex justify-center border-t border-border/60 pt-10">
+          <SaveMapButton fullName={fullName} birthDate={birthDate} />
         </div>
-        <div className="p-6 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm">
-          <div className="flex items-center gap-2 mb-4">
-            <BarChart3 className="h-5 w-5 text-primary" />
-            <h3 className="font-cinzel text-lg text-foreground">
-              {language === 'ro' ? 'Distribuția Numerelor' : language === 'ru' ? 'Распределение Чисел' : 'Number Distribution'}
-            </h3>
-          </div>
-          <Suspense fallback={<ChartSkeleton />}>
-            <NumberDistributionChart name={fullName} />
-          </Suspense>
-        </div>
-      </div>
-
-      <div className="flex justify-center pt-4 opacity-0 animate-fade-in ds-delay-1200">
-        <Button onClick={onReset} variant="outline" className="border-primary/30 text-primary hover:bg-primary/10">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          {t.calculateAgain}
-        </Button>
       </div>
     </div>
   );

@@ -204,21 +204,8 @@ export const translations = {
     
     // Name Analysis
     nameAnalysis: {
-      title: "Analiză Completă a Numelui",
-      subtitle: "Analiză detaliată a fiecărei litere și a energiilor ascunse",
-      letterDistribution: "Distribuția Literelor",
-      individualLetters: "Analiza Fiecărei Litere",
       vowel: "Vocală",
-      consonant: "Consoană",
-      vowelsAnalysis: "Vocale",
-      consonantsAnalysis: "Consoane",
-      soulUrgeNumber: "Numărul Sufletului",
-      personalityNumber: "Numărul Personalității",
-      vowels: "vocale",
-      consonants: "consoane",
-      hiddenNumbers: "Numere Ascunse",
-      number: "Număr",
-      optimizationSuggestions: "Sugestii de Optimizare"
+      consonant: "Consoană"
     },
     
     // Number meanings
@@ -611,21 +598,8 @@ export const translations = {
     
     // Name Analysis
     nameAnalysis: {
-      title: "Complete Name Analysis",
-      subtitle: "Detailed analysis of each letter and hidden energies",
-      letterDistribution: "Letter Distribution",
-      individualLetters: "Individual Letter Analysis",
       vowel: "Vowel",
-      consonant: "Consonant",
-      vowelsAnalysis: "Vowels",
-      consonantsAnalysis: "Consonants",
-      soulUrgeNumber: "Soul Urge Number",
-      personalityNumber: "Personality Number",
-      vowels: "vowels",
-      consonants: "consonants",
-      hiddenNumbers: "Hidden Numbers",
-      number: "Number",
-      optimizationSuggestions: "Optimization Suggestions"
+      consonant: "Consonant"
     },
     
     // Number meanings
@@ -1049,21 +1023,8 @@ export const translations = {
     
     // Name Analysis
     nameAnalysis: {
-      title: "Полный Анализ Имени",
-      subtitle: "Детальный анализ каждой буквы и скрытых энергий",
-      letterDistribution: "Распределение Букв",
-      individualLetters: "Анализ Каждой Буквы",
       vowel: "Гласная",
-      consonant: "Согласная",
-      vowelsAnalysis: "Гласные",
-      consonantsAnalysis: "Согласные",
-      soulUrgeNumber: "Число Души",
-      personalityNumber: "Число Личности",
-      vowels: "гласных",
-      consonants: "согласных",
-      hiddenNumbers: "Скрытые Числа",
-      number: "Число",
-      optimizationSuggestions: "Предложения по Оптимизации"
+      consonant: "Согласная"
     },
     
     // Number meanings

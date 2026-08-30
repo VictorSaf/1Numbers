@@ -16,9 +16,18 @@ import { NumberCard } from "./NumberCard";
 interface NewNumbersProps {
   fullName: string;
   birthDate: Date;
+  /**
+   * Which interpretations to render, in this order.
+   *
+   * The eleven used to arrive as one undifferentiated list under "The New
+   * Numbers", which is why a reader had no way to tell that the two bridges
+   * answer a different question from the inclusion table. The reading now
+   * distributes them across its chapters, and each chapter asks for its own.
+   */
+  keys: readonly string[];
 }
 
-const NewNumbers = ({ fullName, birthDate }: NewNumbersProps) => {
+const NewNumbers = ({ fullName, birthDate, keys }: NewNumbersProps) => {
   const { language } = useLanguage();
 
   const cards = useMemo(() => {
@@ -32,19 +41,25 @@ const NewNumbers = ({ fullName, birthDate }: NewNumbersProps) => {
       { raw?: number; value?: number; isMaster?: boolean; karmicDebt?: number | null }
     >;
 
-    return interpretProfile(profile.pythagorean, language).map((interpretation) => {
+    const byKey = new Map(
+      interpretProfile(profile.pythagorean, language).map((i) => [i.key, i]),
+    );
+
+    return keys.flatMap((key) => {
+      const interpretation = byKey.get(key);
+      if (!interpretation) return [];
       // Not every interpretation maps to a NumResult: subconsciousSelf and the
       // bridges are plain integers. Only the ones that do carry a raw total can
       // show where the value came from.
       const source = extended[interpretation.key];
-      return {
+      return [{
         interpretation,
         raw: typeof source?.raw === "number" ? source.raw : undefined,
         karmicDebt: source?.karmicDebt ?? null,
         isMaster: source?.isMaster ?? false,
-      };
+      }];
     });
-  }, [fullName, birthDate, language]);
+  }, [fullName, birthDate, language, keys]);
 
   return (
     <div className="grid gap-3">

@@ -252,3 +252,71 @@ Lucruri găsite în afara listei. Nimic din ce e aici n-a fost reparat; e doar c
 
 - **Testul de paritate a cheilor de traducere a găsit exact 23**, cum spunea
   auditul: 13 în `export.*` și 10 în `sharing.*`, toate lipsă din RO.
+
+## Plan de implementare — Etapa 1
+
+- **Capitolul 2 n-are diagramă.** Planul cere „exact o diagramă" per capitol, dar
+  punțile, echilibrul, gândirea rațională și sinele subconștient n-au niciuna
+  azi, iar regula 4 interzice calcule noi. Celelalte patru au câte una: radar (1),
+  distribuția cifrelor (3), biorritmuri (4), octagrama (5). Diagrama pentru
+  capitolul 2 aparține Etapei 4, care introduce chiar tokenurile `tensiune` și
+  `armonie` „pentru relațiile dintre numere (punți largi…)".
+
+- **„Piatra de Temelie" nu e încă în capitolul 1.** Tabelul planului o listează
+  acolo, dar `interpretLetters` n-are apelant, iar cablarea lui e explicit
+  Etapa 6. Capitolul 1 are acum Drum, Destin, Suflet, Personalitate, Atitudine
+  și Maturitate.
+
+- **`NameAnalysisCard` a fost desfăcut, nu mutat.** Nu apărea în niciun capitol
+  din tabel, iar la citire a ieșit că trei din cele cinci părți ale lui erau
+  răspunsuri secunde la întrebări la care pagina răspunde deja:
+  `analyzeVowelsSeparately` și `analyzeConsonantsSeparately` reinterpretau
+  Sufletul și Personalitatea, pe care capitolul 1 le dă din motor;
+  `findHiddenNumbers` număra a doua oară Pasiunea Ascunsă, pe care capitolul 3 o
+  ia din motor; iar `getNameOptimizationSuggestions` împacheta
+  `generateNameSuggestions`, pe care `/unelte` îl cheamă direct din tabul
+  „optimizator".
+
+  Ce a rămas e `numerology/LetterMap.tsx`: graficul de litere plus grila de
+  litere, pliată. Graficul ăla **e** distribuția cifrelor, cu împărțirea pe
+  vocale și consoane în plus — strict mai multă informație din aceleași
+  numărători (`analyzeIndividualLetters` și `inclusionTable` pornesc amândouă din
+  `classifyFullName`, iar un test o verifică). Deci
+  `NumberDistributionChart` a dispărut, nu s-a mutat: arăta un subset.
+
+  Șterse în consecință: `NameAnalysisCard` (292 linii), `NumberDistributionChart`
+  și testul lui, patru funcții din `nameAnalysis.ts` cu tipurile lor (~450 linii)
+  și cele patru blocuri de test aferente, plus 13 chei de traducere × 3 limbi
+  rămase fără cititor. `getLetterMeaning` a fost păstrat — e singurul lucru din
+  blocul șters pe care grila de litere încă îl folosește.
+
+  Dacă raportul plătit din Etapa 7 vrea forma lungă a optimizatorului, e la
+  `git show 12a48ea~1:src/lib/nameAnalysis.ts`.
+
+- **Capitolul 3 are acum o singură diagramă**, ca celelalte trei care au una.
+  Rezultat lateral: `@radix-ui/react-tabs` s-a desprins într-un chunk de 1,1 KB
+  partajat de trei pagini, fiindcă nu mai e tras în bundle-ul rezultatului.
+  Total assets 2860 KB → 2852 KB, `index.js` 380 KB → 376 KB.
+
+- **`ResultSection.tsx` a fost șters, nu convertit.** Planul spune că „își schimbă
+  rolul"; rolul nou e altul destul cât un fișier numit `ResultSection` care
+  exportă un antet de capitol ar minți. A devenit
+  `numerology/Chapter.tsx`, cu `Chapter` și `Block`.
+
+- **„Calculează din nou" a urcat, nu a dispărut.** Planul cere ca pagina să se
+  *termine* cu „Salvează harta asta". Ștergerea butonului cu totul ar fi lăsat
+  cititorul fără nicio ieșire din rezultat, fiindcă `handleNewCalculation` din
+  `Index.tsx` n-are apelant. A trecut lângă Export și Share, ca acțiune secundară.
+
+- **`Index.tsx:89` — `handleNewCalculation` e cod mort**, fără apelant. N-a
+  devenit mort din schimbarea asta, deci l-am lăsat; Etapa 2 rescrie navigația
+  din `Index` și e locul unde se decide.
+
+- **`WhenVisible` chiar amână Recharts.** `vendor-charts` are 412 KB și nu e
+  preîncărcat în `index.html`; se aducea doar pentru că graficele se montau
+  necondiționat, iar `React.lazy` pornește importul la randare. Patru locuri sunt
+  acum în spatele porții, inclusiv `NameAnalysisCard`, care își importă lazy
+  propriul grafic și altfel ar fi anulat tot câștigul.
+
+- **Build:** zero chunk-uri noi. `index.js` 380 KB → 388 KB, cele patru
+  componente noi de structură.

@@ -181,7 +181,9 @@ const Index = () => {
 
         {/* Results view */}
         {shouldShowResults && (
-          <div className="max-w-4xl mx-auto pt-4">
+          // Wider than the rest of the page: the reading carries a sticky
+          // chapter column beside it on desktop.
+          <div className="max-w-6xl mx-auto pt-4">
             <NumerologyResults
               fullName={userData.fullName}
               birthDate={userData.birthDate}
