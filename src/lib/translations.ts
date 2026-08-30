@@ -2,6 +2,33 @@ export type Language = "ro" | "en" | "ru";
 
 export const translations = {
   ro: {
+    export: {
+      export: "Exportă",
+      fullReport: "Raport complet PDF",
+      customReport: "Raport personalizat",
+      exportChart: "Exportă graficul",
+      options: "Opțiuni",
+      includeCharts: "Include graficele",
+      includeKarmic: "Include analiza karmică",
+      includePinnacles: "Include pinaclele",
+      includeCycles: "Include ciclurile",
+      includePredictions: "Include previziunile",
+      exporting: "Se exportă...",
+      success: "Export reușit!",
+      error: "Eroare la export"
+    },
+    sharing: {
+      share: "Distribuie",
+      shareTo: "Distribuie pe",
+      facebook: "Facebook",
+      twitter: "Twitter",
+      whatsapp: "WhatsApp",
+      instagram: "Instagram",
+      email: "Trimite pe e-mail",
+      copyLink: "Copiază linkul",
+      linkCopied: "Link copiat!",
+      nativeShare: "Distribuie"
+    },
     loading: "Se încarcă...",
     // Header
     title: "Numerologia",

@@ -104,9 +104,28 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     birthDate: birthDate.toISOString()
   });
   
+  // Hardcoded English, on a page that is otherwise fully translated -- and this
+  // is the text that leaves the app, into someone else's feed.
+  const SHARE_COPY = {
+    ro: {
+      title: (name: string) => `${name} — raport numerologic`,
+      text: (lp: number, d: number) => `Raportul meu numerologic: Drumul Vieții ${lp}, Destin ${d}.`,
+    },
+    en: {
+      title: (name: string) => `${name} — numerology report`,
+      text: (lp: number, d: number) => `My numerology report: Life Path ${lp}, Destiny ${d}.`,
+    },
+    ru: {
+      title: (name: string) => `${name} — нумерологический отчёт`,
+      text: (lp: number, d: number) => `Мой нумерологический отчёт: Жизненный путь ${lp}, Судьба ${d}.`,
+    },
+  } as const;
+
+  const share = SHARE_COPY[language as keyof typeof SHARE_COPY] ?? SHARE_COPY.en;
+
   const shareData = {
-    title: `${fullName} - Numerology Report`,
-    text: `Check out my numerology report! Life Path: ${results.lifePath}, Destiny: ${results.destiny}`,
+    title: share.title(fullName),
+    text: share.text(results.lifePath, results.destiny),
     url: shareUrl
   };
   

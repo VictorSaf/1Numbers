@@ -1,5 +1,6 @@
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend, Tooltip } from 'recharts';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { chartTheme, SERIES } from './chartTheme';
 
 interface NumerologyRadarChartProps {
   lifePath: number;
@@ -56,32 +57,27 @@ export const NumerologyRadarChart = ({
     <div className="w-full h-[300px] md:h-[350px]">
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart data={data} margin={{ top: 20, right: 30, bottom: 20, left: 30 }}>
-          <PolarGrid stroke="hsl(45 80% 55% / 0.3)" />
+          <PolarGrid stroke={chartTheme.line} />
           <PolarAngleAxis 
             dataKey="subject" 
-            tick={{ fill: 'hsl(45 30% 95%)', fontSize: 11 }}
+            tick={{ fill: chartTheme.label, fontSize: 11 }}
           />
           <PolarRadiusAxis 
             angle={90} 
             domain={[0, 33]} 
-            tick={{ fill: 'hsl(240 10% 60%)', fontSize: 10 }}
+            tick={{ fill: chartTheme.labelMuted, fontSize: 10 }}
             axisLine={false}
           />
           <Radar
             name="Numbers"
             dataKey="value"
-            stroke="hsl(45 80% 55%)"
-            fill="hsl(45 80% 55%)"
+            stroke={SERIES[0]}
+            fill={SERIES[0]}
             fillOpacity={0.4}
             strokeWidth={2}
           />
           <Tooltip 
-            contentStyle={{
-              backgroundColor: 'hsl(240 15% 12%)',
-              border: '1px solid hsl(260 30% 20%)',
-              borderRadius: '8px',
-              color: 'hsl(45 30% 95%)'
-            }}
+            contentStyle={chartTheme.tooltip}
           />
         </RadarChart>
       </ResponsiveContainer>

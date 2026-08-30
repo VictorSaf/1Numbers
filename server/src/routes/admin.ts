@@ -1,5 +1,6 @@
 import { Router, Response } from 'express';
 import { z } from 'zod';
+import { withoutSecrets } from '../lib/mcpConfig';
 import pool from '../db';
 import { authenticateToken, requireAdmin, AuthRequest } from '../middleware/auth';
 import { promises as fs } from 'fs';
@@ -7,14 +8,23 @@ import * as path from 'path';
 
 const router = Router();
 
-// Project root - resolved once at startup for security
-const PROJECT_ROOT = path.resolve(__dirname, '../../../..');
+// Project root.
+//
+// This was '../../../..', which from server/src/routes -- and from
+// server/dist/routes after a build, the same depth -- resolved to the *parent*
+// of the repository. Every path below was therefore built from the wrong base.
+const PROJECT_ROOT = path.resolve(__dirname, '../../..');
 
 // Constants for file reading safety
 const MAX_FILE_SIZE = 1024 * 1024; // 1MB max file size
 const CACHE_MAX_AGE = 300; // 5 minutes cache
 
-// Helper: Validate path is within allowed directory
+// Helper: Validate a path is within an allowed directory
+//
+// The four calls that passed PROJECT_ROOT as the allowed directory were removed:
+// each compared a path with the root it had just been built from, so they were
+// always true. The three left check a filename that came out of readdir against
+// the directory it was read from, which is a real containment question.
 const isPathSafe = (filePath: string, allowedDir: string): boolean => {
   const resolvedPath = path.resolve(filePath);
   const resolvedAllowed = path.resolve(allowedDir);
@@ -306,10 +316,6 @@ router.get('/agents', async (req: AuthRequest, res: Response) => {
   try {
     const agentsDir = path.join(PROJECT_ROOT, '.claude', 'agents');
 
-    // Validate directory is within project root
-    if (!isPathSafe(agentsDir, PROJECT_ROOT)) {
-      return res.status(400).json({ error: 'Invalid agents directory path' });
-    }
 
     const agents: { name: string; filename: string; description: string; content: string }[] = [];
 
@@ -373,10 +379,6 @@ router.get('/skills', async (req: AuthRequest, res: Response) => {
   try {
     const skillsDir = path.join(PROJECT_ROOT, '.claude', 'skills');
 
-    // Validate directory is within project root
-    if (!isPathSafe(skillsDir, PROJECT_ROOT)) {
-      return res.status(400).json({ error: 'Invalid skills directory path' });
-    }
 
     const skills: { name: string; command: string; filename: string; description: string; content: string }[] = [];
 
@@ -445,10 +447,6 @@ router.get('/mcp', async (req: AuthRequest, res: Response) => {
   try {
     const mcpPath = path.join(PROJECT_ROOT, '.mcp.json');
 
-    // Validate path is within project root
-    if (!isPathSafe(mcpPath, PROJECT_ROOT)) {
-      return res.status(400).json({ error: 'Invalid MCP config path' });
-    }
 
     // Check if file exists and is a regular file
     if (!(await isRegularFile(mcpPath))) {
@@ -462,9 +460,8 @@ router.get('/mcp', async (req: AuthRequest, res: Response) => {
     }
 
     try {
-      const config = JSON.parse(content);
       setCacheHeaders(res);
-      res.json({ configured: true, config });
+      res.json({ configured: true, config: withoutSecrets(JSON.parse(content)) });
     } catch (parseError) {
       console.error('MCP JSON parse error:', parseError);
       res.status(400).json({ error: 'Invalid JSON in MCP configuration file' });
@@ -479,10 +476,6 @@ router.get('/research', async (req: AuthRequest, res: Response) => {
   try {
     const researchDir = path.join(PROJECT_ROOT, 'docs', 'research');
 
-    // Validate directory is within project root
-    if (!isPathSafe(researchDir, PROJECT_ROOT)) {
-      return res.status(400).json({ error: 'Invalid research directory path' });
-    }
 
     const documents: { name: string; filename: string; summary: string; content: string; modifiedAt: Date }[] = [];
 

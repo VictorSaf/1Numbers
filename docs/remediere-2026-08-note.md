@@ -216,3 +216,39 @@ Lucruri găsite în afara listei. Nimic din ce e aici n-a fost reparat; e doar c
 - **`ThemeContext` avea flash-ul reparat în trecere**, cum cerea directiva:
   citirea din `localStorage` s-a mutat din `useEffect` în initializer-ul lazy,
   cu try/catch pentru modurile private.
+
+## Etapa 7
+
+- **`isPathSafe` n-a fost șters în întregime.** Directiva spune că apelurile sunt
+  decorative — și sunt, dar doar patru din șapte. Cele care compară o cale cu
+  `PROJECT_ROOT` din care tocmai a fost construită au dispărut; cele trei care
+  verifică un nume de fișier venit din `readdir` contra directorului din care a
+  fost citit rămân, fiindcă alea chiar întreabă ceva.
+
+- **`SubscriptionPlans.tsx` a fost șters, deși l-am reparat în Etapa 1.**
+  Directiva cere ambele lucruri, în ordinea asta. Munca de la Etapa 1 (mesaj la
+  403, tabelul de traduceri urcat deasupra handlerelor) a fost reală, dar
+  componenta n-avea importator. `PricingCards` rămâne și e cea folosită.
+
+- **Numele proceselor pm2 din `ecosystem.config.cjs` sunt alegerea mea**
+  (`compass-web`, `compass-api`). Le-am dedus din `ci.yml` și din antetul lui
+  `serve-compass.mjs`. Dacă pm2-ul de pe mașina vie folosește alte nume,
+  `pm2 restart` din `DEPLOY.md` nu va găsi nimic — verifică cu `pm2 list` și
+  spune-mi ca să le aliniez.
+
+- **`.cjs`, nu `.js`**, fiindcă `package.json` din rădăcină e `"type": "module"`
+  iar pm2 citește fișierul cu `require()`.
+
+- **Graficele: culoarea codifică seria, nu categoria.** Cele nouă culori per
+  număr dublau ce spune deja axa X. `NumberDistributionChart` are acum o singură
+  culoare, `LetterAnalysisChart` trei (total / vocale / consoane), toate din
+  `--chart-*`. Paleta definește șase culori în fiecare temă; un grafic care cere
+  mai mult de șase categorii îți spune că acelea aparțin unei axe.
+
+- **`withoutSecrets` a ieșit din `admin.ts` în `server/src/lib/mcpConfig.ts`.**
+  Testul care o verifică importa altfel ruta întreagă, care deschide un pool
+  real — și asta făcea să pice, prin interferență, un test din `hardening.test.ts`
+  care trecea singur.
+
+- **Testul de paritate a cheilor de traducere a găsit exact 23**, cum spunea
+  auditul: 13 în `export.*` și 10 în `sharing.*`, toate lipsă din RO.

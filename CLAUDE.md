@@ -60,7 +60,10 @@ All numerology calculations are pure TypeScript functions:
 - `personalCycles.ts` - Day/Month/Year cycles
 - `pinnacles.ts` - Life pinnacles and challenges
 - `predictions.ts` - Daily/monthly forecasts
-- `nameAnalysis.ts`, `phoneAnalysis.ts`, `vehicleAnalysis.ts`, `locationAnalysis.ts`, `dateAnalysis.ts` - Specialized analysis
+- `nameAnalysis.ts` - Name-specific analysis; phone, address and plate analysis
+  live in `numerology-plus/applied.ts`. The duplicate copies under `src/lib/`
+  had no importer and were removed on 2026-08-30.
+- `calendarDate.ts` - The only place a `YYYY-MM-DD` from the API becomes a Date
 - `translations.ts` - All UI text in RO/EN/RU
 
 ### Routing
@@ -143,6 +146,13 @@ Custom utilities: `.text-gradient-gold`, `.glow-gold`, `.card-mystic`, `.number-
 - `app-truth.md` - Single source of truth for architecture, patterns, and domain rules
 - `.claude/agents/` - Multi-agent definitions (orchestrator, implement, verify, test, docs, numerology-expert, creative, optimize)
 - `.claude/skills/` - Custom skills (/build-check, /new-feature, /add-translation, /quick-test, /analyze)
+
+## Deployment
+
+`DEPLOY.md` describes what actually runs: two pm2 processes behind a Cloudflare
+Tunnel, `ecosystem.config.cjs` for the topology. `docs/istoric/` holds documents
+describing a FastAPI/Docker/Kubernetes system that never ran -- do not treat
+them as current.
 
 ## Testing
 
