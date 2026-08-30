@@ -1,4 +1,5 @@
 import { Router, Response } from 'express';
+import { z } from 'zod';
 import pool from '../db';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
 
@@ -112,6 +113,24 @@ router.get('/preferences', authenticateToken, async (req: AuthRequest, res: Resp
   }
 });
 
+// The shape 007 gives the column as its default, and the shape the dispatch
+// function there reads back with preferences->>'enabled'. Anything else went
+// into JSONB unchecked, so a preferences object of the wrong shape silently
+// stopped that user's notifications instead of failing here.
+const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+const preferencesSchema = z
+  .object({
+    enabled: z.boolean(),
+    dailyPrediction: z.boolean(),
+    dailyPredictionTime: z.string().regex(HHMM),
+    streakReminder: z.boolean(),
+    streakReminderTime: z.string().regex(HHMM),
+    specialDates: z.boolean(),
+    achievements: z.boolean(),
+  })
+  .strict();
+
 // Update user notification preferences
 router.put('/preferences', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
@@ -120,11 +139,11 @@ router.put('/preferences', authenticateToken, async (req: AuthRequest, res: Resp
       return res.status(401).json({ error: 'User ID not found' });
     }
 
-    const { preferences } = req.body;
-
-    if (!preferences) {
-      return res.status(400).json({ error: 'Preferences required' });
+    const parsed = preferencesSchema.safeParse(req.body?.preferences);
+    if (!parsed.success) {
+      return res.status(400).json({ error: 'Invalid preferences', details: parsed.error.issues });
     }
+    const preferences = parsed.data;
 
     await pool.query(
       `INSERT INTO notification_preferences (user_id, preferences)

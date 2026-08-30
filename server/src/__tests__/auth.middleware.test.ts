@@ -1,7 +1,10 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { authenticateToken, requireAdmin, AuthRequest } from '../middleware/auth';
+import pool from '../db';
+
+vi.mock('../db', () => ({ default: { query: vi.fn() } }));
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
@@ -64,33 +67,63 @@ describe('Auth Middleware', () => {
   });
 
   describe('requireAdmin', () => {
-    it('should return 403 if user is not admin', () => {
-      const req = {
-        userRole: 'user',
-      } as AuthRequest;
-      const res = {
-        status: vi.fn().mockReturnThis(),
-        json: vi.fn(),
-      } as unknown as Response;
+    // The role is read from the database now, not from req.userRole, so these
+    // build the answer the lookup gets rather than the claim in the token.
+    const respondWithRole = (role?: string) =>
+      vi.mocked(pool.query).mockResolvedValueOnce({ rows: role ? [{ role }] : [] } as never);
+
+    beforeEach(() => vi.mocked(pool.query).mockReset());
+
+    it('should return 401 if there is no user id on the request', async () => {
+      const req = {} as AuthRequest;
+      const res = { status: vi.fn().mockReturnThis(), json: vi.fn() } as unknown as Response;
       const next = vi.fn() as NextFunction;
 
-      requireAdmin(req, res, next);
+      await requireAdmin(req, res, next);
 
+      expect(res.status).toHaveBeenCalledWith(401);
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('should return 403 if the database says the user is not an admin', async () => {
+      respondWithRole('user');
+      const req = { userId: 'u1', userRole: 'admin' } as AuthRequest;
+      const res = { status: vi.fn().mockReturnThis(), json: vi.fn() } as unknown as Response;
+      const next = vi.fn() as NextFunction;
+
+      await requireAdmin(req, res, next);
+
+      // userRole says admin -- that is the stale claim from a token signed
+      // before the demotion, and it no longer decides anything.
       expect(res.status).toHaveBeenCalledWith(403);
       expect(res.json).toHaveBeenCalledWith({ error: 'Admin access required' });
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('should call next if user is admin', () => {
-      const req = {
-        userRole: 'admin',
-      } as AuthRequest;
-      const res = {} as Response;
+    it('should return 403 if the user no longer exists', async () => {
+      respondWithRole(undefined);
+      const req = { userId: 'gone' } as AuthRequest;
+      const res = { status: vi.fn().mockReturnThis(), json: vi.fn() } as unknown as Response;
       const next = vi.fn() as NextFunction;
 
-      requireAdmin(req, res, next);
+      await requireAdmin(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('should call next if the database says the user is an admin', async () => {
+      respondWithRole('admin');
+      const req = { userId: 'u1', userRole: 'user' } as AuthRequest;
+      const res = { status: vi.fn().mockReturnThis(), json: vi.fn() } as unknown as Response;
+      const next = vi.fn() as NextFunction;
+
+      await requireAdmin(req, res, next);
 
       expect(next).toHaveBeenCalled();
+      // The live role wins in both directions: a token that says 'user' does not
+      // hold back someone the database has promoted.
+      expect(req.userRole).toBe('admin');
     });
   });
 });

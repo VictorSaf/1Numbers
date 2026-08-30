@@ -81,3 +81,36 @@ Lucruri găsite în afara listei. Nimic din ce e aici n-a fost reparat; e doar c
 
 - **Captura schemei a venit prin WhatsApp, dintr-o sesiune CC de pe mașina cu
   baza.** Nu e în repo. Dacă o vrei ca dovadă, `docs/` e locul.
+
+## Etapa 3
+
+- **Promptul de sistem a fost mutat, nu rescris.** Cele 64 de linii din
+  `src/lib/aiPrompts.ts` (`SYSTEM_PROMPTS`, RO/EN/RU) au trecut în
+  `server/src/lib/aiPrompts.ts`. Textul e identic; ce s-a schimbat e cine îl
+  deține. `buildAIPrompt()` întoarce acum doar `userPrompt`.
+
+- **Proxy-ul AI nu era viu.** `AI_PROVIDER` e `'mock'` implicit și nicio cheie
+  nu e setată în `server/.env`, deci exploit-ul era latent, nu activ. S-a închis
+  oricum — ordinea de priorități din directivă rămâne corectă, ruta ar fi devenit
+  periculoasă în clipa în care s-ar fi pus o cheie.
+
+- **`ai.ts:138` cere `claude-3-haiku-20240307`**, un model vechi. Neatins — nu e
+  pe listă și nu e problemă de securitate.
+
+- **`AIConsultant.tsx` trimite istoricul de două ori**: `buildAIPrompt()` îl
+  împachetează deja în `userPrompt`, iar componenta îl trimite și separat ca
+  `conversationHistory`. De-asta plafonul pe `userPrompt` e 8000, nu 2000.
+  Duplicarea e neatinsă — e risipă, nu defect.
+
+- **`companyName` a devenit obligatoriu** la `PUT /white-label`. Înainte putea
+  lipsi și se scria `NULL`. E o alegere de validare, nu una cerută explicit de
+  directivă; dacă vrei configurări fără nume, se scoate `.min(1)`.
+
+- **`admin.ts` construia lista de coloane dinamic** pentru două câmpuri. După ce
+  `status` a dispărut (Etapa 2) și `role` a devenit enum obligatoriu, ramura
+  „No updates provided" nu mai putea fi atinsă. Ștearsă, cu `UPDATE` direct.
+
+- **`ipRateLimit` exista deja în repo** (`middleware/ipRateLimit.ts`, folosit de
+  login și register). Nu a fost nevoie de `express-rate-limit`. `/ai/consult`
+  primește 30 de cereri pe oră pe IP, peste rate limit-ul pe abonament care
+  există separat în `middleware/rateLimit.ts`.

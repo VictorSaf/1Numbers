@@ -1,6 +1,7 @@
 import { Router, Response } from 'express';
 import pool from '../db';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
+import { ACHIEVEMENT_XP_CAP } from '../lib/achievements';
 
 const router = Router();
 
@@ -181,8 +182,17 @@ router.post('/award-achievement', authenticateToken, async (req: AuthRequest, re
 
     const { achievementId, xpReward } = req.body;
 
-    if (!achievementId || typeof xpReward !== 'number') {
-      return res.status(400).json({ error: 'Invalid achievement ID or XP reward' });
+    // Same shape as the caps table /add-xp uses: an unknown key is rejected
+    // rather than trusted, and the reward the client asks for is measured
+    // against what the achievement is actually worth.
+    if (typeof achievementId !== 'string' || !(achievementId in ACHIEVEMENT_XP_CAP)) {
+      return res.status(400).json({ error: 'Unknown achievement ID' });
+    }
+
+    const cap = ACHIEVEMENT_XP_CAP[achievementId];
+
+    if (!Number.isInteger(xpReward) || xpReward <= 0 || xpReward > cap) {
+      return res.status(400).json({ error: `XP reward for ${achievementId} must be an integer between 1 and ${cap}` });
     }
 
     const result = await pool.query(
@@ -344,6 +354,13 @@ router.post('/challenge-progress', authenticateToken, async (req: AuthRequest, r
       return res.status(400).json({ error: 'Challenge ID is required' });
     }
 
+    // The SQL below clamps progress to requirement_count, but it did so with
+    // whatever arrived: a string, a negative, a float. The ceiling is the
+    // challenge's own requirement, read a few lines down.
+    if (!Number.isInteger(incrementBy) || incrementBy <= 0) {
+      return res.status(400).json({ error: 'incrementBy must be a positive integer' });
+    }
+
     // Get challenge info
     const challengeResult = await pool.query(
       `SELECT id, requirement_count, xp_reward
@@ -358,6 +375,12 @@ router.post('/challenge-progress', authenticateToken, async (req: AuthRequest, r
     }
 
     const challenge = challengeResult.rows[0];
+
+    if (incrementBy > challenge.requirement_count) {
+      return res.status(400).json({
+        error: `incrementBy cannot exceed the challenge requirement of ${challenge.requirement_count}`,
+      });
+    }
 
     // Create or update progress
     const progressResult = await pool.query(

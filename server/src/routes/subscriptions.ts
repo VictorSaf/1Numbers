@@ -1,4 +1,5 @@
 import { Router, Response } from 'express';
+import { z } from 'zod';
 import pool from '../db';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
 
@@ -464,10 +465,26 @@ router.get('/white-label', authenticateToken, async (req: AuthRequest, res: Resp
   }
 });
 
+// Every field here is rendered into white-label reports, so the bounds matter
+// more than the types: a logo URL has to be an http(s) URL and a colour has to
+// be a hex colour, not arbitrary text that ends up in a document.
+const whiteLabelSchema = z.object({
+  companyName: z.string().trim().min(1).max(100),
+  logoUrl: z.string().trim().url().max(500).refine((u) => /^https?:\/\//i.test(u)).optional().nullable(),
+  primaryColor: z.string().trim().regex(/^#[0-9a-fA-F]{6}$/).optional().nullable(),
+  contactInfo: z.string().trim().max(500).optional().nullable(),
+  disclaimer: z.string().trim().max(2000).optional().nullable(),
+  isActive: z.boolean().default(true),
+});
+
 router.put('/white-label', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId;
-    const { companyName, logoUrl, primaryColor, contactInfo, disclaimer, isActive = true } = req.body;
+    const parsed = whiteLabelSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: 'Invalid white label config', details: parsed.error.issues });
+    }
+    const { companyName, logoUrl, primaryColor, contactInfo, disclaimer, isActive } = parsed.data;
 
     // Check if user is Pro
     const tierResult = await pool.query('SELECT * FROM get_user_tier_info($1)', [userId]);

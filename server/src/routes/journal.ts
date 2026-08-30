@@ -1,22 +1,32 @@
 import { Router, Request, Response } from 'express';
+import { z } from 'zod';
 import pool from '../db';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
+// `content` is a TEXT column and `tags` a TEXT[]: without a schema the first
+// took a request-body-sized string and the second took whatever array-ish thing
+// node-postgres could coerce.
+const entrySchema = z.object({
+  entryType: z.enum(['journal', 'prediction']),
+  title: z.string().trim().min(1).max(200),
+  content: z.string().max(20000).optional().nullable(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  numerologyData: z.record(z.string(), z.unknown()).optional().nullable(),
+  tags: z.array(z.string().trim().min(1).max(50)).max(20).default([]),
+  mood: z.string().trim().max(50).optional().nullable(),
+});
+
 // Create journal entry
 router.post('/entry', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId;
-    const { entryType, title, content, date, numerologyData, tags, mood } = req.body;
-
-    if (!title || !entryType) {
-      return res.status(400).json({ error: 'Title and entry type are required' });
+    const parsed = entrySchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: 'Invalid journal entry', details: parsed.error.issues });
     }
-
-    if (!['journal', 'prediction'].includes(entryType)) {
-      return res.status(400).json({ error: 'Invalid entry type' });
-    }
+    const { entryType, title, content, date, numerologyData, tags, mood } = parsed.data;
 
     const result = await pool.query(
       `INSERT INTO journal_entries (user_id, entry_type, title, content, date, numerology_data, tags, mood)
@@ -29,7 +39,7 @@ router.post('/entry', authenticateToken, async (req: AuthRequest, res: Response)
         content || null,
         date || new Date().toISOString().split('T')[0],
         numerologyData ? JSON.stringify(numerologyData) : null,
-        tags || [],
+        tags,
         mood || null,
       ]
     );

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import pool from '../db';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -32,10 +33,38 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
   }
 };
 
-export const requireAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
-  if (req.userRole !== 'admin') {
-    return res.status(403).json({ error: 'Admin access required' });
+/**
+ * Admin access is decided by the database, not by the token.
+ *
+ * The role travels in a JWT signed for seven days and there is no server-side
+ * logout, so trusting req.userRole meant a demoted admin kept every admin route
+ * for up to a week -- and the only way to close that window was to rotate
+ * JWT_SECRET and sign everyone out. One indexed lookup by primary key, on a
+ * router that sees very little traffic, buys the demotion taking effect on the
+ * next request.
+ */
+export const requireAdmin = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (!req.userId) {
+    return res.status(401).json({ error: 'Access token required' });
   }
-  next();
+
+  try {
+    const result = await pool.query<{ role: string }>(
+      'SELECT role FROM users WHERE id = $1',
+      [req.userId],
+    );
+
+    const role = result.rows[0]?.role;
+    if (role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    // Everything downstream reads the live role, not the one in the token.
+    req.userRole = role;
+    next();
+  } catch (error) {
+    console.error('Admin check error:', error);
+    return res.status(500).json({ error: 'Failed to verify admin access' });
+  }
 };
 

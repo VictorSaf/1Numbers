@@ -1,5 +1,8 @@
 import { Router, Response } from 'express';
+import { z } from 'zod';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
+import { ipRateLimit } from '../middleware/ipRateLimit';
+import { SYSTEM_PROMPTS } from '../lib/aiPrompts';
 
 const router = Router();
 
@@ -152,38 +155,54 @@ async function callAnthropic(request: AIRequest): Promise<string> {
   return data.content[0]?.text || '';
 }
 
+// The system prompt belongs to the server.
+//
+// /consult used to take one from the request body and pass it straight through
+// as the system message, which made this route an unmetered proxy to our own
+// provider key: any authenticated client could point the model at any task it
+// liked, on our bill. The text itself did not change -- it moved here from
+// src/lib/aiPrompts.ts, to the side that pays for it.
+
+const consultSchema = z.object({
+  // The client folds the user's profile context into this string, so it is
+  // far longer than the question itself.
+  userPrompt: z.string().trim().min(1).max(8000),
+  language: z.enum(['ro', 'en', 'ru']).default('en'),
+  conversationHistory: z
+    .array(
+      z.object({
+        role: z.enum(['user', 'assistant']),
+        content: z.string().max(2000),
+      }),
+    )
+    .max(20)
+    .default([]),
+});
+
 // Main AI consultation endpoint
-router.post('/consult', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.post(
+  '/consult',
+  authenticateToken,
+  ipRateLimit({ windowMs: 60 * 60 * 1000, max: 30 }),
+  async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId;
     if (!userId) {
       return res.status(401).json({ error: 'User ID not found' });
     }
 
-    const { systemPrompt, userPrompt, conversationHistory, language = 'en' } = req.body;
-
-    if (!userPrompt) {
-      return res.status(400).json({ error: 'User prompt is required' });
+    const parsed = consultSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: 'Invalid request', details: parsed.error.issues });
     }
 
-    // Build messages array
-    const messages: AIMessage[] = [];
+    const { userPrompt, conversationHistory, language } = parsed.data;
 
-    if (systemPrompt) {
-      messages.push({ role: 'system', content: systemPrompt });
-    }
-
-    // Add conversation history
-    if (conversationHistory && Array.isArray(conversationHistory)) {
-      conversationHistory.forEach((msg: { role: string; content: string }) => {
-        if (msg.role === 'user' || msg.role === 'assistant') {
-          messages.push({ role: msg.role, content: msg.content });
-        }
-      });
-    }
-
-    // Add current user message
-    messages.push({ role: 'user', content: userPrompt });
+    const messages: AIMessage[] = [
+      { role: 'system', content: SYSTEM_PROMPTS[language] },
+      ...conversationHistory,
+      { role: 'user', content: userPrompt },
+    ];
 
     let answer: string;
 

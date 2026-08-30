@@ -51,6 +51,22 @@ class ApiService {
     });
 
     if (!response.ok) {
+      // A 401 means the token this client is holding is no longer accepted --
+      // it expired mid-session, or it was signed with a secret that has since
+      // been rotated. Nothing in the app inspected the status, so the UI stayed
+      // logged in with every request failing behind it. Signing out here is the
+      // only honest reading of the answer.
+      //
+      // /auth/* is excluded: a wrong password is also a 401, and bouncing the
+      // sign-in page to itself would hide the message that says so.
+      if (response.status === 401 && !endpoint.startsWith('/auth/')) {
+        this.setToken(null);
+        if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/auth')) {
+          const back = window.location.pathname + window.location.search;
+          window.location.assign(`/auth?redirect=${encodeURIComponent(back)}`);
+        }
+      }
+
       const error = await response.json().catch(() => ({ error: 'Request failed' }));
       const errorMessage = error.error || error.message || error.details || 'Request failed';
       const apiError = new Error(errorMessage) as Error & { status?: number };

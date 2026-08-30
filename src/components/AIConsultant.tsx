@@ -6,7 +6,6 @@ import {
   buildAIPrompt,
   generateDailySuggestion,
   FREQUENT_QUESTIONS,
-  SYSTEM_PROMPTS,
   type AIContext,
   type DailySuggestion,
 } from '@/lib/aiPrompts';
@@ -98,7 +97,7 @@ export const AIConsultant = () => {
 
     try {
       // Build prompt with full context
-      const { systemPrompt, userPrompt } = buildAIPrompt(currentQuestion, aiContext);
+      const { userPrompt } = buildAIPrompt(currentQuestion, aiContext);
 
       // Try to call backend API
       const response = await fetch(`${API_BASE}/ai/consult`, {
@@ -108,7 +107,6 @@ export const AIConsultant = () => {
           Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
         },
         body: JSON.stringify({
-          systemPrompt,
           userPrompt,
           conversationHistory: conversation.map((msg) => ({
             role: msg.role,

@@ -1,4 +1,5 @@
 import { Router, Response } from 'express';
+import { z } from 'zod';
 import pool from '../db';
 import { authenticateToken, requireAdmin, AuthRequest } from '../middleware/auth';
 import { promises as fs } from 'fs';
@@ -143,29 +144,28 @@ router.get('/users', async (req: AuthRequest, res: Response) => {
 router.patch('/users/:id', async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const { role } = req.body;
+
+    // The database has CHECK (role IN ('user','admin')), so an invented role was
+    // already refused -- but as a 500 out of a constraint violation. Same list,
+    // stated where the request arrives, so it comes back as a 400 that says why.
+    const parsed = z.object({ role: z.enum(['user', 'admin']) }).safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: "role must be 'user' or 'admin'" });
+    }
+    const { role } = parsed.data;
 
     // Don't allow admin to demote themselves
-    if (id === req.userId && role && role !== 'admin') {
+    if (id === req.userId && role !== 'admin') {
       return res.status(400).json({ error: 'Cannot change your own admin role' });
     }
 
-    const updates: string[] = [];
-    const values: (string | number)[] = [];
-    let paramCount = 1;
-
-    if (role) {
-      updates.push(`role = $${paramCount++}`);
-      values.push(role);
-    }
-
-    if (updates.length === 0) {
-      return res.status(400).json({ error: 'No updates provided' });
-    }
-
-    values.push(id);
-    const query = `UPDATE users SET ${updates.join(', ')} WHERE id = $${paramCount} RETURNING id, email, name, role`;
-    const result = await pool.query(query, values);
+    // The dynamic column list this used to build had one branch left in it once
+    // `status` went away, and the schema above guarantees a role, so the empty
+    // case it guarded against can no longer happen.
+    const result = await pool.query(
+      'UPDATE users SET role = $1 WHERE id = $2 RETURNING id, email, name, role',
+      [role, id],
+    );
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });

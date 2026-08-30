@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
 import profileRoutes from './routes/profiles';
@@ -37,7 +38,31 @@ app.use(cors({
   origin: [...new Set(allowedOrigins)],
   credentials: true
 }));
-app.use(express.json());
+// A request body large enough to matter here is a journal entry or an AI
+// question, both bounded by their own schemas. Express defaults to 100kb; the
+// point of saying it is that the default is a decision, not an accident.
+app.use(express.json({ limit: '100kb' }));
+
+// This API answers JSON and nothing else -- it renders no page, loads no asset
+// and is never framed -- so the policy is the strictest one there is. The three
+// headers that used to be set by hand here are a subset of what helmet sets;
+// scripts/serve-compass.mjs is the reference for the static origin, and this is
+// its counterpart for /api.
+app.use(helmet({
+  contentSecurityPolicy: {
+    useDefaults: false,
+    directives: {
+      'default-src': ["'none'"],
+      'frame-ancestors': ["'none'"],
+      'base-uri': ["'none'"],
+      'form-action': ["'none'"],
+    },
+  },
+  // Set below, and only behind TLS: the tunnel terminates it, and a bare
+  // http:// request has to be redirected before it is worth pinning.
+  strictTransportSecurity: false,
+  crossOriginResourcePolicy: { policy: 'same-site' },
+}));
 
 // Cloudflare terminates TLS and forwards the client's original scheme. Mirrors
 // the static server so /api behaves identically to the rest of the origin.
@@ -51,8 +76,6 @@ app.use((req, res, next) => {
   if (proto === 'https') {
     res.setHeader('Strict-Transport-Security', 'max-age=31536000');
   }
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   next();
 });
 
