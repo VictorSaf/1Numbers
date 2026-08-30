@@ -6,10 +6,14 @@
  * se actualizează peste tot unde apare 7, în toate limbile.
  */
 
+import type { fullPythagoreanProfile } from '../pythagorean.js';
 import type { Lang } from './arcana.js';
 import { archetypeFor } from './archetypes.js';
 import { FRAME_BY_KEY, type Frame } from './frames.js';
 import { LETTER_BY_CH } from './letters.js';
+
+/** Ieșirea lui fullPythagoreanProfile() — singura formă pe care o citesc funcțiile de mai jos. */
+type PythagoreanProfile = ReturnType<typeof fullPythagoreanProfile>;
 
 export interface Interpretation {
   key: string;
@@ -64,7 +68,7 @@ export function interpretLetter(frameKey: string, letter: string, lang: Lang = '
  * Construiește toate interpretările pentru un profil calculat.
  * `profile` = ieșirea din fullPythagoreanProfile().
  */
-export function interpretProfile(profile: any, lang: Lang = 'ro'): Interpretation[] {
+export function interpretProfile(profile: PythagoreanProfile, lang: Lang = 'ro'): Interpretation[] {
   const out: (Interpretation | null)[] = [];
   const e = profile.extended, c = profile.cycles, t = profile.transits;
 
@@ -87,7 +91,7 @@ export function interpretProfile(profile: any, lang: Lang = 'ro'): Interpretatio
 }
 
 /** Interpretările bazate pe litere, separat (au câmp suplimentar). */
-export function interpretLetters(profile: any, lang: Lang = 'ro') {
+export function interpretLetters(profile: PythagoreanProfile, lang: Lang = 'ro') {
   const e = profile.extended;
   return [
     e.cornerstone ? interpretLetter('cornerstone', e.cornerstone.letter, lang) : null,

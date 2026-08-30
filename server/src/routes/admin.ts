@@ -182,7 +182,7 @@ router.patch('/users/:id', async (req: AuthRequest, res: Response) => {
 router.get('/settings', async (req: AuthRequest, res: Response) => {
   try {
     // Try to get settings from database
-    let settings = {
+    const settings = {
       appName: 'Numerology Compass',
       maintenanceMode: false,
       defaultLanguage: 'en',

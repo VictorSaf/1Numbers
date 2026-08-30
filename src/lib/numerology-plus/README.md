@@ -22,7 +22,7 @@ const p = fullProfile('Victor Ion Safta', { day: 25, month: 8, year: 1990 }, { g
 | `matrix.ts` | Matrița Destinului — octagrama pe 22 de arcane, grafic pe decade, compatibilitate |
 | `applied.ts` | Faza C — adresă, telefon, plăcuță, nume de bebeluș, motor homofonic, schimbare de nume, compatibilitate ponderată |
 | `content/arcana.ts` | 22 de arcane × RO/EN/RU × 5 câmpuri + 9 rame de poziție. 555 de stringuri, validate |
-| `test.ts` | 78 de aserțiuni, inclusiv exemplele de referință publicate |
+| `__tests__/engine.test.ts` | 78 de aserțiuni, inclusiv exemplele de referință publicate |
 
 ## Decizii care trebuie asumate conștient
 
@@ -44,9 +44,11 @@ Fiecare e o constantă exportată. Sursele din piață se contrazic real — nu 
 ## Teste
 
 ```bash
-npx tsx src/test.ts          # 78 de aserțiuni
-npx tsx src/content/check.ts # completitudinea conținutului
+npm run test:run -- src/lib/numerology-plus   # motorul + conținutul
 ```
+
+Cele 78 de aserțiuni ale motorului sunt în `__tests__/engine.test.ts`;
+completitudinea conținutului e verificată de `__tests__/content.test.ts`.
 
 ## Ce urmează (nu e în pachet)
 
@@ -83,6 +85,3 @@ const texte = interpretProfile(p, 'ro');   // 11 interpretări gata de randat
 const litere = interpretLetters(p, 'ro');  // 3, cu trăsătura literei
 ```
 
-```bash
-npx tsx src/content/demo.ts   # exemplu + verificarea matricei complete
-```
