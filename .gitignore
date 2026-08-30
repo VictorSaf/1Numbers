@@ -30,3 +30,6 @@ server/.env
 
 # Verification builds; dist/ is what production serves.
 .build-check
+
+# Playwright MCP scratch output (page snapshots from browser checks)
+.playwright-mcp/
