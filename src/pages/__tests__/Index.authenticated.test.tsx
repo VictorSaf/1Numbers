@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
@@ -15,10 +15,13 @@ import Index from "../Index";
  */
 
 const getProfile = vi.fn();
-vi.mock("@/services/api", () => ({
-  api: { getProfile: (...a: unknown[]) => getProfile(...a) },
-  default: { getProfile: (...a: unknown[]) => getProfile(...a) },
-}));
+vi.mock("@/services/api", () => {
+  const svc = {
+    getProfile: (...a: unknown[]) => getProfile(...a),
+    getAllProfiles: async () => ({ success: true, profiles: [] }),
+  };
+  return { api: svc, default: svc };
+});
 
 vi.mock("@/contexts/AuthContext", () => ({
   useAuth: () => ({ isAuthenticated: true, user: { id: "u1" }, isLoading: false }),
@@ -39,29 +42,38 @@ const show = () =>
 beforeEach(() => {
   localStorage.clear();
   getProfile.mockReset().mockResolvedValue({
+    success: true,
     profile: { id: "p1", userId: "u1", fullName: "Victor Ion Safta", birthDate: "1990-08-25" },
   });
 });
 
 describe("Index, autentificat", () => {
-  it("dă harta întreagă, în formatul exemplului", async () => {
-    const { container } = show();
+  it("îți completează numele și data, și te lasă pe tine să apeși", async () => {
+    show();
 
-    // Semnătura formatului: navigația pe capitole, care e a raportului întreg.
-    await waitFor(() => expect(container.querySelector("nav")).toBeInTheDocument());
     await waitFor(() =>
-      expect(container.textContent).toMatch(/Drumul Vieții|Life Path|Жизненный путь/),
+      expect(screen.getByDisplayValue("Victor Ion Safta")).toBeInTheDocument(),
     );
+    expect(screen.getByRole("button", { name: /descoperă|discover|узнать/i })).toBeInTheDocument();
   });
 
-  it("citește harta din profil, nu pe cea a exemplului", async () => {
-    // Exemplul e Maria Elena Popescu, 15.05.1990 -- Drum de Viață 3.
-    // Profilul de aici dă 7. Dacă pe ecran apare harta exemplului, cifra
-    // ancoră ar fi 3.
+  it("nu-i aruncă harta în față fiindcă s-a autentificat", async () => {
     const { container } = show();
     await waitFor(() => expect(getProfile).toHaveBeenCalled());
-    await waitFor(() => expect(container.querySelector("nav")).toBeInTheDocument());
 
+    // Navigația pe capitole e semnătura raportului: nu apare până nu apeși.
+    expect(container.querySelector('nav[aria-label="Capitole"]')).toBeNull();
+  });
+
+  it("dă harta întreagă după apăsare, în formatul exemplului", async () => {
+    const { container } = show();
+    await waitFor(() => expect(screen.getByDisplayValue("Victor Ion Safta")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole("button", { name: /descoperă|discover|узнать/i }));
+
+    await waitFor(() =>
+      expect(container.querySelector('nav[aria-label="Capitole"]')).toBeInTheDocument(),
+    );
     expect(container.textContent).not.toMatch(/Maria Elena Popescu/);
   });
 });

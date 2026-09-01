@@ -45,3 +45,22 @@ const localStorageMock = (() => {
 Object.defineProperty(window, "localStorage", {
   value: localStorageMock,
 });
+
+/**
+ * jsdom nu are IntersectionObserver, iar navigația pe capitole îl folosește ca
+ * să știe unde ai ajuns în raport. Fără el, orice test care randează raportul
+ * întreg cade cu ReferenceError -- ceea ce spune ceva despre mediu, nu despre
+ * cod.
+ */
+class NoopIntersectionObserver implements IntersectionObserver {
+  readonly root = null;
+  readonly rootMargin = '';
+  readonly thresholds: ReadonlyArray<number> = [];
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+  takeRecords(): IntersectionObserverEntry[] { return []; }
+}
+if (!('IntersectionObserver' in globalThis)) {
+  globalThis.IntersectionObserver = NoopIntersectionObserver as unknown as typeof IntersectionObserver;
+}

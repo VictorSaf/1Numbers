@@ -176,6 +176,25 @@ class ApiService {
     }>('/today/reading', { method: 'POST', body: data });
   }
 
+  /**
+   * Citirea întreagă a hărții: legată, nu enumerată.
+   *
+   * Propozițiile adevărate pleacă de aici, din `buildThread` -- aceleași care
+   * compun firul. Serverul le dă modelului doar ca să le lege, și verifică la
+   * întoarcere că n-a apărut nicio cifră străină de hartă.
+   */
+  async getDeepReading(data: {
+    language: 'ro' | 'en' | 'ru';
+    steps: Array<{ name: string; figures: string; say: string }>;
+  }) {
+    return this.request<{
+      body: { opening: string; chapters: Array<{ title: string; text: string }>; closing: string };
+      source: 'model' | 'composed';
+      model?: string;
+      cached: boolean;
+    }>('/chart/reading', { method: 'POST', body: data });
+  }
+
   // Journal endpoints
   async createJournalEntry(data: {
     entryType: 'journal' | 'prediction';

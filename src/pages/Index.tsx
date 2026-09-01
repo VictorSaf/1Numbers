@@ -80,21 +80,18 @@ const Index = () => {
   };
 
   /**
-   * Omul autentificat primește exact ce primește vizitatorul care apasă „vezi
-   * un exemplu”: aceleași cinci capitole, aceeași navigație, pe datele lui.
+   * Un singur drum, pentru toată lumea: formularul, apoi harta.
    *
-   * Până acum vizitatorul primea harta întreagă -- peste douăzeci de blocuri
-   * -- iar cel cu cont primea firul, adică o selecție de șaisprezece pași.
-   * Cine își făcuse cont vedea mai puțin decât cine nu dăduse nimic, ceea ce
-   * nu se poate apăra din nicio direcție.
+   * Omul cu cont primea altceva -- un panou, apoi un fir -- iar vizitatorul
+   * care apăsa „vezi un exemplu” primea raportul întreg. Cine își făcuse cont
+   * vedea mai puțin decât cine nu dăduse nimic.
+   *
+   * Acum e aceeași pagină pentru amândoi. Diferența e că formularul vine
+   * precompletat din profil, iar omul apasă -- `NumerologyForm` știa deja să
+   * facă asta din `profileData`. Apăsarea rămâne a lui: harta se citește când
+   * o ceri, nu îți sare în față fiindcă te-ai autentificat.
    */
-  const mine =
-    isAuthenticated && profile && showDashboard
-      ? { fullName: profile.fullName, birthDate: parseCalendarDate(profile.birthDate) }
-      : null;
-  const reading = userData ?? (mine?.birthDate ? { fullName: mine.fullName, birthDate: mine.birthDate } : null);
-
-  const shouldShowResults = reading !== null;
+  const shouldShowResults = userData !== null;
   const shouldShowForm = !shouldShowResults;
 
   return (
@@ -181,8 +178,8 @@ const Index = () => {
           // chapter column beside it on desktop.
           <div className="max-w-6xl mx-auto pt-4">
             <NumerologyResults
-              fullName={reading.fullName}
-              birthDate={reading.birthDate}
+              fullName={userData.fullName}
+              birthDate={userData.birthDate}
               onReset={handleReset}
             />
           </div>
