@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
+import { humanProfileError } from "@/lib/profileErrors";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useProfiles } from "@/hooks/use-profiles";
 import { useToast } from "@/hooks/use-toast";
@@ -43,7 +44,7 @@ interface KeepNameButtonProps {
 }
 
 export const KeepNameButton = ({ name, defaultCategory }: KeepNameButtonProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { isAuthenticated } = useAuth();
   const { createProfile } = useProfiles();
   const { toast } = useToast();
@@ -82,7 +83,15 @@ export const KeepNameButton = ({ name, defaultCategory }: KeepNameButtonProps) =
       return;
     }
 
-    toast({ title: t.error, description: result.error, variant: "destructive" });
+    // Codul serverului e pentru noi; omul primește o propoziție. Vezi
+    // profileErrors.ts -- același refuz se lovește și la „Salvează harta”.
+    const human = humanProfileError(result.error, language as "ro" | "en" | "ru");
+    if (human) {
+      toast({ title: human.title, description: human.body });
+      return;
+    }
+
+    toast({ title: t.error, variant: "destructive" });
   };
 
   return (

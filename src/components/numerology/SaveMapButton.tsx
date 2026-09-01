@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useProfiles } from "@/hooks/use-profiles";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { humanProfileError } from "@/lib/profileErrors";
 import { formatCalendarDate } from "@/lib/calendarDate";
 
 /**
@@ -78,7 +79,17 @@ export const SaveMapButton = ({ fullName, birthDate }: { fullName: string; birth
     }
 
     setState("idle");
-    toast({ title: t.failed, description: result.error, variant: "destructive" });
+
+    // Codul de eroare e pentru noi; omul primește o propoziție. Traducerea stă
+    // în profileErrors.ts, fiindcă același refuz se lovește în trei locuri.
+    const human = humanProfileError(result.error, (language in COPY ? language : "en") as "ro" | "en" | "ru");
+    if (human) {
+      // Nu e o avarie -- e o regulă. Un toast roșu ar spune altceva.
+      toast({ title: human.title, description: human.body });
+      return;
+    }
+
+    toast({ title: t.failed, variant: "destructive" });
   };
 
   return (

@@ -42,6 +42,7 @@ import {
   normalizeCategory,
   type ProfileCategory,
 } from '@/lib/profileCategories';
+import { humanProfileError } from '@/lib/profileErrors';
 import {
   Select,
   SelectContent,
@@ -228,11 +229,13 @@ const Profile = () => {
           });
           await refetch();
         } else {
-          toast({
-            title: t.error,
-            description: result.error || 'Failed to create profile',
-            variant: 'destructive',
-          });
+          // Refuzurile cunoscute sunt reguli, nu avarii: vezi profileErrors.ts.
+          const human = humanProfileError(result.error, language as 'ro' | 'en' | 'ru');
+          toast(
+            human
+              ? { title: human.title, description: human.body }
+              : { title: t.error, variant: 'destructive' },
+          );
         }
       }
     } catch (error: unknown) {
