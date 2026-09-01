@@ -584,23 +584,25 @@ export function formatConversationHistory(
 }
 
 // Build complete prompt for AI request
+//
 // The system prompt is no longer built here: the server owns it, so that the
 // provider key cannot be pointed at a task the client chose.
+//
+// Nor is the conversation history: it used to be folded into the question text
+// here *and* posted separately by AIConsultant, so the server received it twice
+// and paid for the same tokens twice. It travels once now, in its own field.
+//
+// The profile is returned separately from the question because the server puts
+// it before the cache breakpoint -- it is the only part that does not change
+// during a conversation.
 export function buildAIPrompt(
   userMessage: string,
   context: AIContext
-): { userPrompt: string } {
-  const userContext = buildUserContext(context);
-
-  let userPrompt = `${userContext}\n\n`;
-
-  if (context.conversationHistory && context.conversationHistory.length > 0) {
-    userPrompt += `CONVERSATION HISTORY:\n${formatConversationHistory(context.conversationHistory)}\n\n`;
-  }
-
-  userPrompt += `USER QUESTION: ${userMessage}`;
-
-  return { userPrompt };
+): { profileContext: string; question: string } {
+  return {
+    profileContext: buildUserContext(context).trim(),
+    question: userMessage,
+  };
 }
 
 // Export types for use in components
