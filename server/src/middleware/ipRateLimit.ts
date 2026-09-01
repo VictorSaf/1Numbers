@@ -1,19 +1,30 @@
 import { Request, Response, NextFunction } from 'express';
 
 /**
- * In-memory sliding-window rate limiter keyed by client IP.
+ * Fereastră glisantă în memorie, cu două chei posibile: adresa clientului sau
+ * utilizatorul autentificat.
  *
- * The existing rateLimit middleware keys on req.userId and so cannot protect
- * unauthenticated endpoints such as registration and login.
+ * Limita pe IP nu poate proteja un cont folosit de pe mai multe rețele, iar
+ * limita pe utilizator nu poate proteja rutele neautentificate (înregistrare,
+ * autentificare). Sunt două chei peste același algoritm, nu doi algoritmi.
  *
- * State is per-process and resets on restart, which is acceptable here: this
- * guards a single-instance deployment against casual abuse, not a distributed
- * attack. A shared store would be required if the API is ever scaled out.
+ * Pentru rutele care cheltuie bani la un furnizor extern se pun amândouă.
+ *
+ * Starea e per-proces și dispare la repornire, ceea ce e acceptabil aici:
+ * apără un deployment cu o singură instanță de abuz ocazional, nu de un atac
+ * distribuit. Un depozit comun ar fi necesar dacă API-ul e vreodată scalat.
+ *
+ * Nu există fail-open: middleware-ul din rateLimit.ts cheamă next() la eroare,
+ * ceea ce pe o rută care plătește tokeni ar fi decizia greșită. Aici nu e nimic
+ * care să poată eșua.
  */
 interface Options {
   windowMs: number;
   max: number;
 }
+
+/** Cererile autentificate poartă userId, pus de authenticateToken. */
+type MaybeAuthed = Request & { userId?: string };
 
 const clientIp = (req: Request): string => {
   // Every request arrives through the Cloudflare Tunnel, which sets this header;
@@ -25,12 +36,20 @@ const clientIp = (req: Request): string => {
   return req.ip ?? 'unknown';
 };
 
-export const ipRateLimit = ({ windowMs, max }: Options) => {
+const slidingWindow = (
+  { windowMs, max }: Options,
+  keyOf: (req: MaybeAuthed) => string | undefined,
+) => {
   const hits = new Map<string, number[]>();
 
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: MaybeAuthed, res: Response, next: NextFunction) => {
     const now = Date.now();
-    const key = clientIp(req);
+    const key = keyOf(req);
+
+    // Fără cheie nu se numără. Pentru varianta pe utilizator asta înseamnă o
+    // cerere neautentificată, pe care authenticateToken a oprit-o deja.
+    if (!key) return next();
+
     const recent = (hits.get(key) ?? []).filter((t) => now - t < windowMs);
 
     if (recent.length >= max) {
@@ -52,3 +71,7 @@ export const ipRateLimit = ({ windowMs, max }: Options) => {
     next();
   };
 };
+
+export const ipRateLimit = (options: Options) => slidingWindow(options, clientIp);
+
+export const userRateLimit = (options: Options) => slidingWindow(options, (req) => req.userId);
