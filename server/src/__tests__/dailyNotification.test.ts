@@ -5,7 +5,7 @@ describe('buildDailyPredictionPayload', () => {
   it('compune ziua 4 în română', () => {
     expect(buildDailyPredictionPayload(4, 'ro')).toEqual({
       title: 'Energia Zilei Tale',
-      body: 'O zi excelentă pentru organizare și muncă practică.',
+      body: 'Zi bună pentru ce se construiește încet. Ai grijă să nu folosești munca drept adăpost.',
       tag: 'daily-prediction',
       data: { type: 'daily-prediction', personalDay: 4, url: '/azi' },
     });
@@ -14,13 +14,13 @@ describe('buildDailyPredictionPayload', () => {
   it('compune ziua 1 în engleză', () => {
     const payload = buildDailyPredictionPayload(1, 'en');
     expect(payload.title).toBe('Your Daily Energy');
-    expect(payload.body).toBe('Today is perfect for new beginnings! Number 1 energy supports you.');
+    expect(payload.body).toBe('A day for beginnings. Start what you postpone, and ask for help before you need it.');
   });
 
   it('compune ziua 9 în rusă', () => {
     const payload = buildDailyPredictionPayload(9, 'ru');
     expect(payload.title).toBe('Ваша Энергия Дня');
-    expect(payload.body).toBe('День для сострадания и завершения циклов.');
+    expect(payload.body).toBe('Сегодня вы видите картину целиком. Закройте то, что пора закрыть, даже если оно не идеально.');
   });
 
   it('are un corp nevid pentru fiecare zi 1-9 în fiecare limbă', () => {

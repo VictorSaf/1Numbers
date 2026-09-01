@@ -87,7 +87,7 @@ describe('runDailyDispatch', () => {
     // 1990-05-15 la 2026-09-01 e ziua personală 4.
     expect(vi.mocked(sendToSubscription).mock.calls[0][1]).toEqual({
       title: 'Energia Zilei Tale',
-      body: 'O zi excelentă pentru organizare și muncă practică.',
+      body: 'Zi bună pentru ce se construiește încet. Ai grijă să nu folosești munca drept adăpost.',
       tag: 'daily-prediction',
       data: { type: 'daily-prediction', personalDay: 4, url: '/azi' },
     });
