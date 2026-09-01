@@ -33,10 +33,21 @@ export const ThemeSelector = () => {
 
   return (
     <Select value={theme} onValueChange={(value) => setTheme(value as ThemeName)}>
-      <SelectTrigger className="w-[150px] input-mystic">
+      {/* Pe 390px, „System” plus iconița plus săgeata ocupau o treime din antet,
+          lângă steag și butonul de meniu -- iar „System” e cuvântul nostru pentru
+          „urmează setarea telefonului”, nu unul pe care omul îl caută. Rămâne
+          iconița, care spune același lucru fără să coste lățime; textul revine de
+          la sm: în sus. aria-label ține numele întreg pentru cititoarele de ecran,
+          unde lățimea nu costă nimic. */}
+      <SelectTrigger
+        aria-label={labels[theme]}
+        className="min-h-11 w-11 justify-center px-0 sm:w-[150px] sm:justify-between sm:px-3 input-mystic"
+      >
         <div className="flex items-center gap-2">
           <Icon className="h-4 w-4 text-primary" />
-          <SelectValue>{labels[theme]}</SelectValue>
+          <SelectValue className="hidden sm:inline">
+            <span className="hidden sm:inline">{labels[theme]}</span>
+          </SelectValue>
         </div>
       </SelectTrigger>
       <SelectContent>

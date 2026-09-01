@@ -43,9 +43,16 @@ export const ShareButtons = ({
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
   
+  /**
+   * Butonul de sistem și meniul de rețele purtau același cuvânt.
+   *
+   * `share` deschide o listă -- Facebook, X, WhatsApp, mail, copiere -- deci
+   * numele lui e „unde”, nu „ce”: „Partajează pe…”. `nativeShare` predă totul
+   * foii sistemului, care e chiar ce înțelege omul prin „Partajează”.
+   */
   const labels = {
     ro: {
-      share: "Partajează",
+      share: "Partajează pe…",
       shareTo: "Partajează pe",
       facebook: "Facebook",
       twitter: "Twitter",
@@ -57,7 +64,7 @@ export const ShareButtons = ({
       nativeShare: "Partajează"
     },
     en: {
-      share: "Share",
+      share: "Share to…",
       shareTo: "Share to",
       facebook: "Facebook",
       twitter: "Twitter",
@@ -69,7 +76,7 @@ export const ShareButtons = ({
       nativeShare: "Share"
     },
     ru: {
-      share: "Поделиться",
+      share: "Поделиться в…",
       shareTo: "Поделиться в",
       facebook: "Facebook",
       twitter: "Twitter",
@@ -110,7 +117,7 @@ export const ShareButtons = ({
           variant="outline"
           size="sm"
           onClick={handleNativeShare}
-          className="border-primary/30 text-primary hover:bg-primary/10"
+          className="min-h-11 border-primary/30 text-primary hover:bg-primary/10"
         >
           <Share2 className="h-4 w-4 mr-2" />
           {labels.nativeShare}
@@ -123,7 +130,7 @@ export const ShareButtons = ({
           <Button
             variant="outline"
             size="sm"
-            className="border-primary/30 text-primary hover:bg-primary/10"
+            className="min-h-11 border-primary/30 text-primary hover:bg-primary/10"
           >
             <Share2 className="h-4 w-4 mr-2" />
             {labels.share}

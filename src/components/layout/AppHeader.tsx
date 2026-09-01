@@ -183,7 +183,8 @@ const AppHeader = () => {
             <Button
               variant="ghost"
               size="sm"
-              className="lg:hidden h-9 w-9 p-0 text-foreground/90"
+              // Butonul care deschide meniul pe mobil: 36px erau sub pragul de atingere.
+              className="lg:hidden h-11 w-11 p-0 text-foreground/90"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? (

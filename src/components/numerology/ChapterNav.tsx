@@ -89,7 +89,9 @@ export const ChapterNav = ({ chapters }: { chapters: ChapterMeta[] }) => {
                 onClick={() => go(chapter.id)}
                 aria-current={active === chapter.id ? "true" : undefined}
                 className={cn(
-                  "rounded-full border px-3 py-1.5 text-xs whitespace-nowrap transition-colors",
+                  // 44px e pragul din ghidul iOS. Chip-urile aveau 31: pe o bandă
+                  // orizontală de elemente lipite, degetul nimerea vecinul.
+                  "inline-flex min-h-11 items-center gap-1.5 rounded-full border px-4 text-xs whitespace-nowrap transition-colors",
                   active === chapter.id
                     ? "border-primary/40 bg-primary/10 text-primary"
                     : "border-border/60 text-muted-foreground",
