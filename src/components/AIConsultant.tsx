@@ -35,13 +35,6 @@ interface ConversationMessage {
   timestamp: Date;
 }
 
-interface AIResponse {
-  answer: string;
-  relatedNumbers?: number[];
-  suggestions?: string[];
-  followUpQuestions?: string[];
-}
-
 export const AIConsultant = () => {
   const { language } = useLanguage();
   const { user } = useAuth();
@@ -51,6 +44,7 @@ export const AIConsultant = () => {
   const [conversation, setConversation] = useState<ConversationMessage[]>([]);
   const [dailySuggestion, setDailySuggestion] = useState<DailySuggestion | null>(null);
   const [activeTab, setActiveTab] = useState('chat');
+  const [unavailable, setUnavailable] = useState(false);
 
   // Build AI context from user profile
   const aiContext: AIContext | null = useMemo(() => {
@@ -85,6 +79,7 @@ export const AIConsultant = () => {
     if (!question.trim() || !aiContext) return;
 
     setLoading(true);
+    setUnavailable(false);
     const currentQuestion = question;
     setQuestion('');
 
@@ -117,38 +112,26 @@ export const AIConsultant = () => {
         }),
       });
 
-      let aiResponse: AIResponse;
-
-      if (response.ok) {
-        const data = await response.json();
-        aiResponse = {
-          answer: data.answer,
-          relatedNumbers: data.relatedNumbers,
-          suggestions: data.suggestions,
-          followUpQuestions: data.followUpQuestions,
-        };
-      } else {
-        // Fallback to local generation
-        aiResponse = generateLocalResponse(currentQuestion, aiContext);
+      // Nothing is appended to the conversation when the request fails. The
+      // consultant either shows an answer a model wrote about this person, or
+      // it says it has none -- there is no third thing it may display. What
+      // used to sit here invented a paragraph about the reader's "remarkable
+      // potential" and pushed it into the same bubble as a real answer.
+      if (!response.ok) {
+        setUnavailable(true);
+        return;
       }
 
-      // Add assistant message to conversation
+      const data = await response.json();
       const assistantMessage: ConversationMessage = {
         role: 'assistant',
-        content: aiResponse.answer,
+        content: data.answer,
         timestamp: new Date(),
       };
       setConversation((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error asking question:', error);
-      // Fallback to local generation on error
-      const fallbackResponse = generateLocalResponse(currentQuestion, aiContext);
-      const assistantMessage: ConversationMessage = {
-        role: 'assistant',
-        content: fallbackResponse.answer,
-        timestamp: new Date(),
-      };
-      setConversation((prev) => [...prev, assistantMessage]);
+      setUnavailable(true);
     } finally {
       setLoading(false);
     }
@@ -174,6 +157,7 @@ export const AIConsultant = () => {
       suggestions: 'Sugestii',
       clearChat: 'Șterge conversația',
       noProfile: 'Creează un profil pentru a primi răspunsuri personalizate',
+      unavailable: 'Consultantul nu este disponibil acum. Nu s-a inventat nimic în locul lui — încearcă din nou peste puțin.',
       focus: 'Focus',
       luckyNumbers: 'Numere norocoase',
       advice: 'Sfaturi',
@@ -191,6 +175,7 @@ export const AIConsultant = () => {
       suggestions: 'Suggestions',
       clearChat: 'Clear chat',
       noProfile: 'Create a profile to receive personalized answers',
+      unavailable: 'The consultant is not available right now. Nothing was invented in its place — try again in a moment.',
       focus: 'Focus',
       luckyNumbers: 'Lucky Numbers',
       advice: 'Advice',
@@ -208,6 +193,7 @@ export const AIConsultant = () => {
       suggestions: 'Предложения',
       clearChat: 'Очистить чат',
       noProfile: 'Создайте профиль для получения персонализированных ответов',
+      unavailable: 'Консультант сейчас недоступен. Ничего не было выдумано вместо него — попробуйте ещё раз чуть позже.',
       focus: 'Фокус',
       luckyNumbers: 'Счастливые числа',
       advice: 'Совет',
@@ -311,6 +297,13 @@ export const AIConsultant = () => {
                 </div>
               )}
 
+              {/* Said instead of an answer, never alongside one. */}
+              {unavailable && (
+                <div className="p-4 rounded-lg bg-warn/10 border border-warn/30 text-sm text-warn">
+                  {tr.unavailable}
+                </div>
+              )}
+
               {/* Conversation History */}
               {conversation.length > 0 ? (
                 <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
@@ -397,23 +390,5 @@ export const AIConsultant = () => {
     </div>
   );
 };
-
-// Local fallback response generation
-function generateLocalResponse(question: string, context: AIContext): AIResponse {
-  const { language, profile } = context;
-
-  const responses: Record<string, string> = {
-    ro: `Bazat pe profilul tău numerologic (${profile.fullName}), pot observa că ai un potențial remarcabil. Numerele tale indică o combinație unică de energie și direcție în viață. Te încurajez să explorezi mai profund semnificația numerelor tale personale pentru a descoperi cum poți folosi cel mai bine aceste energii în viața de zi cu zi.`,
-    en: `Based on your numerological profile (${profile.fullName}), I can see that you have remarkable potential. Your numbers indicate a unique combination of energy and life direction. I encourage you to explore more deeply the meaning of your personal numbers to discover how you can best use these energies in your daily life.`,
-    ru: `Основываясь на вашем нумерологическом профиле (${profile.fullName}), я вижу, что у вас замечательный потенциал. Ваши числа указывают на уникальное сочетание энергии и направления в жизни. Рекомендую глубже изучить значение ваших личных чисел, чтобы понять, как лучше использовать эти энергии в повседневной жизни.`,
-  };
-
-  return {
-    answer: responses[language] || responses.en,
-    relatedNumbers: [1, 5, 7],
-    suggestions: [],
-    followUpQuestions: [],
-  };
-}
 
 export default AIConsultant;

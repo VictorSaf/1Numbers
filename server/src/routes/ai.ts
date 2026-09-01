@@ -18,77 +18,34 @@ interface AIRequest {
   temperature?: number;
 }
 
-interface AIResponse {
-  answer: string;
-  relatedNumbers?: number[];
-  suggestions?: string[];
-  followUpQuestions?: string[];
-}
+// Which provider can actually answer, decided per request.
+//
+// There used to be a third value here -- 'mock' -- and it was the default, so
+// an install with no key configured answered every question. It returned a
+// paragraph about the reader's "remarkable potential" and a hardcoded
+// [1, 5, 7], with HTTP 200 and the same shape as a real answer, which meant
+// nothing downstream could tell it apart -- and the client rendered it as a
+// reading. A consultant that is switched off is honest; one that invents is
+// not, because the reader cannot tell which of the two they got.
+//
+// The environment is read per call rather than at import, so a test can prove
+// the unconfigured case without reloading the module.
 
-// AI Provider configuration
-const AI_PROVIDER = process.env.AI_PROVIDER || 'mock'; // 'openai', 'anthropic', or 'mock'
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+type Provider = 'openai' | 'anthropic';
 
-// Mock AI response for development/testing
-function generateMockResponse(userMessage: string, language: string): AIResponse {
-  const responses: Record<string, Record<string, AIResponse>> = {
-    ro: {
-      default: {
-        answer: 'Bazat pe profilul tău numerologic, pot observa că ai un potențial remarcabil. Numerele tale indică o combinație unică de energie și direcție în viață. Te încurajez să explorezi mai profund semnificația numerelor tale personale pentru a descoperi cum poți folosi cel mai bine aceste energii.',
-        relatedNumbers: [1, 5, 7],
-        suggestions: [
-          'Explorează mai mult despre Drumul Vieții',
-          'Verifică previziunile pentru luna aceasta',
-          'Analizează compatibilitatea cu partenerul',
-        ],
-        followUpQuestions: [
-          'Ce semnifică Numărul Destinului pentru mine?',
-          'Cum pot îmbunătăți energia anului personal?',
-          'Care sunt lecțiile karmice principale?',
-        ],
-      },
-    },
-    en: {
-      default: {
-        answer: 'Based on your numerological profile, I can see that you have remarkable potential. Your numbers indicate a unique combination of energy and life direction. I encourage you to explore more deeply the meaning of your personal numbers to discover how you can best use these energies.',
-        relatedNumbers: [1, 5, 7],
-        suggestions: [
-          'Explore more about your Life Path',
-          'Check predictions for this month',
-          'Analyze compatibility with your partner',
-        ],
-        followUpQuestions: [
-          'What does my Destiny Number mean for me?',
-          'How can I improve my personal year energy?',
-          'What are my main karmic lessons?',
-        ],
-      },
-    },
-    ru: {
-      default: {
-        answer: 'Основываясь на вашем нумерологическом профиле, я вижу, что у вас замечательный потенциал. Ваши числа указывают на уникальное сочетание энергии и направления в жизни. Рекомендую глубже изучить значение ваших личных чисел, чтобы понять, как лучше использовать эти энергии.',
-        relatedNumbers: [1, 5, 7],
-        suggestions: [
-          'Изучите больше о Жизненном Пути',
-          'Проверьте прогнозы на этот месяц',
-          'Проанализируйте совместимость с партнером',
-        ],
-        followUpQuestions: [
-          'Что означает мое Число Судьбы?',
-          'Как улучшить энергию личного года?',
-          'Каковы мои основные кармические уроки?',
-        ],
-      },
-    },
-  };
-
-  return responses[language]?.default || responses.en.default;
+function resolveProvider(): Provider | null {
+  const explicit = process.env.AI_PROVIDER;
+  if (explicit === 'openai') return process.env.OPENAI_API_KEY ? 'openai' : null;
+  if (explicit === 'anthropic') return process.env.ANTHROPIC_API_KEY ? 'anthropic' : null;
+  if (process.env.ANTHROPIC_API_KEY) return 'anthropic';
+  if (process.env.OPENAI_API_KEY) return 'openai';
+  return null;
 }
 
 // Call OpenAI API
 async function callOpenAI(request: AIRequest): Promise<string> {
-  if (!OPENAI_API_KEY) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
     throw new Error('OpenAI API key not configured');
   }
 
@@ -96,7 +53,7 @@ async function callOpenAI(request: AIRequest): Promise<string> {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${OPENAI_API_KEY}`,
+      'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
       model: 'gpt-4o-mini',
@@ -119,7 +76,8 @@ async function callOpenAI(request: AIRequest): Promise<string> {
 
 // Call Anthropic API
 async function callAnthropic(request: AIRequest): Promise<string> {
-  if (!ANTHROPIC_API_KEY) {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
     throw new Error('Anthropic API key not configured');
   }
 
@@ -133,7 +91,7 @@ async function callAnthropic(request: AIRequest): Promise<string> {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': ANTHROPIC_API_KEY,
+      'x-api-key': apiKey,
       'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
@@ -204,34 +162,20 @@ router.post(
       { role: 'user', content: userPrompt },
     ];
 
-    let answer: string;
-
-    // Call appropriate AI provider
-    switch (AI_PROVIDER) {
-      case 'openai':
-        answer = await callOpenAI({ messages });
-        break;
-      case 'anthropic':
-        answer = await callAnthropic({ messages });
-        break;
-      case 'mock':
-      default: {
-        // Use mock response for development
-        const mockResponse = generateMockResponse(userPrompt, language);
-        return res.json({
-          success: true,
-          ...mockResponse,
-          provider: 'mock',
-        });
-      }
+    const provider = resolveProvider();
+    if (!provider) {
+      return res.status(503).json({ error: 'ai_unavailable' });
     }
 
-    // Parse AI response for structured data
-    // In a production app, you might ask the AI to return JSON
+    const answer =
+      provider === 'anthropic'
+        ? await callAnthropic({ messages })
+        : await callOpenAI({ messages });
+
     res.json({
       success: true,
       answer,
-      provider: AI_PROVIDER,
+      provider,
     });
   } catch (error: unknown) {
     console.error('AI consultation error:', error);
