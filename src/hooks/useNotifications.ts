@@ -22,6 +22,32 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 import { API_BASE } from '@/lib/apiBase';
 
+/**
+ * Preferințele trăiau numai în localStorage. Serverul nu afla niciodată nimic,
+ * deci rândul din notification_preferences nu se crea, deci
+ * preferences->>'enabled' rămânea false și dispecerul zilnic nu găsea pe nimeni.
+ *
+ * PUT-ul cere obiectul întreg: schema din server/src/routes/notifications.ts e
+ * un zod .strict() cu toate cele șapte câmpuri.
+ */
+const pushPreferencesToServer = async (preferences: NotificationPreferences): Promise<void> => {
+  const token = localStorage.getItem('auth_token');
+  if (!token) return;
+
+  try {
+    await fetch(`${API_BASE}/notifications/preferences`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ preferences }),
+    });
+  } catch {
+    console.warn('Failed to save notification preferences to server');
+  }
+};
+
 interface UseNotificationsReturn {
   // Status
   isSupported: boolean;
@@ -141,7 +167,7 @@ export const useNotifications = (): UseNotificationsReturn => {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
             },
-            body: JSON.stringify({ subscription: subscription.toJSON() }),
+            body: JSON.stringify({ subscription: subscription.toJSON(), language }),
           });
         } catch {
           console.warn('Failed to send subscription to server');
@@ -159,7 +185,7 @@ export const useNotifications = (): UseNotificationsReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, [swRegistration]);
+  }, [swRegistration, language]);
 
   // Unsubscribe from push notifications
   const unsubscribe = useCallback(async (): Promise<boolean> => {
@@ -209,6 +235,13 @@ export const useNotifications = (): UseNotificationsReturn => {
       return newPrefs;
     });
   }, []);
+
+  // Un PUT per obiect de preferințe așezat, inclusiv cel de la montare -- acela
+  // e ce creează rândul pe server pentru un cont care n-a avut niciodată unul.
+  // PUT-ul e idempotent, deci o repetare nu costă nimic.
+  useEffect(() => {
+    void pushPreferencesToServer(preferences);
+  }, [preferences]);
 
   // Send test notification
   const sendTestNotification = useCallback(async (): Promise<void> => {
