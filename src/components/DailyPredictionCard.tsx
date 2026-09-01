@@ -2,7 +2,8 @@ import { Music, Palette, Lightbulb, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { DailyPrediction, getDayRecommendations, calculateDayColor, getDayMusicRecommendations } from '@/lib/predictions';
+import { DailyPrediction } from '@/lib/predictions';
+import { dayAdvice, dayColor, dayMusic, type GuidanceLang } from '@/lib/dayGuidance';
 
 interface DailyPredictionCardProps {
   prediction: DailyPrediction;
@@ -13,9 +14,16 @@ interface DailyPredictionCardProps {
 export const DailyPredictionCard = ({ prediction, birthDate, date }: DailyPredictionCardProps) => {
   const { language, t } = useLanguage();
   
-  const recommendations = getDayRecommendations(birthDate, date);
-  const color = calculateDayColor(prediction.number);
-  const music = getDayMusicRecommendations(prediction.number);
+  const recommendations = dayAdvice(prediction.number, (['ro','en','ru'].includes(language) ? language : 'en') as GuidanceLang);
+  /**
+   * Recomandările, culoarea și genurile veneau din predictions.ts, unde erau
+   * scrise doar în engleză. Etichetele din jur erau traduse, deci pagina în
+   * română arăta titluri românești peste conținut englezesc -- mai rău decât
+   * o pagină întreagă într-o limbă, fiindcă pare o traducere abandonată.
+   */
+  const guidanceLang = (["ro", "en", "ru"].includes(language) ? language : "en") as GuidanceLang;
+  const color = dayColor(prediction.number, guidanceLang);
+  const music = dayMusic(prediction.number, guidanceLang);
   
   const labels = {
     ro: {
