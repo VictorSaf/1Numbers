@@ -30,8 +30,11 @@ module.exports = {
     },
     {
       name: 'compass-api',
-      script: 'server/dist/index.js',
-      cwd: __dirname,
+      script: 'dist/index.js',
+      // cwd e server/, nu rădăcina: app.ts și db.ts cheamă dotenv.config() fără
+      // cale, care rezolvă față de process.cwd(). Cu rădăcina, dotenv citea
+      // .env-ul de sus și nu găsea JWT_SECRET, iar procesul cădea la pornire.
+      cwd: require('path').join(__dirname, 'server'),
       // instances: 1 nu mai e o presupunere pe care se sprijină corectitudinea.
       // Dispecerul de notificări revendică fiecare trimitere printr-un
       // INSERT ... ON CONFLICT DO NOTHING pe indexul unic
