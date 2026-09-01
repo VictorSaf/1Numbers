@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
+import type { ProfileCategory } from '@/lib/profileCategories';
 
 export interface Profile {
   id: string;
@@ -9,6 +10,7 @@ export interface Profile {
   birthDate: string;
   birthTime?: string;
   birthPlace?: string;
+  category: ProfileCategory;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -76,6 +78,7 @@ export const useProfiles = () => {
     birthDate: string;
     birthTime?: string;
     birthPlace?: string;
+    category?: ProfileCategory;
     setAsActive?: boolean;
   }) => {
     try {
@@ -99,6 +102,7 @@ export const useProfiles = () => {
     birthDate: string;
     birthTime?: string;
     birthPlace?: string;
+    category?: ProfileCategory;
   }) => {
     try {
       const response = await api.updateProfile(profileId, data);

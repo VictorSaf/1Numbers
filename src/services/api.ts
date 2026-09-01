@@ -1,5 +1,6 @@
 // API Service Configuration
 import { API_BASE } from '@/lib/apiBase';
+import type { ProfileCategory } from '@/lib/profileCategories';
 
 const API_BASE_URL = API_BASE;
 
@@ -111,14 +112,30 @@ class ApiService {
     return this.request<{ success: boolean; profiles: unknown[] }>('/profiles/all');
   }
 
-  async createProfile(data: { fullName: string; birthDate: string; birthTime?: string; birthPlace?: string; setAsActive?: boolean }) {
+  async createProfile(data: {
+    fullName: string;
+    birthDate: string;
+    birthTime?: string;
+    birthPlace?: string;
+    category?: ProfileCategory;
+    setAsActive?: boolean;
+  }) {
     return this.request<{ success: boolean; profile: unknown }>('/profiles/me', {
       method: 'POST',
       body: data,
     });
   }
 
-  async updateProfile(profileId: string, data: { fullName: string; birthDate: string; birthTime?: string; birthPlace?: string }) {
+  async updateProfile(
+    profileId: string,
+    data: {
+      fullName: string;
+      birthDate: string;
+      birthTime?: string;
+      birthPlace?: string;
+      category?: ProfileCategory;
+    },
+  ) {
     return this.request<{ success: boolean; profile: unknown }>(`/profiles/${profileId}`, {
       method: 'PUT',
       body: data,
