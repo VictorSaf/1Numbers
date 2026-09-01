@@ -106,8 +106,9 @@ router.post('/me', authenticateToken, async (req: AuthRequest, res: Response) =>
     try {
       await client.query('BEGIN');
 
-      // If setAsActive is true, deactivate all other profiles
-      if (setAsActive) {
+      // If setAsActive is true, deactivate all other profiles — but only for
+      // a profile that can actually become active (own map).
+      if (category === 'eu' && setAsActive) {
         await client.query(
           'UPDATE user_profiles SET is_active = false WHERE user_id = $1',
           [userId]
@@ -120,7 +121,13 @@ router.post('/me', authenticateToken, async (req: AuthRequest, res: Response) =>
         [userId]
       );
       const isFirstProfile = parseInt(existingCount.rows[0].count) === 0;
-      const shouldBeActive = setAsActive !== false && (isFirstProfile || setAsActive === true);
+      // Numai o hartă proprie poate fi cea activă: profilul activ alimentează
+      // /azi și prefill-urile, iar harta unui copil ajunsă activă ar arăta
+      // previziunile copilului drept ale utilizatorului. Constrângerea din
+      // migrația 012 spune același lucru; asta o spune înainte de INSERT, ca
+      // utilizatorul să primească un răspuns și nu o eroare de bază de date.
+      const shouldBeActive =
+        category === 'eu' && (setAsActive === true || (isFirstProfile && setAsActive !== false));
 
       // Create new profile
       const result = await client.query(
@@ -267,13 +274,18 @@ router.post('/:id/activate', authenticateToken, async (req: AuthRequest, res: Re
 
       // Verify profile belongs to user
       const verifyResult = await client.query(
-        'SELECT id FROM user_profiles WHERE id = $1 AND user_id = $2',
+        'SELECT id, category FROM user_profiles WHERE id = $1 AND user_id = $2',
         [profileId, userId]
       );
 
       if (verifyResult.rows.length === 0) {
         await client.query('ROLLBACK');
         return res.status(404).json({ error: 'Profile not found' });
+      }
+
+      if (verifyResult.rows[0].category !== 'eu') {
+        await client.query('ROLLBACK');
+        return res.status(400).json({ error: 'Only your own maps can be the active profile' });
       }
 
       // Deactivate all profiles for this user

@@ -95,3 +95,65 @@ describe('categoria intră în API', () => {
     expect(insert![1]).toContain('eu');
   });
 });
+
+describe('numai o hartă a mea poate fi cea activă', () => {
+  it('refuză activarea hărții unui copil', async () => {
+    client.query.mockImplementation((sql: string) => {
+      if (/SELECT id, category FROM user_profiles/.test(sql)) {
+        return Promise.resolve({ rows: [{ id: 'p1', category: 'copil' }] });
+      }
+      return Promise.resolve({ rows: [] });
+    });
+
+    const response = await request(app)
+      .post('/api/profiles/p1/activate')
+      .set('Authorization', auth);
+
+    expect(response.status).toBe(400);
+    expect(client.query).toHaveBeenCalledWith('ROLLBACK');
+  });
+
+  it('lasă activarea unei hărți proprii', async () => {
+    client.query.mockImplementation((sql: string) => {
+      if (/SELECT id, category FROM user_profiles/.test(sql)) {
+        return Promise.resolve({ rows: [{ id: 'p1', category: 'eu' }] });
+      }
+      if (/SET is_active = true/.test(sql)) {
+        return Promise.resolve({ rows: [row({ category: 'eu', is_active: true })] });
+      }
+      return Promise.resolve({ rows: [] });
+    });
+
+    const response = await request(app)
+      .post('/api/profiles/p1/activate')
+      .set('Authorization', auth);
+
+    expect(response.status).toBe(200);
+    expect(response.body.profile.isActive).toBe(true);
+  });
+
+  it('nu activează o firmă nici când i se cere explicit', async () => {
+    client.query.mockImplementation((sql: string) => {
+      if (/SELECT COUNT/.test(sql)) return Promise.resolve({ rows: [{ count: '0' }] });
+      if (/INSERT INTO user_profiles/.test(sql)) {
+        return Promise.resolve({ rows: [row({ category: 'afacere', is_active: false })] });
+      }
+      return Promise.resolve({ rows: [] });
+    });
+
+    await request(app)
+      .post('/api/profiles/me')
+      .set('Authorization', auth)
+      .send({
+        fullName: 'Lumina SRL',
+        birthDate: '2019-03-02',
+        category: 'afacere',
+        setAsActive: true,
+      });
+
+    const insert = client.query.mock.calls.find(([sql]: [string]) =>
+      /INSERT INTO user_profiles/.test(sql),
+    );
+    expect(insert![1][6]).toBe(false);
+  });
+});
