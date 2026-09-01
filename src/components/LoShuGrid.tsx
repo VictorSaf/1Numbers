@@ -6,6 +6,7 @@ import {
   generateLoShuGrid,
   LO_SHU_GRID_LAYOUT,
   LO_SHU_NUMBER_MEANINGS,
+  LO_SHU_POSITIONS,
   NUMBER_REMEDIES,
   type LoShuGridResult,
   type NumberRemedy,
@@ -112,6 +113,11 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
       ro: "Click pentru detalii",
       en: "Click for details",
       ru: "Нажмите для подробностей",
+    },
+    appears: {
+      ro: (n: number) => (n === 0 ? "Lipsește din data ta" : `Apare de ${n} ori în data ta`),
+      en: (n: number) => (n === 0 ? "Missing from your date" : `Appears ${n} times in your date`),
+      ru: (n: number) => (n === 0 ? "Отсутствует в вашей дате" : `Встречается ${n} раз(а) в вашей дате`),
     },
   };
 
@@ -220,6 +226,40 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
           <p className="text-xs text-center text-muted-foreground mt-2">
             {labels.clickForDetails[language]}
           </p>
+
+          {/* Clicul chiar dă detalii.
+              Până acum seta o stare folosită într-un singur loc -- ca să deseneze
+              un inel în jurul celulei -- iar înțelesul stătea într-un tooltip,
+              adică pe hover. Pe un ecran cu atingere, hover-ul nu se declanșează
+              niciodată: textul promitea una și componenta făcea alta.
+              Tooltipul rămâne pentru mouse, unde e mai rapid decât un clic. */}
+          {selectedNumber !== null && (() => {
+            const meaning = LO_SHU_NUMBER_MEANINGS[selectedNumber][language];
+            // LO_SHU_POSITIONS dă perechea rând/coloană a cifrei: poziția ei în
+            // pătrat e fixă, doar numărătoarea diferă de la om la om.
+            const [row, col] = LO_SHU_POSITIONS[selectedNumber];
+            const times = result.grid[row][col];
+            return (
+              <div
+                data-cell-details
+                className="mt-4 rounded-xl border border-primary/30 bg-primary/5 p-4"
+              >
+                <div className="flex items-baseline gap-3">
+                  <span className="num text-2xl text-primary">{selectedNumber}</span>
+                  <span className="font-heading text-lg text-foreground">{meaning.title}</span>
+                </div>
+                <p className="mt-2 text-sm leading-relaxed text-foreground/85">
+                  {meaning.description}
+                </p>
+                <p className="mt-1 text-sm text-primary">{meaning.energy}</p>
+                {/* Câte a ieșit e chiar ce distinge harta asta de oricare alta:
+                    înțelesul cifrei e același pentru toată lumea, numărul nu. */}
+                <p className="mt-3 border-t border-line pt-3 text-sm text-muted-foreground">
+                  {labels.appears[language](times)}
+                </p>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Analysis Section */}
