@@ -10,8 +10,26 @@
 // .cjs rather than .js because the root package.json is "type": "module" and
 // pm2 reads this file with require().
 //
-// Both processes bind to loopback. The Cloudflare Tunnel runs on the same host
-// and splits by path: /api/* to the API, everything else to the static server.
+// Ambele procese ascultă pe rețeaua locală, nu doar pe loopback. Tunelul
+// Cloudflare rulează pe aceeași mașină și împarte pe cale: /api/* la API,
+// restul la serverul static -- asta nu se schimbă.
+//
+// HOST e aici, nu în cod, fiindcă e o decizie de topologie: cine deschide
+// fișierul ăsta vede dintr-o privire ce e expus și unde se schimbă. Codul are
+// loopback ca implicit, deci o mașină fără fișierul ăsta rămâne închisă.
+//
+// Motivul: panoul de admin. Tunelul răspunde 404 la ^/admin și ^/api/admin din
+// 2026-08-30 și rămâne așa, deci de pe alt calculator nu exista nicio cale.
+// Dintre cele trei posibile -- tunel SSH (Remote Login oprit), Cloudflare
+// Access (se configurează în panoul Cloudflare) și scoaterea blocajului din
+// tunel (ar pune adminul pe internetul deschis) -- rețeaua locală e cea mai
+// mică schimbare care rezolvă.
+//
+// Ce se expune nou e strict panoul de admin: restul aplicației era deja
+// publică prin tunel. Îl apără mai departe autentificarea și requireAdmin,
+// care citește rolul din baza de date la fiecare cerere, nu din token.
+//
+// Ca să revii: șterge cele două linii HOST și `pm2 restart compass compass-api`.
 module.exports = {
   apps: [
     {
@@ -26,6 +44,7 @@ module.exports = {
       max_memory_restart: '200M',
       env: {
         NODE_ENV: 'production',
+        HOST: '0.0.0.0',
       },
     },
     {
@@ -47,6 +66,7 @@ module.exports = {
       max_memory_restart: '400M',
       env: {
         NODE_ENV: 'production',
+        HOST: '0.0.0.0',
         // Everything else -- DATABASE_URL, JWT_SECRET, the feature flags -- is
         // read from server/.env by dotenv, which is where the secrets live and
         // where they stay out of this file.

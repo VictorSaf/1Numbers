@@ -74,11 +74,31 @@ Plus: serverele ascultă doar pe `127.0.0.1`, iar `requireAdmin` citește rolul
 din baza de date, nu din token. Patru straturi, dintre care build-ul e cel mai
 slab și singurul care te încurcă pe tine.
 
-De pe alt calculator, adminul se atinge printr-un tunel SSH, nu deschizând
-ingress-ul:
+De pe alt calculator din aceeași rețea, adminul se atinge direct pe IP-ul
+mașinii: `http://<ip>:8090/admin`. Ambele procese ascultă pe rețeaua locală,
+prin `HOST: '0.0.0.0'` din `ecosystem.config.cjs` (2026-09-01). Codul are
+loopback ca implicit, deci o mașină fără fișierul ăla rămâne închisă.
+
+S-a ales asta dintre trei căi: tunelul SSH ar fi cerut Remote Login pornit,
+Cloudflare Access se configurează în panoul Cloudflare, iar scoaterea
+blocajului din tunel ar fi pus adminul pe internetul deschis. Rețeaua locală
+e cea mai mică schimbare care rezolvă, și nu atinge tunelul: `/admin` și
+`/api/admin` răspund în continuare 404 prin domeniu.
+
+Ce se expune nou e strict panoul de admin -- restul aplicației era deja
+publică prin tunel. Îl apără autentificarea și `requireAdmin`, care citește
+rolul din baza de date la fiecare cerere, nu din token.
+
+Ca să revii la loopback: șterge cele două linii `HOST` din
+`ecosystem.config.cjs` și repornește.
+
+Repornirea după o schimbare în `ecosystem.config.cjs` cere `pm2 delete` plus
+`pm2 start`, nu `restart`: pm2 păstrează mediul de la pornire, iar
+`--update-env` îl împreunează cu shell-ul curent -- ceea ce a scurs o dată
+variabilele unei sesiuni Claude Code în proces.
 
 ```bash
-ssh -N -L 8090:127.0.0.1:8090 -L 3001:127.0.0.1:3001 <user>@<ip-ul-mașinii>
+pm2 delete compass compass-api && pm2 start ecosystem.config.cjs
 ```
 
 ### Prima rulare pe o bază care are deja schema

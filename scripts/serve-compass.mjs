@@ -11,7 +11,25 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(fileURLToPath(new URL("../dist", import.meta.url)));
 const PORT = 8090;
-const HOST = "127.0.0.1";
+
+/**
+ * Loopback e implicit; rețeaua locală se cere explicit, prin HOST.
+ *
+ * Panoul de admin trebuie atins de pe alt calculator, iar căile erau trei:
+ * tunel SSH (Remote Login e oprit, iar pornirea lui e o setare de sistem),
+ * Cloudflare Access (se configurează în panoul Cloudflare) sau scoaterea
+ * blocajului din tunel -- care ar pune adminul pe internetul deschis.
+ *
+ * Legarea la rețeaua locală e cea mai mică schimbare care rezolvă. Tunelul
+ * rămâne neatins: `/admin` și `/api/admin` continuă să răspundă 404 prin
+ * domeniu. Ce se adaugă e vizibilitatea din rețeaua locală -- iar restul
+ * aplicației era oricum publică prin tunel, deci ce se expune nou e strict
+ * panoul de admin, apărat mai departe de autentificare și de requireAdmin,
+ * care citește rolul din baza de date la fiecare cerere, nu din token.
+ *
+ * Ca să revii: scoate HOST din ecosystem.config.cjs și repornește.
+ */
+const HOST = process.env.HOST ?? "127.0.0.1";
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
