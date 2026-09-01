@@ -7,10 +7,11 @@ import { NumberCard } from "./NumberCard";
 /**
  * The fourteen numbers the engine adds beyond the core five.
  *
- * This module is the only thing that pulls in the engine's content layer --
- * archetypes, frames and arcana together run to well over a thousand lines of
- * copy in three languages. It is loaded lazily by the results page so the main
- * bundle carries none of it until someone actually asks for a reading.
+ * This module and LetterStones are the only things that pull in the engine's
+ * content layer -- archetypes, frames and arcana together run to well over a
+ * thousand lines of copy in three languages. Both are loaded lazily by the
+ * results page so the main bundle carries none of it until someone actually
+ * asks for a reading.
  */
 
 interface NewNumbersProps {

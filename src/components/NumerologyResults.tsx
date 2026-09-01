@@ -38,6 +38,7 @@ const TransitsTimeline = lazy(() => import("@/components/numerology/TransitsTime
 const Biorhythms = lazy(() => import("@/components/numerology/Biorhythms"));
 const DestinyMatrix = lazy(() => import("@/components/numerology/DestinyMatrix"));
 const NewNumbers = lazy(() => import("@/components/numerology/NewNumbers"));
+const LetterStones = lazy(() => import("@/components/numerology/LetterStones"));
 const Contradictions = lazy(() => import("@/components/numerology/Contradictions"));
 const NumerologyRadarChart = lazy(() => import("./charts/NumerologyRadarChart").then(m => ({ default: m.NumerologyRadarChart })));
 
@@ -167,6 +168,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     luckyDates: { ro: "Date Favorabile", en: "Lucky Dates", ru: "Благоприятные Даты" },
     nameAnalysis: { ro: "Analiza Numelui", en: "Name Analysis", ru: "Анализ Имени" },
     newNumbers: { ro: "Numerele Noi", en: "The New Numbers", ru: "Новые Числа" },
+    stones: { ro: "Cele trei litere", en: "The three letters", ru: "Три буквы" },
     planes: { ro: "Planurile de Expresie", en: "Planes of Expression", ru: "Планы Выражения" },
     matrix: { ro: "Matrița Destinului", en: "Destiny Matrix", ru: "Матрица Судьбы" },
     parallel: { ro: "Sisteme paralele", en: "Parallel systems", ru: "Параллельные системы" },
@@ -190,6 +192,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     luckyDates: { ro: "Zilele favorabile pentru decizii importante.", en: "The days that favour important decisions.", ru: "Дни, благоприятные для важных решений." },
     nameAnalysis: { ro: "Distribuția literelor, vocalelor și consoanelor din numele tău.", en: "The distribution of letters, vowels and consonants in your name.", ru: "Распределение букв, гласных и согласных в вашем имени." },
     newNumbers: { ro: "Atitudine, Maturitate, Echilibru, Pasiune Ascunsă și încă zece.", en: "Attitude, Maturity, Balance, Hidden Passion and ten more.", ru: "Отношение, Зрелость, Баланс, Скрытая страсть и ещё десять." },
+    stones: { ro: "Cum intri, cum închei, și ce simți înainte de gând.", en: "How you begin, how you finish, and what you feel before thought.", ru: "Как вы начинаете, как завершаете и что вы чувствуете до мысли." },
     planes: { ro: "Cum se distribuie literele numelui tău pe patru planuri și trei naturi.", en: "How the letters of your name spread across four planes and three natures.", ru: "Как буквы вашего имени распределяются по четырём планам и трём натурам." },
     matrix: { ro: "Cele nouă puncte ale octagramei, calculate din data nașterii.", en: "The nine points of the octagram, drawn from your birth date.", ru: "Девять точек октаграммы, рассчитанных по дате рождения." },
     parallel: { ro: "Aceleași litere, citite de alt sistem. Numărul compus caldeean spune altceva decât cel pitagoreic.", en: "The same letters, read by another system. The Chaldean compound says something the Pythagorean one does not.", ru: "Те же буквы, прочитанные другой системой. Халдейское составное число говорит не то же, что пифагорейское." },
@@ -284,6 +287,16 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
             </Suspense>
           </Block>
 
+          {/* Cele trei litere răspund la „cum intri", „cum închei", „ce simți
+              înainte de gând" -- reflexe care nu depind de an, deci capitolul
+              ăsta. Nu stau lângă LetterMap, în capitolul 3, doar pentru că și
+              acolo e vorba de litere: acela răspunde la ce lipsește din hartă.
+              Diagrama capitolului rămâne ultima. */}
+          <Block title={sectionLabels.stones[language]} icon={<Type className="h-5 w-5 text-primary" />} note={teasers.stones[language]}>
+            <Suspense fallback={chartSkeleton}>
+              <LetterStones fullName={fullName} birthDate={birthDate} />
+            </Suspense>
+          </Block>
           {/* The one diagram of this chapter: the five core numbers on one
               scale, which is the only place they can be seen against each
               other. It used to sit orphaned at the very bottom of the page. */}
