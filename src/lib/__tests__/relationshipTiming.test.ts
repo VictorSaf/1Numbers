@@ -71,3 +71,60 @@ describe("alinierea anului", () => {
     expect(backward.person1).toBe(forward.person2);
   });
 });
+
+import { calculateMonthAlignments, calculateRelationshipTiming } from "../relationshipTiming";
+import { calculatePersonalMonthNumber } from "../personalCycles";
+
+describe("alinierea lunilor", () => {
+  it("întoarce douăsprezece luni, de la 1 la 12", () => {
+    const months = calculateMonthAlignments(ANA, ION, 2026);
+
+    expect(months).toHaveLength(12);
+    expect(months.map((m) => m.month)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  it("ia lunile personale direct din motor", () => {
+    const months = calculateMonthAlignments(ANA, ION, 2026);
+
+    for (const month of months) {
+      expect(month.person1).toBe(calculatePersonalMonthNumber(ANA, 2026, month.month));
+      expect(month.person2).toBe(calculatePersonalMonthNumber(ION, 2026, month.month));
+    }
+  });
+
+  it("dă fiecărei luni banda potrivită scorului ei", () => {
+    for (const month of calculateMonthAlignments(ANA, ION, 2026)) {
+      expect(month.band).toBe(bandForScore(month.score));
+    }
+  });
+
+  it("ține scorurile în intervalul matricei", () => {
+    for (const month of calculateMonthAlignments(ANA, ION, 2026)) {
+      expect(month.score).toBeGreaterThanOrEqual(40);
+      expect(month.score).toBeLessThanOrEqual(100);
+    }
+  });
+
+  it("nu întoarce aceeași lună de douăsprezece ori", () => {
+    // Dacă indexul s-ar fi pierdut pe drum, toate lunile ar avea aceleași
+    // numere -- lucru pe care o aserțiune de lungime nu-l prinde.
+    const numbers = calculateMonthAlignments(ANA, ION, 2026).map((m) => `${m.person1}-${m.person2}`);
+    expect(new Set(numbers).size).toBeGreaterThan(1);
+  });
+});
+
+describe("întregul strat temporal", () => {
+  it("adună anul și lunile într-un singur obiect", () => {
+    const timing = calculateRelationshipTiming(ANA, ION, 2026);
+
+    expect(timing.year).toEqual(calculateYearAlignment(ANA, ION, 2026));
+    expect(timing.months).toHaveLength(12);
+  });
+
+  it("folosește același an pentru amândouă", () => {
+    const timing = calculateRelationshipTiming(ANA, ION, 2029);
+
+    expect(timing.year.year).toBe(2029);
+    expect(timing.months[0].person1).toBe(calculatePersonalMonthNumber(ANA, 2029, 1));
+  });
+});

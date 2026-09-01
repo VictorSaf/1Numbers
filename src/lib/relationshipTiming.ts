@@ -1,5 +1,6 @@
 import { calculatePersonalYearNumber } from "./numerology";
 import { getCompatibilityScore, getCompatibilityLevel } from "./compatibility";
+import { calculatePersonalMonthNumber } from "./personalCycles";
 
 /**
  * Relația, în timp.
@@ -48,3 +49,40 @@ export const calculateYearAlignment = (
 
   return { year, person1, person2, score, band: bandForScore(score) };
 };
+
+export interface MonthAlignment {
+  month: number;
+  person1: number;
+  person2: number;
+  score: number;
+  band: AlignmentBand;
+}
+
+/** Cele douăsprezece luni ale unui an, în ordine. */
+export const calculateMonthAlignments = (
+  birthDate1: Date,
+  birthDate2: Date,
+  year: number = new Date().getFullYear(),
+): MonthAlignment[] =>
+  Array.from({ length: 12 }, (_, index) => {
+    const month = index + 1;
+    const person1 = calculatePersonalMonthNumber(birthDate1, year, month);
+    const person2 = calculatePersonalMonthNumber(birthDate2, year, month);
+    const score = getCompatibilityScore(person1, person2);
+
+    return { month, person1, person2, score, band: bandForScore(score) };
+  });
+
+export interface RelationshipTiming {
+  year: YearAlignment;
+  months: MonthAlignment[];
+}
+
+export const calculateRelationshipTiming = (
+  birthDate1: Date,
+  birthDate2: Date,
+  year: number = new Date().getFullYear(),
+): RelationshipTiming => ({
+  year: calculateYearAlignment(birthDate1, birthDate2, year),
+  months: calculateMonthAlignments(birthDate1, birthDate2, year),
+});
