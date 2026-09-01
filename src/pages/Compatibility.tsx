@@ -31,6 +31,7 @@ import { cn } from "@/lib/utils";
 import { BirthDateSelect } from "@/components/BirthDateSelect";
 import { RelationshipTimingCard } from "@/components/compatibility/RelationshipTimingCard";
 import { calculateRelationshipTiming, type RelationshipTiming } from "@/lib/relationshipTiming";
+import { TwoJudgements } from "@/components/numerology/TwoJudgements";
 
 interface PersonData {
   fullName: string;
@@ -304,6 +305,20 @@ const Compatibility = () => {
                   </div>
                 ))}
               </div>
+
+              {/* Ce ascunde procentul, și ce spune a doua tradiție.
+                  Procentul de deasupra e o medie ponderată: două perechi cu
+                  același 74% pot fi una echilibrată pe toate liniile și alta
+                  ruptă în două. Iar tradiția vedică judecă aceeași pereche
+                  prin alt criteriu -- prietenie sau dușmănie între planetele
+                  zilelor de naștere -- și poate să nu fie de acord.
+                  Stă imediat sub scor, fiindcă despre scorul ăla vorbește. */}
+              {person1.birthDate && person2.birthDate && (
+                <TwoJudgements
+                  a={{ name: person1.fullName, birthDate: person1.birthDate }}
+                  b={{ name: person2.fullName, birthDate: person2.birthDate }}
+                />
+              )}
 
               {/* Relationship Dynamics Card */}
               {detailedResult && (
