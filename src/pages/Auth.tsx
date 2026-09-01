@@ -120,7 +120,10 @@ const Auth = () => {
         
         if (result.success) {
           toast({ title: l.loginSuccess });
-          navigate('/');
+          // Cine se întoarce are deja o hartă: îl interesează ziua de azi, nu
+          // să-și recitească harta. Înscrierea rămâne pe '/' -- acolo încă nu
+          // există hartă prin care ziua să fie citită.
+          navigate('/azi');
         } else {
           toast({ title: l.error, description: result.error, variant: 'destructive' });
         }

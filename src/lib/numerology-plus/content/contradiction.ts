@@ -38,7 +38,9 @@ interface Side {
   essence: string;
 }
 
-const POSITIONS: Record<string, Record<Lang, string>> = {
+/** Numele pozițiilor. Exportat: citirea zilei compară ziua cu aceleași patru
+ * poziții, iar două tabele separate ar diverge la prima redenumire. */
+export const POSITIONS: Record<string, Record<Lang, string>> = {
   lifePath: { ro: 'Drumul tău', en: 'Your Life Path', ru: 'Ваш Жизненный путь' },
   expression: { ro: 'Destinul tău', en: 'Your Expression', ru: 'Ваша Судьба' },
   soulUrge: { ro: 'Sufletul tău', en: 'Your Soul Urge', ru: 'Ваша Душа' },

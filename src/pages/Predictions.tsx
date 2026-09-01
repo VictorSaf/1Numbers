@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Today } from '@/components/Today';
 import { useProfile } from '@/hooks/use-profile';
 import { 
   getDailyPrediction, 
@@ -172,19 +173,34 @@ const Predictions = () => {
   const annualOpportunities = birthDate ? calculateAnnualOpportunities(birthDate, selectedYear) : null;
   const annualChallenges = birthDate ? calculateAnnualChallenges(birthDate, selectedYear) : null;
 
+  // Ziua ta, citită prin harta ta. Pagina asta calcula ziua personală corect
+  // și apoi o descria singură: ziua 5 spunea același lucru unui Drum 6 și unui
+  // Drum 1. Aia e o efemeridă -- adevărată despre toată lumea, deci despre
+  // nimeni. Antetul dispare când ea e pe ecran, din același motiv ca la hartă:
+  // un titlu deasupra unei descoperiri o transformă în raport.
+  const mine = hasProfile && profileData ? profileData : null;
+
   return (
     <PageLayout>
-      <PageHeader
-        title={l.title}
-        subtitle={l.subtitle}
-        badge={{
-          icon: <TrendingUp className="h-4 w-4 text-primary" />,
-          label: l.label
-        }}
-      />
+      {!mine && (
+        <PageHeader
+          title={l.title}
+          subtitle={l.subtitle}
+          badge={{
+            icon: <TrendingUp className="h-4 w-4 text-primary" />,
+            label: l.label
+          }}
+        />
+      )}
 
       {/* Main Content */}
       <main className="relative z-10 px-4 pb-16">
+        {mine && (
+          <div className="pt-2">
+            <Today fullName={mine.fullName} birthDate={mine.birthDate} />
+          </div>
+        )}
+
         <div className="max-w-4xl mx-auto space-y-8 pt-4">
           
           {/* Universal Day Energy */}
