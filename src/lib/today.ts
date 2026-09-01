@@ -59,10 +59,13 @@ const JOIN: Record<TodayLang, {
   resonance: (position: string, n: number) => string;
   echo: (position: string, n: number, essence: string) => string;
   friction: (position: string, n: number, essence: string) => string;
-  askResonance: string;
-  askEcho: string;
-  askFriction: string;
-  askNone: string;
+  /* Întrebările își cară singure contextul. Apar sub o linie de separare, la
+   * distanță de text, deci „care dintre cele două a câștigat?" nu are cum să
+   * fie înțeles: cele două n-au fost numite niciodată acolo unde se citește. */
+  askResonance: (position: string, n: number) => string;
+  askEcho: (position: string, n: number, day: number) => string;
+  askFriction: (position: string, n: number, day: number) => string;
+  askNone: (day: number) => string;
   plain: string;
 }> = {
   ro: {
@@ -73,10 +76,10 @@ const JOIN: Record<TodayLang, {
       `${p} e ${n} — ${e}. Ziua nu cere exact asta, dar cere ceva din aceeași familie.`,
     friction: (p, n, e) =>
       `${p} e ${n}: ${e}. Ziua trage în partea cealaltă, și de-aia o zi ca asta obosește fără motiv vizibil.`,
-    askResonance: "Unde s-a văzut azi?",
-    askEcho: "Ce a ieșit din asta azi?",
-    askFriction: "Care dintre cele două a câștigat azi?",
-    askNone: "Ce ți-a cerut ziua, de fapt?",
+    askResonance: (p, n) => `${p} e ${n}, și ziua de azi tot ${n}. Unde s-a văzut asta azi?`,
+    askEcho: (p, n, d) => `${p} e ${n}, ziua e ${d}. Ce a ieșit din asta azi?`,
+    askFriction: (p, n, d) => `${p} e ${n}, ziua cere ${d}. Care dintre ele a câștigat azi?`,
+    askNone: (d) => `Ziua a fost ${d}. Ce ți-a cerut, de fapt?`,
     plain:
       "Ziua personală iese din ziua și luna nașterii tale adunate cu data de azi, reduse la o cifră. Se schimbă zilnic — de-aia e a ta, nu a calendarului.",
   },
@@ -88,10 +91,10 @@ const JOIN: Record<TodayLang, {
       `${p} is ${n} — ${e}. The day does not ask for exactly that, but for something in the same family.`,
     friction: (p, n, e) =>
       `${p} is ${n}: ${e}. The day pulls the other way, which is why a day like this tires you for no visible reason.`,
-    askResonance: "Where did that show today?",
-    askEcho: "What came of it today?",
-    askFriction: "Which of the two won today?",
-    askNone: "What did the day actually ask of you?",
+    askResonance: (p, n) => `${p} is ${n}, and so is today. Where did that show today?`,
+    askEcho: (p, n, d) => `${p} is ${n}, today is ${d}. What came of that today?`,
+    askFriction: (p, n, d) => `${p} is ${n}, today asks for ${d}. Which of them won today?`,
+    askNone: (d) => `Today was ${d}. What did it actually ask of you?`,
     plain:
       "Your personal day comes from your birth day and month added to today's date, reduced to one figure. It changes daily — that is what makes it yours, not the calendar's.",
   },
@@ -103,10 +106,10 @@ const JOIN: Record<TodayLang, {
       `${p} — ${n}: ${e}. День требует не совсем этого, но чего-то из той же семьи.`,
     friction: (p, n, e) =>
       `${p} — ${n}: ${e}. День тянет в другую сторону, поэтому такой день утомляет без видимой причины.`,
-    askResonance: "Где это проявилось сегодня?",
-    askEcho: "Что из этого вышло сегодня?",
-    askFriction: "Что из двух победило сегодня?",
-    askNone: "Чего день на самом деле от вас потребовал?",
+    askResonance: (p, n) => `${p} — ${n}, и сегодняшний день тоже ${n}. Где это проявилось сегодня?`,
+    askEcho: (p, n, d) => `${p} — ${n}, день — ${d}. Что из этого вышло сегодня?`,
+    askFriction: (p, n, d) => `${p} — ${n}, день требует ${d}. Что из них победило сегодня?`,
+    askNone: (d) => `День был ${d}. Чего он на самом деле от вас потребовал?`,
     plain:
       "Личный день складывается из дня и месяца вашего рождения и сегодняшней даты, сведённых к одной цифре. Он меняется каждый день — поэтому он ваш, а не календарный.",
   },
@@ -181,14 +184,13 @@ export function buildToday(
   // Întrebarea urmează cel mai tare raport: fricțiunea, dacă există, fiindcă
   // ea e ce se simte peste zi.
   const lead = relations.find((r) => r.kind === "friction") ?? relations[0];
-  const ask =
-    lead?.kind === "friction"
-      ? join.askFriction
-      : lead?.kind === "resonance"
-        ? join.askResonance
-        : lead?.kind === "echo"
-          ? join.askEcho
-          : join.askNone;
+  const ask = !lead
+    ? join.askNone(day)
+    : lead.kind === "friction"
+      ? join.askFriction(lead.position, lead.value, day)
+      : lead.kind === "resonance"
+        ? join.askResonance(lead.position, lead.value)
+        : join.askEcho(lead.position, lead.value, day);
 
   return {
     day,

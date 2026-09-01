@@ -67,6 +67,21 @@ describe("buildToday", () => {
     expect(r.ask).toMatch(/\?/);
   });
 
+  it("numește în întrebare lucrurile despre care întreabă", () => {
+    // „Care dintre cele două a câștigat azi?" -- care două? Întrebarea apare
+    // singură, sub o linie de separare, deci nu se poate sprijini pe textul
+    // de deasupra: trebuie să-și care singură contextul.
+    for (let d = 1; d <= 31; d++) {
+      const r = buildToday(NAME, BIRTH, "ro", new Date(2026, 8, d));
+      const lead = r.relations.find((x) => x.kind === "friction") ?? r.relations[0];
+      if (!lead) continue;
+
+      expect(r.ask, `ziua ${d}`).toContain(lead.position);
+      expect(r.ask, `ziua ${d}`).toMatch(new RegExp(`\\b${lead.value}\\b`));
+      expect(r.ask, `ziua ${d}`).not.toMatch(/cele două|the two|из двух/);
+    }
+  });
+
   it.each<Lang>(["ro", "en", "ru"])("scrie tot, nevid, în %s", (lang) => {
     for (let d = 1; d <= 31; d++) {
       const r = buildToday(NAME, BIRTH, lang, new Date(2026, 8, d));
