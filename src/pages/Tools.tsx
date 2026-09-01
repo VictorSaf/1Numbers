@@ -24,6 +24,7 @@ import { calculateLifePathNumber } from "@/lib/numerology";
 import { format } from "date-fns";
 import { NumerologyCalendar } from "@/components/NumerologyCalendar";
 import { LoShuGrid } from "@/components/LoShuGrid";
+import { KeepNameButton } from "@/components/people/KeepNameButton";
 
 const Tools = () => {
   const { language } = useLanguage();
@@ -510,6 +511,10 @@ const Tools = () => {
                           </CardContent>
                         </Card>
                       </div>
+
+                      <div className="flex justify-end pt-2">
+                        <KeepNameButton name={newName} defaultCategory="eu" />
+                      </div>
                     </div>
                   )}
                 </CardContent>
@@ -554,6 +559,10 @@ const Tools = () => {
                           <CardHeader className="py-3"><CardTitle className="text-sm text-primary">{t.recommendations}</CardTitle></CardHeader>
                           <CardContent><ul className="text-sm space-y-1">{businessAnalysis.recommendations.map((r, i) => <li key={i}>• {r}</li>)}</ul></CardContent>
                         </Card>
+                      </div>
+
+                      <div className="flex justify-end pt-2">
+                        <KeepNameButton name={businessName} defaultCategory="afacere" />
                       </div>
                     </div>
                   )}
@@ -675,6 +684,10 @@ const Tools = () => {
                           </Card>
                         ))
                       )}
+
+                      <div className="flex justify-end pt-2">
+                        <KeepNameButton name={optimizerName} defaultCategory="eu" />
+                      </div>
                     </div>
                   )}
                 </CardContent>

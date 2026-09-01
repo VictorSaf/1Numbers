@@ -146,6 +146,7 @@ export const translations = {
     useProfileData: "Folosește datele din profil",
     profileRequired: "Te rugăm să creezi un profil pentru a folosi această funcție",
     cancel: "Anulează",
+    save: "Salvează",
     error: "Eroare",
     // Multiple profiles
     switchProfile: "Schimbă Profilul",
@@ -562,6 +563,7 @@ export const translations = {
     compareProfiles: "Compare Profiles",
     selectProfilesToCompare: "Select profiles to compare",
     cancel: "Cancel",
+    save: "Save",
     error: "Error",
     
     // Compatibility page
@@ -1046,6 +1048,7 @@ export const translations = {
     compareProfiles: "Сравнить Профили",
     selectProfilesToCompare: "Выберите профили для сравнения",
     cancel: "Отмена",
+    save: "Сохранить",
     error: "Ошибка",
     
     // Compatibility page
