@@ -4,7 +4,7 @@
 // splits by path: /api/* goes to the backend on :3001, everything else here.
 // Zero dependencies so pm2 can restart it without a network.
 
-import { createServer } from "node:http";
+import { createServer, request as httpRequest } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { extname, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -168,6 +168,44 @@ const serveFile = async (res, filePath, { immutable, head, proto, status = 200 }
 const server = createServer(async (req, res) => {
   const head = req.method === "HEAD";
   const proto = clientProto(req);
+  const { pathname } = new URL(req.url, `http://${HOST}`);
+  const isApi = pathname === "/api" || pathname.startsWith("/api/");
+
+  /**
+   * /api merge la backend -- aici, nu doar în tunel.
+   *
+   * Frontendul cere `/api/...` relativ la origine. Prin domeniu, Cloudflare
+   * împarte pe cale și trimite /api la :3001, deci serverul ăsta nu vedea
+   * niciodată așa ceva și răspundea 404 tocmai ca să semnaleze o rutare
+   * greșită. Dar de când se poate intra direct pe :8090 din rețeaua locală,
+   * nu mai există nimeni care să facă împărțirea: autentificarea lovea aici
+   * și primea 404 -- sau 405, fiindcă e un POST.
+   *
+   * Aceeași împărțire, făcută în două locuri, pentru cele două căi de intrare.
+   * Prin tunel nimic nu se schimbă: cererile de /api nu ajung până aici.
+   */
+  if (isApi) {
+    const upstream = httpRequest(
+      {
+        host: "127.0.0.1",
+        port: 3001,
+        path: req.url,
+        method: req.method,
+        // Gazda originală se pierde altfel, iar backendul o folosește la CORS.
+        headers: { ...req.headers, host: "127.0.0.1:3001" },
+      },
+      (up) => {
+        res.writeHead(up.statusCode ?? 502, up.headers);
+        up.pipe(res);
+      },
+    );
+    // Backendul căzut nu trebuie să doboare serverul static: 502, nu excepție.
+    upstream.on("error", () => {
+      if (!res.headersSent) res.writeHead(502, { "Content-Type": MIME[".txt"] });
+      res.end("Bad Gateway");
+    });
+    return req.pipe(upstream);
+  }
 
   // Anything that reached Cloudflare over plain HTTP is bounced before it is served.
   if (proto === "http") {
@@ -176,14 +214,6 @@ const server = createServer(async (req, res) => {
 
   if (req.method !== "GET" && !head) {
     return send(res, 405, "Method Not Allowed", { head, proto, Allow: "GET, HEAD" });
-  }
-
-  const { pathname } = new URL(req.url, `http://${HOST}`);
-
-  // /api belongs to the backend. If one of these arrives here the tunnel is
-  // misrouting; answer 404 rather than masking it with the SPA shell.
-  if (pathname === "/api" || pathname.startsWith("/api/")) {
-    return send(res, 404, "Not Found", { head, proto, "Content-Type": MIME[".txt"] });
   }
 
   // A retired path, before anything else looks for a file to serve.

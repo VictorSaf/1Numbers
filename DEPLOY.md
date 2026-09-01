@@ -75,7 +75,11 @@ din baza de date, nu din token. Patru straturi, dintre care build-ul e cel mai
 slab și singurul care te încurcă pe tine.
 
 De pe alt calculator din aceeași rețea, adminul se atinge direct pe IP-ul
-mașinii: `http://<ip>:8090/admin`. Ambele procese ascultă pe rețeaua locală,
+mașinii: `http://<ip>:8090/admin`. `serve-compass.mjs` trimite singur `/api/*`
+la `:3001` -- aceeași împărțire pe care o face tunelul, fiindcă frontendul
+cere `/api/...` relativ la origine și pe calea directă nu există nimeni
+altcineva care s-o facă. Prin tunel nimic nu se schimbă: cererile de `/api`
+nu ajung niciodată la serverul static. Ambele procese ascultă pe rețeaua locală,
 prin `HOST: '0.0.0.0'` din `ecosystem.config.cjs` (2026-09-01). Codul are
 loopback ca implicit, deci o mașină fără fișierul ăla rămâne închisă.
 
