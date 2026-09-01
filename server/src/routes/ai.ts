@@ -48,19 +48,18 @@ router.post(
       return res.status(401).json({ error: 'User ID not found' });
     }
 
-    // Starea se spune înainte de a valida orice altceva. Verificat înaintea
-    // formei cererii, nu după: indisponibilitatea nu depinde de ce a trimis
-    // clientul, iar `ai-honesty.test.ts` verifică exact asta -- un client care
-    // trimite un corp complet diferit tot primește 503, nu 400, când nu există
-    // cheie. Vechiul cod cădea în tăcere pe un răspuns inventat; aici lipsa
-    // cheii e un fapt pe care interfața îl arată dintâi.
-    if (!isAiConfigured()) {
-      return res.status(503).json({ error: 'ai_unavailable' });
-    }
-
+    // Forma cererii se validează la marginea routerului, înaintea oricărei
+    // verificări de stare: un corp malformat primește 400 indiferent de mediu.
     const parsed = consultSchema.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({ error: 'Invalid request', details: parsed.error.issues });
+    }
+
+    // Abia după ce cererea e validă verificăm dacă avem cu ce răspunde. Un
+    // corp valid pe un server neconfigurat primește 503, nu un răspuns
+    // inventat -- vechiul cod cădea în tăcere pe unul local.
+    if (!isAiConfigured()) {
+      return res.status(503).json({ error: 'ai_unavailable' });
     }
 
     const { profileContext, question, conversationHistory, language } = parsed.data;

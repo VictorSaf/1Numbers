@@ -47,7 +47,11 @@ const consult = () =>
   request(app)
     .post('/api/ai/consult')
     .set('Authorization', asUser)
-    .send({ userPrompt: 'Ce spune harta mea despre anul asta?', language: 'ro' });
+    .send({
+      profileContext: 'Drumul Vieții: 7',
+      question: 'Ce spune harta mea despre anul asta?',
+      language: 'ro',
+    });
 
 describe('with no provider configured', () => {
   it('reports itself unavailable instead of answering', async () => {
