@@ -3,19 +3,27 @@ import { Search, Sparkles, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useSearchParams } from "react-router-dom";
 import {
   getAllAngelNumbers,
   getAngelNumberMeaning,
   searchAngelNumbers,
   AngelNumberMeaning,
-} from "@/lib/angelNumbers";
+} from "@/lib/angel";
 import { AngelNumberCard, AngelNumberCompact } from "@/components/AngelNumberCard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const AngelNumbers = () => {
   const { language } = useLanguage();
-  const [searchInput, setSearchInput] = useState("");
-  const [selectedNumber, setSelectedNumber] = useState<AngelNumberMeaning | null>(null);
+  // /unelte?s=angel&n=444 deschide unealta direct pe o secvență. Nu e nevoie de
+  // o rută nouă: Tools.tsx citește deja tab-ul din query, iar un al doilea
+  // parametru face legătura partajabilă fără nimic în routes.json.
+  const [params] = useSearchParams();
+  const initial = params.get("n") ?? "";
+  const [searchInput, setSearchInput] = useState(initial);
+  const [selectedNumber, setSelectedNumber] = useState<AngelNumberMeaning | null>(
+    initial ? getAngelNumberMeaning(initial) : null,
+  );
 
   const allNumbers = useMemo(() => getAllAngelNumbers(), []);
 
@@ -45,8 +53,8 @@ const AngelNumbers = () => {
       search: "Caută",
       popularNumbers: "Numere Populare",
       allNumbers: "Toate Numerele",
-      noResults: "Nu am găsit acest număr în baza noastră de date.",
-      tryAnother: "Încearcă un alt număr sau caută după cuvinte cheie.",
+      noResults: "Numărul acesta nu formează un tipar pe care să-l putem citi.",
+      tryAnother: "Citim repetări (444, 1111), alternanțe (1212), oglinzi (1221) și șiruri (1234, 4321).",
       whatAreAngelNumbers: "Ce sunt Numerele Îngerilor?",
       angelNumbersExplanation:
         "Numerele îngerilor sunt secvențe de numere care poartă ghidare divină, referindu-se la semnificații numerologice specifice. Când vezi aceste numere repetitiv, îngerii încearcă să-ți transmită un mesaj.",
@@ -67,8 +75,8 @@ const AngelNumbers = () => {
       search: "Search",
       popularNumbers: "Popular Numbers",
       allNumbers: "All Numbers",
-      noResults: "We couldn't find this number in our database.",
-      tryAnother: "Try another number or search by keywords.",
+      noResults: "This number does not form a pattern we can read.",
+      tryAnother: "We read repetitions (444, 1111), alternations (1212), mirrors (1221) and runs (1234, 4321).",
       whatAreAngelNumbers: "What are Angel Numbers?",
       angelNumbersExplanation:
         "Angel numbers are sequences of numbers that carry divine guidance by referring to specific numerological meanings. When you see these numbers repeatedly, angels are trying to convey a message to you.",
@@ -89,8 +97,8 @@ const AngelNumbers = () => {
       search: "Искать",
       popularNumbers: "Популярные Числа",
       allNumbers: "Все Числа",
-      noResults: "Мы не нашли это число в нашей базе данных.",
-      tryAnother: "Попробуйте другое число или поищите по ключевым словам.",
+      noResults: "Это число не образует закономерности, которую мы умеем читать.",
+      tryAnother: "Мы читаем повторы (444, 1111), чередования (1212), зеркала (1221) и ряды (1234, 4321).",
       whatAreAngelNumbers: "Что такое Ангельские Числа?",
       angelNumbersExplanation:
         "Ангельские числа — это последовательности чисел, несущие божественное руководство через конкретные нумерологические значения. Когда вы видите эти числа повторно, ангелы пытаются передать вам послание.",
@@ -106,7 +114,12 @@ const AngelNumbers = () => {
     },
   }[language];
 
-  const popularNumbers = ["111", "222", "333", "444", "555", "777", "888", "1111"];
+  // Nu mai e „toate numerele pe care le avem": catalogul are 35 și crește prin
+  // regulă. Astea sunt cele mai căutate, una din fiecare formă la final.
+  const popularNumbers = [
+    "111", "222", "333", "444", "555", "666", "777", "888", "999",
+    "1111", "1234", "1212",
+  ];
 
   const handleQuickSearch = (num: string) => {
     setSearchInput(num);

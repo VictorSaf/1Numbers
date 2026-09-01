@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { AngelNumberMeaning } from "@/lib/angelNumbers";
+import { AngelNumberMeaning } from "@/lib/angel";
 import { ChevronDown, ChevronUp, Sparkles, MessageCircle, Lightbulb, Link } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
