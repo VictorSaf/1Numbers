@@ -26,6 +26,7 @@ import {
   ChevronRight,
   RefreshCw,
 } from 'lucide-react';
+import { AssistantText } from '@/components/AssistantText';
 import { API_BASE } from '@/lib/apiBase';
 import { parseCalendarDate } from '@/lib/calendarDate';
 
@@ -334,13 +335,22 @@ export const AIConsultant = () => {
                       className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
                       <div
+                        data-role={msg.role}
                         className={`max-w-[85%] p-3 rounded-lg ${
                           msg.role === 'user'
                             ? 'bg-primary text-primary-foreground'
                             : 'bg-muted'
                         }`}
                       >
-                        <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                        {/* Întrebarea omului e text simplu, cum a scris-o.
+                            Răspunsul modelului vine în markdown -- titluri,
+                            îngroșări, liste -- și până acum se afișa cu tot cu
+                            semne, ca un bloc pe care nu-l parcurgea nimeni. */}
+                        {msg.role === 'user' ? (
+                          <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                        ) : (
+                          <AssistantText text={msg.content} />
+                        )}
                         <p className="text-[10px] opacity-70 mt-1">
                           {msg.timestamp.toLocaleTimeString()}
                         </p>

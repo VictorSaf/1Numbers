@@ -94,9 +94,12 @@ describe("when the server answers 503", () => {
     const { container } = await askAndFail(serverRefuses);
 
     await waitFor(() => expect(screen.getByText(QUESTION)).toBeInTheDocument());
-    // One bubble means the question and nothing answering it. If the bubble
-    // markup changes this breaks loudly, which is the point.
-    expect(container.querySelectorAll("p.whitespace-pre-wrap")).toHaveLength(1);
+    // Counted by role, not by CSS class. An assistant message renders through
+    // AssistantText and carries different markup, so a class-based count would
+    // silently stop seeing exactly the thing this test exists to catch.
+    const bubbles = container.querySelectorAll("[data-role]");
+    expect(bubbles).toHaveLength(1);
+    expect(bubbles[0].getAttribute("data-role")).toBe("user");
   });
 });
 
