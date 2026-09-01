@@ -1,7 +1,9 @@
 import { Router, Response } from 'express';
 import { z } from 'zod';
 import pool from '../db';
-import { authenticateToken, AuthRequest } from '../middleware/auth';
+import { authenticateToken, requireAdmin, AuthRequest } from '../middleware/auth';
+import { configurePush } from '../lib/push';
+import { USER_ROWS_SQL, dispatchForUser, localIsoDate, type DueRow } from '../lib/dailyDispatch';
 
 const router = Router();
 
@@ -273,6 +275,48 @@ router.get('/unread-count', authenticateToken, async (req: AuthRequest, res: Res
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     res.status(500).json({
       error: 'Failed to get unread count',
+      details: process.env.NODE_ENV === 'development' ? errorMessage : undefined,
+    });
+  }
+});
+
+/**
+ * Proba.
+ *
+ * Trimite notificarea zilei de azi către propriile dispozitive ale adminului
+ * care cheamă, ignorând ora și preferințele. Cheia de revendicare e
+ * `test:<timestamp>`, deci nu consumă revendicarea zilnică și poate fi rulată
+ * de câte ori e nevoie.
+ *
+ * Există fiindcă o notificare zilnică trimisă greșit ajunge la toți deodată și
+ * nu se poate retrage: singurul mod cinstit de a dovedi lanțul e să-l parcurgi
+ * o dată, către un dispozitiv al tău.
+ */
+router.post('/test-send', authenticateToken, requireAdmin, async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.userId;
+    if (!userId) {
+      return res.status(401).json({ error: 'User ID not found' });
+    }
+
+    if (!configurePush()) {
+      return res.status(503).json({ error: 'Push is not configured (VAPID keys missing)' });
+    }
+
+    const { rows } = await pool.query<DueRow>(USER_ROWS_SQL, [userId]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'No push subscription with an active profile for this user' });
+    }
+
+    const now = new Date();
+    const tally = await dispatchForUser(rows, localIsoDate(now), `test:${now.toISOString()}`);
+
+    res.json({ success: true, tally });
+  } catch (error: unknown) {
+    console.error('Test send error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    res.status(500).json({
+      error: 'Failed to send test notification',
       details: process.env.NODE_ENV === 'development' ? errorMessage : undefined,
     });
   }
