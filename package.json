@@ -16,7 +16,8 @@
     "create-admin-user": "node scripts/create-admin-user.js",
     "orchestrate": "cd .claude/orchestrator && npm start",
     "typecheck": "tsc -b --noEmit",
-    "build:internal": "VITE_INCLUDE_INTERNAL=1 npm run build"
+    "build:internal": "VITE_INCLUDE_INTERNAL=1 npm run build",
+    "vapid": "node scripts/set-vapid-keys.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
