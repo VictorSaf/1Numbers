@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { ro, enUS, ru } from 'date-fns/locale';
-import { CalendarIcon, Save, Trash2, User } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { CalendarIcon, Save, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -35,6 +34,21 @@ import { NotificationSettings } from '@/components/NotificationSettings';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { parseCalendarDate } from '@/lib/calendarDate';
+import { PeopleFilter } from '@/components/people/PeopleFilter';
+import { PeopleGroup } from '@/components/people/PeopleGroup';
+import {
+  PROFILE_CATEGORIES,
+  groupProfilesByCategory,
+  normalizeCategory,
+  type ProfileCategory,
+} from '@/lib/profileCategories';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const locales = { ro, en: enUS, ru };
 
@@ -60,16 +74,29 @@ const Profile = () => {
   const [saving, setSaving] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deletingProfileId, setDeletingProfileId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<ProfileCategory | null>(null);
 
   const [formData, setFormData] = useState({
     fullName: '',
     birthDate: undefined as Date | undefined,
     birthTime: '',
     birthPlace: '',
+    category: 'eu' as ProfileCategory,
   });
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const dateLocale = locales[language];
+
+  const counts = Object.fromEntries(
+    PROFILE_CATEGORIES.map((category) => [
+      category,
+      profiles.filter((p) => normalizeCategory(p.category) === category).length,
+    ]),
+  ) as Record<ProfileCategory, number>;
+
+  const groups = groupProfilesByCategory(profiles).filter(
+    (group) => filter === null || group.category === filter,
+  );
 
   useEffect(() => {
     if (!authLoading) {
@@ -89,6 +116,7 @@ const Profile = () => {
           birthDate: parseCalendarDate(activeProfile.birthDate),
           birthTime: activeProfile.birthTime || '',
           birthPlace: activeProfile.birthPlace || '',
+          category: normalizeCategory(activeProfile.category),
         });
         // Set editingProfileId to active profile if not already set
         if (!editingProfileId) {
@@ -102,6 +130,7 @@ const Profile = () => {
         birthDate: undefined,
         birthTime: '',
         birthPlace: '',
+        category: 'eu',
       });
     }
   }, [activeProfile, editingProfileId]);
@@ -115,6 +144,7 @@ const Profile = () => {
         birthDate: parseCalendarDate(profile.birthDate),
         birthTime: profile.birthTime || '',
         birthPlace: profile.birthPlace || '',
+        category: normalizeCategory(profile.category),
       });
     }
   };
@@ -126,6 +156,7 @@ const Profile = () => {
       birthDate: undefined,
       birthTime: '',
       birthPlace: '',
+      category: 'eu',
     });
   };
 
@@ -152,6 +183,7 @@ const Profile = () => {
         birthDate: formattedDate,
         birthTime: formData.birthTime || undefined,
         birthPlace: formData.birthPlace || undefined,
+        category: formData.category,
       };
 
       if (editingProfileId) {
@@ -174,7 +206,7 @@ const Profile = () => {
         // Create new profile (set as active if it's the first one)
         const result = await createProfile({
           ...data,
-          setAsActive: profiles.length === 0,
+          setAsActive: formData.category === 'eu' && profiles.length === 0,
         });
         if (result.success) {
           toast({
@@ -262,60 +294,33 @@ const Profile = () => {
         <div className="max-w-4xl mx-auto pt-4 space-y-6">
           {/* Profile Switcher */}
           {profiles.length > 0 && (
-            <div className="card-mystic rounded-2xl p-6 glow-gold-subtle">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold">{t.allProfiles}</h3>
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <h2 className="font-heading text-xl text-foreground">{t.people.title}</h2>
                 <ProfileSwitcher onProfileSwitch={(id) => startEditing(id)} />
               </div>
-              <div className="space-y-2">
-                {profiles.map((profile) => (
-                  <div
-                    key={profile.id}
-                    className={cn(
-                      "flex items-center justify-between p-3 rounded-lg border",
-                      profile.isActive
-                        ? "bg-primary/10 border-primary/30"
-                        : "bg-muted/30 border-border/30"
-                    )}
-                  >
-                    <div className="flex-1">
-                      <div className="font-medium">{profile.fullName}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {parseCalendarDate(profile.birthDate)?.toLocaleDateString()}
-                        {profile.isActive && (
-                          <Badge variant="secondary" className="ml-2">
-                            {t.activeProfile}
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => startEditing(profile.id)}
-                      >
-                        {t.editProfile}
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => {
-                          setDeletingProfileId(profile.id);
-                          setShowDeleteDialog(true);
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <Button
-                variant="outline"
-                className="w-full mt-4"
-                onClick={startCreating}
-              >
+              <p className="text-sm text-muted-foreground font-raleway">{t.people.subtitle}</p>
+
+              <PeopleFilter selected={filter} counts={counts} onSelect={setFilter} />
+
+              {groups.length === 0 ? (
+                <p className="text-sm text-muted-foreground font-raleway">{t.people.empty}</p>
+              ) : (
+                groups.map((group) => (
+                  <PeopleGroup
+                    key={group.category}
+                    category={group.category}
+                    profiles={group.profiles}
+                    onEdit={startEditing}
+                    onDelete={(id) => {
+                      setDeletingProfileId(id);
+                      setShowDeleteDialog(true);
+                    }}
+                  />
+                ))
+              )}
+
+              <Button variant="outline" className="w-full" onClick={startCreating}>
                 {t.createNewProfile}
               </Button>
             </div>
@@ -351,10 +356,37 @@ const Profile = () => {
                 </p>
               </div>
 
+              {/* Category */}
+              <div className="space-y-2">
+                <Label className="text-foreground/90 font-raleway text-sm tracking-wide">
+                  {t.people.categoryLabel}
+                </Label>
+                <Select
+                  value={formData.category}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, category: value as ProfileCategory })
+                  }
+                >
+                  <SelectTrigger className="input-mystic h-12">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PROFILE_CATEGORIES.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {t.people.categories[category]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  {t.people.categoryHints[formData.category]}
+                </p>
+              </div>
+
               {/* Birth Date */}
               <div className="space-y-2">
                 <Label className="text-foreground/90 font-raleway text-sm tracking-wide">
-                  {t.birthDateLabel}
+                  {formData.category === 'afacere' ? t.people.foundedLabel : t.birthDateLabel}
                 </Label>
                 <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                   <PopoverTrigger asChild>
