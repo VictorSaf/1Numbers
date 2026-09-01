@@ -36,3 +36,8 @@ server/.env
 
 # Written by Claude Code per project; local to this machine.
 .claude/settings.local.json
+
+# Copiile de siguranță ale fișierelor de mediu conțin secrete, ca originalele.
+# scripts/set-anthropic-key.sh creează una la fiecare rulare.
+.env.bak.*
+*/.env.bak.*
