@@ -208,7 +208,7 @@ export const Thread = ({
 
       <div className="mt-7 flex flex-wrap items-center gap-4">
         {!done ? (
-          <button type="button" onClick={advance} className="btn-mystic rounded-xl px-6 py-3 text-sm">
+          <button type="button" onClick={advance} className="btn-primary text-sm">
             {label}
             {teaser && <span className="opacity-70"> → {teaser}</span>}
           </button>
