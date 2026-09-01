@@ -36,7 +36,7 @@ Deploy-ul e manual, pe mașina care servește:
 
 ```bash
 git pull
-npm ci && npm run build            # frontend → dist/
+npm ci && npm run build:internal   # frontend → dist/, vezi nota de mai jos
 cd server && npm ci && npm run build && npm run migrate && cd ..
 pm2 restart compass compass-api
 ```
@@ -45,11 +45,41 @@ Apoi, în browser: **`DevTools → Application → Service Workers → Unregiste
 Nu e opțional. Workerul înregistrat anterior servește shell-ul vechi de pe origin
 indiferent ce s-a deployat, iar un `Cmd+Shift+R` nu-l scoate. Verifici că te uiți
 la build-ul nou comparând hash-ul lui `index-*.js` din `Network` cu cel tipărit
-de `npm run build`.
+de comanda de build.
 
-`npm run build` rulează și `prerender-meta`, `stamp-sw` și `emit-routes`, deci
+`build:internal` e `VITE_INCLUDE_INTERNAL=1 npm run build`, deci rulează tot ce
+rulează și `build`: `prerender-meta`, `stamp-sw` și `emit-routes`. Adică
 sitemap-ul, meta-ul per rută și numele cache-ului service workerului se
 regenerează singure. Nu le atinge de mână.
+
+### De ce `build:internal` și nu `build`
+
+`npm run build` lasă afară rutele marcate `internal` în `routes.json` —
+`/admin`, `/design-system`, `/white-label`. Aici există un singur `dist/` și un
+singur server static, iar `dist/` ăla e și ce servește tunelul, și ce deschizi
+tu pe `http://127.0.0.1:8090`. Deci un build fără rutele interne nu le ascunde
+de public: le ia de pe mașină, singurul loc unde adminul chiar trebuie să
+meargă.
+
+Ce ține adminul privat e tunelul, nu build-ul. `~/.cloudflared/config.yml`
+răspunde 404 la `^/admin(/|$)` și la `^/api/admin(/|$)` (decis 2026-08-30).
+Verificat pe 2026-09-01, din același `dist/` construit cu `build:internal`:
+
+```
+http://127.0.0.1:8090/admin           200
+https://compass.oneaigency.com/admin  404
+```
+
+Plus: serverele ascultă doar pe `127.0.0.1`, iar `requireAdmin` citește rolul
+din baza de date, nu din token. Patru straturi, dintre care build-ul e cel mai
+slab și singurul care te încurcă pe tine.
+
+De pe alt calculator, adminul se atinge printr-un tunel SSH, nu deschizând
+ingress-ul:
+
+```bash
+ssh -N -L 8090:127.0.0.1:8090 -L 3001:127.0.0.1:3001 <user>@<ip-ul-mașinii>
+```
 
 ### Prima rulare pe o bază care are deja schema
 

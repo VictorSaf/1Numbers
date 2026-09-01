@@ -11,7 +11,9 @@ Numerology Compass is a multilingual (Romanian/English/Russian) numerology web a
 ```bash
 # Frontend
 npm run dev           # Start dev server on http://localhost:8082
-npm run build         # Production build
+npm run build         # Build without the internal routes
+npm run build:internal # Build WITH /admin, /design-system, /white-label — use
+                      # this one to deploy the machine that serves. See Routing.
 npm run lint          # Run ESLint
 npm run test          # Run tests in watch mode
 npm run test:run      # Run tests once
@@ -79,9 +81,15 @@ Each route has a `kind`:
 
 - `public` — indexable, carries `meta` per language, appears in the sitemap
 - `app` — a real route that is private or carries params: served, never indexed
-- `internal` — development only, dropped from the production build entirely
-  (`/admin`, `/design-system`, `/white-label`). `npm run build:internal` puts
-  them back for the copy served locally on :8090.
+- `internal` — `/admin`, `/design-system`, `/white-label`. Left out by
+  `npm run build`, put back by `npm run build:internal`.
+
+  **Deploy the machine that serves with `build:internal`.** There is one
+  `dist/` and one static server, and the tunnel is what keeps `/admin`
+  private — it answers 404 to `^/admin(/|$)` and `^/api/admin(/|$)`
+  (measured 2026-09-01, decided 2026-08-30). Building without the internal
+  routes takes admin away from the machine too, where it is meant to work,
+  and buys no privacy the tunnel was not already providing. See DEPLOY.md.
 
 Adding a route means editing `routes.json` și `PAGES` in `App.tsx`. Nothing else.
 
