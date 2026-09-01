@@ -1,117 +1,12 @@
 import { Router, Response } from 'express';
 import { z } from 'zod';
+import Anthropic from '@anthropic-ai/sdk';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
-import { ipRateLimit } from '../middleware/ipRateLimit';
-import { SYSTEM_PROMPTS } from '../lib/aiPrompts';
+import { ipRateLimit, userRateLimit } from '../middleware/ipRateLimit';
+import { isAiConfigured, askConsultant, AiUnavailableError } from '../lib/anthropic';
+import { buildConsultMessages } from '../lib/consultMessages';
 
 const router = Router();
-
-// Types for AI requests
-interface AIMessage {
-  role: 'system' | 'user' | 'assistant';
-  content: string;
-}
-
-interface AIRequest {
-  messages: AIMessage[];
-  maxTokens?: number;
-  temperature?: number;
-}
-
-// Which provider can actually answer, decided per request.
-//
-// There used to be a third value here -- 'mock' -- and it was the default, so
-// an install with no key configured answered every question. It returned a
-// paragraph about the reader's "remarkable potential" and a hardcoded
-// [1, 5, 7], with HTTP 200 and the same shape as a real answer, which meant
-// nothing downstream could tell it apart -- and the client rendered it as a
-// reading. A consultant that is switched off is honest; one that invents is
-// not, because the reader cannot tell which of the two they got.
-//
-// The environment is read per call rather than at import, so a test can prove
-// the unconfigured case without reloading the module.
-
-type Provider = 'openai' | 'anthropic';
-
-function resolveProvider(): Provider | null {
-  const explicit = process.env.AI_PROVIDER;
-  if (explicit === 'openai') return process.env.OPENAI_API_KEY ? 'openai' : null;
-  if (explicit === 'anthropic') return process.env.ANTHROPIC_API_KEY ? 'anthropic' : null;
-  if (process.env.ANTHROPIC_API_KEY) return 'anthropic';
-  if (process.env.OPENAI_API_KEY) return 'openai';
-  return null;
-}
-
-// Call OpenAI API
-async function callOpenAI(request: AIRequest): Promise<string> {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new Error('OpenAI API key not configured');
-  }
-
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: 'gpt-4o-mini',
-      messages: request.messages,
-      max_tokens: request.maxTokens || 1000,
-      temperature: request.temperature || 0.7,
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`OpenAI API error: ${error}`);
-  }
-
-  const data = await response.json() as {
-    choices: Array<{ message?: { content?: string } }>;
-  };
-  return data.choices[0]?.message?.content || '';
-}
-
-// Call Anthropic API
-async function callAnthropic(request: AIRequest): Promise<string> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    throw new Error('Anthropic API key not configured');
-  }
-
-  // Extract system message and user messages
-  const systemMessage = request.messages.find(m => m.role === 'system')?.content || '';
-  const userMessages = request.messages
-    .filter(m => m.role !== 'system')
-    .map(m => ({ role: m.role, content: m.content }));
-
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
-      model: 'claude-3-haiku-20240307',
-      max_tokens: request.maxTokens || 1000,
-      system: systemMessage,
-      messages: userMessages,
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Anthropic API error: ${error}`);
-  }
-
-  const data = await response.json() as {
-    content: Array<{ text?: string }>;
-  };
-  return data.content[0]?.text || '';
-}
 
 // The system prompt belongs to the server.
 //
@@ -122,31 +17,45 @@ async function callAnthropic(request: AIRequest): Promise<string> {
 // src/lib/aiPrompts.ts, to the side that pays for it.
 
 const consultSchema = z.object({
-  // The client folds the user's profile context into this string, so it is
-  // far longer than the question itself.
-  userPrompt: z.string().trim().min(1).max(8000),
+  // Profilul e generat de noi și trimis de client; intră în prompt ca date,
+  // niciodată în câmpul `system`. 6000 acoperă cu mult profilul cel mai bogat.
+  profileContext: z.string().trim().min(1).max(6000),
+  // Întrebarea o scrie un om. Vechea schemă avea un singur câmp de 8000, care
+  // amesteca profilul cu întrebarea; opt mii de caractere de întrebare nu sunt
+  // o întrebare.
+  question: z.string().trim().min(1).max(1000),
   language: z.enum(['ro', 'en', 'ru']).default('en'),
+  // Patru schimburi. API-ul e stateless, deci istoricul se retrimite întreg la
+  // fiecare rundă și fiecare mesaj în plus se plătește din nou.
   conversationHistory: z
     .array(
       z.object({
         role: z.enum(['user', 'assistant']),
-        content: z.string().max(2000),
+        content: z.string().min(1).max(1500),
       }),
     )
-    .max(20)
+    .max(8)
     .default([]),
 });
 
-// Main AI consultation endpoint
 router.post(
   '/consult',
   authenticateToken,
   ipRateLimit({ windowMs: 60 * 60 * 1000, max: 30 }),
+  userRateLimit({ windowMs: 60 * 60 * 1000, max: 15 }),
   async (req: AuthRequest, res: Response) => {
-  try {
-    const userId = req.userId;
-    if (!userId) {
+    if (!req.userId) {
       return res.status(401).json({ error: 'User ID not found' });
+    }
+
+    // Starea se spune înainte de a valida orice altceva. Verificat înaintea
+    // formei cererii, nu după: indisponibilitatea nu depinde de ce a trimis
+    // clientul, iar `ai-honesty.test.ts` verifică exact asta -- un client care
+    // trimite un corp complet diferit tot primește 503, nu 400, când nu există
+    // cheie. Vechiul cod cădea în tăcere pe un răspuns inventat; aici lipsa
+    // cheii e un fapt pe care interfața îl arată dintâi.
+    if (!isAiConfigured()) {
+      return res.status(503).json({ error: 'ai_unavailable' });
     }
 
     const parsed = consultSchema.safeParse(req.body);
@@ -154,38 +63,43 @@ router.post(
       return res.status(400).json({ error: 'Invalid request', details: parsed.error.issues });
     }
 
-    const { userPrompt, conversationHistory, language } = parsed.data;
+    const { profileContext, question, conversationHistory, language } = parsed.data;
 
-    const messages: AIMessage[] = [
-      { role: 'system', content: SYSTEM_PROMPTS[language] },
-      ...conversationHistory,
-      { role: 'user', content: userPrompt },
-    ];
+    try {
+      const { system, messages } = buildConsultMessages({
+        language,
+        profileContext,
+        history: conversationHistory,
+        question,
+      });
 
-    const provider = resolveProvider();
-    if (!provider) {
-      return res.status(503).json({ error: 'ai_unavailable' });
+      const result = await askConsultant({ system, messages });
+
+      // Prefixul cache-abil e scurt (system + profil). Sub pragul minim al
+      // modelului cache-ul nu se activează, în tăcere -- de aceea îl măsurăm
+      // în loc să presupunem că merge.
+      console.log(
+        `[ai] in=${result.usage.inputTokens} out=${result.usage.outputTokens} ` +
+          `cache_read=${result.usage.cacheReadTokens} cache_write=${result.usage.cacheCreationTokens}`,
+      );
+
+      return res.json({ success: true, answer: result.text, truncated: result.truncated });
+    } catch (error: unknown) {
+      // Clase tipate, nu potriveli pe textul mesajului: un 429 și un 401 arată
+      // la fel într-un string și cer răspunsuri complet diferite.
+      if (error instanceof AiUnavailableError || error instanceof Anthropic.AuthenticationError) {
+        console.error('[ai] provider credentials rejected or missing');
+        return res.status(503).json({ error: 'ai_unavailable' });
+      }
+      if (error instanceof Anthropic.RateLimitError) {
+        console.error('[ai] provider rate limit');
+        return res.status(429).json({ error: 'ai_busy' });
+      }
+      console.error('[ai] consultation failed:', error);
+      return res.status(502).json({ error: 'ai_failed' });
     }
-
-    const answer =
-      provider === 'anthropic'
-        ? await callAnthropic({ messages })
-        : await callOpenAI({ messages });
-
-    res.json({
-      success: true,
-      answer,
-      provider,
-    });
-  } catch (error: unknown) {
-    console.error('AI consultation error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    res.status(500).json({
-      error: 'AI consultation failed',
-      details: process.env.NODE_ENV === 'development' ? errorMessage : undefined,
-    });
-  }
-});
+  },
+);
 
 // Get daily suggestion endpoint
 router.get('/daily-suggestion', authenticateToken, async (req: AuthRequest, res: Response) => {

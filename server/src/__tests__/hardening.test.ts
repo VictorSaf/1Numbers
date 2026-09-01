@@ -76,9 +76,9 @@ describe('gamification will not pay what the client asks for', () => {
 
 describe('input is validated at the edge of the router', () => {
   it('will not take a system prompt from the client', async () => {
-    // The field is simply not in the schema any more, so it is dropped rather
-    // than forwarded. What proves it is that a request carrying only a system
-    // prompt has no question in it, and is refused for that.
+    // Câmpul nu e în schemă, deci e ignorat, nu transmis. Ce dovedește asta e
+    // că o cerere care poartă doar un prompt de sistem nu are nicio întrebare
+    // în ea și e refuzată pentru asta.
     const response = await request(app)
       .post('/api/ai/consult')
       .set('Authorization', asUser)
@@ -92,7 +92,7 @@ describe('input is validated at the edge of the router', () => {
     const response = await request(app)
       .post('/api/ai/consult')
       .set('Authorization', asUser)
-      .send({ userPrompt: 'x'.repeat(8001), language: 'en' });
+      .send({ profileContext: 'Drumul Vieții: 7', question: 'x'.repeat(1001), language: 'en' });
 
     expect(response.status).toBe(400);
   });
