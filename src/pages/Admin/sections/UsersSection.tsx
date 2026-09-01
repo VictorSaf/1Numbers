@@ -57,7 +57,35 @@ export const UsersSection = () => {
     birthDate: '',
   });
   const [saving, setSaving] = useState(false);
+  const [listError, setListError] = useState<string | null>(null);
   const { toast } = useToast();
+
+  /**
+   * Un corp de răspuns care poate să nu fie JSON.
+   *
+   * `await response.json()` pe un corp gol aruncă „Unexpected end of JSON
+   * input” -- adevărat despre parser și fără niciun înțeles pentru om. Se
+   * întâmplă real: tunelul răspunde 404 cu zero octeți la /api/admin, deci
+   * orice cerere plecată din pagina greșită ajunge exact acolo.
+   *
+   * Ce iese de aici e ori obiectul, ori un motiv care spune ce s-a întâmplat.
+   */
+  const readBody = async (response: Response): Promise<Record<string, unknown>> => {
+    const text = await response.text();
+    if (!text) {
+      return {
+        error:
+          response.status === 404
+            ? 'The API did not answer on this address. Open the panel on the machine that serves it.'
+            : `The server answered ${response.status} with an empty body.`,
+      };
+    }
+    try {
+      return JSON.parse(text) as Record<string, unknown>;
+    } catch {
+      return { error: `The server answered ${response.status} with something that is not JSON.` };
+    }
+  };
 
   const authFetch = (path: string, init: RequestInit = {}) =>
     fetch(`${API_BASE}${path}`, {
@@ -75,7 +103,7 @@ export const UsersSection = () => {
         method: 'PATCH',
         body: JSON.stringify({ plan }),
       });
-      if (!response.ok) throw new Error((await response.json()).error ?? 'failed');
+      if (!response.ok) throw new Error(String((await readBody(response)).error ?? 'failed'));
       toast({ title: 'Plan updated', description: `Now on ${plan}` });
       fetchUsers();
     } catch (error) {
@@ -103,11 +131,11 @@ export const UsersSection = () => {
         method: 'POST',
         body: JSON.stringify(body),
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error ?? 'failed');
+      const data = await readBody(response);
+      if (!response.ok) throw new Error(String(data.error ?? 'failed'));
       toast({
         title: 'Account created',
-        description: data.user?.hasMap
+        description: (data.user as { hasMap?: boolean } | undefined)?.hasMap
           ? `${form.email} on ${form.plan}, with their map`
           : `${form.email} on ${form.plan} — no map yet`,
       });
@@ -138,9 +166,15 @@ export const UsersSection = () => {
       if (response.ok) {
         const data = await response.json();
         setUsers(data.users || []);
+        setListError(null);
+        return;
       }
+      // Lista goală și lista care n-a putut fi citită arată la fel pe ecran, iar
+      // „No users found” pentru o cerere respinsă e o minciună liniștită.
+      const body = await readBody(response);
+      setListError(String(body.error ?? `The server answered ${response.status}.`));
     } catch (error) {
-      console.error('Failed to fetch users:', error);
+      setListError(error instanceof Error ? error.message : 'Could not reach the API.');
     } finally {
       setLoading(false);
     }
@@ -293,6 +327,11 @@ export const UsersSection = () => {
             </div>
             <Badge variant="secondary">{users.length} users</Badge>
           </div>
+          {/* Lista goală și lista care n-a putut fi citită arată la fel pe
+              ecran. „No users found” pentru o cerere respinsă e o minciună
+              liniștită, iar asta e chiar ce s-a văzut: „0 users” în timp ce
+              API-ul răspundea 404 cu corp gol. */}
+          {listError && <p className="mt-3 text-sm text-tension">{listError}</p>}
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
