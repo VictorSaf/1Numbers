@@ -26,6 +26,7 @@ import { Link } from "react-router-dom";
 import { Chapter, Block, type ChapterMeta } from "@/components/numerology/Chapter";
 import { LetterMap } from "@/components/numerology/LetterMap";
 import { ChapterNav } from "@/components/numerology/ChapterNav";
+import { Deeper } from "@/components/numerology/Deeper";
 import { SaveMapButton } from "@/components/numerology/SaveMapButton";
 import { DeepReading } from "@/components/DeepReading";
 import { VedicNumbers } from "@/components/numerology/VedicNumbers";
@@ -155,6 +156,20 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
         ru: "Карта всей жизни, по этапам.",
       },
     },
+    /**
+     * Tradițiile paralele stăteau la „Ce urmează”, unde nu răspundeau la
+     * întrebarea capitolului: matricea, vedicul, kua și kabbala nu spun nimic
+     * despre etapele vieții. Sunt aceeași dată de naștere citită prin alte
+     * alfabete și alte reguli -- altă întrebare, deci alt capitol.
+     */
+    traditions: {
+      title: { ro: "Aceeași hartă, alte tradiții", en: "The same map, other traditions", ru: "Та же карта, другие традиции" },
+      question: {
+        ro: "Ce spun despre tine sistemele care numără altfel.",
+        en: "What the systems that count differently say about you.",
+        ru: "Что о вас говорят системы, которые считают иначе.",
+      },
+    },
   };
 
   const chapters: ChapterMeta[] = Object.entries(CHAPTERS).map(([id, c]) => ({
@@ -179,6 +194,9 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     vedic: { ro: "Numerologie vedică (Ank Jyotish)", en: "Vedic numerology (Ank Jyotish)", ru: "Ведическая нумерология (Анк Джьотиш)" },
     kua: { ro: "Numărul Kua (Feng Shui)", en: "The Kua number (Feng Shui)", ru: "Число Гуа (фэн-шуй)" },
     kabbalah: { ro: "Kabbalah", en: "Kabbalah", ru: "Каббала" },
+    deeperSelf: { ro: "Cele trei litere și profilul complet", en: "The three letters and the full profile", ru: "Три буквы и полный профиль" },
+    deeperLessons: { ro: "Pătratul Lo Shu, distribuția și planurile", en: "The Lo Shu square, distribution and planes", ru: "Квадрат Ло Шу, распределение и планы" },
+    deeperNow: { ro: "Zilele favorabile și bioritmurile", en: "Lucky dates and biorhythms", ru: "Благоприятные дни и биоритмы" },
     openChaldean: { ro: "Deschide analiza caldeeană", en: "Open the Chaldean analysis", ru: "Открыть халдейский анализ" },
     transits: { ro: "Tranzite și Esență", en: "Transits and Essence", ru: "Транзиты и Сущность" },
     biorhythms: { ro: "Biorritmuri", en: "Biorhythms", ru: "Биоритмы" },
@@ -314,6 +332,10 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
               ăsta. Nu stau lângă LetterMap, în capitolul 3, doar pentru că și
               acolo e vorba de litere: acela răspunde la ce lipsește din hartă.
               Diagrama capitolului rămâne ultima. */}
+          {/* Al doilea strat: adevărat, dar nu primul lucru de citit. Ce
+              răspunde direct la „din ce ești făcut” -- miezul și numerele noi --
+              rămâne mereu deschis. */}
+          <Deeper label={sectionLabels.deeperSelf[language]}>
           <Block title={sectionLabels.stones[language]} icon={<Type className="h-5 w-5 text-primary" />} note={teasers.stones[language]}>
             <Suspense fallback={chartSkeleton}>
               <LetterStones fullName={fullName} birthDate={birthDate} />
@@ -329,6 +351,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
               </Suspense>
             </WhenVisible>
           </Block>
+          </Deeper>
         </Chapter>
 
         {/* 2 — Ce se contrazice în tine */}
@@ -380,6 +403,10 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
             )}
           </Block>
 
+          {/* Al doilea strat. Ce răspunde la „ce lipsește din harta ta” --
+              datoriile și lecțiile karmice -- rămâne deschis; grilele de aici
+              arată aceleași absențe din alte unghiuri. */}
+          <Deeper label={sectionLabels.deeperLessons[language]}>
           <Block title={sectionLabels.depth[language]} icon={<Grid3x3 className="h-5 w-5 text-primary" />} note={teasers.depth[language]}>
             <Suspense fallback={chartSkeleton}>
               <NewNumbers fullName={fullName} birthDate={birthDate} keys={CHAPTER_LESSONS} />
@@ -402,6 +429,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
               <ExpressionPlanes fullName={fullName} />
             </Suspense>
           </Block>
+          </Deeper>
         </Chapter>
 
         {/* 4 — Unde ești acum */}
@@ -419,6 +447,9 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
             </Suspense>
           </Block>
 
+          {/* Al doilea strat. Ciclurile și tranzitele spun unde ești; zilele
+              favorabile și bioritmurile sunt unelte, nu răspunsul. */}
+          <Deeper label={sectionLabels.deeperNow[language]}>
           <Block title={sectionLabels.luckyDates[language]} icon={<CalendarCheck className="h-5 w-5 text-primary" />} note={teasers.luckyDates[language]}>
             <LuckyDatesCard birthDate={birthDate} fullName={fullName} delay={200} />
           </Block>
@@ -432,6 +463,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
               </Suspense>
             </WhenVisible>
           </Block>
+          </Deeper>
         </Chapter>
 
         {/* 5 — Ce urmează */}
@@ -456,8 +488,19 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
             </Suspense>
           </Block>
 
-          {/* The octagram, this chapter's one diagram. Inline SVG, not Recharts,
-              so it needs no visibility gate. */}
+        </Chapter>
+
+        {/* 6 — Aceeași hartă, alte tradiții
+            Cele cinci blocuri de mai jos stăteau la „Ce urmează”, unde nu
+            răspundeau la întrebarea capitolului: matricea, vedicul, kua și
+            kabbala nu spun nimic despre etapele vieții. Sunt aceeași dată de
+            naștere citită prin alte alfabete și alte reguli.
+            Un Destin pitagoreic de 1 și unul caldeean de 5 nu se contrazic --
+            sunt două citiri ale aceluiași nume prin alfabete formate în locuri
+            diferite. De aceea stau împreună, și separat de restul. */}
+        <Chapter meta={chapters[5]} index={6}>
+          {/* Octograma. SVG inline, nu Recharts, deci nu are nevoie de poartă
+              de vizibilitate. */}
           <Block title={sectionLabels.matrix[language]} icon={<Compass className="h-5 w-5 text-primary" />} note={teasers.matrix[language]}>
             <Suspense fallback={chartSkeleton}>
               <DestinyMatrix birthDate={birthDate} />
