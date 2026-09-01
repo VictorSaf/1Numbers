@@ -1,7 +1,7 @@
 // useNotifications Hook
 // Manages push notification permissions, subscriptions, and preferences
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   isNotificationSupported,
   getNotificationPermission,
@@ -85,6 +85,41 @@ export const useNotifications = (): UseNotificationsReturn => {
     loadNotificationPreferences()
   );
   const [swRegistration, setSwRegistration] = useState<ServiceWorkerRegistration | null>(null);
+  const skipPushOnceRef = useRef(false);
+
+  // Load preferences from server at mount (if authenticated)
+  useEffect(() => {
+    skipPushOnceRef.current = true; // Anticipate loading from server, skip PUT once
+
+    const loadPreferencesFromServer = async () => {
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        skipPushOnceRef.current = false; // No auth, allow PUT immediately
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/notifications/preferences`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setPreferences(data.preferences);
+          // skipPushOnceRef.current stays true, PUT will skip once
+        } else {
+          // Server doesn't have a row yet, push defaults at mount
+          skipPushOnceRef.current = false; // Allow PUT for user changes
+          await pushPreferencesToServer(DEFAULT_PREFERENCES);
+        }
+      } catch {
+        // Error loading, push defaults at mount
+        skipPushOnceRef.current = false;
+        await pushPreferencesToServer(DEFAULT_PREFERENCES);
+      }
+    };
+
+    void loadPreferencesFromServer();
+  }, []);
 
   // Initialize service worker on mount
   useEffect(() => {
@@ -236,10 +271,13 @@ export const useNotifications = (): UseNotificationsReturn => {
     });
   }, []);
 
-  // Un PUT per obiect de preferințe așezat, inclusiv cel de la montare -- acela
-  // e ce creează rândul pe server pentru un cont care n-a avut niciodată unul.
-  // PUT-ul e idempotent, deci o repetare nu costă nimic.
+  // Sync preference changes to server, but skip once if loaded from server at mount.
+  // This prevents overwriting server data with local defaults on a fresh device.
   useEffect(() => {
+    if (skipPushOnceRef.current) {
+      skipPushOnceRef.current = false;
+      return;
+    }
     void pushPreferencesToServer(preferences);
   }, [preferences]);
 
