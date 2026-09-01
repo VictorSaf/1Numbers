@@ -118,13 +118,40 @@ describe("Thread", () => {
     expect(screen.getByText(new RegExp(steps[0].teaser!))).toBeInTheDocument();
   });
 
-  it("ține minte unde ai rămas după o reîncărcare", () => {
+  it("o ia de la început la fiecare intrare", () => {
+    // Poziția salvată omora chiar experiența: odată citită, harta rămânea
+    // citită și nu mai era nimic de descoperit a doua zi.
     const first = show();
     go(3);
     first.unmount();
 
     const { container } = show();
-    expect(container.querySelectorAll("[data-beat]")).toHaveLength(4);
+    expect(container.querySelectorAll("[data-beat]")).toHaveLength(1);
+  });
+
+  it("nu oferă scurtătura cuiva care n-a terminat harta niciodată", () => {
+    show();
+    go(2);
+
+    expect(screen.queryByRole("button", { name: /whole map|harta întreagă/i })).not.toBeInTheDocument();
+  });
+
+  it("dă o scurtătură celui care a mai citit-o o dată", () => {
+    // Fără ea, cine a citit ieri tot ar trebui să apese de douăzeci de ori
+    // ca să-și revadă harta.
+    const first = show();
+    for (let i = 0; i < 200; i++) {
+      const btn = screen.queryByRole("button", { name: /go on|continue/i });
+      if (!btn) break;
+      fireEvent.click(btn);
+    }
+    first.unmount();
+
+    const { container } = show();
+    expect(container.querySelectorAll("[data-beat]")).toHaveLength(1);
+
+    fireEvent.click(screen.getByRole("button", { name: /whole map/i }));
+    expect(container.querySelectorAll("[data-step]")).toHaveLength(steps.length);
   });
 
   it("ascunde butonul când firul s-a terminat", () => {

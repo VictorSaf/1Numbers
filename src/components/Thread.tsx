@@ -27,8 +27,18 @@ import { Words } from "@/components/Words";
  *    la final, când chiar există o hartă de privit dintr-o dată.
  */
 
-const seenKey = (fullName: string, birthDate: Date) =>
-  `thread-beat:${fullName.trim().toLowerCase()}:${birthDate.toISOString().slice(0, 10)}`;
+/**
+ * Ce se ține minte NU e unde ai rămas, ci că ai ajuns o dată la capăt.
+ *
+ * Poziția salvată omora chiar experiența: odată citită, harta rămânea citită,
+ * iar a doua zi nu mai era nimic de descoperit -- doar un teanc de carduri
+ * deja deschise. Firul pornește acum de la prima frază de fiecare dată.
+ *
+ * Steagul rămâne pentru un singur motiv: fără el, cine a citit ieri tot ar
+ * trebui să apese de douăzeci de ori ca să-și revadă harta.
+ */
+const doneKey = (fullName: string, birthDate: Date) =>
+  `thread-done:${fullName.trim().toLowerCase()}:${birthDate.toISOString().slice(0, 10)}`;
 
 interface Copy {
   more: string;
@@ -36,12 +46,14 @@ interface Copy {
   done: string;
   works: string;
   breaks: string;
+  /** Scurtătura, pentru cine a mai citit harta o dată. */
+  whole: string;
 }
 
 const COPY: Record<ThreadLang, Copy> = {
-  ro: { more: "mai departe", next: "continuă", done: "Ai citit toată harta.", works: "când funcționează", breaks: "când se strică" },
-  en: { more: "go on", next: "continue", done: "You have read the whole map.", works: "when it works", breaks: "when it breaks" },
-  ru: { more: "дальше", next: "продолжить", done: "Вы прочитали всю карту.", works: "когда работает", breaks: "когда ломается" },
+  ro: { more: "mai departe", next: "continuă", done: "Ai citit toată harta.", works: "când funcționează", breaks: "când se strică", whole: "sari la harta întreagă" },
+  en: { more: "go on", next: "continue", done: "You have read the whole map.", works: "when it works", breaks: "when it breaks", whole: "skip to the whole map" },
+  ru: { more: "дальше", next: "продолжить", done: "Вы прочитали всю карту.", works: "когда работает", breaks: "когда ломается", whole: "перейти ко всей карте" },
 };
 
 type BeatKind = "say" | "works" | "breaks" | "detail" | "plain";
@@ -88,26 +100,35 @@ export const Thread = ({
     [steps],
   );
 
-  const key = seenKey(fullName, birthDate);
+  const key = doneKey(fullName, birthDate);
   const [seen, setSeen] = useState(1);
+  const [readBefore, setReadBefore] = useState(false);
 
   useEffect(() => {
     try {
-      const saved = Number(localStorage.getItem(key));
-      if (Number.isFinite(saved) && saved >= 1) setSeen(Math.min(saved, beats.length));
+      setReadBefore(localStorage.getItem(key) === "1");
     } catch {
-      // localStorage indisponibil în unele moduri private; firul pornește de la prima frază.
+      // localStorage indisponibil în unele moduri private: fără scurtătură.
     }
-  }, [key, beats.length]);
+  }, [key]);
+
+  const markRead = () => {
+    try {
+      localStorage.setItem(key, "1");
+    } catch {
+      // Nesalvat înseamnă doar că data viitoare nu apare scurtătura.
+    }
+  };
 
   const advance = () => {
     const next = Math.min(seen + 1, beats.length);
     setSeen(next);
-    try {
-      localStorage.setItem(key, String(next));
-    } catch {
-      // Nesalvat înseamnă că mâine reia de unde știe, nu că se strică ceva.
-    }
+    if (next >= beats.length) markRead();
+  };
+
+  const skipToMap = () => {
+    setSeen(beats.length);
+    markRead();
   };
 
   const shown = beats.slice(0, seen);
@@ -234,6 +255,16 @@ export const Thread = ({
           </button>
         ) : (
           <span className="text-sm text-muted-foreground">{copy.done}</span>
+        )}
+
+        {!done && readBefore && (
+          <button
+            type="button"
+            onClick={skipToMap}
+            className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+          >
+            {copy.whole}
+          </button>
         )}
 
         <span className="num text-xs text-muted-foreground">
