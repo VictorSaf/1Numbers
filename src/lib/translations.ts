@@ -52,6 +52,7 @@ export const translations = {
         copil: "Un copil, sau un nume pe care îl alegi pentru unul.",
         afacere: "O firmă sau un brand. Data e cea a înființării.",
       },
+      deleteConfirm: "Sigur ștergi această hartă? Nu poți reveni asupra acestei acțiuni.",
     },
     loading: "Se încarcă...",
     // Header
@@ -390,6 +391,14 @@ export const translations = {
       personalMonth: "Luna personală",
       universalDay: "Ziua universală",
       advice: "Ce ai de făcut"
+    },
+    // Ce află vizitatorul înainte să i se ceară ceva. Pagina cerea înainte să
+    // ofere: "Calculează Numerele Tale" e o comandă, nu o promisiune.
+    firstVisit: {
+      promise: "Scrii numele de la naștere și data nașterii. Primești o hartă în cinci capitole, de citit acum.",
+      noAccount: "Fără cont, fără plată, fără adresă de e-mail.",
+      tryExample: "Vezi întâi o hartă de exemplu",
+      exampleNote: "Harta unei persoane inventate, ca să vezi despre ce e vorba înainte să-ți scrii numele."
     },
     
     // Lucky Dates
@@ -790,6 +799,12 @@ export const translations = {
       universalDay: "Universal day",
       advice: "What to do"
     },
+    firstVisit: {
+      promise: "Write the name you were born with and your date of birth. You get a map in five chapters, to read now.",
+      noAccount: "No account, no payment, no email address.",
+      tryExample: "See an example map first",
+      exampleNote: "The map of a made-up person, so you can see what this is before you type your own name."
+    },
     
     // Export & Sharing
     export: {
@@ -842,6 +857,7 @@ export const translations = {
         copil: "A child, or a name you are choosing for one.",
         afacere: "A company or a brand. The date is the founding date.",
       },
+      deleteConfirm: "Are you sure you want to delete this map? This action cannot be undone.",
     },
 
     // Lucky Dates
@@ -1244,6 +1260,12 @@ export const translations = {
       universalDay: "Универсальный день",
       advice: "Что делать"
     },
+    firstVisit: {
+      promise: "Напишите имя, данное при рождении, и дату рождения. Получите карту из пяти глав — читать прямо сейчас.",
+      noAccount: "Без аккаунта, без оплаты, без адреса почты.",
+      tryExample: "Сначала посмотрите пример карты",
+      exampleNote: "Карта вымышленного человека, чтобы понять, о чём речь, прежде чем вводить своё имя."
+    },
     
     // Export & Sharing
     export: {
@@ -1296,6 +1318,7 @@ export const translations = {
         copil: "Ребёнок или имя, которое вы для него выбираете.",
         afacere: "Компания или бренд. Дата — дата основания.",
       },
+      deleteConfirm: "Вы уверены, что хотите удалить эту карту? Это действие необратимо.",
     },
 
     // Lucky Dates
