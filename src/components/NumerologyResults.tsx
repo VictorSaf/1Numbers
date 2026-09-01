@@ -27,6 +27,7 @@ import { Chapter, Block, type ChapterMeta } from "@/components/numerology/Chapte
 import { LetterMap } from "@/components/numerology/LetterMap";
 import { ChapterNav } from "@/components/numerology/ChapterNav";
 import { Deeper } from "@/components/numerology/Deeper";
+import { TwoAnswers } from "@/components/numerology/TwoAnswers";
 import { SaveMapButton } from "@/components/numerology/SaveMapButton";
 import { DeepReading } from "@/components/DeepReading";
 import { VedicNumbers } from "@/components/numerology/VedicNumbers";
@@ -194,6 +195,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     vedic: { ro: "Numerologie vedică (Ank Jyotish)", en: "Vedic numerology (Ank Jyotish)", ru: "Ведическая нумерология (Анк Джьотиш)" },
     kua: { ro: "Numărul Kua (Feng Shui)", en: "The Kua number (Feng Shui)", ru: "Число Гуа (фэн-шуй)" },
     kabbalah: { ro: "Kabbalah", en: "Kabbalah", ru: "Каббала" },
+    twoAnswers: { ro: "Unde harta se răspunde de două ori", en: "Where the map answers twice", ru: "Где карта отвечает дважды" },
     deeperSelf: { ro: "Cele trei litere și profilul complet", en: "The three letters and the full profile", ru: "Три буквы и полный профиль" },
     deeperLessons: { ro: "Pătratul Lo Shu, distribuția și planurile", en: "The Lo Shu square, distribution and planes", ru: "Квадрат Ло Шу, распределение и планы" },
     deeperNow: { ro: "Zilele favorabile și bioritmurile", en: "Lucky dates and biorhythms", ru: "Благоприятные дни и биоритмы" },
@@ -211,6 +213,11 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
 
   // One line per section, shown under its title whether it is open or closed.
   const teasers = {
+    twoAnswers: {
+      ro: "Aceleași întrebări, puse prin sisteme diferite — și ce înseamnă când răspunsurile nu coincid.",
+      en: "The same questions put through different systems — and what it means when the answers do not match.",
+      ru: "Одни и те же вопросы через разные системы — и что значит, когда ответы расходятся.",
+    },
     pinnacles: { ro: "Cele patru etape majore ale vieții tale și provocările fiecăreia.", en: "The four major stages of your life and the challenge of each.", ru: "Четыре главных этапа вашей жизни и вызов каждого." },
     karmic: { ro: "Datoriile 13, 14, 16 și 19 și ce înseamnă pentru tine.", en: "Debts 13, 14, 16 and 19 and what they mean for you.", ru: "Долги 13, 14, 16 и 19 и что они значат для вас." },
     lessons: { ro: "Numerele lipsă din numele tău și lecțiile pe care le indică.", en: "The numbers missing from your name and the lessons they point to.", ru: "Числа, отсутствующие в имени, и уроки, на которые они указывают." },
@@ -367,6 +374,15 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
             <Suspense fallback={chartSkeleton}>
               <NewNumbers fullName={fullName} birthDate={birthDate} keys={CHAPTER_TENSION} />
             </Suspense>
+          </Block>
+
+          {/* Contradicțiile de deasupra sunt între două poziții ale aceleiași
+              hărți. Astea sunt între două SISTEME care răspund la aceeași
+              întrebare -- alt fel de dezacord, dar același capitol: „ce se
+              contrazice în tine”. Existau de la început, împrăștiate prin
+              raport, și nimic nu le punea față în față. */}
+          <Block title={sectionLabels.twoAnswers[language]} icon={<AlertTriangle className="h-5 w-5 text-warn" />} note={teasers.twoAnswers[language]}>
+            <TwoAnswers fullName={fullName} birthDate={birthDate} />
           </Block>
         </Chapter>
 
