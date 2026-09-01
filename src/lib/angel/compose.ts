@@ -10,6 +10,7 @@ import { archetypeFor, type Lang } from "@/lib/numerology-plus";
 import type { Pattern } from "./patterns";
 import { PATTERN_FRAMES, type PatternFrame } from "./frames";
 import { DIGIT_ADVICE } from "./advice";
+import { CULTURAL_NOTES } from "./overrides";
 
 const LANGS: Lang[] = ["ro", "en", "ru"];
 
@@ -73,7 +74,16 @@ export function composeMeaning(pattern: Pattern): AngelNumberMeaning | null {
     shortMessage: byLang((l) => fill(frame.shortTpl[l], vars(l))),
     spiritualSignificance: byLang((l) => fill(frame.spiritualTpl[l], vars(l))),
     fullMeaning: byLang((l) =>
-      [frame.leadTpl[l], frame.amplifyTpl[l], frame.worksTpl[l], frame.breaksTpl[l]]
+      [
+        // Nota culturală, când există, stă în față: e ce trebuie citit înainte
+        // de interpretare, nu în locul ei.
+        CULTURAL_NOTES[pattern.sequence]?.[l],
+        frame.leadTpl[l],
+        frame.amplifyTpl[l],
+        frame.worksTpl[l],
+        frame.breaksTpl[l],
+      ]
+        .filter((tpl): tpl is string => Boolean(tpl))
         .map((tpl) => fill(tpl, vars(l)))
         .join(" "),
     ),

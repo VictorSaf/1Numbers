@@ -88,3 +88,33 @@ describe("formele relaționale", () => {
     expect(getAngelNumberMeaning("3434")).not.toBeNull();
   });
 });
+
+describe("notele culturale", () => {
+  it("respinge asocierea moștenită a lui 666, înainte de orice altceva", () => {
+    const m = getAngelNumberMeaning("666")!;
+    expect(m.fullMeaning.ro.startsWith("Înainte de orice altceva")).toBe(true);
+    expect(m.fullMeaning.ro).toContain("616");
+    expect(m.fullMeaning.en).toContain("616");
+    expect(m.fullMeaning.ru).toContain("616");
+  });
+
+  it("explică de ce 1111 e văzut mai des decât altele", () => {
+    const m = getAngelNumberMeaning("1111")!;
+    expect(m.fullMeaning.ro).toContain("11:11");
+    expect(m.fullMeaning.en).toContain("11:11");
+    expect(m.fullMeaning.ru).toContain("11:11");
+  });
+
+  it("păstrează textul compus după notă, nu în locul lui", () => {
+    const six = getAngelNumberMeaning("666")!;
+    const seven = getAngelNumberMeaning("777")!;
+    // Paragraful de amplificare al ramei de triplu apare în amândouă.
+    const shared = "Repetiția nu schimbă înțelesul cifrei";
+    expect(six.fullMeaning.ro).toContain(shared);
+    expect(seven.fullMeaning.ro).toContain(shared);
+  });
+
+  it("nu atinge secvențele fără notă", () => {
+    expect(getAngelNumberMeaning("444")!.fullMeaning.ro.startsWith("Când aceeași cifră")).toBe(true);
+  });
+});
