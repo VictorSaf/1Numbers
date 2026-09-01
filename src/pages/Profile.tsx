@@ -71,6 +71,20 @@ const Profile = () => {
   const { profiles, activeProfile, createProfile, updateProfile, deleteProfile, refetch } = useProfiles();
 
   const [editingProfileId, setEditingProfileId] = useState<string | null>(null);
+
+  /**
+   * Numele și data nașterii de pe harta proprie nu se mai schimbă odată puse.
+   *
+   * Toată aplicația e construită pe ele -- ziua personală, ecoul din jurnal
+   * legat de cifra zilei, citirea întreagă indexată pe amprenta hărții. Aici
+   * doar se arată ce refuză serverul oricum: un câmp care se lasă tastat și
+   * apoi întoarce 409 e mai rău decât unul care spune de la început că nu.
+   *
+   * Doar harta proprie. Un copil sau un apropiat rămân de corectat.
+   */
+  const identityIsFixed =
+    editingProfileId !== null &&
+    profiles.some((p) => p.id === editingProfileId && normalizeCategory(p.category) === 'eu');
   const [saving, setSaving] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deletingProfileId, setDeletingProfileId] = useState<string | null>(null);
@@ -349,6 +363,8 @@ const Profile = () => {
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   placeholder={t.fullNamePlaceholder}
                   className="input-mystic h-12 text-base"
+                  disabled={identityIsFixed}
+                  readOnly={identityIsFixed}
                   required
                 />
                 <p className="text-xs text-muted-foreground">
@@ -392,6 +408,7 @@ const Profile = () => {
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
+                      disabled={identityIsFixed}
                       className={cn(
                         "w-full justify-start text-left font-normal h-12 input-mystic",
                         !formData.birthDate && "text-muted-foreground"

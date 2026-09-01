@@ -93,14 +93,51 @@ router.get('/all', authenticateToken, async (req: AuthRequest, res: Response) =>
 });
 
 // Create new profile (always creates, never updates)
+/**
+ * Profilurile le creează adminul, nu utilizatorul.
+ *
+ * Odată creat, numele și data nașterii de pe harta proprie nu se mai schimbă
+ * (vezi PUT mai jos). Dacă utilizatorul ar putea crea profiluri, regula aia ar
+ * fi o sugestie: își face altul și îl activează. Cele două reguli țin doar
+ * împreună.
+ *
+ * Rolul se citește din baza de date, nu din token: un token semnat acum șapte
+ * zile pentru cineva între timp retrogradat nu mai deschide nimic.
+ */
 router.post('/me', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId;
+
+    const who = await pool.query('SELECT role FROM users WHERE id = $1', [userId]);
+    if (who.rows[0]?.role !== 'admin') {
+      return res.status(403).json({
+        error: 'admin_only',
+        message: 'Profiles are created by an administrator.',
+      });
+    }
     const parsed = profileSchema.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({ error: 'Invalid profile', details: parsed.error.issues });
     }
     const { fullName, birthDate, birthTime, birthPlace, category, setAsActive } = parsed.data;
+
+    /**
+     * O singură hartă proprie. Fără asta, faptul că identitatea de pe `eu` e
+     * fixă ar fi o sugestie: creezi al doilea profil „eu” cu alte date și îl
+     * faci activ.
+     */
+    if (category === 'eu') {
+      const own = await pool.query(
+        "SELECT id FROM user_profiles WHERE user_id = $1 AND category = 'eu' LIMIT 1",
+        [userId],
+      );
+      if (own.rowCount) {
+        return res.status(409).json({
+          error: 'own_map_exists',
+          message: 'You already have your own map. Other people go in as apropiat, copil or afacere.',
+        });
+      }
+    }
 
     const client = await pool.connect();
     try {
@@ -186,12 +223,38 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
 
     // Verify profile belongs to user
     const verifyResult = await pool.query(
-      'SELECT id FROM user_profiles WHERE id = $1 AND user_id = $2',
+      'SELECT id, category, full_name, birth_date::text AS birth_date FROM user_profiles WHERE id = $1 AND user_id = $2',
       [profileId, userId]
     );
 
     if (verifyResult.rows.length === 0) {
       return res.status(404).json({ error: 'Profile not found' });
+    }
+
+    /**
+     * Numele și data nașterii de pe harta proprie nu se mai schimbă.
+     *
+     * Toată aplicația e construită pe ele: ziua personală din /azi, ecoul din
+     * jurnal legat de cifra zilei, citirea întreagă indexată pe amprenta
+     * hărții. Schimbate, tot ce s-a scris înainte rămâne în bază adevărat
+     * despre altă hartă decât cea pe care o vede omul azi, iar jurnalul lui
+     * devine dovada altcuiva.
+     *
+     * Doar `eu`. Un profil de copil sau de apropiat rămâne editabil: acolo o
+     * dată greșită e o greșeală de tastare despre altcineva, nu temelia
+     * propriilor lui date.
+     */
+    const current = verifyResult.rows[0];
+    if (current.category === 'eu') {
+      const changed =
+        (fullName !== undefined && fullName.trim() !== String(current.full_name).trim()) ||
+        (birthDate !== undefined && birthDate !== String(current.birth_date).slice(0, 10));
+      if (changed) {
+        return res.status(409).json({
+          error: 'identity_is_fixed',
+          message: 'The name and birth date of your own map cannot be changed once set.',
+        });
+      }
     }
 
     // Update profile

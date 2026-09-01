@@ -11,6 +11,25 @@ const auth = `Bearer ${jwt.sign(
   process.env.JWT_SECRET!,
 )}`;
 
+/**
+ * Crearea de profiluri a devenit o operație de admin: utilizatorul nu-și mai
+ * poate face profil, fiindcă altfel identitatea fixă de pe harta proprie ar
+ * fi o sugestie -- și-ar face altul și l-ar activa.
+ *
+ * Testele de aici sunt despre CATEGORII, nu despre cine are voie. Deci pun
+ * rolul care le lasă să ajungă la ce verifică; cine are voie e testat separat,
+ * în profiles.identity.test.ts.
+ */
+const asAdmin = () => {
+  vi.mocked(pool.query).mockImplementation((sql: unknown) => {
+    if (/SELECT role FROM users/i.test(String(sql))) {
+      return Promise.resolve({ rows: [{ role: 'admin' }], rowCount: 1 } as never);
+    }
+    // Nicio hartă proprie încă: lasă verificarea de unicitate să treacă.
+    return Promise.resolve({ rows: [], rowCount: 0 } as never);
+  });
+};
+
 const row = (over: Record<string, unknown> = {}) => ({
   id: 'p1',
   user_id: 'u1',
@@ -55,6 +74,7 @@ describe('categoria iese din API', () => {
 
 describe('categoria intră în API', () => {
   it('o scrie la creare', async () => {
+    asAdmin();
     client.query.mockImplementation((sql: string) => {
       if (/SELECT COUNT/.test(sql)) return Promise.resolve({ rows: [{ count: '3' }] });
       if (/INSERT INTO user_profiles/.test(sql)) return Promise.resolve({ rows: [row()] });
@@ -72,6 +92,7 @@ describe('categoria intră în API', () => {
   });
 
   it('cade pe o categorie care nu există', async () => {
+    asAdmin();
     const response = await request(app)
       .post('/api/profiles/me')
       .set('Authorization', auth)
@@ -80,6 +101,7 @@ describe('categoria intră în API', () => {
   });
 
   it('pune eu când nu se cere nimic', async () => {
+    asAdmin();
     client.query.mockImplementation((sql: string) => {
       if (/SELECT COUNT/.test(sql)) return Promise.resolve({ rows: [{ count: '3' }] });
       if (/INSERT INTO user_profiles/.test(sql)) return Promise.resolve({ rows: [row({ category: 'eu' })] });
@@ -133,6 +155,7 @@ describe('numai o hartă a mea poate fi cea activă', () => {
   });
 
   it('nu activează o firmă nici când i se cere explicit', async () => {
+    asAdmin();
     client.query.mockImplementation((sql: string) => {
       if (/SELECT COUNT/.test(sql)) return Promise.resolve({ rows: [{ count: '0' }] });
       if (/INSERT INTO user_profiles/.test(sql)) {

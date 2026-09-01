@@ -176,13 +176,21 @@ router.post('/users', async (req: AuthRequest, res: Response) => {
       password: z.string().min(6).max(200),
       role: z.enum(['user', 'admin']).default('user'),
       plan: z.enum(PLANS).default('free'),
+      // Harta, opțională dar indivizibilă: utilizatorul nu-și mai poate crea
+      // profil, iar POST /profiles/me scrie pentru cine cheamă -- deci ăsta e
+      // singurul loc din care harta cuiva poate lua ființă.
+      birthName: z.string().trim().min(1).max(120).optional(),
+      birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+    })
+    .refine((v) => (v.birthName === undefined) === (v.birthDate === undefined), {
+      message: 'birthName and birthDate go together: half a map is not a map',
     })
     .safeParse(req.body);
 
   if (!parsed.success) {
     return res.status(400).json({ error: 'invalid_request', details: parsed.error.issues });
   }
-  const { email, name, password, role, plan } = parsed.data;
+  const { email, name, password, role, plan, birthName, birthDate } = parsed.data;
 
   try {
     const exists = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
@@ -208,7 +216,17 @@ router.post('/users', async (req: AuthRequest, res: Response) => {
       [user.id, planRow.rows[0].id],
     );
 
-    return res.status(201).json({ user: { ...user, plan } });
+    let hasMap = false;
+    if (birthName && birthDate) {
+      await pool.query(
+        `INSERT INTO user_profiles (user_id, full_name, birth_date, category, is_active)
+         VALUES ($1, $2, $3, 'eu', true)`,
+        [user.id, birthName, birthDate],
+      );
+      hasMap = true;
+    }
+
+    return res.status(201).json({ user: { ...user, plan, hasMap } });
   } catch (error) {
     console.error('Create user error:', error);
     return res.status(500).json({ error: 'Failed to create user' });

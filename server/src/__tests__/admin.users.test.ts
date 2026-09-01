@@ -107,6 +107,48 @@ describe('POST /api/admin/users', () => {
   });
 });
 
+describe('contul și harta, dintr-o singură acțiune', () => {
+  // Utilizatorul nu-și mai poate crea profil, iar POST /profiles/me scrie
+  // pentru cine cheamă -- deci adminul ar fi putut crea doar harta lui.
+  const WITH_MAP = { ...NEW_USER, birthName: 'Om Nou Complet', birthDate: '1990-01-01' };
+
+  it('creează și harta, când primește numele de naștere și data', async () => {
+    asAdmin();
+    vi.mocked(pool.query)
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as never)
+      .mockResolvedValueOnce({ rows: [{ id: 2 }], rowCount: 1 } as never)
+      .mockResolvedValueOnce({ rows: [{ id: OTHER_ID, email: WITH_MAP.email, name: 'x', role: 'user' }], rowCount: 1 } as never)
+      .mockResolvedValueOnce({ rows: [{}], rowCount: 1 } as never)   // abonament
+      .mockResolvedValueOnce({ rows: [{ id: 'pr1' }], rowCount: 1 } as never); // profil
+
+    const res = await create(WITH_MAP).expect(201);
+
+    expect(res.body.user.hasMap).toBe(true);
+    const sqls = vi.mocked(pool.query).mock.calls.map((c) => String(c[0]));
+    expect(sqls.some((q) => /INSERT INTO user_profiles/i.test(q))).toBe(true);
+  });
+
+  it('creează doar contul când nu i se dă o hartă', async () => {
+    asAdmin();
+    vi.mocked(pool.query)
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as never)
+      .mockResolvedValueOnce({ rows: [{ id: 1 }], rowCount: 1 } as never)
+      .mockResolvedValueOnce({ rows: [{ id: OTHER_ID, email: 'x@y.ro', name: 'x', role: 'user' }], rowCount: 1 } as never)
+      .mockResolvedValueOnce({ rows: [{}], rowCount: 1 } as never);
+
+    const res = await create(NEW_USER).expect(201);
+
+    expect(res.body.user.hasMap).toBe(false);
+    const sqls = vi.mocked(pool.query).mock.calls.map((c) => String(c[0]));
+    expect(sqls.some((q) => /INSERT INTO user_profiles/i.test(q))).toBe(false);
+  });
+
+  it('cere data odată cu numele de naștere: o hartă pe jumătate nu e o hartă', async () => {
+    asAdmin();
+    await create({ ...NEW_USER, birthName: 'Om Nou Complet' }).expect(400);
+  });
+});
+
 describe('PATCH /api/admin/users/:id — planul', () => {
   it('schimbă planul fără să atingă rolul', async () => {
     asAdmin();
