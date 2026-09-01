@@ -38,10 +38,13 @@ const show = () =>
 
 const said = (el: HTMLElement, text: string) =>
   el.textContent?.replace(/\s+/g, " ").includes(text.replace(/\s+/g, " "));
-const on = () => screen.queryByRole("button", { name: /go on|continue/i });
-/** Textul vine de la server, deci nimic nu e pe ecran înainte de răspuns. */
-const ready = () => waitFor(() => expect(on()).toBeInTheDocument());
-const toEnd = () => { for (let i = 0; i < 20; i++) { const b = on(); if (!b) break; fireEvent.click(b); } };
+/**
+ * Textul vine de la server, deci nimic nu e pe ecran înainte de răspuns -- iar
+ * de când ziua se citește întreagă, semnalul că a sosit e chiar textul, nu un
+ * buton de avansare.
+ */
+const ready = () => waitFor(() => expect(screen.getByRole("textbox")).toBeInTheDocument());
+const toEnd = () => {};
 
 beforeEach(() => {
   create.mockClear();
@@ -69,13 +72,15 @@ describe("Today", () => {
     expect(said(container, reading.say)).toBe(true);
   });
 
-  it("încape într-un minut: cel mult șase apăsări", async () => {
-    show();
+  it("arată ziua întreagă dintr-o dată, fără pași intermediari", async () => {
+    // Dezvăluirea frază cu frază a fost construită pentru hartă, care se
+    // citește o dată. Ziua se citește în fiecare dimineață: patru apăsări ca
+    // să afli ce cere ziua fac dintr-un minut de citit cinci de clicuri.
+    const { container } = show();
     await ready();
-    let clicks = 0;
-    for (let i = 0; i < 20; i++) { const b = on(); if (!b) break; fireEvent.click(b); clicks++; }
 
-    expect(clicks).toBeLessThanOrEqual(6);
+    expect(container.querySelectorAll("[data-beat]").length).toBeGreaterThanOrEqual(3);
+    expect(screen.queryByRole("button", { name: /go on|continue|mai departe/i })).not.toBeInTheDocument();
   });
 
   it("spune cum întâlnește ziua harta ta", async () => {
@@ -86,13 +91,10 @@ describe("Today", () => {
     for (const rel of reading.relations) expect(said(container, rel.text)).toBe(true);
   });
 
-  it("întreabă abia la capăt, nu peste text", async () => {
+  it("pune întrebarea sub text, o dată cu el", async () => {
     show();
     await ready();
-    expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
 
-    toEnd();
-    expect(screen.getByText(new RegExp(reading.ask.replace("?", "\\?")))).toBeInTheDocument();
     expect(screen.getByRole("textbox")).toBeInTheDocument();
   });
 
@@ -192,7 +194,7 @@ describe("Today și ziua de calendar", () => {
         <Today fullName={NAME} birthDate={BIRTH} today={noaptea} />
       </LanguageProvider>,
     );
-    await waitFor(() => expect(on()).toBeInTheDocument());
+    await ready();
     toEnd();
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "ceva" } });
     fireEvent.click(screen.getByRole("button", { name: /keep|save/i }));
@@ -212,7 +214,7 @@ describe("Today își amintește", () => {
   it("arată ce ai scris ultima dată, lângă întrebare", async () => {
     withEcho("Ultima dată când ziua a fost 8, ai scris: „Am plecat din ședință.”");
     const { container } = show();
-    await waitFor(() => expect(on()).toBeInTheDocument());
+    await ready();
     toEnd();
 
     expect(said(container, "Am plecat din ședință.")).toBe(true);
@@ -223,7 +225,7 @@ describe("Today își amintește", () => {
     // singura frază pe care omul o citește cu adevărat rămâne mereu aceeași.
     withEcho(undefined);
     const { container } = show();
-    await waitFor(() => expect(on()).toBeInTheDocument());
+    await ready();
     toEnd();
 
     expect(said(container, "Ce a câștigat azi?")).toBe(true);
@@ -233,17 +235,10 @@ describe("Today își amintește", () => {
   it("nu arată nimic despre trecut când nu există trecut", async () => {
     withEcho(undefined);
     const { container } = show();
-    await waitFor(() => expect(on()).toBeInTheDocument());
+    await ready();
     toEnd();
 
     expect(container.querySelector("[data-echo]")).toBeNull();
   });
 
-  it("nu pune trecutul peste text, ci abia la întrebare", async () => {
-    withEcho("Ultima dată când ziua a fost 8, ai scris: „ceva”");
-    const { container } = show();
-    await waitFor(() => expect(on()).toBeInTheDocument());
-
-    expect(container.querySelector("[data-echo]")).toBeNull();
-  });
 });

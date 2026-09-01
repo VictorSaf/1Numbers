@@ -20,7 +20,6 @@ import { formatCalendarDate } from "@/lib/calendarDate";
 
 interface Copy {
   kicker: string;
-  more: string;
   keep: string;
   kept: string;
   saving: string;
@@ -33,7 +32,6 @@ interface Copy {
 const COPY: Record<TodayLang, Copy> = {
   ro: {
     kicker: "ziua ta",
-    more: "mai departe",
     keep: "ține minte",
     kept: "Scris în jurnal. Ne vedem mâine.",
     saving: "se scrie…",
@@ -43,7 +41,6 @@ const COPY: Record<TodayLang, Copy> = {
   },
   en: {
     kicker: "your day",
-    more: "go on",
     keep: "keep this",
     kept: "Kept in your journal. See you tomorrow.",
     saving: "keeping…",
@@ -53,7 +50,6 @@ const COPY: Record<TodayLang, Copy> = {
   },
   ru: {
     kicker: "ваш день",
-    more: "дальше",
     keep: "сохранить",
     kept: "Записано в дневник. До завтра.",
     saving: "сохраняем…",
@@ -129,13 +125,21 @@ export const Today = ({
     [written, reading.plain],
   );
 
-  const [seen, setSeen] = useState(1);
   const [answer, setAnswer] = useState("");
   const [kept, setKept] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [failed, setFailed] = useState(false);
 
-  const done = beats.length > 0 && seen >= beats.length;
+  /**
+   * Ziua se citește întreagă, dintr-o dată.
+   *
+   * Dezvăluirea frază cu frază a fost construită pentru HARTĂ, care se citește
+   * o singură dată și merită timpul ăla. Ziua se citește în fiecare dimineață,
+   * iar patru apăsări ca să afli ce cere ziua transformă un minut de citit în
+   * cinci de clicuri. Cuvintele apar în continuare eșalonat -- ăla e ritm de
+   * lectură, nu o poartă.
+   */
+  const done = beats.length > 0;
 
   const keep = async () => {
     const text = answer.trim();
@@ -187,8 +191,22 @@ export const Today = ({
         </div>
 
         <div className="space-y-6">
-          {beats.slice(0, seen).map((text, i) => {
-            const fresh = i === seen - 1;
+          {beats.map((text, i) => {
+            /**
+             * Toate frazele sunt în pagină de la început; ce se eșalonează e
+             * scrierea lor. Fiecare pornește după ce s-a terminat cea de
+             * dinainte, altfel patru fraze s-ar scrie una peste alta și
+             * ochiul n-ar avea unde să se așeze.
+             *
+             * Decalajul se calculează din lungimile de dinainte, nu se
+             * ghicește: o frază lungă întârzie mai mult pe următoarea, exact
+             * cât îi ia să se scrie. 260ms de pauză între ele.
+             */
+            const stepOf = (n: number) => (n === 0 ? 55 : n === beats.length - 1 ? 28 : 34);
+            const from = beats
+              .slice(0, i)
+              .reduce((acc, prev, j) => acc + prev.split(" ").length * stepOf(j) + 260, 0);
+
             if (i === beats.length - 1)
               return (
                 <p
@@ -196,7 +214,7 @@ export const Today = ({
                   data-beat="plain"
                   className="border-t border-line pt-4 text-sm leading-relaxed text-muted-foreground"
                 >
-                  <Words text={text} animate={fresh} step={28} />
+                  <Words text={text} step={28} from={from} />
                 </p>
               );
             return (
@@ -209,7 +227,7 @@ export const Today = ({
                     : "text-[0.98rem] leading-relaxed text-foreground/85"
                 }
               >
-                <Words text={text} animate={fresh} step={i === 0 ? 55 : 34} />
+                <Words text={text} step={stepOf(i)} from={from} />
               </p>
             );
           })}
@@ -254,20 +272,6 @@ export const Today = ({
       </article>
       )}
 
-      {written && !done && (
-        <div className="mt-7 flex items-center gap-4">
-          <button
-            type="button"
-            onClick={() => setSeen((s) => Math.min(s + 1, beats.length))}
-            className="btn-primary text-sm"
-          >
-            {copy.more}
-          </button>
-          <span className="num text-xs text-muted-foreground">
-            {seen} / {beats.length}
-          </span>
-        </div>
-      )}
     </div>
   );
 };
