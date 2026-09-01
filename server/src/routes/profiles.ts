@@ -1,8 +1,49 @@
 import { Router, Request, Response } from 'express';
+import { z } from 'zod';
 import pool from '../db';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
 
 const router = Router();
+
+const PROFILE_COLUMNS =
+  'id, user_id, full_name, birth_date, birth_time, birth_place, category, is_active, created_at, updated_at';
+
+interface ProfileRow {
+  id: string;
+  user_id: string;
+  full_name: string;
+  birth_date: string;
+  birth_time: string | null;
+  birth_place: string | null;
+  category: string;
+  is_active: boolean;
+  created_at: Date;
+  updated_at: Date;
+}
+
+const toProfile = (row: ProfileRow) => ({
+  id: row.id,
+  userId: row.user_id,
+  fullName: row.full_name,
+  birthDate: row.birth_date,
+  birthTime: row.birth_time,
+  birthPlace: row.birth_place,
+  category: row.category,
+  isActive: row.is_active,
+  createdAt: row.created_at,
+  updatedAt: row.updated_at,
+});
+
+export const PROFILE_CATEGORIES = ['eu', 'apropiat', 'copil', 'afacere'] as const;
+
+const profileSchema = z.object({
+  fullName: z.string().trim().min(1).max(120),
+  birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'birthDate must be YYYY-MM-DD'),
+  birthTime: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/).optional().nullable(),
+  birthPlace: z.string().trim().max(200).optional().nullable(),
+  category: z.enum(PROFILE_CATEGORIES).default('eu'),
+  setAsActive: z.boolean().optional(),
+});
 
 // Get current user's active profile
 router.get('/me', authenticateToken, async (req: AuthRequest, res: Response) => {
@@ -10,9 +51,7 @@ router.get('/me', authenticateToken, async (req: AuthRequest, res: Response) => 
     const userId = req.userId;
 
     const result = await pool.query(
-      `SELECT id, user_id, full_name, birth_date, birth_time, birth_place, is_active, created_at, updated_at 
-       FROM user_profiles 
-       WHERE user_id = $1 AND is_active = true`,
+      `SELECT ${PROFILE_COLUMNS} FROM user_profiles WHERE user_id = $1 AND is_active = true`,
       [userId]
     );
 
@@ -20,20 +59,9 @@ router.get('/me', authenticateToken, async (req: AuthRequest, res: Response) => 
       return res.json({ success: true, profile: null });
     }
 
-    const profile = result.rows[0];
     res.json({
       success: true,
-      profile: {
-        id: profile.id,
-        userId: profile.user_id,
-        fullName: profile.full_name,
-        birthDate: profile.birth_date,
-        birthTime: profile.birth_time,
-        birthPlace: profile.birth_place,
-        isActive: profile.is_active,
-        createdAt: profile.created_at,
-        updatedAt: profile.updated_at
-      }
+      profile: toProfile(result.rows[0] as ProfileRow),
     });
   } catch (error) {
     console.error('Get profile error:', error);
@@ -47,28 +75,16 @@ router.get('/all', authenticateToken, async (req: AuthRequest, res: Response) =>
     const userId = req.userId;
 
     const result = await pool.query(
-      `SELECT id, user_id, full_name, birth_date, birth_time, birth_place, is_active, created_at, updated_at 
-       FROM user_profiles 
-       WHERE user_id = $1 
+      `SELECT ${PROFILE_COLUMNS}
+       FROM user_profiles
+       WHERE user_id = $1
        ORDER BY is_active DESC, created_at DESC`,
       [userId]
     );
 
-    const profiles = result.rows.map(profile => ({
-      id: profile.id,
-      userId: profile.user_id,
-      fullName: profile.full_name,
-      birthDate: profile.birth_date,
-      birthTime: profile.birth_time,
-      birthPlace: profile.birth_place,
-      isActive: profile.is_active,
-      createdAt: profile.created_at,
-      updatedAt: profile.updated_at
-    }));
-
     res.json({
       success: true,
-      profiles
+      profiles: (result.rows as ProfileRow[]).map(toProfile),
     });
   } catch (error) {
     console.error('Get all profiles error:', error);
@@ -80,17 +96,11 @@ router.get('/all', authenticateToken, async (req: AuthRequest, res: Response) =>
 router.post('/me', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId;
-    const { fullName, birthDate, birthTime, birthPlace, setAsActive } = req.body;
-
-    if (!fullName || !birthDate) {
-      return res.status(400).json({ error: 'Full name and birth date are required' });
+    const parsed = profileSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: 'Invalid profile', details: parsed.error.issues });
     }
-
-    // Validate birth date
-    const birthDateObj = new Date(birthDate);
-    if (isNaN(birthDateObj.getTime())) {
-      return res.status(400).json({ error: 'Invalid birth date format' });
-    }
+    const { fullName, birthDate, birthTime, birthPlace, category, setAsActive } = parsed.data;
 
     const client = await pool.connect();
     try {
@@ -114,28 +124,17 @@ router.post('/me', authenticateToken, async (req: AuthRequest, res: Response) =>
 
       // Create new profile
       const result = await client.query(
-        `INSERT INTO user_profiles (user_id, full_name, birth_date, birth_time, birth_place, is_active)
-         VALUES ($1, $2, $3, $4, $5, $6)
-         RETURNING id, user_id, full_name, birth_date, birth_time, birth_place, is_active, created_at, updated_at`,
-        [userId, fullName, birthDate, birthTime || null, birthPlace || null, shouldBeActive]
+        `INSERT INTO user_profiles (user_id, full_name, birth_date, birth_time, birth_place, category, is_active)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         RETURNING ${PROFILE_COLUMNS}`,
+        [userId, fullName, birthDate, birthTime || null, birthPlace || null, category, shouldBeActive]
       );
 
       await client.query('COMMIT');
 
-      const profile = result.rows[0];
       res.status(201).json({
         success: true,
-        profile: {
-          id: profile.id,
-          userId: profile.user_id,
-          fullName: profile.full_name,
-          birthDate: profile.birth_date,
-          birthTime: profile.birth_time,
-          birthPlace: profile.birth_place,
-          isActive: profile.is_active,
-          createdAt: profile.created_at,
-          updatedAt: profile.updated_at
-        }
+        profile: toProfile(result.rows[0] as ProfileRow),
       });
     } catch (error: unknown) {
       await client.query('ROLLBACK');
@@ -145,22 +144,22 @@ router.post('/me', authenticateToken, async (req: AuthRequest, res: Response) =>
     }
   } catch (error: unknown) {
     console.error('Create profile error:', error);
-    
+
     const pgError = error as { code?: string; message?: string };
     // Provide more detailed error information
     if (pgError.code === '42P01') {
       // Table does not exist
-      return res.status(500).json({ 
-        error: 'Database table not found. Please run migration: npm run migrate' 
+      return res.status(500).json({
+        error: 'Database table not found. Please run migration: npm run migrate'
       });
     }
-    
+
     if (pgError.code === '23503') {
       // Foreign key violation
       return res.status(400).json({ error: 'Invalid user ID' });
     }
-    
-    res.status(500).json({ 
+
+    res.status(500).json({
       error: 'Internal server error',
       details: process.env.NODE_ENV === 'development' ? pgError.message : undefined
     });
@@ -172,17 +171,11 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
   try {
     const userId = req.userId;
     const profileId = req.params.id;
-    const { fullName, birthDate, birthTime, birthPlace } = req.body;
-
-    if (!fullName || !birthDate) {
-      return res.status(400).json({ error: 'Full name and birth date are required' });
+    const parsed = profileSchema.partial({ category: true }).safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: 'Invalid profile', details: parsed.error.issues });
     }
-
-    // Validate birth date
-    const birthDateObj = new Date(birthDate);
-    if (isNaN(birthDateObj.getTime())) {
-      return res.status(400).json({ error: 'Invalid birth date format' });
-    }
+    const { fullName, birthDate, birthTime, birthPlace, category } = parsed.data;
 
     // Verify profile belongs to user
     const verifyResult = await pool.query(
@@ -196,32 +189,22 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
 
     // Update profile
     const result = await pool.query(
-      `UPDATE user_profiles 
-       SET full_name = $1, birth_date = $2, birth_time = $3, birth_place = $4, updated_at = NOW()
-       WHERE id = $5 AND user_id = $6
-       RETURNING id, user_id, full_name, birth_date, birth_time, birth_place, is_active, created_at, updated_at`,
-      [fullName, birthDate, birthTime || null, birthPlace || null, profileId, userId]
+      `UPDATE user_profiles
+       SET full_name = $1, birth_date = $2, birth_time = $3, birth_place = $4,
+           category = COALESCE($5, category), updated_at = NOW()
+       WHERE id = $6 AND user_id = $7
+       RETURNING ${PROFILE_COLUMNS}`,
+      [fullName, birthDate, birthTime || null, birthPlace || null, category ?? null, profileId, userId]
     );
 
-    const profile = result.rows[0];
     res.json({
       success: true,
-      profile: {
-        id: profile.id,
-        userId: profile.user_id,
-        fullName: profile.full_name,
-        birthDate: profile.birth_date,
-        birthTime: profile.birth_time,
-        birthPlace: profile.birth_place,
-        isActive: profile.is_active,
-        createdAt: profile.created_at,
-        updatedAt: profile.updated_at
-      }
+      profile: toProfile(result.rows[0] as ProfileRow),
     });
   } catch (error: unknown) {
     console.error('Update profile error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Internal server error',
       details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
     });
@@ -252,12 +235,12 @@ router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response)
     // If deleted profile was active, activate the most recent profile
     if (wasActive) {
       const remainingResult = await pool.query(
-        `UPDATE user_profiles 
-         SET is_active = true 
+        `UPDATE user_profiles
+         SET is_active = true
          WHERE user_id = $1 AND id = (
-           SELECT id FROM user_profiles 
-           WHERE user_id = $1 
-           ORDER BY created_at DESC 
+           SELECT id FROM user_profiles
+           WHERE user_id = $1
+           ORDER BY created_at DESC
            LIMIT 1
          )
          RETURNING id`,
@@ -301,29 +284,18 @@ router.post('/:id/activate', authenticateToken, async (req: AuthRequest, res: Re
 
       // Activate the selected profile
       const result = await client.query(
-        `UPDATE user_profiles 
-         SET is_active = true 
+        `UPDATE user_profiles
+         SET is_active = true
          WHERE id = $1 AND user_id = $2
-         RETURNING id, user_id, full_name, birth_date, birth_time, birth_place, is_active, created_at, updated_at`,
+         RETURNING ${PROFILE_COLUMNS}`,
         [profileId, userId]
       );
 
       await client.query('COMMIT');
 
-      const profile = result.rows[0];
       res.json({
         success: true,
-        profile: {
-          id: profile.id,
-          userId: profile.user_id,
-          fullName: profile.full_name,
-          birthDate: profile.birth_date,
-          birthTime: profile.birth_time,
-          birthPlace: profile.birth_place,
-          isActive: profile.is_active,
-          createdAt: profile.created_at,
-          updatedAt: profile.updated_at
-        }
+        profile: toProfile(result.rows[0] as ProfileRow),
       });
     } catch (error: unknown) {
       await client.query('ROLLBACK');
@@ -334,7 +306,7 @@ router.post('/:id/activate', authenticateToken, async (req: AuthRequest, res: Re
   } catch (error: unknown) {
     console.error('Activate profile error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Internal server error',
       details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
     });
@@ -342,4 +314,3 @@ router.post('/:id/activate', authenticateToken, async (req: AuthRequest, res: Re
 });
 
 export default router;
-
