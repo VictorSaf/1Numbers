@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Sparkles, Moon, Sun, Stars } from "lucide-react";
 import { NumerologyForm } from "@/components/NumerologyForm";
+import { FirstVisitPromise, EXAMPLE_NAME, EXAMPLE_BIRTH_DATE } from "@/components/FirstVisitPromise";
 import { NumerologyResults } from "@/components/NumerologyResults";
 import { BentoDashboard } from "@/components/dashboard/BentoDashboard";
 import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
@@ -79,6 +80,13 @@ const Index = () => {
     setShowDashboard(false);
   };
 
+  // Un clic până la o hartă adevărată. Nu o descriere a produsului, ci
+  // produsul: aceleași cinci capitole, aceleași calcule, pe o persoană
+  // inventată. Trece prin `handleCalculate`, deci nu ocolește nimic.
+  const handleTryExample = () => {
+    handleCalculate({ fullName: EXAMPLE_NAME, birthDate: EXAMPLE_BIRTH_DATE });
+  };
+
   const handleReset = () => {
     setUserData(null);
     if (profile) {
@@ -144,6 +152,8 @@ const Index = () => {
                     {t.formSubtitle}
                   </p>
                 </div>
+
+                <FirstVisitPromise onTryExample={handleTryExample} />
 
                 <NumerologyForm
                   onCalculate={handleCalculate}
