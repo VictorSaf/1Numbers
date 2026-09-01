@@ -19,6 +19,18 @@ export interface ThreadStep {
   name: string;
   /** De unde vine cifra, pentru cine n-a auzit niciodată de ea. */
   plain: string;
+  /** Numele arhetipului: Protectorul, Liderul. Cifra capătă chip. */
+  title?: string;
+  /** Patru cuvinte care o încadrează dintr-o privire. */
+  keywords?: string[];
+  /** Cum arată când funcționează. */
+  works?: string;
+  /** Cum arată același lucru când se strică. Partea căutată. */
+  breaks?: string;
+  /** Câte o linie pentru fiecare cifră, când pasul poartă mai multe. */
+  details?: string[];
+  /** Ce urmează. Fără el, „continuă" nu e o invitație. */
+  teaser?: string;
   /** Cât de departe de obișnuit e faptul ăsta. Ancora nu concurează. */
   rank: number;
 }
@@ -121,7 +133,25 @@ const REPEAT_LEAD: Record<ThreadLang, (n: number, times: number, essence: string
 
 const JOIN: Record<ThreadLang, string> = { ro: " și ", en: " and ", ru: " и " };
 
+/** Ce urmează, spus în trei cuvinte. Un buton fără destinație nu se apasă. */
+const TEASERS: Record<string, Record<ThreadLang, string>> = {
+  bridgeSoulPersonality: { ro: "ce nu se potrivește", en: "what does not fit", ru: "что не совпадает" },
+  bridgeLifePathExpression: { ro: "ce nu se potrivește", en: "what does not fit", ru: "что не совпадает" },
+  personalYear: { ro: "unde ești acum", en: "where you are now", ru: "где вы сейчас" },
+  karmicLessons: { ro: "ce lipsește", en: "what is missing", ru: "чего не хватает" },
+  hiddenPassion: { ro: "ce se repetă", en: "what repeats", ru: "что повторяется" },
+  letters: { ro: "cele trei litere", en: "the three letters", ru: "три буквы" },
+};
+
+const MISSING_ONE: Record<ThreadLang, (n: number, essence: string) => string> = {
+  ro: (n, e) => `Fără ${n}: ${e}. Nu-ți vine de la sine.`,
+  en: (n, e) => `No ${n}: ${e}. It does not come to you on its own.`,
+  ru: (n, e) => `Нет ${n}: ${e}. Само это к вам не приходит.`,
+};
+
 const archetype = (n: number) => ARCHETYPES.find((a) => a.n === n) ?? ARCHETYPES[0];
+
+const capitalise = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
 
 /** Esența plus umbra, compuse: ce ești, și cum se strică același lucru. */
 const essenceAndShadow = (n: number, lang: ThreadLang): string => {
@@ -148,10 +178,15 @@ export function buildThread(
 
   // Ancora. Rangul nu contează -- e scoasă din sortare și pusă prima.
   const lp = profile.core.lifePath.value;
+  const lpA = archetype(lp);
   steps.push({
     key: "lifePath",
     kicker: KICKERS.anchor[lang],
-    say: essenceAndShadow(lp, lang),
+    title: lpA.title[lang],
+    keywords: lpA.keywords[lang],
+    say: capitalise(lpA.essence[lang]) + ".",
+    works: capitalise(lpA.strength[lang]) + ".",
+    breaks: capitalise(lpA.shadow[lang]) + ".",
     figures: String(lp),
     name: NAMES.lifePath[lang],
     plain: PLAIN.lifePath[lang],
@@ -178,6 +213,9 @@ export function buildThread(
     key: "personalYear",
     kicker: KICKERS.now[lang],
     say: YEAR_LEAD[lang](year, archetype(year).essence[lang]),
+    title: archetype(year).title[lang],
+    keywords: archetype(year).keywords[lang],
+    works: capitalise(archetype(year).strength[lang]) + ".",
     figures: String(year),
     name: NAMES.personalYear[lang],
     plain: PLAIN.personalYear[lang],
@@ -195,6 +233,7 @@ export function buildThread(
       kicker: KICKERS.missing[lang],
       say: MISSING_LEAD[lang](list),
       figures: missing.join(" · "),
+      details: missing.map((n) => MISSING_ONE[lang](n, archetype(n).essence[lang])),
       name: NAMES.karmicLessons[lang],
       plain: PLAIN.karmicLessons[lang],
       rank: 10 + missing.length * 2,
@@ -209,6 +248,9 @@ export function buildThread(
       kicker: KICKERS.repeat[lang],
       say: REPEAT_LEAD[lang](hp.value, hp.frequency, archetype(hp.value).essence[lang]),
       figures: `${hp.value} × ${hp.frequency}`,
+      title: archetype(hp.value).title[lang],
+      works: capitalise(archetype(hp.value).strength[lang]) + ".",
+      breaks: capitalise(archetype(hp.value).shadow[lang]) + ".",
       name: NAMES.hiddenPassion[lang],
       plain: PLAIN.hiddenPassion[lang],
       rank: 6 + hp.frequency,
@@ -221,7 +263,8 @@ export function buildThread(
     steps.push({
       key: "letters",
       kicker: KICKERS.letters[lang],
-      say: letters.map((l) => `${l.letter} — ${l.lead}`).join(" "),
+      say: letters[0] ? letters[0].lead : "",
+      details: letters.map((l) => `${l.letter} — ${l.label}: ${l.lead}`),
       figures: letters.map((l) => l.letter).join(" · "),
       name: NAMES.letters[lang],
       plain: PLAIN.letters[lang],
@@ -231,5 +274,11 @@ export function buildThread(
 
   const [anchor, ...rest] = steps;
   rest.sort((a, z) => z.rank - a.rank);
-  return [anchor, ...rest];
+  const ordered = [anchor, ...rest];
+
+  // Fiecare pas anunță ce urmează. Ultimul nu are ce anunța.
+  return ordered.map((step, i) => {
+    const next = ordered[i + 1];
+    return next ? { ...step, teaser: TEASERS[next.key]?.[lang] ?? next.name } : step;
+  });
 }

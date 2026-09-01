@@ -5,11 +5,14 @@ import { Thread } from "../Thread";
 import { buildThread } from "@/lib/thread";
 
 /**
- * Firul pe ecran: un pas, apoi următorul, și ține minte unde ai rămas.
+ * Firul pe ecran: o frază pe rând, nu un card pe rând.
  *
- * Panoul de dinainte arăta totul deodată. Aici se dezvăluie, iar poziția
- * supraviețuiește reîncărcării -- altfel „continuă" ar fi doar o animație,
- * nu o citire care se reia.
+ * Frazele motorului sunt dense. Puse una sub alta, se anulează: „ești locul
+ * unde alții se așază" și „tot ea devine control prin grijă" sunt două idei,
+ * iar citite lipite nu rămâne niciuna. De aceea unitatea dezvăluirii e fraza.
+ *
+ * Poziția supraviețuiește reîncărcării, altfel apăsarea ar fi o animație, nu o
+ * citire care se reia mâine de unde a rămas.
  */
 
 const NAME = "Victor Ion Safta";
@@ -24,62 +27,92 @@ const show = () =>
   );
 
 const steps = buildThread(NAME, BIRTH, "en", TODAY);
+const go = (times: number) => {
+  for (let i = 0; i < times; i++) {
+    fireEvent.click(screen.getByRole("button", { name: /go on|continue/i }));
+  }
+};
 
 beforeEach(() => localStorage.clear());
 
 describe("Thread", () => {
-  it("arată un singur pas la început, nu toată harta", () => {
+  it("arată o singură frază la început, nu tot cardul", () => {
     const { container } = show();
 
     expect(container.querySelectorAll("[data-step]")).toHaveLength(1);
+    expect(container.querySelectorAll("[data-beat]")).toHaveLength(1);
     expect(screen.getByText(steps[0].say)).toBeInTheDocument();
   });
 
-  it("pune Drumul Vieții primul, cu cifra lui ca semnătură", () => {
+  it("arată cifra mare și numele arhetipului de la prima frază", () => {
     show();
 
+    // Cifra e prezență, nu semnătură: e acolo înainte de orice text.
     expect(screen.getByText(steps[0].figures)).toBeInTheDocument();
-    expect(screen.getByText(steps[0].name)).toBeInTheDocument();
+    expect(screen.getByText(steps[0].title!)).toBeInTheDocument();
   });
 
-  it("spune de unde vine cifra, pentru cine n-a auzit de ea", () => {
-    show();
-
-    expect(screen.getByText(steps[0].plain)).toBeInTheDocument();
-  });
-
-  it("dezvăluie pasul următor la apăsare", () => {
+  it("adaugă fraza următoare în același card, nu un card nou", () => {
     const { container } = show();
 
-    fireEvent.click(screen.getByRole("button", { name: /continu/i }));
+    go(1);
 
+    expect(container.querySelectorAll("[data-step]")).toHaveLength(1);
+    expect(container.querySelectorAll("[data-beat]")).toHaveLength(2);
+    expect(screen.getByText(steps[0].works!)).toBeInTheDocument();
+  });
+
+  it("spune de unde vine cifra, la finalul pasului", () => {
+    show();
+
+    const beatsInFirst = 3 + (steps[0].details?.length ?? 0); // say, works, breaks, plain
+    go(beatsInFirst);
+
+    expect(screen.getByText(steps[0].plain, { exact: false })).toBeInTheDocument();
+  });
+
+  it("trece la pasul următor abia după ce l-a terminat pe primul", () => {
+    const { container } = show();
+
+    const beatsInFirst = 4 + (steps[0].details?.length ?? 0);
+    go(beatsInFirst - 1);
+    expect(container.querySelectorAll("[data-step]")).toHaveLength(1);
+
+    go(1);
     expect(container.querySelectorAll("[data-step]")).toHaveLength(2);
-    expect(screen.getByText(steps[1].say)).toBeInTheDocument();
+  });
+
+  it("anunță ce urmează doar când butonul chiar schimbă pasul", () => {
+    show();
+
+    // În interiorul unui pas nu are ce anunța: urmează aceeași idee.
+    expect(screen.queryByText(new RegExp(steps[0].teaser!))).not.toBeInTheDocument();
+
+    const beatsInFirst = 4 + (steps[0].details?.length ?? 0);
+    go(beatsInFirst - 1);
+
+    expect(screen.getByText(new RegExp(steps[0].teaser!))).toBeInTheDocument();
   });
 
   it("ține minte unde ai rămas după o reîncărcare", () => {
     const first = show();
-    fireEvent.click(screen.getByRole("button", { name: /continu/i }));
-    fireEvent.click(screen.getByRole("button", { name: /continu/i }));
+    go(3);
     first.unmount();
 
     const { container } = show();
-    expect(container.querySelectorAll("[data-step]")).toHaveLength(3);
+    expect(container.querySelectorAll("[data-beat]")).toHaveLength(4);
   });
 
   it("ascunde butonul când firul s-a terminat", () => {
-    show();
+    const { container } = show();
 
-    for (let i = 1; i < steps.length; i++) {
-      fireEvent.click(screen.getByRole("button", { name: /continu/i }));
+    for (let i = 0; i < 200; i++) {
+      const btn = screen.queryByRole("button", { name: /go on|continue/i });
+      if (!btn) break;
+      fireEvent.click(btn);
     }
 
-    expect(screen.queryByRole("button", { name: /continu/i })).not.toBeInTheDocument();
-  });
-
-  it("arată cât a citit din cât", () => {
-    show();
-
-    expect(screen.getByText(new RegExp(`1\\s*/\\s*${steps.length}`))).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /go on|continue/i })).not.toBeInTheDocument();
+    expect(container.querySelectorAll("[data-step]")).toHaveLength(steps.length);
   });
 });

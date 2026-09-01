@@ -87,8 +87,11 @@ const Index = () => {
 
   return (
     <PageLayout>
-      {/* Header */}
-      <PageHeader
+      {/* Antetul de marketing dispare pentru cine e deja înăuntru: „Discover
+          the hidden secrets in your personal numbers" e o promisiune făcută
+          cuiva care încă n-a intrat, iar deasupra firului concurează cu chiar
+          lucrul pe care omul a venit să-l citească. */}
+      {!shouldShowDashboard && <PageHeader
         title={t.title}
         subtitle={t.subtitle}
         badge={{
@@ -101,7 +104,7 @@ const Index = () => {
           ),
           label: t.title
         }}
-      />
+      />}
 
       {/* Main Content */}
       <main className="relative z-10 px-4 pb-16">

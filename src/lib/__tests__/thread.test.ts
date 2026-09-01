@@ -80,6 +80,35 @@ describe("buildThread", () => {
     expect(other.join()).not.toBe(mine.join());
   });
 
+
+  it("dă pasului-ancoră tot ce are motorul despre cifră, nu o singură frază", () => {
+    // Arhetipul are titlu, cuvinte-cheie, cum funcționează și cum se strică.
+    // Prima versiune folosea doar esența, adică o pătrime din ce era calculat.
+    const first = buildThread(NAME, BIRTH, "ro", TODAY)[0];
+
+    expect(first.title).toBeTruthy();
+    expect(first.keywords?.length).toBeGreaterThanOrEqual(3);
+    expect(first.works!.length).toBeGreaterThan(20);
+    expect(first.breaks!.length).toBeGreaterThan(20);
+  });
+
+  it("spune ce urmează, ca să fie un motiv să apeși", () => {
+    const steps = buildThread(NAME, BIRTH, "ro", TODAY);
+
+    for (const [i, step] of steps.entries()) {
+      if (i === steps.length - 1) expect(step.teaser).toBeUndefined();
+      else expect(step.teaser!.length).toBeGreaterThan(3);
+    }
+  });
+
+  it("explică fiecare cifră care lipsește, nu doar le enumeră", () => {
+    const missing = buildThread(NAME, BIRTH, "ro", TODAY).find((s) => s.key === "karmicLessons");
+
+    // „Lipsesc 7 și 8" nu spune nimic. Ce înseamnă fiecare, da.
+    expect(missing!.details?.length).toBe(missing!.figures.split(" · ").length);
+    for (const d of missing!.details!) expect(d.length).toBeGreaterThan(15);
+  });
+
   it("are cel puțin șase pași, ca firul să merite parcurs", () => {
     expect(buildThread(NAME, BIRTH, "ro", TODAY).length).toBeGreaterThanOrEqual(6);
   });

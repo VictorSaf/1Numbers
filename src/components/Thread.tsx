@@ -1,33 +1,60 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { buildThread, type ThreadLang } from "@/lib/thread";
+import { buildThread, type ThreadLang, type ThreadStep } from "@/lib/thread";
 
 /**
- * Harta, spusă pe rând.
+ * Harta, spusă pe rând -- o frază pe rând.
  *
- * Ce înlocuiește: un panou de unsprezece blocuri, fiecare o cifră mare fără
- * propoziție, toate cu aceeași greutate -- „Drumul Vieții" avea exact cât
- * „Streak: 0 days". Un om care intra prima dată vedea șapte numere și nicio
- * frază care să le lege, așa că nu știa de unde s-o apuce.
+ * Trei corecții succesive au dus aici, și fiecare a fost o lecție:
  *
- * Inversarea care contează: propoziția e conținutul, cifra e semnătura. Acum
- * cifra era titlu de 2rem și textul subtitlu; aici e invers, iar sub fiecare
- * cifră stă o linie care spune DE UNDE vine -- cine n-a auzit niciodată de
- * „Suflet" află că vine din vocalele numelui. Cum se calculează rămâne la
- * /invata: aici nu se predă numerologie, se citește o hartă.
+ * 1. Panoul de dinainte arăta unsprezece blocuri deodată, fiecare o cifră fără
+ *    propoziție. Nimeni nu știa de unde s-o apuce.
+ * 2. Prima versiune a firului a dezvăluit pas cu pas, dar a făcut cifra o notă
+ *    de subsol -- deși ea e chiar lucrul dezvăluit -- și a folosit o singură
+ *    frază din arhetip, deși motorul avea patru.
+ * 3. A doua a pus toate frazele deodată în card. Fiind fiecare densă, se
+ *    anulau: „ești locul unde alții se așază" și „tot ea devine control prin
+ *    grijă" sunt două idei, iar citite lipite nu rămâne niciuna.
  *
- * Poziția se ține în localStorage, per om. Fără ea, „continuă" ar fi o
- * animație, nu o citire care se reia mâine de unde a rămas.
+ * De aceea unitatea dezvăluirii e fraza, nu cardul. Apeși, apare o idee. O
+ * citești. Apeși din nou. Cardul se umple sub ochii tăi, iar când s-a umplut,
+ * următoarea apăsare începe pasul următor.
  */
 
 const seenKey = (fullName: string, birthDate: Date) =>
-  `thread-seen:${fullName.trim().toLowerCase()}:${birthDate.toISOString().slice(0, 10)}`;
+  `thread-beat:${fullName.trim().toLowerCase()}:${birthDate.toISOString().slice(0, 10)}`;
 
-const COPY = {
-  ro: { more: "continuă", done: "Ai citit toată harta.", of: "din" },
-  en: { more: "continue", done: "You have read the whole map.", of: "of" },
-  ru: { more: "продолжить", done: "Вы прочитали всю карту.", of: "из" },
-} as const;
+interface Copy {
+  more: string;
+  next: string;
+  done: string;
+  works: string;
+  breaks: string;
+}
+
+const COPY: Record<ThreadLang, Copy> = {
+  ro: { more: "mai departe", next: "continuă", done: "Ai citit toată harta.", works: "când funcționează", breaks: "când se strică" },
+  en: { more: "go on", next: "continue", done: "You have read the whole map.", works: "when it works", breaks: "when it breaks" },
+  ru: { more: "дальше", next: "продолжить", done: "Вы прочитали всю карту.", works: "когда работает", breaks: "когда ломается" },
+};
+
+type BeatKind = "say" | "works" | "breaks" | "detail" | "plain";
+interface Beat {
+  kind: BeatKind;
+  text: string;
+  step: ThreadStep;
+  /** Al câtelea e în pasul lui; 0 înseamnă că pasul abia începe. */
+  within: number;
+}
+
+/** Un pas se desface în fraze, în ordinea în care se citesc. */
+const beatsOf = (step: ThreadStep): Omit<Beat, "step" | "within">[] => [
+  { kind: "say", text: step.say },
+  ...(step.works ? [{ kind: "works" as const, text: step.works }] : []),
+  ...(step.breaks ? [{ kind: "breaks" as const, text: step.breaks }] : []),
+  ...(step.details ?? []).map((text) => ({ kind: "detail" as const, text })),
+  { kind: "plain", text: step.plain },
+];
 
 export const Thread = ({
   fullName,
@@ -39,31 +66,36 @@ export const Thread = ({
   today?: Date;
 }) => {
   const { language } = useLanguage();
-  const lang = language as ThreadLang;
-  const copy = COPY[lang] ?? COPY.en;
+  const lang = (language in COPY ? language : "en") as ThreadLang;
+  const copy = COPY[lang];
 
   const steps = useMemo(
     () => buildThread(fullName, birthDate, lang, today),
     [fullName, birthDate, lang, today],
   );
 
+  const beats = useMemo<Beat[]>(
+    () =>
+      steps.flatMap((step) =>
+        beatsOf(step).map((b, within) => ({ ...b, step, within })),
+      ),
+    [steps],
+  );
+
   const key = seenKey(fullName, birthDate);
   const [seen, setSeen] = useState(1);
 
-  // Poziția se citește o dată, la montare. Se mărginește la lungimea firului:
-  // dacă motorul emite mai puțini pași decât data trecută, o valoare veche ar
-  // lăsa ecranul gol fără niciun mesaj.
   useEffect(() => {
     try {
       const saved = Number(localStorage.getItem(key));
-      if (Number.isFinite(saved) && saved >= 1) setSeen(Math.min(saved, steps.length));
+      if (Number.isFinite(saved) && saved >= 1) setSeen(Math.min(saved, beats.length));
     } catch {
-      // localStorage indisponibil în unele moduri private; firul pornește de la 1.
+      // localStorage indisponibil în unele moduri private; firul pornește de la prima frază.
     }
-  }, [key, steps.length]);
+  }, [key, beats.length]);
 
   const advance = () => {
-    const next = Math.min(seen + 1, steps.length);
+    const next = Math.min(seen + 1, beats.length);
     setSeen(next);
     try {
       localStorage.setItem(key, String(next));
@@ -72,58 +104,125 @@ export const Thread = ({
     }
   };
 
-  const done = seen >= steps.length;
+  const shown = beats.slice(0, seen);
+  const done = seen >= beats.length;
+
+  // Butonul spune unde duce doar când trece la alt pas. În interiorul unui pas
+  // nu are ce anunța: urmează aceeași idee, dusă mai departe.
+  const current = beats[seen - 1];
+  const upcoming = beats[seen];
+  const crossing = upcoming && upcoming.step.key !== current?.step.key;
+  const label = crossing ? copy.next : copy.more;
+  const teaser = crossing ? current?.step.teaser : undefined;
+
+  // Pașii deschiși, fiecare cu frazele lui dezvăluite până acum.
+  const open = steps
+    .map((step) => ({ step, mine: shown.filter((b) => b.step.key === step.key) }))
+    .filter((g) => g.mine.length > 0);
 
   return (
-    <div className="mx-auto w-full max-w-2xl">
-      <div className="space-y-4">
-        {steps.slice(0, seen).map((step) => (
+    <div className="mx-auto w-full max-w-3xl">
+      <div className="space-y-5">
+        {open.map(({ step, mine }) => (
           <article
             key={step.key}
             data-step={step.key}
-            className="rounded-2xl border border-line bg-surface/70 p-7 shadow-[0_1px_2px_rgba(0,0,0,.06),0_18px_40px_-28px_rgba(0,0,0,.35)] sm:p-9"
+            className="rounded-2xl border border-line bg-surface/70 p-7 shadow-[0_1px_2px_rgba(0,0,0,.06),0_22px_48px_-30px_rgba(0,0,0,.4)] sm:p-10"
           >
-            <span className="mb-4 block text-[0.65rem] uppercase tracking-[0.15em] text-muted-foreground">
+            <span className="mb-6 block text-[0.63rem] uppercase tracking-[0.16em] text-muted-foreground">
               {step.kicker}
             </span>
 
-            {/* Propoziția e conținutul: Literata, mare, cu spațiu în jur. */}
-            <p className="font-heading text-xl leading-relaxed text-foreground sm:text-2xl">
-              {step.say}
-            </p>
-
-            <div className="mt-6 flex items-start gap-3 border-t border-line pt-4">
-              <span className="num shrink-0 pt-0.5 text-base text-primary">{step.figures}</span>
-              <span className="flex flex-col gap-1">
-                <span className="text-sm text-foreground/80">{step.name}</span>
-                <span className="max-w-prose text-sm leading-relaxed text-muted-foreground">
-                  {step.plain}
-                </span>
+            {/* Cifra e prezență, nu semnătură: o vezi înainte de orice text. */}
+            <div className="mb-7 flex items-center gap-5">
+              <span className="num text-6xl leading-none text-primary sm:text-7xl">
+                {step.figures}
               </span>
+              {(step.title || step.keywords?.length) && (
+                <span className="flex min-w-0 flex-col gap-1.5">
+                  {step.title && (
+                    <span className="font-heading text-lg text-foreground sm:text-xl">
+                      {step.title}
+                    </span>
+                  )}
+                  {step.keywords?.length ? (
+                    <span className="text-sm text-muted-foreground">
+                      {step.keywords.join(" · ")}
+                    </span>
+                  ) : null}
+                </span>
+              )}
+            </div>
+
+            <div className="space-y-6">
+              {mine.map((beat) => {
+                if (beat.kind === "say")
+                  return (
+                    <p
+                      key="say"
+                      data-beat="say"
+                      className="font-heading text-xl leading-relaxed text-foreground sm:text-[1.6rem] sm:leading-[1.45]"
+                    >
+                      {beat.text}
+                    </p>
+                  );
+
+                if (beat.kind === "plain")
+                  return (
+                    <p
+                      key="plain"
+                      data-beat="plain"
+                      className="border-t border-line pt-4 text-sm leading-relaxed text-muted-foreground"
+                    >
+                      <span className="text-foreground/70">{step.name}</span> · {beat.text}
+                    </p>
+                  );
+
+                if (beat.kind === "detail")
+                  return (
+                    <p
+                      key={beat.text}
+                      data-beat="detail"
+                      className="flex gap-3 text-[0.98rem] leading-relaxed text-foreground/85"
+                    >
+                      <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-primary" aria-hidden="true" />
+                      <span>{beat.text}</span>
+                    </p>
+                  );
+
+                return (
+                  <div key={beat.kind} data-beat={beat.kind} className="flex flex-col gap-1.5">
+                    <span className="text-[0.63rem] uppercase tracking-[0.16em] text-muted-foreground">
+                      {beat.kind === "works" ? copy.works : copy.breaks}
+                    </span>
+                    <p className="max-w-prose text-[0.98rem] leading-relaxed text-foreground/85">
+                      {beat.text}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
           </article>
         ))}
       </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-4">
-        {!done && (
-          <button
-            type="button"
-            onClick={advance}
-            className="btn-mystic rounded-xl px-5 py-2.5 text-sm"
-          >
-            {copy.more}
+      <div className="mt-7 flex flex-wrap items-center gap-4">
+        {!done ? (
+          <button type="button" onClick={advance} className="btn-mystic rounded-xl px-6 py-3 text-sm">
+            {label}
+            {teaser && <span className="opacity-70"> → {teaser}</span>}
           </button>
+        ) : (
+          <span className="text-sm text-muted-foreground">{copy.done}</span>
         )}
-        {done && <span className="text-sm text-muted-foreground">{copy.done}</span>}
 
         <span className="num text-xs text-muted-foreground">
-          {seen} / {steps.length}
+          {seen} / {beats.length}
         </span>
         <span className="h-px flex-1 bg-line" aria-hidden="true">
           <span
             className="block h-px bg-primary transition-[width] duration-300 motion-reduce:transition-none"
-            style={{ width: `${Math.round((seen / steps.length) * 100)}%` }}
+            style={{ width: `${Math.round((seen / beats.length) * 100)}%` }}
           />
         </span>
       </div>
