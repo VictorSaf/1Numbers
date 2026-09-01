@@ -5,6 +5,11 @@ import { authenticateToken, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
+// Limba în care pleacă push-ul spre acest dispozitiv. Coloana are un CHECK cu
+// aceleași trei valori; validarea aici întoarce un 400 în loc să lase baza să
+// arunce un 500.
+const languageSchema = z.enum(['ro', 'en', 'ru']);
+
 // Store push subscription
 router.post('/subscribe', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
@@ -13,19 +18,25 @@ router.post('/subscribe', authenticateToken, async (req: AuthRequest, res: Respo
       return res.status(401).json({ error: 'User ID not found' });
     }
 
-    const { subscription } = req.body;
+    const { subscription, language } = req.body;
 
     if (!subscription || !subscription.endpoint) {
       return res.status(400).json({ error: 'Invalid subscription data' });
     }
 
+    const parsedLanguage = language === undefined ? 'ro' : languageSchema.safeParse(language);
+    if (parsedLanguage !== 'ro' && !parsedLanguage.success) {
+      return res.status(400).json({ error: 'Invalid language' });
+    }
+    const subscriptionLanguage = parsedLanguage === 'ro' ? 'ro' : parsedLanguage.data;
+
     // Store subscription in database
     await pool.query(
-      `INSERT INTO push_subscriptions (user_id, endpoint, keys, created_at)
-       VALUES ($1, $2, $3, NOW())
+      `INSERT INTO push_subscriptions (user_id, endpoint, keys, language, created_at)
+       VALUES ($1, $2, $3, $4, NOW())
        ON CONFLICT (user_id, endpoint)
-       DO UPDATE SET keys = $3, updated_at = NOW()`,
-      [userId, subscription.endpoint, JSON.stringify(subscription.keys)]
+       DO UPDATE SET keys = $3, language = $4, updated_at = NOW()`,
+      [userId, subscription.endpoint, JSON.stringify(subscription.keys), subscriptionLanguage]
     );
 
     res.json({
