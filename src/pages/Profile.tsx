@@ -30,6 +30,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useProfiles } from '@/hooks/use-profiles';
 import { ProfileSwitcher } from '@/components/ProfileSwitcher';
 import { ProfileComparison } from '@/components/ProfileComparison';
+import { AIConsultant } from '@/components/AIConsultant';
 import { NotificationSettings } from '@/components/NotificationSettings';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -459,6 +460,13 @@ const Profile = () => {
             <ProfileComparison />
           )}
 
+
+          {/* Consultantul stă aici, nu pe pagina de prețuri.
+              Întrebarea „și ce înseamnă asta pentru mine?" se naște în fața
+              propriilor numere, nu în fața unui tabel de tarife. Componenta
+              citește profilul activ, deci ce vede omul pe ecran și ce vede
+              modelul în prompt sunt același lucru. */}
+          <AIConsultant />
           {/* Notification preferences. The component existed with no importer,
               so the whole permission-and-preferences flow was unreachable. */}
           <NotificationSettings />
