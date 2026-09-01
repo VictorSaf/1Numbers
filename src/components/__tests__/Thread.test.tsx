@@ -132,6 +132,25 @@ describe("Thread", () => {
     expect(container.querySelectorAll("[data-beat]")).toHaveLength(1);
   });
 
+  it("îți oferă să reiei de unde ai rămas, fără să te oblige", () => {
+    // Harta are peste șaizeci de apăsări. Pornirea de la capăt e ritualul, dar
+    // fără o cale de întoarcere nimeni n-ar ajunge vreodată la sfârșitul ei.
+    const first = show();
+    go(9);
+    first.unmount();
+
+    const { container } = show();
+    expect(container.querySelectorAll("[data-beat]")).toHaveLength(1);
+
+    fireEvent.click(screen.getByRole("button", { name: /where you left|unde ai rămas/i }));
+    expect(container.querySelectorAll("[data-beat]").length).toBeGreaterThan(1);
+  });
+
+  it("nu oferă întoarcerea cuiva care n-a fost nicăieri", () => {
+    show();
+    expect(screen.queryByRole("button", { name: /where you left/i })).not.toBeInTheDocument();
+  });
+
   it("nu oferă scurtătura cuiva care n-a terminat harta niciodată", () => {
     show();
     go(2);

@@ -19,6 +19,7 @@ const TODAY = new Date(2026, 8, 1);
 type Lang = "ro" | "en" | "ru";
 
 const keys = (steps: ThreadStep[]) => steps.map((s) => s.key);
+const keys_ = keys;
 
 describe("buildThread", () => {
   it("începe întotdeauna cu Drumul Vieții, oricât de banal ar fi", () => {
@@ -107,6 +108,28 @@ describe("buildThread", () => {
     // „Lipsesc 7 și 8" nu spune nimic. Ce înseamnă fiecare, da.
     expect(missing!.details?.length).toBe(missing!.figures.split(" · ").length);
     for (const d of missing!.details!) expect(d.length).toBeGreaterThan(15);
+  });
+
+  it("arată tot ce calculează motorul, nu o șesime din el", () => {
+    // Motorul calcula treizeci de lucruri și firul arăta șase. Sufletul,
+    // Personalitatea și Destinul -- miezul oricărei hărți -- apăreau doar
+    // înăuntrul unui pod, niciodată ca lucruri în sine.
+    const keys = keys_(buildThread(NAME, BIRTH, "ro", TODAY));
+
+    for (const k of [
+      "expression", "soulUrge", "personality", "birthday",
+      "maturity", "attitude", "balance", "subconsciousSelf", "rationalThought",
+    ]) {
+      expect(keys, `lipsește ${k}`).toContain(k);
+    }
+  });
+
+  it("ridică datoriile karmice deasupra pașilor obișnuiți, când există", () => {
+    const steps = buildThread(NAME, BIRTH, "ro", TODAY);
+    const debt = steps.find((s) => s.key === "karmicDebts");
+    if (!debt) return; // harta asta poate să n-aibă -- se testează doar rangul
+    const letters = steps.findIndex((s) => s.key === "letters");
+    expect(steps.findIndex((s) => s.key === "karmicDebts")).toBeLessThan(letters);
   });
 
   it("are cel puțin șase pași, ca firul să merite parcurs", () => {

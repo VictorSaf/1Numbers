@@ -64,6 +64,7 @@ const KICKERS: Record<string, Record<ThreadLang, string>> = {
   missing: { ro: "ce lipsește din hartă", en: "what the map is missing", ru: "чего нет на карте" },
   repeat: { ro: "ce se repetă", en: "what repeats", ru: "что повторяется" },
   letters: { ro: "cele trei litere", en: "the three letters", ru: "три буквы" },
+  you: { ro: "cine ești, pe altă latură", en: "who you are, from another side", ru: "кто вы, с другой стороны" },
 };
 
 /** Explicațiile. Spun DE UNDE vine cifra, nu cum se calculează -- aia e Learn. */
@@ -103,6 +104,61 @@ const PLAIN: Record<string, Record<ThreadLang, string>> = {
     en: "The first letter of your first name, the last of your surname, and the first vowel. How you enter something, how you finish it, and what you feel before you think.",
     ru: "Первая буква имени, последняя фамилии и первая гласная. Как вы входите в дело, как его завершаете и что чувствуете до мысли.",
   },
+
+  // Cele nouă adăugate când firul a trecut de la a arăta o șesime din hartă la
+  // a o arăta întreagă. Textele astea sunt singurul lucru scris de mână aici:
+  // interpretările vin din arhetipuri, dar „de unde vine cifra” nu se poate
+  // compune -- fiecare are altă rețetă.
+  expression: {
+    ro: "Se adună toate literele numelui tău întreg, fiecare cu cifra ei, și se reduce. E numele care ți s-a dat, nu ziua în care te-ai născut.",
+    en: "Every letter of your full name gets a figure; they are added and reduced. This is the name you were given, not the day you were born.",
+    ru: "Каждая буква вашего полного имени имеет цифру; их складывают и сводят. Это данное вам имя, а не день рождения.",
+  },
+  soulUrge: {
+    ro: "Doar vocalele numelui tău. Vocalele sunt sunetele care ies fără ca gura să le oprească — de-aia li se spune partea care nu se vede din afară.",
+    en: "Only the vowels of your name. Vowels are the sounds nothing in the mouth stops — which is why they stand for the part others do not see.",
+    ru: "Только гласные вашего имени. Гласные — звуки, которые ничто не останавливает; поэтому они означают то, чего снаружи не видно.",
+  },
+  personality: {
+    ro: "Doar consoanele. Ele sunt sunetele care se lovesc de ceva ca să existe — partea din tine cu care alții se lovesc prima dată.",
+    en: "Only the consonants. They are the sounds that need something to strike against — the part of you others meet first.",
+    ru: "Только согласные. Это звуки, которым нужно обо что-то удариться, — та часть вас, с которой другие сталкиваются первой.",
+  },
+  birthday: {
+    ro: "Ziua din lună în care te-ai născut, redusă. E singura cifră din hartă pe care n-o poate schimba nimic: nici numele, nici anul.",
+    en: "The day of the month you were born, reduced. It is the one figure nothing can change: not your name, not the year.",
+    ru: "День месяца вашего рождения, сведённый к цифре. Единственное число, которое ничто не меняет: ни имя, ни год.",
+  },
+  maturity: {
+    ro: "Drumul Vieții adunat cu Destinul. E ce iese din ele două puse împreună — de-aia se simte mai mult după patruzeci de ani decât la douăzeci.",
+    en: "Your Life Path added to your Expression. It is what the two make together — which is why it shows more after forty than at twenty.",
+    ru: "Жизненный путь плюс Судьба. Это то, что получается из них вместе, — поэтому оно заметнее после сорока, чем в двадцать.",
+  },
+  attitude: {
+    ro: "Luna și ziua nașterii, adunate. Nu anul — de-aia arată reacția scurtă, cea de dinainte să apuci să gândești.",
+    en: "Your birth month and day, added. Not the year — which is why it shows the quick reaction, the one before you think.",
+    ru: "Месяц и день рождения, сложенные. Без года — поэтому показывает быструю реакцию, ту, что до размышления.",
+  },
+  balance: {
+    ro: "Doar inițialele numelui tău. Se citește când lucrurile se strică — inițialele sunt ce rămâne dintr-un nume când nu mai e timp de tot.",
+    en: "Only the initials of your name. It is read when things break — initials are what remains of a name when there is no time for all of it.",
+    ru: "Только инициалы вашего имени. Читается, когда всё рушится: инициалы — то, что остаётся от имени, когда нет времени на целое.",
+  },
+  subconsciousSelf: {
+    ro: "Nouă minus câte cifre lipsesc din numele tău. Cu cât ai mai multe, cu atât te descurci mai repede când ceva te ia prin surprindere.",
+    en: "Nine minus how many figures are missing from your name. The more you have, the faster you cope when something takes you by surprise.",
+    ru: "Девять минус число отсутствующих цифр в вашем имени. Чем их больше, тем быстрее вы справляетесь с неожиданным.",
+  },
+  rationalThought: {
+    ro: "Primul tău prenume adunat cu ziua nașterii. Arată cum te apuci de o problemă înainte s-o rezolvi: de la fapte sau de la senzație.",
+    en: "Your first name added to your birth day. It shows how you take hold of a problem before solving it: from facts, or from feel.",
+    ru: "Ваше первое имя плюс день рождения. Показывает, как вы берётесь за задачу до решения: от фактов или от ощущения.",
+  },
+  karmicDebts: {
+    ro: "Unele cifre din hartă vin din 13, 14, 16 sau 19 înainte de a fi reduse. Se numesc datorii fiindcă aceleași lucruri se întorc până sunt făcute.",
+    en: "Some figures in your chart come from 13, 14, 16 or 19 before reduction. They are called debts because the same things return until they are done.",
+    ru: "Некоторые числа карты происходят из 13, 14, 16 или 19 до сведения. Их зовут долгами: одно и то же возвращается, пока не сделано.",
+  },
 };
 
 const NAMES: Record<string, Record<ThreadLang, string>> = {
@@ -111,6 +167,16 @@ const NAMES: Record<string, Record<ThreadLang, string>> = {
   karmicLessons: { ro: "Lecții karmice", en: "Karmic lessons", ru: "Кармические уроки" },
   hiddenPassion: { ro: "Pasiunea ascunsă", en: "Hidden Passion", ru: "Скрытая страсть" },
   letters: { ro: "Piatra de Temelie, de Vârf, Prima Vocală", en: "Cornerstone, Capstone, First Vowel", ru: "Краеугольный, Замковый, Первая гласная" },
+  expression: { ro: "Destinul", en: "Expression", ru: "Судьба" },
+  soulUrge: { ro: "Sufletul", en: "Soul Urge", ru: "Душа" },
+  personality: { ro: "Personalitatea", en: "Personality", ru: "Личность" },
+  birthday: { ro: "Ziua nașterii", en: "Birthday", ru: "День рождения" },
+  maturity: { ro: "Maturitatea", en: "Maturity", ru: "Зрелость" },
+  attitude: { ro: "Atitudinea", en: "Attitude", ru: "Отношение" },
+  balance: { ro: "Echilibrul", en: "Balance", ru: "Равновесие" },
+  subconsciousSelf: { ro: "Sinele subconștient", en: "Subconscious Self", ru: "Подсознательное Я" },
+  rationalThought: { ro: "Gândirea rațională", en: "Rational Thought", ru: "Рациональное мышление" },
+  karmicDebts: { ro: "Ce se întoarce", en: "What returns", ru: "Что возвращается" },
 };
 
 const YEAR_LEAD: Record<ThreadLang, (n: number, essence: string) => string> = {
@@ -141,12 +207,25 @@ const TEASERS: Record<string, Record<ThreadLang, string>> = {
   karmicLessons: { ro: "ce lipsește", en: "what is missing", ru: "чего не хватает" },
   hiddenPassion: { ro: "ce se repetă", en: "what repeats", ru: "что повторяется" },
   letters: { ro: "cele trei litere", en: "the three letters", ru: "три буквы" },
+  you: { ro: "cine ești, pe altă latură", en: "who you are, from another side", ru: "кто вы, с другой стороны" },
 };
 
 const MISSING_ONE: Record<ThreadLang, (n: number, essence: string) => string> = {
   ro: (n, e) => `Fără ${n}: ${e}. Nu-ți vine de la sine.`,
   en: (n, e) => `No ${n}: ${e}. It does not come to you on its own.`,
   ru: (n, e) => `Нет ${n}: ${e}. Само это к вам не приходит.`,
+};
+
+const DEBT_LEAD: Record<ThreadLang, (list: number[]) => string> = {
+  ro: (l) => `Harta ta poartă ${l.length === 1 ? "o datorie" : `${l.length} datorii`}: ${l.join(", ")}. Nu e o pedeapsă — e un lucru nefăcut care se tot reprogramează.`,
+  en: (l) => `Your chart carries ${l.length === 1 ? "one debt" : `${l.length} debts`}: ${l.join(", ")}. Not a punishment — something undone that keeps rescheduling itself.`,
+  ru: (l) => `Ваша карта несёт ${l.length === 1 ? "один долг" : `долгов: ${l.length}`}: ${l.join(", ")}. Это не наказание — несделанное, что переносится снова и снова.`,
+};
+
+const DEBT_ONE: Record<ThreadLang, (debt: number, where: string, shadow: string) => string> = {
+  ro: (d, w, sh) => `${d}, pe ${w}: ${sh}`,
+  en: (d, w, sh) => `${d}, on ${w}: ${sh}`,
+  ru: (d, w, sh) => `${d}, на «${w}»: ${sh}`,
 };
 
 const archetype = (n: number) => ARCHETYPES.find((a) => a.n === n) ?? ARCHETYPES[0];
@@ -221,6 +300,66 @@ export function buildThread(
     plain: PLAIN.personalYear[lang],
     rank: year === 1 || year === 9 ? 18 : 8,
   });
+
+  /**
+   * Restul hărții.
+   *
+   * Motorul calcula treizeci de lucruri și firul arăta șase: Sufletul,
+   * Personalitatea și Destinul -- miezul oricărei hărți -- apăreau doar
+   * înăuntrul unui pod, niciodată ca lucruri în sine. Aici se pun toate cele
+   * care se compun dintr-o singură cifră, fiecare cu rangul ei.
+   *
+   * Rangul e distanța față de obișnuit, nu importanța. Destinul e fundamental,
+   * dar îl are toată lumea; un 11 pe orice poziție e rar, deci urcă -- de-aia
+   * numerele-maestru primesc un adaos.
+   */
+  const master = (n: number) => (n === 11 || n === 22 || n === 33 ? 9 : 0);
+
+  const simple = (key: string, n: number, base: number) => {
+    const a = archetype(n);
+    steps.push({
+      key,
+      kicker: KICKERS.you[lang],
+      title: a.title[lang],
+      keywords: a.keywords[lang],
+      say: capitalise(a.essence[lang]) + ".",
+      works: capitalise(a.strength[lang]) + ".",
+      breaks: capitalise(a.shadow[lang]) + ".",
+      figures: String(n),
+      name: NAMES[key][lang],
+      plain: PLAIN[key][lang],
+      rank: base + master(n),
+    });
+  };
+
+  const core = profile.core;
+  const ext = profile.extended;
+
+  simple("expression", core.expression.value, 14);
+  simple("soulUrge", core.soulUrge.value, 13);
+  simple("personality", core.personality.value, 12);
+  simple("maturity", ext.maturity.value, 7);
+  simple("birthday", core.birthday.value, 5);
+  simple("attitude", ext.attitude.value, 4);
+  simple("rationalThought", ext.rationalThought.value, 4);
+  simple("balance", ext.balance.value, 3);
+  simple("subconsciousSelf", ext.subconsciousSelf, 3);
+
+  // Ce se întoarce. Rar, și singurul lucru din hartă pe care oamenii îl caută
+  // singuri -- deci urcă peste contradicții.
+  if (profile.karmicDebts.length > 0) {
+    const d = profile.karmicDebts;
+    steps.push({
+      key: "karmicDebts",
+      kicker: KICKERS.tension[lang],
+      say: DEBT_LEAD[lang](d.map((x) => x.debt)),
+      details: d.map((x) => DEBT_ONE[lang](x.debt, NAMES[x.source]?.[lang] ?? x.source, archetype(x.reduced).shadow[lang])),
+      figures: d.map((x) => String(x.debt)).join(" · "),
+      name: NAMES.karmicDebts[lang],
+      plain: PLAIN.karmicDebts[lang],
+      rank: 22 + d.length,
+    });
+  }
 
   // Ce lipsește. Cu cât lipsesc mai multe, cu atât absența spune mai mult.
   const missing = profile.extended.karmicLessons;

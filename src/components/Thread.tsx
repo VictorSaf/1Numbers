@@ -29,17 +29,20 @@ import { Words } from "@/components/Words";
  */
 
 /**
- * Ce se ține minte NU e unde ai rămas, ci că ai ajuns o dată la capăt.
+ * Se ține minte cât de departe ai ajuns vreodată -- nu ca să pornească de
+ * acolo, ci ca să existe o cale de întoarcere.
  *
- * Poziția salvată omora chiar experiența: odată citită, harta rămânea citită,
- * iar a doua zi nu mai era nimic de descoperit -- doar un teanc de carduri
- * deja deschise. Firul pornește acum de la prima frază de fiecare dată.
+ * Pornirea automată din poziția salvată omora experiența: odată citită, harta
+ * rămânea citită, iar a doua zi nu mai era nimic de descoperit. Firul pornește
+ * de la prima frază de fiecare dată, și asta rămâne.
  *
- * Steagul rămâne pentru un singur motiv: fără el, cine a citit ieri tot ar
- * trebui să apese de douăzeci de ori ca să-și revadă harta.
+ * Dar harta are peste șaizeci de apăsări de când arată tot ce calculează
+ * motorul, nu o șesime. Fără o întoarcere, nimeni n-ar ajunge la capătul ei
+ * niciodată. Deci: pornire de la zero, cu întoarcerea oferită alături -- iar
+ * cine a fost o dată până la capăt primește și saltul direct la hartă.
  */
-const doneKey = (fullName: string, birthDate: Date) =>
-  `thread-done:${fullName.trim().toLowerCase()}:${birthDate.toISOString().slice(0, 10)}`;
+const farKey = (fullName: string, birthDate: Date) =>
+  `thread-far:${fullName.trim().toLowerCase()}:${birthDate.toISOString().slice(0, 10)}`;
 
 interface Copy {
   more: string;
@@ -49,14 +52,16 @@ interface Copy {
   breaks: string;
   /** Scurtătura, pentru cine a mai citit harta o dată. */
   whole: string;
+  /** Întoarcerea, pentru cine a rămas pe drum. */
+  resume: (n: number) => string;
   /** Ieșirea. Harta se citește o dată; ziua, în fiecare zi. */
   today: string;
 }
 
 const COPY: Record<ThreadLang, Copy> = {
-  ro: { more: "mai departe", next: "continuă", done: "Ai citit toată harta.", works: "când funcționează", breaks: "când se strică", whole: "sari la harta întreagă", today: "Vezi ce cere ziua de azi" },
-  en: { more: "go on", next: "continue", done: "You have read the whole map.", works: "when it works", breaks: "when it breaks", whole: "skip to the whole map", today: "See what today asks" },
-  ru: { more: "дальше", next: "продолжить", done: "Вы прочитали всю карту.", works: "когда работает", breaks: "когда ломается", whole: "перейти ко всей карте", today: "Посмотреть, чего требует сегодня" },
+  ro: { more: "mai departe", next: "continuă", done: "Ai citit toată harta.", works: "când funcționează", breaks: "când se strică", whole: "sari la harta întreagă", today: "Vezi ce cere ziua de azi", resume: (n) => `reia de unde ai rămas (${n})` },
+  en: { more: "go on", next: "continue", done: "You have read the whole map.", works: "when it works", breaks: "when it breaks", whole: "skip to the whole map", today: "See what today asks", resume: (n) => `pick up where you left off (${n})` },
+  ru: { more: "дальше", next: "продолжить", done: "Вы прочитали всю карту.", works: "когда работает", breaks: "когда ломается", whole: "перейти ко всей карте", today: "Посмотреть, чего требует сегодня", resume: (n) => `продолжить с того места (${n})` },
 };
 
 type BeatKind = "say" | "works" | "breaks" | "detail" | "plain";
@@ -103,35 +108,41 @@ export const Thread = ({
     [steps],
   );
 
-  const key = doneKey(fullName, birthDate);
+  const key = farKey(fullName, birthDate);
   const [seen, setSeen] = useState(1);
-  const [readBefore, setReadBefore] = useState(false);
+  /** Cel mai departe ajuns vreodată. 0 = niciodată. */
+  const [far, setFar] = useState(0);
 
   useEffect(() => {
     try {
-      setReadBefore(localStorage.getItem(key) === "1");
+      const saved = Number(localStorage.getItem(key));
+      if (Number.isFinite(saved) && saved > 1) setFar(Math.min(saved, beats.length));
     } catch {
-      // localStorage indisponibil în unele moduri private: fără scurtătură.
+      // localStorage indisponibil în unele moduri private: fără întoarcere.
     }
-  }, [key]);
+  }, [key, beats.length]);
 
-  const markRead = () => {
+  const remember = (n: number) => {
+    if (n <= far) return;
+    setFar(n);
     try {
-      localStorage.setItem(key, "1");
+      localStorage.setItem(key, String(n));
     } catch {
-      // Nesalvat înseamnă doar că data viitoare nu apare scurtătura.
+      // Nesalvat înseamnă doar că data viitoare nu apare întoarcerea.
     }
   };
 
   const advance = () => {
     const next = Math.min(seen + 1, beats.length);
     setSeen(next);
-    if (next >= beats.length) markRead();
+    remember(next);
   };
+
+  const resume = () => setSeen(far);
 
   const skipToMap = () => {
     setSeen(beats.length);
-    markRead();
+    remember(beats.length);
   };
 
   const shown = beats.slice(0, seen);
@@ -268,7 +279,17 @@ export const Thread = ({
           </>
         )}
 
-        {!done && readBefore && (
+        {!done && far > seen && far < beats.length && (
+          <button
+            type="button"
+            onClick={resume}
+            className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+          >
+            {copy.resume(far)}
+          </button>
+        )}
+
+        {!done && far >= beats.length && (
           <button
             type="button"
             onClick={skipToMap}
