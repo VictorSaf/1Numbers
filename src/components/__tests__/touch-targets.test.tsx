@@ -52,3 +52,23 @@ describe("antetul pe telefon", () => {
     expect(src).toMatch(/hidden sm:inline|sr-only sm:not-sr-only/);
   });
 });
+
+describe("mărimile butonului", () => {
+  const src = read("components/ui/button.tsx");
+  const sizes = src.slice(src.indexOf("size: {"), src.indexOf("size: {") + 320);
+
+  it("nu coboară nicio mărime sub pragul de atingere", () => {
+    // 44px = h-11. Toate cele patru mărimi îl ating sau îl depășesc, fiindcă
+    // un buton „mic” rămâne un buton apăsat cu degetul.
+    const heights = [...sizes.matchAll(/h-(\d+)/g)].map((m) => Number(m[1]));
+    expect(heights.length).toBeGreaterThanOrEqual(4);
+    for (const h of heights) expect(h).toBeGreaterThanOrEqual(11);
+  });
+
+  it("nu face „mic” mai mare decât „normal”", () => {
+    // Ridicat doar sm la 44, ar fi ieșit mai înalt decât default, care era 40.
+    const h = (key: string) => Number(sizes.match(new RegExp(`${key}: "h-(\\d+)`))?.[1]);
+    expect(h("sm")).toBeLessThanOrEqual(h("default"));
+    expect(h("default")).toBeLessThanOrEqual(h("lg"));
+  });
+});
