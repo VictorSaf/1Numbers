@@ -109,6 +109,19 @@ describe("Today, cartea zilei", () => {
     expect(container.textContent).toContain(reading.card.shadow);
   });
 
+  it("arată chiar cartea, nu doar numele ei", async () => {
+    const { container } = show();
+    await ready();
+
+    const img = container.querySelector("img") as HTMLImageElement | null;
+    expect(img).not.toBeNull();
+    // Fișierul poartă numărul arcanei DIN MOTOR. Motorul are 8 = Dreptatea și
+    // 11 = Forța; pachetul din 1909 le are invers, fiindcă Waite le-a schimbat
+    // locul. Maparea s-a făcut la descărcare, deci aici indicele e al nostru.
+    expect(img!.getAttribute("src")).toBe(`/tarot/${reading.card.n}.jpg`);
+    expect(img!.getAttribute("alt")).toBe(reading.card.title);
+  });
+
   it("arată atmosfera potrivită tonului zilei", async () => {
     const { container } = show();
     await ready();

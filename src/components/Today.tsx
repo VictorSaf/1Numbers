@@ -212,6 +212,28 @@ export const Today = ({
             Lumina și umbra stau alături fiindcă o zi le are pe amândouă, iar o
             aplicație care arată doar partea bună devine un horoscop de ziar. */}
         <div className="mt-8 border-t border-line pt-7">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-7">
+            {/* Cartea, arătată.
+                Scanul ediției originale Rider & Son, 1909 -- domeniu public din
+                31 decembrie 2021, la 70 de ani de la moartea Pamelei Colman
+                Smith. NU recolorarea din 1971, care are drepturi proprii.
+                Numele pachetului e marcă înregistrată, deci nu apare nicăieri:
+                cartea se numește Împărăteasa, care nu e marcă.
+                Fișierele poartă numerele arcanelor DIN MOTORUL NOSTRU. Contează:
+                motorul are 8 = Dreptatea și 11 = Forța, iar pachetul le are
+                invers, fiindcă Waite le-a schimbat locul. Maparea s-a făcut la
+                descărcare, pe identitatea cărții. */}
+            <img
+              src={`/tarot/${reading.card.n}.jpg`}
+              alt={reading.card.title}
+              width={140}
+              height={239}
+              loading="lazy"
+              decoding="async"
+              className="w-[120px] shrink-0 self-start rounded-lg border border-line shadow-[0_10px_30px_-14px_rgba(0,0,0,.6)] sm:w-[140px]"
+            />
+
+            <div className="min-w-0">
           <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
             <span className="num text-sm text-muted-foreground">{copy.card}</span>
             {/* Numărul arcanei NU se scrie: e chiar cifra zilei, deja mare în
@@ -223,7 +245,7 @@ export const Today = ({
             {reading.card.keywords.join(" · ")}
           </p>
 
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 sm:gap-4">
+          <div className="mt-5 grid gap-3 sm:gap-4">
             <div className="rounded-xl border border-harmony/30 bg-harmony/5 p-4">
               <span className="block text-[0.63rem] uppercase tracking-[0.16em] text-harmony">
                 {copy.light}
@@ -239,6 +261,8 @@ export const Today = ({
               <p className="mt-1.5 text-[0.95rem] leading-relaxed text-foreground/85">
                 {reading.card.shadow}
               </p>
+            </div>
+          </div>
             </div>
           </div>
         </div>
