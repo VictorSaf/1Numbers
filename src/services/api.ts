@@ -153,6 +153,27 @@ class ApiService {
     });
   }
 
+  /**
+   * Ziua, scrisă de model o dată pe zi.
+   *
+   * Propozițiile adevărate pleacă de aici -- motorul de arhetipuri stă în
+   * frontend -- iar serverul le dă modelului doar ca să le reformuleze.
+   * Serverul verifică singur ziua personală din data nașterii pe care o are.
+   */
+  async getTodayReading(data: {
+    date: string;
+    language: 'ro' | 'en' | 'ru';
+    personalDay: number;
+    composed: { ziua: string; fric: string; aproape: string; intrebare: string };
+  }) {
+    return this.request<{
+      body: { ziua: string; fric: string; aproape: string; intrebare: string };
+      source: 'model' | 'composed';
+      model?: string;
+      cached: boolean;
+    }>('/today/reading', { method: 'POST', body: data });
+  }
+
   // Journal endpoints
   async createJournalEntry(data: {
     entryType: 'journal' | 'prediction';

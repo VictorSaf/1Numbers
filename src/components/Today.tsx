@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { buildToday, type TodayLang } from "@/lib/today";
 import { Words } from "@/components/Words";
@@ -25,6 +25,8 @@ interface Copy {
   saving: string;
   failed: string;
   entryTitle: (n: number) => string;
+  /** Cât se scrie ziua. O dată pe zi, deci merită spus ce se întâmplă. */
+  writing: string;
 }
 
 const COPY: Record<TodayLang, Copy> = {
@@ -36,6 +38,7 @@ const COPY: Record<TodayLang, Copy> = {
     saving: "se scrie…",
     failed: "Nu s-a putut scrie. Încearcă din nou.",
     entryTitle: (n) => `Ziua ${n}`,
+    writing: "se scrie ziua ta…",
   },
   en: {
     kicker: "your day",
@@ -45,6 +48,7 @@ const COPY: Record<TodayLang, Copy> = {
     saving: "keeping…",
     failed: "Could not keep it. Try again.",
     entryTitle: (n) => `Day ${n}`,
+    writing: "writing your day…",
   },
   ru: {
     kicker: "ваш день",
@@ -54,6 +58,7 @@ const COPY: Record<TodayLang, Copy> = {
     saving: "сохраняем…",
     failed: "Не удалось сохранить. Попробуйте ещё раз.",
     entryTitle: (n) => `День ${n}`,
+    writing: "пишем ваш день…",
   },
 };
 
@@ -75,10 +80,44 @@ export const Today = ({
     [fullName, birthDate, lang, today],
   );
 
+  /**
+   * Textul vine de la server, unde un model îl rescrie în fiecare zi altfel.
+   *
+   * Nu se arată nimic până nu se știe ce se arată. Varianta „pune textul compus
+   * și schimbă-l când sosește al modelului” ar face literele să se schimbe sub
+   * ochii omului -- iar o citire care se rescrie singură nu mai e o citire.
+   * Se întâmplă o dată pe zi; a doua vizită vine din cache, instantaneu.
+   */
+  const [written, setWritten] = useState<{ ziua: string; fric: string; aproape: string; intrebare: string } | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    const composed = {
+      ziua: reading.say,
+      fric: reading.relations.find((r) => r.kind === "friction")?.text ?? reading.relations[0]?.text ?? reading.say,
+      aproape: reading.relations.find((r) => r.kind !== "friction")?.text ?? reading.relations[0]?.text ?? reading.say,
+      intrebare: reading.ask,
+    };
+
+    api
+      .getTodayReading({
+        date: reading.date.toISOString().slice(0, 10),
+        language: lang,
+        personalDay: reading.day,
+        composed,
+      })
+      .then((r) => { if (alive) setWritten(r.body); })
+      // Ziua trebuie să existe. Nu se spune nimic despre eroare: omul n-are ce
+      // face cu ea, iar textul compus spune aceleași fapte.
+      .catch(() => { if (alive) setWritten(composed); });
+
+    return () => { alive = false; };
+  }, [reading, lang]);
+
   // Fraza e unitatea, ca la fir: puse una sub alta, se anulează.
   const beats = useMemo(
-    () => [reading.say, ...reading.relations.map((r) => r.text), reading.plain],
-    [reading],
+    () => (written ? [written.ziua, written.aproape, written.fric, reading.plain] : []),
+    [written, reading.plain],
   );
 
   const [seen, setSeen] = useState(1);
@@ -87,7 +126,7 @@ export const Today = ({
   const [saving, setSaving] = useState(false);
   const [failed, setFailed] = useState(false);
 
-  const done = seen >= beats.length;
+  const done = beats.length > 0 && seen >= beats.length;
 
   const keep = async () => {
     const text = answer.trim();
@@ -118,6 +157,13 @@ export const Today = ({
 
   return (
     <div className="mx-auto flex min-h-[calc(100vh-16rem)] w-full max-w-3xl flex-col justify-center">
+      {!written && (
+        <p className="text-center text-sm text-muted-foreground" role="status">
+          {copy.writing}
+        </p>
+      )}
+
+      {written && (
       <article className="rounded-2xl border border-line bg-surface/70 p-7 shadow-[0_1px_2px_rgba(0,0,0,.06),0_22px_48px_-30px_rgba(0,0,0,.4)] sm:p-10">
         <span className="mb-6 block text-[0.63rem] uppercase tracking-[0.16em] text-muted-foreground">
           {copy.kicker}
@@ -188,8 +234,9 @@ export const Today = ({
           </div>
         )}
       </article>
+      )}
 
-      {!done && (
+      {written && !done && (
         <div className="mt-7 flex items-center gap-4">
           <button
             type="button"

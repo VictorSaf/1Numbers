@@ -14,10 +14,14 @@ import { buildToday } from "@/lib/today";
  */
 
 const create = vi.fn().mockResolvedValue({ success: true, entry: {} });
-vi.mock("@/services/api", () => ({
-  api: { createJournalEntry: (...a: unknown[]) => create(...a) },
-  default: { createJournalEntry: (...a: unknown[]) => create(...a) },
-}));
+const read = vi.fn();
+vi.mock("@/services/api", () => {
+  const svc = {
+    createJournalEntry: (...a: unknown[]) => create(...a),
+    getTodayReading: (...a: unknown[]) => read(...a),
+  };
+  return { api: svc, default: svc };
+});
 
 const NAME = "Victor Ion Safta";
 const BIRTH = new Date(1990, 7, 25);
@@ -34,36 +38,56 @@ const show = () =>
 const said = (el: HTMLElement, text: string) =>
   el.textContent?.replace(/\s+/g, " ").includes(text.replace(/\s+/g, " "));
 const on = () => screen.queryByRole("button", { name: /go on|continue/i });
+/** Textul vine de la server, deci nimic nu e pe ecran înainte de răspuns. */
+const ready = () => waitFor(() => expect(on()).toBeInTheDocument());
 const toEnd = () => { for (let i = 0; i < 20; i++) { const b = on(); if (!b) break; fireEvent.click(b); } };
 
-beforeEach(() => { create.mockClear(); localStorage.clear(); });
+beforeEach(() => {
+  create.mockClear();
+  // Implicit: serverul întoarce exact textul compus, ca testele existente să
+  // vorbească despre ce vorbeau. Cazurile modelului au testele lor mai jos.
+  read.mockReset().mockResolvedValue({
+    body: {
+      ziua: reading.say,
+      fric: reading.relations[1]?.text ?? reading.relations[0].text,
+      aproape: reading.relations[0].text,
+      intrebare: reading.ask,
+    },
+    source: "composed", cached: false,
+  });
+  localStorage.clear();
+});
 
 describe("Today", () => {
-  it("arată cifra zilei tale, mare, de la început", () => {
+  it("arată cifra zilei tale, mare, de la început", async () => {
     const { container } = show();
+    await ready();
 
     expect(screen.getByText(String(reading.day))).toBeInTheDocument();
     expect(screen.getByText(reading.title)).toBeInTheDocument();
     expect(said(container, reading.say)).toBe(true);
   });
 
-  it("încape într-un minut: cel mult șase apăsări", () => {
+  it("încape într-un minut: cel mult șase apăsări", async () => {
     show();
+    await ready();
     let clicks = 0;
     for (let i = 0; i < 20; i++) { const b = on(); if (!b) break; fireEvent.click(b); clicks++; }
 
     expect(clicks).toBeLessThanOrEqual(6);
   });
 
-  it("spune cum întâlnește ziua harta ta", () => {
+  it("spune cum întâlnește ziua harta ta", async () => {
     const { container } = show();
+    await ready();
     toEnd();
 
     for (const rel of reading.relations) expect(said(container, rel.text)).toBe(true);
   });
 
-  it("întreabă abia la capăt, nu peste text", () => {
+  it("întreabă abia la capăt, nu peste text", async () => {
     show();
+    await ready();
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
 
     toEnd();
@@ -73,6 +97,7 @@ describe("Today", () => {
 
   it("scrie răspunsul în jurnal, cu ziua atașată", async () => {
     show();
+    await ready();
     toEnd();
 
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "Am plecat din ședință." } });
@@ -85,8 +110,9 @@ describe("Today", () => {
     expect((sent.numerologyData as Record<string, unknown>).personalDay).toBe(reading.day);
   });
 
-  it("nu trimite un răspuns gol", () => {
+  it("nu trimite un răspuns gol", async () => {
     show();
+    await ready();
     toEnd();
 
     fireEvent.click(screen.getByRole("button", { name: /keep|save/i }));
@@ -95,6 +121,7 @@ describe("Today", () => {
 
   it("după ce ai răspuns, arată ce ai scris, nu caseta", async () => {
     const { container } = show();
+    await ready();
     toEnd();
 
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "Am plecat din ședință." } });
@@ -102,5 +129,41 @@ describe("Today", () => {
 
     await waitFor(() => expect(screen.queryByRole("textbox")).not.toBeInTheDocument());
     expect(said(container, "Am plecat din ședință.")).toBe(true);
+  });
+});
+
+describe("Today, textul scris de model", () => {
+  it("arată ce a scris modelul, nu ce a compus motorul", async () => {
+    const mine = { ...reading.relations.reduce((a, r, i) => a, {}) };
+    read.mockResolvedValue({
+      body: { ziua: "Astăzi contează rezultatul concret.", fric: "F.", aproape: "A.", intrebare: "Î?" },
+      source: "model", model: "claude-sonnet-5", cached: false,
+    });
+    const { container } = show();
+
+    await waitFor(() => expect(said(container, "Astăzi contează rezultatul concret.")).toBe(true));
+    expect(said(container, reading.say)).toBe(false);
+  });
+
+  it("trimite propozițiile compuse, nu doar cifrele", async () => {
+    show();
+    await waitFor(() => expect(read).toHaveBeenCalledTimes(1));
+
+    const sent = read.mock.calls[0][0] as Record<string, unknown>;
+    expect(sent.personalDay).toBe(reading.day);
+    expect((sent.composed as Record<string, string>).ziua).toBe(reading.say);
+  });
+
+  it("arată ziua compusă dacă serverul cade, fără să spună nimic despre eroare", async () => {
+    read.mockRejectedValue(new Error("offline"));
+    const { container } = show();
+
+    await waitFor(() => expect(said(container, reading.say)).toBe(true));
+    expect(container.textContent).not.toMatch(/eroare|error|failed/i);
+  });
+
+  it("nu schimbă textul sub ochii omului: nu arată nimic până nu știe ce arată", () => {
+    const { container } = show();
+    expect(container.querySelectorAll("[data-beat]")).toHaveLength(0);
   });
 });
