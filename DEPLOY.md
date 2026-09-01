@@ -75,9 +75,14 @@ special.
 | `FRONTEND_URL` | CORS cade pe `localhost:8082` |
 | `ALLOW_REGISTRATION` | înregistrarea publică e închisă (403) |
 | `ALLOW_BILLING` | `/subscriptions/create`, `/upgrade`, `/purchase` întorc 403 |
-| `AI_PROVIDER` | `mock`; `openai` sau `anthropic` cer cheia respectivă |
+| `ANTHROPIC_API_KEY` | consultantul AI e indisponibil — `/api/ai/consult` întoarce 503 și interfața spune că nu e disponibil |
 
-Ultimele două sunt închise în producție. Nu există integrare de plată.
+`ALLOW_REGISTRATION` și `ALLOW_BILLING` sunt închise în producție. Nu există
+integrare de plată.
+
+`AI_PROVIDER` nu mai există. Avea implicit valoarea `mock`, ceea ce însemna că
+un server fără cheie întorcea răspunsuri inventate ca și cum ar fi venit de la
+model. Acum furnizorul e unul singur, iar singura întrebare e dacă are cheie.
 
 ## Verificare după deploy
 
