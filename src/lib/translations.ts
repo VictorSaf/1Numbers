@@ -29,6 +29,30 @@ export const translations = {
       linkCopied: "Link copiat!",
       nativeShare: "Distribuie"
     },
+    people: {
+      title: "Oamenii mei",
+      subtitle: "Hărțile pe care le ții: ale tale, ale celor apropiați, ale copiilor, ale firmelor.",
+      all: "Toate",
+      empty: "Nicio hartă aici încă.",
+      aboutSomeoneElse: "Datele acestei persoane le vezi numai tu. Nu sunt trimise nicăieri și le poți șterge oricând.",
+      keepName: "Păstrează numele",
+      keepNameDone: "Numele e păstrat",
+      dateLabel: "Data nașterii",
+      foundedLabel: "Data înființării",
+      categoryLabel: "Ce fel de hartă e",
+      categories: {
+        eu: "Eu",
+        apropiat: "Cineva apropiat",
+        copil: "Copil",
+        afacere: "Afacere",
+      },
+      categoryHints: {
+        eu: "Tu, inclusiv variantele numelui tău.",
+        apropiat: "Partener, familie, prieten.",
+        copil: "Un copil, sau un nume pe care îl alegi pentru unul.",
+        afacere: "O firmă sau un brand. Data e cea a înființării.",
+      },
+    },
     loading: "Se încarcă...",
     // Header
     title: "Numerologia",
@@ -354,6 +378,18 @@ export const translations = {
       good: "Bună",
       neutral: "Neutră",
       challenging: "Provocatoare"
+    },
+    // Navigarea pe zile de pe /azi. Etichete de interfață; ce înseamnă o zi
+    // anume stă în src/lib/dayContent.ts, lângă motor.
+    today: {
+      previousDay: "Ziua precedentă",
+      nextDay: "Ziua următoare",
+      backToToday: "Înapoi la azi",
+      horizonEdge: "Se pot citi 90 de zile în fiecare direcție.",
+      personalDay: "Ziua personală",
+      personalMonth: "Luna personală",
+      universalDay: "Ziua universală",
+      advice: "Ce ai de făcut"
     },
     
     // Lucky Dates
@@ -744,6 +780,16 @@ export const translations = {
       neutral: "Neutral",
       challenging: "Challenging"
     },
+    today: {
+      previousDay: "Previous day",
+      nextDay: "Next day",
+      backToToday: "Back to today",
+      horizonEdge: "You can read 90 days in each direction.",
+      personalDay: "Personal day",
+      personalMonth: "Personal month",
+      universalDay: "Universal day",
+      advice: "What to do"
+    },
     
     // Export & Sharing
     export: {
@@ -773,7 +819,31 @@ export const translations = {
       linkCopied: "Link copied!",
       nativeShare: "Share"
     },
-    
+    people: {
+      title: "My people",
+      subtitle: "The maps you keep: your own, the people close to you, children, businesses.",
+      all: "All",
+      empty: "No maps here yet.",
+      aboutSomeoneElse: "This person's details are visible to you alone. They are sent nowhere, and you can delete them at any time.",
+      keepName: "Keep this name",
+      keepNameDone: "Name kept",
+      dateLabel: "Date of birth",
+      foundedLabel: "Date founded",
+      categoryLabel: "What kind of map this is",
+      categories: {
+        eu: "Me",
+        apropiat: "Someone close",
+        copil: "Child",
+        afacere: "Business",
+      },
+      categoryHints: {
+        eu: "You, including variants of your own name.",
+        apropiat: "Partner, family, friend.",
+        copil: "A child, or a name you are choosing for one.",
+        afacere: "A company or a brand. The date is the founding date.",
+      },
+    },
+
     // Lucky Dates
     luckyDates: {
       title: "Lucky Dates",
@@ -1164,6 +1234,16 @@ export const translations = {
       neutral: "Нейтральная",
       challenging: "Сложная"
     },
+    today: {
+      previousDay: "Предыдущий день",
+      nextDay: "Следующий день",
+      backToToday: "Вернуться к сегодня",
+      horizonEdge: "Можно читать 90 дней в каждую сторону.",
+      personalDay: "Личный день",
+      personalMonth: "Личный месяц",
+      universalDay: "Универсальный день",
+      advice: "Что делать"
+    },
     
     // Export & Sharing
     export: {
@@ -1193,7 +1273,31 @@ export const translations = {
       linkCopied: "Ссылка скопирована!",
       nativeShare: "Поделиться"
     },
-    
+    people: {
+      title: "Мои люди",
+      subtitle: "Карты, которые вы храните: свои, близких, детей, компаний.",
+      all: "Все",
+      empty: "Здесь пока нет карт.",
+      aboutSomeoneElse: "Данные этого человека видите только вы. Они никуда не отправляются, и вы можете удалить их в любой момент.",
+      keepName: "Сохранить это имя",
+      keepNameDone: "Имя сохранено",
+      dateLabel: "Дата рождения",
+      foundedLabel: "Дата основания",
+      categoryLabel: "Какая это карта",
+      categories: {
+        eu: "Я",
+        apropiat: "Близкий человек",
+        copil: "Ребёнок",
+        afacere: "Бизнес",
+      },
+      categoryHints: {
+        eu: "Вы, включая варианты вашего имени.",
+        apropiat: "Партнёр, семья, друг.",
+        copil: "Ребёнок или имя, которое вы для него выбираете.",
+        afacere: "Компания или бренд. Дата — дата основания.",
+      },
+    },
+
     // Lucky Dates
     luckyDates: {
       title: "Удачные Даты",
