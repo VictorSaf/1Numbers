@@ -511,7 +511,7 @@ const Profile = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>{t.deleteProfile}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete your profile? This action cannot be undone.
+              {t.people.deleteConfirm}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
