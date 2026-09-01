@@ -35,6 +35,34 @@ interface User {
  */
 const PLANS = ['free', 'premium', 'pro'] as const;
 
+/**
+ * Codurile serverului, spuse pe limba omului.
+ *
+ * Serverul răspunde cu coduri fiindcă îi vorbește altui program: `email_taken`
+ * e precis, și e pentru noi. Pus într-un toast, e o ghicitoare -- iar exact
+ * asta s-a văzut: un cont creat cu succes, o a doua încercare pe același
+ * email, și un dreptunghi roșu scriind „email_taken”. Omul a înțeles „nu mă
+ * lasă să creez”, nu „ai reușit deja”.
+ *
+ * Ce nu e în tabel rămâne cum vine: un cod necunoscut îmbrăcat într-o
+ * explicație inventată e mai rău decât unul spus ca atare.
+ */
+const SAYS: Record<string, string> = {
+  email_taken: 'That email already has an account. Look for it in the list below.',
+  unknown_plan: 'That plan does not exist. Pick free, premium or pro.',
+  invalid_request:
+    'Something in the form is not accepted. Check the email, and that the password has at least 6 characters.',
+  'Access token required': 'You are signed out. Sign in again and reopen this page.',
+  'Invalid or expired token': 'Your session expired. Sign in again.',
+  'Admin access required': 'This account is not an administrator.',
+};
+
+const human = (raw: unknown): string => {
+  const text = String(raw ?? '');
+  const key = Object.keys(SAYS).find((k) => text.includes(k));
+  return key ? SAYS[key] : text || 'Unknown error.';
+};
+
 export const UsersSection = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -103,7 +131,7 @@ export const UsersSection = () => {
         method: 'PATCH',
         body: JSON.stringify({ plan }),
       });
-      if (!response.ok) throw new Error(String((await readBody(response)).error ?? 'failed'));
+      if (!response.ok) throw new Error(human((await readBody(response)).error));
       toast({ title: 'Plan updated', description: `Now on ${plan}` });
       fetchUsers();
     } catch (error) {
@@ -132,7 +160,7 @@ export const UsersSection = () => {
         body: JSON.stringify(body),
       });
       const data = await readBody(response);
-      if (!response.ok) throw new Error(String(data.error ?? 'failed'));
+      if (!response.ok) throw new Error(human(data.error));
       toast({
         title: 'Account created',
         description: (data.user as { hasMap?: boolean } | undefined)?.hasMap
@@ -172,7 +200,7 @@ export const UsersSection = () => {
       // Lista goală și lista care n-a putut fi citită arată la fel pe ecran, iar
       // „No users found” pentru o cerere respinsă e o minciună liniștită.
       const body = await readBody(response);
-      setListError(String(body.error ?? `The server answered ${response.status}.`));
+      setListError(body.error ? human(body.error) : `The server answered ${response.status}.`);
     } catch (error) {
       setListError(error instanceof Error ? error.message : 'Could not reach the API.');
     } finally {
