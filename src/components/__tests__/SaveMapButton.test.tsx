@@ -76,6 +76,43 @@ describe("SaveMapButton, când serverul refuză", () => {
     expect(said()).toMatch(/could not save|nu s-a putut/i);
   });
 
+  it("oferă s-o țină ca apropiat, nu doar să spună că se poate", async () => {
+    // Un mesaj care descrie o alternativă fără s-o ofere e o instrucțiune, nu
+    // un produs: omul ar trebui să caute singur secțiunea cu oameni.
+    createProfile.mockResolvedValue({ success: false, error: "admin_only" });
+    show();
+    press();
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /keep as someone close|ține ca apropiat/i })).toBeInTheDocument(),
+    );
+  });
+
+  it("o ține chiar ca apropiat, nu ca hartă proprie", async () => {
+    createProfile.mockResolvedValue({ success: false, error: "admin_only" });
+    show();
+    press();
+
+    await waitFor(() => screen.getByRole("button", { name: /keep as someone close/i }));
+    createProfile.mockResolvedValue({ success: true, profile: {} });
+    fireEvent.click(screen.getByRole("button", { name: /keep as someone close/i }));
+
+    await waitFor(() => expect(createProfile).toHaveBeenCalledTimes(2));
+    const second = createProfile.mock.calls[1][0] as Record<string, unknown>;
+    expect(second.category).toBe("apropiat");
+    // O hartă ținută pentru altcineva nu devine harta ta activă.
+    expect(second.setAsActive).toBe(false);
+  });
+
+  it("nu oferă alternativa când refuzul e altul", async () => {
+    createProfile.mockResolvedValue({ success: false, error: "own_map_exists" });
+    show();
+    press();
+
+    await waitFor(() => expect(toast).toHaveBeenCalled());
+    expect(screen.queryByRole("button", { name: /keep as someone close/i })).not.toBeInTheDocument();
+  });
+
   it("spune că s-a salvat, când chiar s-a salvat", async () => {
     createProfile.mockResolvedValue({ success: true, profile: {} });
     show();

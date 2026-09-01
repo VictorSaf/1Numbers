@@ -29,6 +29,8 @@ const COPY = {
     needAccount: "Ai nevoie de un cont",
     needAccountBody: "Creează unul sau conectează-te ca să păstrezi harta.",
     failed: "Nu s-a putut salva",
+    keepClose: "Ține-o ca apropiat",
+    keptClose: "E la oamenii tăi",
   },
   en: {
     save: "Save this map",
@@ -37,6 +39,8 @@ const COPY = {
     needAccount: "You need an account",
     needAccountBody: "Sign in or create one to keep this map.",
     failed: "Could not save",
+    keepClose: "Keep as someone close",
+    keptClose: "Kept with your people",
   },
   ru: {
     save: "Сохранить эту карту",
@@ -45,6 +49,8 @@ const COPY = {
     needAccount: "Нужен аккаунт",
     needAccountBody: "Войдите или создайте аккаунт, чтобы сохранить карту.",
     failed: "Не удалось сохранить",
+    keepClose: "Сохранить как близкого",
+    keptClose: "В разделе близких",
   },
 } as const;
 
@@ -54,7 +60,15 @@ export const SaveMapButton = ({ fullName, birthDate }: { fullName: string; birth
   const { createProfile } = useProfiles();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [state, setState] = useState<"idle" | "saving" | "saved">("idle");
+  /**
+   * „offerClose” apare doar după ce serverul refuză harta proprie.
+   *
+   * Mesajul spunea că harta se poate ține ca om apropiat -- adevărat, dar un
+   * mesaj care descrie o alternativă fără s-o ofere e o instrucțiune, nu un
+   * produs: omul ar trebui să caute singur secțiunea cu oameni și să retasteze
+   * numele și data pe care tocmai le-a citit.
+   */
+  const [state, setState] = useState<"idle" | "saving" | "saved" | "offerClose">("idle");
 
   const t = COPY[language as keyof typeof COPY] ?? COPY.en;
 
@@ -65,16 +79,19 @@ export const SaveMapButton = ({ fullName, birthDate }: { fullName: string; birth
       return;
     }
 
+    const asClose = state === "offerClose";
     setState("saving");
+
     const result = await createProfile({
       fullName,
       birthDate: formatCalendarDate(birthDate),
-      setAsActive: true,
+      // Ținută pentru altcineva, deci nu devine harta ta activă.
+      ...(asClose ? { category: "apropiat" as const, setAsActive: false } : { setAsActive: true }),
     });
 
     if (result.success) {
       setState("saved");
-      toast({ title: t.saved });
+      toast({ title: asClose ? t.keptClose : t.saved });
       return;
     }
 
@@ -86,6 +103,9 @@ export const SaveMapButton = ({ fullName, birthDate }: { fullName: string; birth
     if (human) {
       // Nu e o avarie -- e o regulă. Un toast roșu ar spune altceva.
       toast({ title: human.title, description: human.body });
+      // Refuzul hărții proprii are o ieșire, și ea se pune pe buton. Celelalte
+      // refuzuri n-au: „ai deja harta ta” nu se rezolvă apăsând din nou.
+      if ((result.error ?? "").includes("admin_only") && !asClose) setState("offerClose");
       return;
     }
 
@@ -93,11 +113,17 @@ export const SaveMapButton = ({ fullName, birthDate }: { fullName: string; birth
   };
 
   return (
-    <Button onClick={save} disabled={state !== "idle"} size="lg" className="gap-2">
+    <Button onClick={save} disabled={state === "saving" || state === "saved"} size="lg" className="gap-2">
       {state === "saving" && <Loader2 className="h-4 w-4 animate-spin" />}
       {state === "saved" && <Check className="h-4 w-4" />}
       {state === "idle" && <BookmarkPlus className="h-4 w-4" />}
-      {state === "saving" ? t.saving : state === "saved" ? t.saved : t.save}
+      {state === "saving"
+        ? t.saving
+        : state === "saved"
+          ? t.saved
+          : state === "offerClose"
+            ? t.keepClose
+            : t.save}
     </Button>
   );
 };
