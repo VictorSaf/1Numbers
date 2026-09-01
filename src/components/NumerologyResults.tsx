@@ -27,6 +27,7 @@ import { Chapter, Block, type ChapterMeta } from "@/components/numerology/Chapte
 import { LetterMap } from "@/components/numerology/LetterMap";
 import { ChapterNav } from "@/components/numerology/ChapterNav";
 import { SaveMapButton } from "@/components/numerology/SaveMapButton";
+import { DeepReading } from "@/components/DeepReading";
 import { VedicNumbers } from "@/components/numerology/VedicNumbers";
 import { KuaNumber } from "@/components/numerology/KuaNumber";
 import { KabbalahNumbers } from "@/components/numerology/KabbalahNumbers";
@@ -255,6 +256,11 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
 
   return (
     <div className="lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-10">
+      {/* Citirea întreagă stă înaintea capitolelor: ele explică fiecare număr
+          separat, ea spune ce ies împreună. Cine citește de sus în jos
+          întâlnește întâi întregul, apoi părțile. */}
+      <DeepReading fullName={fullName} birthDate={birthDate} />
+
       <ChapterNav chapters={chapters} />
 
       <div className="space-y-14">
