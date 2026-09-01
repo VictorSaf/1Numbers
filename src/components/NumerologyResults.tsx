@@ -27,6 +27,9 @@ import { Chapter, Block, type ChapterMeta } from "@/components/numerology/Chapte
 import { LetterMap } from "@/components/numerology/LetterMap";
 import { ChapterNav } from "@/components/numerology/ChapterNav";
 import { SaveMapButton } from "@/components/numerology/SaveMapButton";
+import { VedicNumbers } from "@/components/numerology/VedicNumbers";
+import { KuaNumber } from "@/components/numerology/KuaNumber";
+import { KabbalahNumbers } from "@/components/numerology/KabbalahNumbers";
 import { WhenVisible } from "@/components/WhenVisible";
 import {
   CHAPTER_SELF, CHAPTER_TENSION, CHAPTER_LESSONS, CHAPTER_NOW,
@@ -171,7 +174,10 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     stones: { ro: "Cele trei litere", en: "The three letters", ru: "Три буквы" },
     planes: { ro: "Planurile de Expresie", en: "Planes of Expression", ru: "Планы Выражения" },
     matrix: { ro: "Matrița Destinului", en: "Destiny Matrix", ru: "Матрица Судьбы" },
-    parallel: { ro: "Sisteme paralele", en: "Parallel systems", ru: "Параллельные системы" },
+    parallel: { ro: "Numărul compus caldeean", en: "The Chaldean compound number", ru: "Халдейское составное число" },
+    vedic: { ro: "Numerologie vedică (Ank Jyotish)", en: "Vedic numerology (Ank Jyotish)", ru: "Ведическая нумерология (Анк Джьотиш)" },
+    kua: { ro: "Numărul Kua (Feng Shui)", en: "The Kua number (Feng Shui)", ru: "Число Гуа (фэн-шуй)" },
+    kabbalah: { ro: "Kabbalah", en: "Kabbalah", ru: "Каббала" },
     openChaldean: { ro: "Deschide analiza caldeeană", en: "Open the Chaldean analysis", ru: "Открыть халдейский анализ" },
     transits: { ro: "Tranzite și Esență", en: "Transits and Essence", ru: "Транзиты и Сущность" },
     biorhythms: { ro: "Biorritmuri", en: "Biorhythms", ru: "Биоритмы" },
@@ -195,6 +201,9 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     stones: { ro: "Cum intri, cum închei, și ce simți înainte de gând.", en: "How you begin, how you finish, and what you feel before thought.", ru: "Как вы начинаете, как завершаете и что вы чувствуете до мысли." },
     planes: { ro: "Cum se distribuie literele numelui tău pe patru planuri și trei naturi.", en: "How the letters of your name spread across four planes and three natures.", ru: "Как буквы вашего имени распределяются по четырём планам и трём натурам." },
     matrix: { ro: "Cele nouă puncte ale octagramei, calculate din data nașterii.", en: "The nine points of the octagram, drawn from your birth date.", ru: "Девять точек октаграммы, рассчитанных по дате рождения." },
+    vedic: { ro: "Mulank, Bhagyank și Naamank, planetele lor și cum se împacă între ele.", en: "Mulank, Bhagyank and Naamank, their planets, and how they get on.", ru: "Муланк, Бхагьянк и Нааманк, их планеты и то, как они уживаются." },
+    kua: { ro: "Un număr Feng Shui derivat din anul nașterii și cele patru direcții pe care le deschide.", en: "A Feng Shui number drawn from the birth year, and the four directions it opens.", ru: "Число фэн-шуй, выведенное из года рождения, и четыре направления, которые оно открывает." },
+    kabbalah: { ro: "Două sisteme cu același nume și nicio legătură între ele, puse una lângă alta.", en: "Two systems that share a name and nothing else, set side by side.", ru: "Две системы с общим названием и без всякой связи между собой, поставленные рядом." },
     parallel: { ro: "Aceleași litere, citite de alt sistem. Numărul compus caldeean spune altceva decât cel pitagoreic.", en: "The same letters, read by another system. The Chaldean compound says something the Pythagorean one does not.", ru: "Те же буквы, прочитанные другой системой. Халдейское составное число говорит не то же, что пифагорейское." },
     transits: { ro: "Ce literă îți guvernează fiecare an și când Esența întâlnește Anul Personal.", en: "Which letter governs each year, and when Essence meets the Personal Year.", ru: "Какая буква управляет каждым годом и когда Сущность встречает Личный год." },
     biorhythms: { ro: "Ciclurile fizic, emoțional și intelectual pe o lună în jurul zilei de azi.", en: "Physical, emotional and intellectual cycles across a month around today.", ru: "Физический, эмоциональный и интеллектуальный циклы за месяц вокруг сегодняшнего дня." },
@@ -442,10 +451,27 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
             </Suspense>
           </Block>
 
-          {/* /chaldean had no link into it from anywhere in the application --
-              it was reachable by typing the URL. It belongs to this chapter, and
-              this is where the engine's Vedic, Kabbalah and Chaldean numbers
-              will render inline; until then, the link is the entrance. */}
+          {/* The engine's three parallel systems, inline at last.
+              fullProfile computed vedic, kua and kabbalah from the day
+              numerology-plus landed and nothing rendered any of them: a grep for
+              vedicProfile, kuaNumber or hebrewGematria outside
+              src/lib/numerology-plus came back empty. The comment that used to
+              sit here promised these blocks and pointed at /chaldean instead. */}
+          <Block title={sectionLabels.vedic[language]} icon={<Star className="h-5 w-5 text-primary" />} note={teasers.vedic[language]}>
+            <VedicNumbers fullName={fullName} birthDate={birthDate} />
+          </Block>
+
+          <Block title={sectionLabels.kua[language]} icon={<Compass className="h-5 w-5 text-primary" />} note={teasers.kua[language]}>
+            <KuaNumber birthDate={birthDate} />
+          </Block>
+
+          <Block title={sectionLabels.kabbalah[language]} icon={<Type className="h-5 w-5 text-primary" />} note={teasers.kabbalah[language]}>
+            <KabbalahNumbers fullName={fullName} />
+          </Block>
+
+          {/* The Chaldean page keeps its link: it carries the 52-entry compound
+              table, the favourable days and the business-name reading, none of
+              which the three blocks above do. It is depth now, not the entrance. */}
           <Block title={sectionLabels.parallel[language]} icon={<Compass className="h-5 w-5 text-primary" />} note={teasers.parallel[language]}>
             <Link
               to="/chaldean"
