@@ -1,7 +1,7 @@
 // ChaldeanAnalysis Page
 // Display Chaldean numerology analysis with compound numbers
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,6 +23,7 @@ import {
 } from '@/lib/chaldean';
 import { parseCalendarDate } from '@/lib/calendarDate';
 import { PageLayout } from '@/components/layout/PageLayout';
+import { formatCalendarDate } from '@/lib/calendarDate';
 import {
   Star,
   Calendar,
@@ -44,10 +45,30 @@ const ChaldeanAnalysis = () => {
 
   // Birth data lives on the active profile; User carries only id, email, name
   // and createdAt, so these always initialised empty.
-  const [fullName, setFullName] = useState(profileData?.fullName ?? '');
-  const [birthDate, setBirthDate] = useState(profileData ? profileData.birthDate.toISOString().slice(0, 10) : '');
+  const [fullName, setFullName] = useState('');
+  const [birthDate, setBirthDate] = useState('');
   const [businessName, setBusinessName] = useState('');
   const [showResults, setShowResults] = useState(false);
+
+  /**
+   * Profilul sosește după prima randare, deci un `useState(profileData…)` îl
+   * ratează întotdeauna.
+   *
+   * Inițializatorul rulează o singură dată, la montare, când hook-ul de
+   * profiluri încă încarcă și `profileData` e null. Câmpurile rămâneau goale
+   * pentru un om autentificat, iar codul părea să facă precompletarea.
+   *
+   * Aici se umplu când datele ajung, dar numai câmpurile pe care omul nu le-a
+   * atins: altfel, o sosire întârziată ar șterge ce tocmai a tastat.
+   */
+  useEffect(() => {
+    if (!profileData) return;
+    setFullName((v) => v || profileData.fullName);
+    // formatCalendarDate, nu toISOString: acela convertește în UTC și mută
+    // ziua de naștere cu o zi în jumătate din fusurile lumii.
+    setBirthDate((v) => v || formatCalendarDate(profileData.birthDate));
+  }, [profileData]);
+
 
   const translations: Record<string, Record<string, string>> = {
     ro: {

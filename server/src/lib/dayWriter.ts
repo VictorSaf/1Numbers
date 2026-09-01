@@ -30,9 +30,21 @@ export const DAY_WRITER_MODEL = process.env.DAY_WRITER_MODEL || 'claude-sonnet-5
 /** Reformularea a patru fraze; 1500 lasă loc fără să încurajeze eseuri. */
 const MAX_TOKENS = 1500;
 
+/**
+ * Ziua are una sau două relații cu harta, nu întotdeauna două.
+ *
+ * Când există doar un ecou și nicio fricțiune, `fric` și `aproape` primeau
+ * amândouă aceeași propoziție -- clientul cădea pe `relations[0]` pentru
+ * ambele -- iar modelul o reformula de două ori. Pe ecran ieșeau două
+ * paragrafe care spuneau exact același lucru cu alte cuvinte.
+ *
+ * Deci părțile de relație sunt opționale, iar textul are exact atâtea bucăți
+ * câte relații are ziua.
+ */
 export const DAY_PARTS = ['ziua', 'fric', 'aproape', 'intrebare'] as const;
+export const REQUIRED_PARTS = ['ziua', 'intrebare'] as const;
 export type DayPart = (typeof DAY_PARTS)[number];
-export type DayBody = Record<DayPart, string>;
+export type DayBody = Partial<Record<DayPart, string>> & { ziua: string; intrebare: string };
 
 export interface DayFacts {
   personalDay: number;
@@ -60,28 +72,60 @@ NU ai voie să adaugi nimic ce nu e în ele. Fără ședințe, birou, e-mailuri,
 
 Scrii în ${lang} corectă, cu toate semnele diacritice, la persoana a doua. Propoziții de 12-25 de cuvinte. Fără metafore decorative, fără "energii cosmice", fără exclamații, fără emoji, fără titluri.
 
-Răspunzi DOAR cu un obiect JSON cu cheile ziua, fric, aproape, intrebare. Fără text în jurul lui.`;
+Răspunzi DOAR cu un obiect JSON, cu EXACT aceleași chei pe care le-ai primit — nici una în plus, nici una în minus. Fără text în jurul lui.`;
 
 /** Cifrele dintr-un text, ca mulțime. Ordinea și repetarea nu contează. */
 const figuresIn = (s: string): Set<string> => new Set(s.match(/\d+/g) ?? []);
 
-const sameFigures = (source: string, written: string): boolean => {
-  const a = figuresIn(source);
-  const b = figuresIn(written);
-  for (const n of a) if (!b.has(n)) return false;
-  for (const n of b) if (!a.has(n)) return false;
+/**
+ * Regula e asimetrică, și asta e miezul ei.
+ *
+ * Ce e în sursă trebuie păstrat: o frază care pierde „Destinul tău e 1” spune
+ * altceva decât a calculat motorul. Dar ce se ADAUGĂ e îngăduit doar din
+ * mulțimea permisă -- sursa plus ziua personală, care e subiectul întregii
+ * citiri și a plecat în aceeași cerere.
+ *
+ * Simetric, regula cerea modelului să pomenească ziua în fiecare frază; strict
+ * pe sursă, arunca un text corect care spunea „Sufletul tău e 5, ziua cere 3”.
+ */
+const keepsFigures = (source: string, written: string, alsoAllowed: string[] = []): boolean => {
+  const from = figuresIn(source);
+  const to = figuresIn(written);
+  const allowed = new Set([...from, ...alsoAllowed]);
+
+  for (const n of from) if (!to.has(n)) return false;
+  for (const n of to) if (!allowed.has(n)) return false;
   return true;
 };
 
 /** Textul modelului trece doar dacă e întreg și spune aceleași cifre. */
-export const isFaithful = (composed: DayBody, written: unknown): written is DayBody => {
+export const isFaithful = (
+  composed: DayBody,
+  written: unknown,
+  /**
+   * Ziua personală e îngăduită în orice frază, chiar dacă propoziția sursă
+   * n-o conține.
+   *
+   * Ea e subiectul întregii citiri: „Sufletul tău e 5, ziua cere 3” e o
+   * propoziție mai bună decât „Sufletul tău e 5”, iar cifra nu e inventată --
+   * a plecat în aceeași cerere. Prima versiune o respingea ca pe o cifră
+   * străină și arunca un text corect.
+   */
+  personalDay?: number,
+): written is DayBody => {
   if (!written || typeof written !== 'object') return false;
   const w = written as Record<string, unknown>;
-  return DAY_PARTS.every(
+  // Verificate sunt fix părțile trimise: ce n-a plecat n-are ce să se întoarcă.
+  const sent = DAY_PARTS.filter((k) => typeof composed[k] === 'string');
+  return sent.every(
     (k) =>
       typeof w[k] === 'string' &&
       (w[k] as string).trim().length > 10 &&
-      sameFigures(composed[k], w[k] as string),
+      keepsFigures(
+        composed[k] as string,
+        w[k] as string,
+        personalDay === undefined ? [] : [String(personalDay)],
+      ),
   );
 };
 
@@ -106,7 +150,9 @@ export async function writeDay(facts: DayFacts): Promise<DayWritten> {
           role: 'user',
           content:
             'Rescrie astea patru, păstrând cifrele:\n\n' +
-            DAY_PARTS.map((k) => `${k}: ${JSON.stringify(facts.composed[k])}`).join('\n'),
+            DAY_PARTS.filter((k) => facts.composed[k])
+              .map((k) => `${k}: ${JSON.stringify(facts.composed[k])}`)
+              .join('\n'),
         },
       ],
     });
@@ -116,7 +162,7 @@ export async function writeDay(facts: DayFacts): Promise<DayWritten> {
       '';
     const parsed = JSON.parse(text.trim().replace(/^```(?:json)?\s*|\s*```$/g, ''));
 
-    if (!isFaithful(facts.composed, parsed)) {
+    if (!isFaithful(facts.composed, parsed, facts.personalDay)) {
       return { body: facts.composed, source: 'composed' };
     }
 

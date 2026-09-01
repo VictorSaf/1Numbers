@@ -1,7 +1,7 @@
 // Remedies Page
 // Display numerological remedies based on user's numbers
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { parseCalendarDate } from '@/lib/calendarDate';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,6 +16,7 @@ import { getRemedyForNumber, getAllRemedies, getDailyRemedy, NumberRemedy } from
 import { calculateLifePathNumber, calculateDestinyNumber } from '@/lib/numerology';
 import { useProfile } from '@/hooks/use-profile';
 import { PageLayout } from '@/components/layout/PageLayout';
+import { formatCalendarDate } from '@/lib/calendarDate';
 import {
   Sparkles,
   User,
@@ -35,8 +36,28 @@ const Remedies = () => {
 
   // Birth data lives on the active profile; User carries only id, email, name
   // and createdAt, so these always initialised empty.
-  const [birthDate, setBirthDate] = useState(profileData ? profileData.birthDate.toISOString().slice(0, 10) : '');
-  const [fullName, setFullName] = useState(profileData?.fullName ?? '');
+  const [birthDate, setBirthDate] = useState('');
+  const [fullName, setFullName] = useState('');
+
+  /**
+   * Profilul sosește după prima randare, deci un `useState(profileData…)` îl
+   * ratează întotdeauna.
+   *
+   * Inițializatorul rulează o singură dată, la montare, când hook-ul de
+   * profiluri încă încarcă și `profileData` e null. Câmpurile rămâneau goale
+   * pentru un om autentificat, iar codul părea să facă precompletarea.
+   *
+   * Aici se umplu când datele ajung, dar numai câmpurile pe care omul nu le-a
+   * atins: altfel, o sosire întârziată ar șterge ce tocmai a tastat.
+   */
+  useEffect(() => {
+    if (!profileData) return;
+    setFullName((v) => v || profileData.fullName);
+    // formatCalendarDate, nu toISOString: acela convertește în UTC și mută
+    // ziua de naștere cu o zi în jumătate din fusurile lumii.
+    setBirthDate((v) => v || formatCalendarDate(profileData.birthDate));
+  }, [profileData]);
+
   const [selectedNumber, setSelectedNumber] = useState<number | null>(null);
 
   const translations: Record<string, Record<string, string>> = {

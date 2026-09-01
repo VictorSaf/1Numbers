@@ -55,6 +55,46 @@ const GOOD = {
 beforeEach(() => { create.mockReset(); process.env.ANTHROPIC_API_KEY = 'sk-ant-test'; });
 afterEach(() => { delete process.env.ANTHROPIC_API_KEY; delete process.env.DAY_WRITER_MODEL; });
 
+describe('o zi cu o singură relație', () => {
+  // Ziua are una sau două relații cu harta. Cerându-le pe amândouă mereu,
+  // clientul cădea pe aceeași propoziție de două ori, iar modelul o reformula
+  // de două ori: pe ecran ieșeau două paragrafe cu același înțeles.
+  const ONE: DayFacts = {
+    personalDay: 3,
+    language: 'ro',
+    composed: {
+      ziua: 'Ziua asta cere energia expresiei -- ce simți trebuie să iasă în afară.',
+      aproape: 'Sufletul tău e 5 — energia mișcării. Ziua cere ceva din aceeași familie.',
+      intrebare: 'Sufletul tău e 5, ziua e 3. Ce a ieșit din asta azi?',
+    },
+  };
+
+  it('trimite modelului doar părțile care există', async () => {
+    create.mockResolvedValue(modelSays({
+      ziua: 'Astăzi, ce simți are nevoie să iasă.',
+      aproape: 'Sufletul tău e 5: mișcarea. Ziua de 3 cere ceva înrudit.',
+      intrebare: 'Sufletul tău e 5, ziua e 3. Ce a ieșit azi?',
+    }));
+
+    await writeDay(ONE);
+
+    const sent = JSON.stringify(create.mock.calls[0][0].messages);
+    expect(sent).not.toContain('fric:');
+  });
+
+  it('acceptă un răspuns fără partea care n-a fost cerută', async () => {
+    create.mockResolvedValue(modelSays({
+      ziua: 'Astăzi, ce simți are nevoie să iasă.',
+      aproape: 'Sufletul tău e 5: mișcarea. Ziua de 3 cere ceva înrudit.',
+      intrebare: 'Sufletul tău e 5, ziua e 3. Ce a ieșit azi?',
+    }));
+
+    const r = await writeDay(ONE);
+    expect(r.source).toBe('model');
+    expect(r.body.fric).toBeUndefined();
+  });
+});
+
 describe('writeDay', () => {
   it('întoarce textul modelului când e bun', async () => {
     create.mockResolvedValue(modelSays(GOOD));

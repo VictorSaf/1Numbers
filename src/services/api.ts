@@ -164,10 +164,10 @@ class ApiService {
     date: string;
     language: 'ro' | 'en' | 'ru';
     personalDay: number;
-    composed: { ziua: string; fric: string; aproape: string; intrebare: string };
+    composed: { ziua: string; fric?: string; aproape?: string; intrebare: string };
   }) {
     return this.request<{
-      body: { ziua: string; fric: string; aproape: string; intrebare: string };
+      body: { ziua: string; fric?: string; aproape?: string; intrebare: string };
       source: 'model' | 'composed';
       model?: string;
       /** Ce a scris omul ultima dată la aceeași cifră, citat întocmai. */

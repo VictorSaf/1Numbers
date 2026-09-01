@@ -55,8 +55,14 @@ const readingSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   language: z.enum(['ro', 'en', 'ru']),
   personalDay: z.number().int().min(1).max(33),
+  // `fric` și `aproape` sunt opționale: ziua are una sau două relații cu harta,
+  // iar cerându-le pe amândouă mereu, clientul trimitea aceeași propoziție de
+  // două ori și modelul o reformula de două ori.
   composed: z.object({
-    ziua: sentence, fric: sentence, aproape: sentence, intrebare: sentence,
+    ziua: sentence,
+    fric: sentence.optional(),
+    aproape: sentence.optional(),
+    intrebare: sentence,
   }),
 });
 
