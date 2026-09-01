@@ -54,6 +54,24 @@ export const translations = {
       },
       deleteConfirm: "Sigur ștergi această hartă? Nu poți reveni asupra acestei acțiuni.",
     },
+    timing: {
+      title: "Relația în timp",
+      subtitle: "Scorul spune cât de aproape sunteți. Anul și lunile spun unde vă prinde perioada asta.",
+      thisYear: "Anul ăsta",
+      monthByMonth: "Lună de lună",
+      yourYear: "Anul tău personal",
+      theirYear: "Anul lui personal",
+      bands: {
+        harmony: "Vă trageți în aceeași direcție",
+        mixed: "Mergeți în paralel",
+        tension: "Trageți în direcții diferite",
+      },
+      bandHints: {
+        harmony: "Ce vrea unul e și ce vrea celălalt. E perioada în care lucrurile mari se fac ușor.",
+        mixed: "Nici împreună, nici împotrivă. Merge orice, dacă vă spuneți unde sunteți.",
+        tension: "Unul strânge, celălalt desface. Nu e o problemă între voi — e o distanță de ținut minte.",
+      },
+    },
     loading: "Se încarcă...",
     // Header
     title: "Numerologia",
@@ -859,6 +877,24 @@ export const translations = {
       },
       deleteConfirm: "Are you sure you want to delete this map? This action cannot be undone.",
     },
+    timing: {
+      title: "The relationship over time",
+      subtitle: "The score says how close you are. The year and the months say where this stretch of time finds you.",
+      thisYear: "This year",
+      monthByMonth: "Month by month",
+      yourYear: "Your personal year",
+      theirYear: "Their personal year",
+      bands: {
+        harmony: "You are pulling the same way",
+        mixed: "You are running in parallel",
+        tension: "You are pulling different ways",
+      },
+      bandHints: {
+        harmony: "What one of you wants is what the other wants too. This is when the big things get done easily.",
+        mixed: "Neither together nor against. Anything works, as long as you say where you are.",
+        tension: "One of you is gathering, the other is letting go. It is not a fault between you — it is a distance worth remembering.",
+      },
+    },
 
     // Lucky Dates
     luckyDates: {
@@ -1319,6 +1355,24 @@ export const translations = {
         afacere: "Компания или бренд. Дата — дата основания.",
       },
       deleteConfirm: "Вы уверены, что хотите удалить эту карту? Это действие необратимо.",
+    },
+    timing: {
+      title: "Отношения во времени",
+      subtitle: "Оценка говорит, насколько вы близки. Год и месяцы говорят, где вас застаёт это время.",
+      thisYear: "В этом году",
+      monthByMonth: "Месяц за месяцем",
+      yourYear: "Ваш личный год",
+      theirYear: "Его личный год",
+      bands: {
+        harmony: "Вы тянете в одну сторону",
+        mixed: "Вы идёте параллельно",
+        tension: "Вы тянете в разные стороны",
+      },
+      bandHints: {
+        harmony: "Чего хочет один, того хочет и другой. Это время, когда большие дела даются легко.",
+        mixed: "Ни вместе, ни против. Годится что угодно, если вы говорите друг другу, где находитесь.",
+        tension: "Один собирает, другой отпускает. Это не поломка между вами — это расстояние, о котором стоит помнить.",
+      },
     },
 
     // Lucky Dates
