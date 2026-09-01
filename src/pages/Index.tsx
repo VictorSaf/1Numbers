@@ -3,7 +3,7 @@ import { Sparkles, Moon, Sun, Stars } from "lucide-react";
 import { NumerologyForm } from "@/components/NumerologyForm";
 import { FirstVisitPromise, EXAMPLE_NAME, EXAMPLE_BIRTH_DATE } from "@/components/FirstVisitPromise";
 import { NumerologyResults } from "@/components/NumerologyResults";
-import { BentoDashboard } from "@/components/dashboard/BentoDashboard";
+import { Thread } from "@/components/Thread";
 import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -33,15 +33,12 @@ const Index = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(false);
   const [showDashboard, setShowDashboard] = useState(true);
-  const [streak, setStreak] = useState(0);
 
   useEffect(() => {
     if (isAuthenticated) {
       loadProfile();
-      loadStreak();
     } else {
       setProfile(null);
-      setStreak(0);
     }
   }, [isAuthenticated]);
 
@@ -61,17 +58,6 @@ const Index = () => {
       setProfile(null);
     } finally {
       setLoadingProfile(false);
-    }
-  };
-
-  const loadStreak = async () => {
-    try {
-      const response = await api.getStreak();
-      if (response.success && response.streak !== undefined) {
-        setStreak(response.streak);
-      }
-    } catch (error) {
-      console.error('Error loading streak:', error);
     }
   };
 
@@ -126,14 +112,22 @@ const Index = () => {
           </div>
         )}
 
-        {/* Bento Dashboard for authenticated users with profile */}
+        {/* Harta, spusă pe rând.
+            Aici era un panou de unsprezece blocuri, fiecare o cifră mare fără
+            propoziție, toate cu aceeași greutate: Drumul Vieții cântărea exact
+            cât „Streak: 0 days". Cine intra prima dată vedea șapte numere și
+            nicio frază care să le lege.
+            Firul spune un lucru, apoi următorul, în ordinea în care fiecare
+            fapt distinge harta asta de oricare alta. Ce a plecat de aici --
+            grila Lo Shu, calendarul lunar, compatibilitatea -- are deja o
+            adresă proprie în navigație. */}
         {shouldShowDashboard && !loadingProfile && (
-          <BentoDashboard
-            fullName={profile.fullName}
-            birthDate={parseCalendarDate(profile.birthDate)}
-            userName={user?.email?.split('@')[0] || profile.fullName}
-            streak={streak}
-          />
+          <div className="pt-2">
+            <Thread
+              fullName={profile.fullName}
+              birthDate={parseCalendarDate(profile.birthDate)}
+            />
+          </div>
         )}
 
         {/* Form for new calculations */}

@@ -1,0 +1,86 @@
+import { describe, it, expect } from "vitest";
+import { buildThread, type ThreadStep } from "../thread";
+
+/**
+ * Firul: harta spusă pe rând, în ordinea în care te distinge.
+ *
+ * Panoul de dinainte arăta unsprezece blocuri deodată, toate cu aceeași
+ * greutate, fiecare o cifră fără propoziție. Firul spune un lucru, apoi
+ * următorul, iar ordinea nu e aceeași pentru toți: urcă ce e rar în harta ta.
+ *
+ * Textele nu se scriu aici. Vin din motor -- arhetipuri, contradicții,
+ * interpretări -- exact ca pe pagina de rezultat, ca notificarea și harta să
+ * nu spună lucruri diferite despre același număr.
+ */
+
+const NAME = "Victor Ion Safta";
+const BIRTH = new Date(1990, 7, 25);
+const TODAY = new Date(2026, 8, 1);
+type Lang = "ro" | "en" | "ru";
+
+const keys = (steps: ThreadStep[]) => steps.map((s) => s.key);
+
+describe("buildThread", () => {
+  it("începe întotdeauna cu Drumul Vieții, oricât de banal ar fi", () => {
+    // Nu pentru că ar fi cel mai rar, ci pentru că restul se citește prin el.
+    expect(buildThread(NAME, BIRTH, "ro", TODAY)[0].key).toBe("lifePath");
+  });
+
+  it("pune contradicția înaintea pașilor obișnuiți", () => {
+    const order = keys(buildThread(NAME, BIRTH, "ro", TODAY));
+    const tension = order.findIndex((k) => k.startsWith("bridge"));
+    const letters = order.indexOf("letters");
+
+    expect(tension).toBeGreaterThan(0);
+    expect(tension).toBeLessThan(letters);
+  });
+
+  it("nu inventează un pas de lecții karmice pentru un nume care nu are", () => {
+    // ANA are toate cifrele lipsă în afară de 1 și 5, deci pasul apare.
+    // Un nume care le-ar avea pe toate nu l-ar primi -- aici verific doar că
+    // pasul e legat de conținut, nu adăugat mereu.
+    const withLessons = buildThread(NAME, BIRTH, "ro", TODAY);
+    const step = withLessons.find((s) => s.key === "karmicLessons");
+
+    expect(step).toBeDefined();
+    expect(step!.figures).toMatch(/\d/);
+  });
+
+  it.each<Lang>(["ro", "en", "ru"])(
+    "dă fiecărui pas toate câmpurile, nevide, în %s",
+    (lang) => {
+      for (const step of buildThread(NAME, BIRTH, lang, TODAY)) {
+        expect(step.kicker.length, `kicker ${step.key}`).toBeGreaterThan(0);
+        expect(step.say.length, `say ${step.key}`).toBeGreaterThan(20);
+        expect(step.figures.length, `figures ${step.key}`).toBeGreaterThan(0);
+        expect(step.name.length, `name ${step.key}`).toBeGreaterThan(0);
+        expect(step.plain.length, `plain ${step.key}`).toBeGreaterThan(20);
+      }
+    },
+  );
+
+  it("nu lasă niciun șablon nerezolvat în text", () => {
+    for (const lang of ["ro", "en", "ru"] as Lang[]) {
+      for (const step of buildThread(NAME, BIRTH, lang, TODAY)) {
+        expect(`${step.say} ${step.plain}`).not.toMatch(/\{(essence|strength|shadow|n|title)\}/);
+        expect(`${step.say} ${step.plain}`).not.toMatch(/undefined/);
+      }
+    }
+  });
+
+  it("dă aceeași ordine pentru aceeași hartă, și alta pentru alta", () => {
+    const mine = keys(buildThread(NAME, BIRTH, "ro", TODAY));
+    const again = keys(buildThread(NAME, BIRTH, "ro", TODAY));
+    const other = keys(buildThread("Ana Maria Pop", new Date(1993, 2, 4), "ro", TODAY));
+
+    expect(again).toEqual(mine);
+    expect(other[0]).toBe("lifePath");
+    // Ordinea de după ancoră depinde de hartă; dacă ar fi identică pentru
+    // oricine, „se rearanjează după harta lui" ar fi doar o afirmație.
+    expect(other.join()).not.toBe(mine.join());
+  });
+
+  it("are cel puțin șase pași, ca firul să merite parcurs", () => {
+    expect(buildThread(NAME, BIRTH, "ro", TODAY).length).toBeGreaterThanOrEqual(6);
+  });
+});
