@@ -27,16 +27,16 @@ export interface HumanError {
 const MESSAGES: Record<string, Record<ProfileErrorLang, { title: string; body: string }>> = {
   admin_only: {
     ro: {
-      title: 'Hărțile le face administratorul',
-      body: 'Poți citi harta oricând, dar salvarea în cont o face administratorul. Scrie-i și ți-o pune el.',
+      title: 'Harta ta o pune administratorul',
+      body: 'Harta proprie e legată de contul tău, așa că o pune administratorul. Poți în schimb să ții harta asta ca om apropiat, în secțiunea cu oameni.',
     },
     en: {
-      title: 'Maps are created by the administrator',
-      body: 'You can read the map any time, but saving it to an account is done by the administrator. Ask them and they will add it.',
+      title: 'Your own map is set up by the administrator',
+      body: 'Your own map is tied to your account, so an administrator sets it. You can instead keep this map as someone close, in the people section.',
     },
     ru: {
-      title: 'Карты создаёт администратор',
-      body: 'Карту можно читать всегда, но сохранение в аккаунт делает администратор. Напишите ему, и он её добавит.',
+      title: 'Вашу карту создаёт администратор',
+      body: 'Своя карта привязана к аккаунту, поэтому её задаёт администратор. Зато эту карту можно сохранить как близкого человека, в разделе людей.',
     },
   },
   own_map_exists: {

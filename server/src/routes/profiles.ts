@@ -94,12 +94,15 @@ router.get('/all', authenticateToken, async (req: AuthRequest, res: Response) =>
 
 // Create new profile (always creates, never updates)
 /**
- * Profilurile le creează adminul, nu utilizatorul.
+ * Harta proprie o dă adminul. Restul hărților sunt ale utilizatorului.
  *
- * Odată creat, numele și data nașterii de pe harta proprie nu se mai schimbă
- * (vezi PUT mai jos). Dacă utilizatorul ar putea crea profiluri, regula aia ar
- * fi o sugestie: își face altul și îl activează. Cele două reguli țin doar
- * împreună.
+ * O hartă `eu` leagă o persoană de platformă -- ea E accesul, iar accesul se
+ * acordă, nu se ia. Plus: numele și data de pe ea nu se mai schimbă odată puse
+ * (vezi PUT mai jos), iar dacă utilizatorul și-ar putea face alta, regula aia
+ * ar fi o sugestie. Cele două țin doar împreună.
+ *
+ * O hartă de copil, apropiat sau afacere nu dă acces nimănui: e a lui, ținută
+ * pentru altcineva. N-are de ce să treacă pe la administrator.
  *
  * Rolul se citește din baza de date, nu din token: un token semnat acum șapte
  * zile pentru cineva între timp retrogradat nu mai deschide nimic.
@@ -107,14 +110,6 @@ router.get('/all', authenticateToken, async (req: AuthRequest, res: Response) =>
 router.post('/me', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId;
-
-    const who = await pool.query('SELECT role FROM users WHERE id = $1', [userId]);
-    if (who.rows[0]?.role !== 'admin') {
-      return res.status(403).json({
-        error: 'admin_only',
-        message: 'Profiles are created by an administrator.',
-      });
-    }
     const parsed = profileSchema.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({ error: 'Invalid profile', details: parsed.error.issues });
@@ -127,6 +122,14 @@ router.post('/me', authenticateToken, async (req: AuthRequest, res: Response) =>
      * faci activ.
      */
     if (category === 'eu') {
+      const who = await pool.query('SELECT role FROM users WHERE id = $1', [userId]);
+      if (who.rows[0]?.role !== 'admin') {
+        return res.status(403).json({
+          error: 'admin_only',
+          message: 'Your own map is set up by an administrator.',
+        });
+      }
+
       const own = await pool.query(
         "SELECT id FROM user_profiles WHERE user_id = $1 AND category = 'eu' LIMIT 1",
         [userId],

@@ -91,14 +91,32 @@ describe('profilurile le creează adminul, nu utilizatorul', () => {
   );
   const NEW = { fullName: 'Om Nou', birthDate: '1990-01-01', category: 'eu' };
 
-  it('refuză unui utilizator obișnuit crearea unui profil', async () => {
-    // Rolul se citește din bază, nu din token: un token vechi al cuiva retrogradat
-    // nu mai deschide nimic.
+  it('refuză unui utilizator obișnuit o hartă proprie nouă', async () => {
+    // O hartă „eu” leagă o persoană de platformă -- ea E accesul, și de-aia o
+    // dă adminul. Rolul se citește din bază, nu din token: un token vechi al
+    // cuiva retrogradat între timp nu mai deschide nimic.
     vi.mocked(pool.query).mockResolvedValueOnce({ rows: [{ role: 'user' }], rowCount: 1 } as never);
 
     const res = await create(token, NEW).expect(403);
     expect(res.body.error).toBe('admin_only');
   });
+
+  it.each(['copil', 'apropiat', 'afacere'])(
+    'lasă utilizatorul să-și țină harta unui %s',
+    async (category) => {
+      // Harta copilului tău nu dă acces nimănui: e a ta, ținută pentru el.
+      vi.mocked(pool.query).mockResolvedValueOnce({ rows: [{ role: 'user' }], rowCount: 1 } as never);
+      const client = { query: vi.fn(), release: vi.fn() };
+      client.query
+        .mockResolvedValueOnce({} as never)
+        .mockResolvedValueOnce({ rows: [{ count: '1' }], rowCount: 1 } as never)
+        .mockResolvedValueOnce({ rows: [{ id: PROFILE_ID }], rowCount: 1 } as never)
+        .mockResolvedValueOnce({} as never);
+      (pool as unknown as { connect: unknown }).connect = vi.fn().mockResolvedValue(client);
+
+      await create(token, { fullName: 'Copilul Meu', birthDate: '2015-03-04', category }).expect(201);
+    },
+  );
 
   it('nu se lasă păcălită de un rol scris în token', async () => {
     const faked = jwt.sign({ userId: USER_ID, email: 'a@b.ro', role: 'admin' }, process.env.JWT_SECRET!);
