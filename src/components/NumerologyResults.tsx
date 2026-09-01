@@ -256,14 +256,21 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
 
   return (
     <div className="lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-10">
-      {/* Citirea întreagă stă înaintea capitolelor: ele explică fiecare număr
-          separat, ea spune ce ies împreună. Cine citește de sus în jos
-          întâlnește întâi întregul, apoi părțile. */}
-      <DeepReading fullName={fullName} birthDate={birthDate} />
-
       <ChapterNav chapters={chapters} />
 
       <div className="space-y-14">
+        {/* Citirea întreagă stă înaintea capitolelor: ele explică fiecare număr
+            separat, ea spune ce ies împreună. Cine citește de sus în jos
+            întâlnește întâi întregul, apoi părțile.
+
+            În coloana de conținut, nu lângă ea. Grila de aici are exact două
+            coloane -- 13rem pentru navigație, restul pentru text -- iar pusă ca
+            frate, citirea lua coloana navigației și împingea totul cu un loc
+            mai încolo: pe desktop, tot raportul se strângea în treisprezece
+            rem. Pe telefon nu se vedea nimic, fiindcă acolo grila nici nu e
+            grilă. */}
+        <DeepReading fullName={fullName} birthDate={birthDate} />
+
         <div className="text-center space-y-4 opacity-0 animate-fade-in">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
             <Star className="h-4 w-4 text-primary" />
