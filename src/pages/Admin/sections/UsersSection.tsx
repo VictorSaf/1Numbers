@@ -40,7 +40,22 @@ export const UsersSection = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [creating, setCreating] = useState(false);
-  const [form, setForm] = useState({ email: '', name: '', password: '', plan: 'free' });
+  /**
+ * Contul și harta, dintr-o singură acțiune.
+ *
+ * Utilizatorul nu-și mai poate face harta proprie -- ea E accesul, iar accesul
+ * se acordă. Deci ăsta e singurul loc din care harta cuiva poate lua ființă,
+ * și trebuie să ia numele de naștere cu data. Împreună sau deloc: serverul
+ * refuză jumătate de hartă, fiindcă jumătate de hartă nu e o hartă.
+ */
+  const [form, setForm] = useState({
+    email: '',
+    name: '',
+    password: '',
+    plan: 'free',
+    birthName: '',
+    birthDate: '',
+  });
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
 
@@ -76,15 +91,28 @@ export const UsersSection = () => {
     if (saving) return;
     setSaving(true);
     try {
+      // Câmpurile de hartă pleacă doar dacă sunt amândouă completate: goale,
+      // ar fi picat validarea „împreună sau deloc”.
+      const { birthName, birthDate, ...account } = form;
+      const body =
+        birthName.trim() && birthDate
+          ? { ...account, birthName: birthName.trim(), birthDate }
+          : account;
+
       const response = await authFetch('/admin/users', {
         method: 'POST',
-        body: JSON.stringify(form),
+        body: JSON.stringify(body),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? 'failed');
-      toast({ title: 'Account created', description: `${form.email} on ${form.plan}` });
+      toast({
+        title: 'Account created',
+        description: data.user?.hasMap
+          ? `${form.email} on ${form.plan}, with their map`
+          : `${form.email} on ${form.plan} — no map yet`,
+      });
       // Parola nu rămâne în memoria paginii după ce a plecat.
-      setForm({ email: '', name: '', password: '', plan: 'free' });
+      setForm({ email: '', name: '', password: '', plan: 'free', birthName: '', birthDate: '' });
       setCreating(false);
       fetchUsers();
     } catch (error) {
@@ -217,19 +245,34 @@ export const UsersSection = () => {
                 aria-label="Plan"
                 value={form.plan}
                 onChange={(e) => setForm({ ...form, plan: e.target.value })}
-                className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                className="h-11 rounded-md border border-input bg-background px-3 text-sm"
               >
                 {PLANS.map((p) => (
                   <option key={p} value={p}>{p}</option>
                 ))}
               </select>
+
+              <Input
+                placeholder="Full name at birth (for the map)"
+                value={form.birthName}
+                onChange={(e) => setForm({ ...form, birthName: e.target.value })}
+              />
+              <Input
+                type="date"
+                aria-label="Date of birth"
+                max={new Date().toISOString().slice(0, 10)}
+                value={form.birthDate}
+                onChange={(e) => setForm({ ...form, birthDate: e.target.value })}
+              />
             </div>
             <div className="mt-4 flex items-center gap-3">
               <Button onClick={createUser} disabled={saving || !form.email || form.password.length < 6}>
                 {saving ? 'Creating…' : 'Create account'}
               </Button>
               <span className="text-sm text-muted-foreground">
-                The password is hashed the same way public registration hashes it.
+                {form.birthName.trim() || form.birthDate
+                  ? 'Birth name and date go together — half a map is not a map.'
+                  : 'Leave the birth fields empty to create the account without a map.'}
               </span>
             </div>
           </CardContent>
