@@ -29,6 +29,8 @@ import { ro, enUS, ru } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BirthDateSelect } from "@/components/BirthDateSelect";
+import { RelationshipTimingCard } from "@/components/compatibility/RelationshipTimingCard";
+import { calculateRelationshipTiming, type RelationshipTiming } from "@/lib/relationshipTiming";
 
 interface PersonData {
   fullName: string;
@@ -44,6 +46,7 @@ const Compatibility = () => {
   const [person2, setPerson2] = useState<PersonData>({ fullName: "", birthDate: undefined });
   const [result, setResult] = useState<CompatibilityResult | null>(null);
   const [detailedResult, setDetailedResult] = useState<DetailedCompatibilityResult | null>(null);
+  const [timing, setTiming] = useState<RelationshipTiming | null>(null);
   const [relationshipType, setRelationshipType] = useState<RelationshipType>("romantic");
   const [isCalendar1Open, setIsCalendar1Open] = useState(false);
   const [isCalendar2Open, setIsCalendar2Open] = useState(false);
@@ -70,6 +73,10 @@ const Compatibility = () => {
         { fullName: person2.fullName, birthDate: person2.birthDate }
       );
       setResult(baseCompatibility);
+
+      // Stratul temporal stă lângă scor, nu în el: aceleași două date de
+      // naștere, citite prin anul și lunile personale ale fiecăruia.
+      setTiming(calculateRelationshipTiming(person1.birthDate, person2.birthDate));
 
       // Calculate detailed compatibility based on relationship type
       let detailed: DetailedCompatibilityResult;
@@ -113,6 +120,7 @@ const Compatibility = () => {
     setPerson2({ fullName: "", birthDate: undefined });
     setResult(null);
     setDetailedResult(null);
+    setTiming(null);
   };
 
   const getScoreColor = (score: number) => {
@@ -300,6 +308,14 @@ const Compatibility = () => {
               {/* Relationship Dynamics Card */}
               {detailedResult && (
                 <RelationshipDynamicsCard compatibility={detailedResult} />
+              )}
+
+              {timing && (
+                <RelationshipTimingCard
+                  timing={timing}
+                  name1={person1.fullName}
+                  name2={person2.fullName}
+                />
               )}
 
               {/* Share Compatibility */}
