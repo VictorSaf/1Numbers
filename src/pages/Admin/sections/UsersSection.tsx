@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Search, Shield, User as UserIcon, MoreVertical } from 'lucide-react';
+import { Search, Shield, User as UserIcon, MoreVertical, UserPlus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -19,13 +19,84 @@ interface User {
   name: string;
   role: string;
   createdAt: string;
+  /** free | premium | pro. Cine n-are abonament activ apare ca free. */
+  plan?: string;
 }
+
+/**
+ * Rolul și planul sunt lucruri diferite, și panoul le ține separate.
+ *
+ * Rolul spune cine poate administra; planul spune ce a cumpărat. Un admin pe
+ * plan free e combinația obișnuită aici. Amestecate într-un singur selector,
+ * ar deveni imposibil de exprimat.
+ *
+ * Nimic din aplicație nu aplică încă planurile: setarea lor e o decizie
+ * înregistrată, nu o poartă închisă. Se vede în badge, ca să nu pară altfel.
+ */
+const PLANS = ['free', 'premium', 'pro'] as const;
 
 export const UsersSection = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [creating, setCreating] = useState(false);
+  const [form, setForm] = useState({ email: '', name: '', password: '', plan: 'free' });
+  const [saving, setSaving] = useState(false);
   const { toast } = useToast();
+
+  const authFetch = (path: string, init: RequestInit = {}) =>
+    fetch(`${API_BASE}${path}`, {
+      ...init,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+        ...(init.headers ?? {}),
+      },
+    });
+
+  const updateUserPlan = async (userId: number, plan: string) => {
+    try {
+      const response = await authFetch(`/admin/users/${userId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ plan }),
+      });
+      if (!response.ok) throw new Error((await response.json()).error ?? 'failed');
+      toast({ title: 'Plan updated', description: `Now on ${plan}` });
+      fetchUsers();
+    } catch (error) {
+      toast({
+        title: 'Could not change the plan',
+        description: error instanceof Error ? error.message : 'unknown error',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const createUser = async () => {
+    if (saving) return;
+    setSaving(true);
+    try {
+      const response = await authFetch('/admin/users', {
+        method: 'POST',
+        body: JSON.stringify(form),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? 'failed');
+      toast({ title: 'Account created', description: `${form.email} on ${form.plan}` });
+      // Parola nu rămâne în memoria paginii după ce a plecat.
+      setForm({ email: '', name: '', password: '', plan: 'free' });
+      setCreating(false);
+      fetchUsers();
+    } catch (error) {
+      toast({
+        title: 'Could not create the account',
+        description: error instanceof Error ? error.message : 'unknown error',
+        variant: 'destructive',
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const fetchUsers = async () => {
     try {
@@ -109,8 +180,61 @@ export const UsersSection = () => {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-heading font-bold mb-2">Users</h2>
-        <p className="text-muted-foreground">Manage user accounts and roles</p>
+        <p className="text-muted-foreground">Manage accounts, roles and plans</p>
       </div>
+
+      <Card className="card-mystic">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">New account</CardTitle>
+            <Button variant={creating ? 'ghost' : 'default'} onClick={() => setCreating(!creating)}>
+              <UserPlus className="mr-2 h-4 w-4" />
+              {creating ? 'Cancel' : 'Create user'}
+            </Button>
+          </div>
+        </CardHeader>
+        {creating && (
+          <CardContent>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Input
+                type="email"
+                placeholder="Email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+              />
+              <Input
+                placeholder="Name (optional)"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+              />
+              <Input
+                type="password"
+                placeholder="Password (at least 6 characters)"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+              />
+              <select
+                aria-label="Plan"
+                value={form.plan}
+                onChange={(e) => setForm({ ...form, plan: e.target.value })}
+                className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+              >
+                {PLANS.map((p) => (
+                  <option key={p} value={p}>{p}</option>
+                ))}
+              </select>
+            </div>
+            <div className="mt-4 flex items-center gap-3">
+              <Button onClick={createUser} disabled={saving || !form.email || form.password.length < 6}>
+                {saving ? 'Creating…' : 'Create account'}
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                The password is hashed the same way public registration hashes it.
+              </span>
+            </div>
+          </CardContent>
+        )}
+      </Card>
 
       <Card className="card-mystic">
         <CardHeader>
@@ -152,6 +276,16 @@ export const UsersSection = () => {
                   <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
                     {user.role}
                   </Badge>
+                  <select
+                    aria-label={`Plan for ${user.email}`}
+                    value={user.plan ?? 'free'}
+                    onChange={(e) => updateUserPlan(user.id, e.target.value)}
+                    className="h-8 rounded-md border border-input bg-background px-2 text-sm"
+                  >
+                    {PLANS.map((p) => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
                   <div className="text-sm text-muted-foreground">
                     {user.createdAt
                       ? new Date(user.createdAt).toLocaleDateString()

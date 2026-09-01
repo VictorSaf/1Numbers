@@ -1,5 +1,6 @@
 import { Router, Response } from 'express';
 import { z } from 'zod';
+import bcrypt from 'bcrypt';
 import { withoutSecrets } from '../lib/mcpConfig';
 import pool from '../db';
 import { authenticateToken, requireAdmin, AuthRequest } from '../middleware/auth';
@@ -132,10 +133,17 @@ router.get('/dashboard', async (req: AuthRequest, res: Response) => {
 // GET /api/admin/users - List all users
 router.get('/users', async (req: AuthRequest, res: Response) => {
   try {
+    // Planul vine alături de rol fiindcă sunt lucruri diferite, iar un panou
+    // care arată doar rolul nu spune ce a cumpărat omul. Fără abonament, free:
+    // asta e starea reală a oricui n-a plătit, nu o lipsă de date.
     const result = await pool.query(
-      `SELECT id, email, name, role, created_at as "createdAt"
-       FROM users
-       ORDER BY created_at DESC`
+      `SELECT u.id, u.email, u.name, u.role, u.created_at AS "createdAt",
+              COALESCE(p.name, 'free') AS plan
+         FROM users u
+         LEFT JOIN subscriptions s
+           ON s.user_id = u.id AND s.status = 'active'
+         LEFT JOIN subscription_plans p ON p.id = s.plan_id
+        ORDER BY u.created_at DESC`
     );
 
     res.json({ users: result.rows });
@@ -145,7 +153,69 @@ router.get('/users', async (req: AuthRequest, res: Response) => {
   }
 });
 
-// PATCH /api/admin/users/:id - Update user role
+
+/**
+ * Planurile, așa cum le numește baza. Lista e aici, nu dedusă la runtime, ca o
+ * cerere cu un plan inventat să pice cu 400 care spune ce e valid -- nu cu 500
+ * dintr-o cheie străină încălcată.
+ */
+const PLANS = ['free', 'premium', 'pro'] as const;
+
+// POST /api/admin/users - Create a user
+//
+// Singura cale de a face un cont era înregistrarea publică, iar ea e închisă
+// din ALLOW_REGISTRATION. Parola trece prin exact același bcrypt ca acolo: un
+// cont făcut de admin nu e un cont de rang doi, e același lucru.
+router.post('/users', async (req: AuthRequest, res: Response) => {
+  const parsed = z
+    .object({
+      email: z.string().trim().email().max(320),
+      name: z.string().trim().min(1).max(200).optional(),
+      // Aceeași limită ca la înregistrare. Dacă se strânge acolo, se strânge
+      // și aici -- două praguri diferite ar însemna două uși de intrare.
+      password: z.string().min(6).max(200),
+      role: z.enum(['user', 'admin']).default('user'),
+      plan: z.enum(PLANS).default('free'),
+    })
+    .safeParse(req.body);
+
+  if (!parsed.success) {
+    return res.status(400).json({ error: 'invalid_request', details: parsed.error.issues });
+  }
+  const { email, name, password, role, plan } = parsed.data;
+
+  try {
+    const exists = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+    if (exists.rowCount) return res.status(409).json({ error: 'email_taken' });
+
+    const planRow = await pool.query('SELECT id FROM subscription_plans WHERE name = $1', [plan]);
+    if (!planRow.rowCount) return res.status(400).json({ error: 'unknown_plan' });
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    const created = await pool.query(
+      `INSERT INTO users (email, password_hash, name, role)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, email, name, role, created_at AS "createdAt"`,
+      [email, passwordHash, name || email.split('@')[0], role],
+    );
+    const user = created.rows[0];
+
+    // Și pentru free se scrie un rând: „n-are abonament” și „are free” arată la
+    // fel în interogări, dar numai unul dintre ele e o decizie luată de cineva.
+    await pool.query(
+      `INSERT INTO subscriptions (user_id, plan_id, status, billing_period)
+       VALUES ($1, $2, 'active', 'monthly')`,
+      [user.id, planRow.rows[0].id],
+    );
+
+    return res.status(201).json({ user: { ...user, plan } });
+  } catch (error) {
+    console.error('Create user error:', error);
+    return res.status(500).json({ error: 'Failed to create user' });
+  }
+});
+
+// PATCH /api/admin/users/:id - Update user role or plan
 //
 // This used to accept a `status` as well and write it to users.status, a column
 // no migration creates and the live database does not have -- so every request
@@ -158,11 +228,43 @@ router.patch('/users/:id', async (req: AuthRequest, res: Response) => {
     // The database has CHECK (role IN ('user','admin')), so an invented role was
     // already refused -- but as a 500 out of a constraint violation. Same list,
     // stated where the request arrives, so it comes back as a 400 that says why.
-    const parsed = z.object({ role: z.enum(['user', 'admin']) }).safeParse(req.body);
+    // Rolul și planul sunt lucruri diferite: rolul spune cine poate administra,
+    // planul spune ce a cumpărat. Se schimbă separat, iar o cerere care nu cere
+    // niciunul nu e o cerere.
+    const parsed = z
+      .object({
+        role: z.enum(['user', 'admin']).optional(),
+        plan: z.enum(PLANS).optional(),
+      })
+      .refine((v) => v.role !== undefined || v.plan !== undefined, {
+        message: 'role or plan is required',
+      })
+      .safeParse(req.body);
     if (!parsed.success) {
-      return res.status(400).json({ error: "role must be 'user' or 'admin'" });
+      return res.status(400).json({ error: "role must be 'user' or 'admin'; plan one of free, premium, pro" });
     }
-    const { role } = parsed.data;
+    const { role, plan } = parsed.data;
+
+    if (plan) {
+      const planRow = await pool.query('SELECT id FROM subscription_plans WHERE name = $1', [plan]);
+      if (!planRow.rowCount) return res.status(400).json({ error: 'unknown_plan' });
+
+      const target = await pool.query('SELECT id FROM users WHERE id = $1', [id]);
+      if (!target.rowCount) return res.status(404).json({ error: 'User not found' });
+
+      // Un singur abonament activ per om: cel vechi se închide, cel nou se scrie.
+      await pool.query(
+        `WITH closed AS (
+           UPDATE subscriptions SET status = 'cancelled', cancelled_at = NOW(), updated_at = NOW()
+            WHERE user_id = $1 AND status = 'active'
+         )
+         INSERT INTO subscriptions (user_id, plan_id, status, billing_period)
+         VALUES ($1, $2, 'active', 'monthly')`,
+        [id, planRow.rows[0].id],
+      );
+
+      if (!role) return res.json({ user: { id, plan } });
+    }
 
     // Don't allow admin to demote themselves
     if (id === req.userId && role !== 'admin') {

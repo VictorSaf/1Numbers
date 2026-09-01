@@ -125,7 +125,11 @@ describe('input is validated at the edge of the router', () => {
       .send({ role: 'superadmin' });
 
     expect(response.status).toBe(400);
-    expect(response.body.error).toBe("role must be 'user' or 'admin'");
+    // Textul s-a lungit când ruta a început să accepte și un plan. Aserțiunea
+    // e pe proprietatea care contează -- că răspunsul spune ce roluri există --
+    // nu pe șirul exact, care se schimbă ori de câte ori ruta primește un câmp
+    // nou fără ca protecția să slăbească.
+    expect(response.body.error).toMatch(/role must be 'user' or 'admin'/);
   });
 
   it('refuses a body past the json limit', async () => {
