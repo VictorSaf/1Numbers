@@ -44,7 +44,10 @@ export const AIConsultant = () => {
   const [conversation, setConversation] = useState<ConversationMessage[]>([]);
   const [dailySuggestion, setDailySuggestion] = useState<DailySuggestion | null>(null);
   const [activeTab, setActiveTab] = useState('chat');
-  const [unavailable, setUnavailable] = useState(false);
+  // What actually happened to the last question. Not an assistant message:
+  // an answer that didn't come from the model has no business in the
+  // conversation next to ones that did.
+  const [problem, setProblem] = useState<'unavailable' | 'busy' | 'failed' | null>(null);
 
   // Build AI context from user profile
   const aiContext: AIContext | null = useMemo(() => {
@@ -79,7 +82,7 @@ export const AIConsultant = () => {
     if (!question.trim() || !aiContext) return;
 
     setLoading(true);
-    setUnavailable(false);
+    setProblem(null);
     const currentQuestion = question;
     setQuestion('');
 
@@ -91,9 +94,16 @@ export const AIConsultant = () => {
     };
     setConversation((prev) => [...prev, userMessage]);
 
+    // The server accepts at most eight history messages, each up to 1500
+    // characters. Trim to that here instead of letting the request come
+    // back 400 once the conversation runs long.
+    const history = conversation.slice(-8).map((msg) => ({
+      role: msg.role,
+      content: msg.content.slice(0, 1500),
+    }));
+
     try {
-      // Build prompt with full context
-      const { userPrompt } = buildAIPrompt(currentQuestion, aiContext);
+      const { profileContext, question: askedQuestion } = buildAIPrompt(currentQuestion, aiContext);
 
       // Try to call backend API
       const response = await fetch(`${API_BASE}/ai/consult`, {
@@ -103,11 +113,9 @@ export const AIConsultant = () => {
           Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
         },
         body: JSON.stringify({
-          userPrompt,
-          conversationHistory: conversation.map((msg) => ({
-            role: msg.role,
-            content: msg.content,
-          })),
+          profileContext,
+          question: askedQuestion,
+          conversationHistory: history,
           language,
         }),
       });
@@ -117,21 +125,25 @@ export const AIConsultant = () => {
       // it says it has none -- there is no third thing it may display. What
       // used to sit here invented a paragraph about the reader's "remarkable
       // potential" and pushed it into the same bubble as a real answer.
-      if (!response.ok) {
-        setUnavailable(true);
-        return;
+      if (response.ok) {
+        const data = (await response.json()) as { answer: string };
+        const assistantMessage: ConversationMessage = {
+          role: 'assistant',
+          content: data.answer,
+          timestamp: new Date(),
+        };
+        setConversation((prev) => [...prev, assistantMessage]);
+      } else if (response.status === 503) {
+        // No model key configured server-side. Said, not papered over.
+        setProblem('unavailable');
+      } else if (response.status === 429) {
+        setProblem('busy');
+      } else {
+        setProblem('failed');
       }
-
-      const data = await response.json();
-      const assistantMessage: ConversationMessage = {
-        role: 'assistant',
-        content: data.answer,
-        timestamp: new Date(),
-      };
-      setConversation((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error asking question:', error);
-      setUnavailable(true);
+      setProblem('failed');
     } finally {
       setLoading(false);
     }
@@ -144,6 +156,7 @@ export const AIConsultant = () => {
 
   const clearConversation = () => {
     setConversation([]);
+    setProblem(null);
   };
 
   const translations: Record<string, Record<string, string>> = {
@@ -158,6 +171,8 @@ export const AIConsultant = () => {
       clearChat: 'Șterge conversația',
       noProfile: 'Creează un profil pentru a primi răspunsuri personalizate',
       unavailable: 'Consultantul nu este disponibil acum. Nu s-a inventat nimic în locul lui — încearcă din nou peste puțin.',
+      rateLimited: 'Ai pus prea multe întrebări într-un timp scurt. Încearcă din nou mai târziu.',
+      error: 'Nu am putut obține un răspuns. Încearcă din nou.',
       focus: 'Focus',
       luckyNumbers: 'Numere norocoase',
       advice: 'Sfaturi',
@@ -176,6 +191,8 @@ export const AIConsultant = () => {
       clearChat: 'Clear chat',
       noProfile: 'Create a profile to receive personalized answers',
       unavailable: 'The consultant is not available right now. Nothing was invented in its place — try again in a moment.',
+      rateLimited: 'Too many questions in a short time. Please try again later.',
+      error: 'We could not get an answer. Please try again.',
       focus: 'Focus',
       luckyNumbers: 'Lucky Numbers',
       advice: 'Advice',
@@ -194,6 +211,8 @@ export const AIConsultant = () => {
       clearChat: 'Очистить чат',
       noProfile: 'Создайте профиль для получения персонализированных ответов',
       unavailable: 'Консультант сейчас недоступен. Ничего не было выдумано вместо него — попробуйте ещё раз чуть позже.',
+      rateLimited: 'Слишком много вопросов за короткое время. Попробуйте позже.',
+      error: 'Не удалось получить ответ. Попробуйте ещё раз.',
       focus: 'Фокус',
       luckyNumbers: 'Счастливые числа',
       advice: 'Совет',
@@ -298,9 +317,11 @@ export const AIConsultant = () => {
               )}
 
               {/* Said instead of an answer, never alongside one. */}
-              {unavailable && (
+              {problem && (
                 <div className="p-4 rounded-lg bg-warn/10 border border-warn/30 text-sm text-warn">
-                  {tr.unavailable}
+                  {problem === 'unavailable' && tr.unavailable}
+                  {problem === 'busy' && tr.rateLimited}
+                  {problem === 'failed' && tr.error}
                 </div>
               )}
 
@@ -354,11 +375,11 @@ export const AIConsultant = () => {
                     }
                   }}
                   className="min-h-[80px] resize-none"
-                  disabled={!profile}
+                  disabled={!profile || problem === 'unavailable'}
                 />
                 <Button
                   onClick={handleAsk}
-                  disabled={loading || !question.trim() || !profile}
+                  disabled={loading || !question.trim() || !profile || problem === 'unavailable'}
                   className="self-end"
                 >
                   {loading ? (
