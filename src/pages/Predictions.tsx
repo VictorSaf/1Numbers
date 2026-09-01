@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Sun, Moon, Calendar, TrendingUp, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
 import { ro, enUS, ru } from 'date-fns/locale';
@@ -22,6 +22,9 @@ import {
 import { DailyPredictionCard } from '@/components/DailyPredictionCard';
 import { WeeklyMonthlyPredictionCard } from '@/components/WeeklyMonthlyPredictionCard';
 import { BirthDateSelect } from "@/components/BirthDateSelect";
+import { DayNavigator } from '@/components/predictions/DayNavigator';
+import { useSelectedDay } from '@/hooks/use-selected-day';
+import { getDayContent } from '@/lib/dayContent';
 
 const locales = { ro, en: enUS, ru };
 
@@ -56,7 +59,13 @@ const Predictions = () => {
   }, [hasProfile, profileData, birthDate]);
 
   const dateLocale = locales[language];
-  const today = new Date();
+  // `today` rămâne ancora: orizontul se măsoară din el, iar cardul de zi
+  // universală de mai sus e despre ziua reală. Ce s-a schimbat e că ziua
+  // *citită* nu mai e obligată să fie aceeași -- se alege, și alegerea stă în
+  // adresă. Memoizat pentru că e dependență în `useSelectedDay`; fără asta,
+  // fiecare render ar produce altă ancoră.
+  const today = useMemo(() => new Date(), []);
+  const { selectedDay, selectDay } = useSelectedDay(today);
 
   const labels = {
     ro: {
@@ -65,7 +74,7 @@ const Predictions = () => {
       label: 'Previziuni',
       enterBirthDate: 'Introdu data nașterii pentru previziuni personalizate',
       selectBirthDate: 'Selectează data nașterii',
-      daily: 'Ziua de Azi',
+      daily: 'Ziua',
       monthly: 'Luna Curentă',
       universalDay: 'Ziua Universală',
       personalDay: 'Ziua Ta Personală',
@@ -92,7 +101,7 @@ const Predictions = () => {
       label: 'Predictions',
       enterBirthDate: 'Enter your birth date for personalized predictions',
       selectBirthDate: 'Select birth date',
-      daily: 'Today',
+      daily: 'The day',
       monthly: 'This Month',
       universalDay: 'Universal Day',
       personalDay: 'Your Personal Day',
@@ -119,7 +128,7 @@ const Predictions = () => {
       label: 'Прогнозы',
       enterBirthDate: 'Введите дату рождения для персонализированных прогнозов',
       selectBirthDate: 'Выберите дату рождения',
-      daily: 'Сегодня',
+      daily: 'День',
       monthly: 'Этот месяц',
       universalDay: 'Универсальный День',
       personalDay: 'Ваш Личный День',
@@ -144,7 +153,8 @@ const Predictions = () => {
 
   const l = labels[language];
   const universalEnergy = getUniversalDayEnergy(today);
-  const dailyPrediction = birthDate ? getDailyPrediction(birthDate, today) : null;
+  const dailyPrediction = birthDate ? getDailyPrediction(birthDate, selectedDay) : null;
+  const dayContent = birthDate ? getDayContent(birthDate, selectedDay, language) : null;
   const monthlyPrediction = birthDate ? getMonthlyPrediction(birthDate, selectedMonth, selectedYear) : null;
   
   // Calculate weekly prediction (start of current week - Monday)
@@ -219,10 +229,35 @@ const Predictions = () => {
               <TabsContent value="daily" className="space-y-6">
                 {dailyPrediction && birthDate && (
                   <>
-                    <DailyPredictionCard 
-                      prediction={dailyPrediction} 
+                    <DayNavigator date={selectedDay} today={today} onChange={selectDay} />
+
+                    {dayContent && (
+                      <div className="card-mystic grid grid-cols-3 gap-3 rounded-xl p-4 text-center">
+                        <div>
+                          <p className="font-raleway text-xs text-muted-foreground">{t.today.personalDay}</p>
+                          <p className="num text-2xl text-primary">{dayContent.personalDay}</p>
+                        </div>
+                        <div>
+                          <p className="font-raleway text-xs text-muted-foreground">{t.today.personalMonth}</p>
+                          <p className="num text-2xl text-foreground">{dayContent.personalMonth}</p>
+                        </div>
+                        <div>
+                          <p className="font-raleway text-xs text-muted-foreground">{t.today.universalDay}</p>
+                          <p className="num text-2xl text-foreground">{dayContent.universalDay}</p>
+                        </div>
+                        <div className="col-span-3 border-t border-border/40 pt-3 text-left">
+                          <p className="font-heading text-sm text-primary">{dayContent.keywords}</p>
+                          <p className="mt-1 text-sm text-foreground/90">{dayContent.meaning}</p>
+                          <p className="mt-3 font-raleway text-xs text-muted-foreground">{t.today.advice}</p>
+                          <p className="text-sm text-foreground/90">{dayContent.advice}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    <DailyPredictionCard
+                      prediction={dailyPrediction}
                       birthDate={birthDate}
-                      date={today}
+                      date={selectedDay}
                     />
                     <div className="card-mystic rounded-xl p-6 space-y-6">
                       <div className="text-center">
