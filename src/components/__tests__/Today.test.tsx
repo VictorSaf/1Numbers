@@ -68,7 +68,9 @@ describe("Today", () => {
     show();
     await ready();
 
-    expect(screen.getByText(String(reading.day))).toBeInTheDocument();
+    // Cifra apare o singură dată: numărul arcanei E cifra zilei, iar scris de
+    // două ori ar fi chiar duplicarea pe care pagina o avea.
+    expect(screen.getAllByText(String(reading.day))).toHaveLength(1);
     expect(screen.getByText(reading.title)).toBeInTheDocument();
   });
 
@@ -94,6 +96,26 @@ describe("Today", () => {
     await ready();
 
     expect(says(container, reading.plain)).toBe(true);
+  });
+});
+
+describe("Today, cartea zilei", () => {
+  it("dă cartea cu numărul zilei, nu una trasă la întâmplare", async () => {
+    const { container } = show();
+    await ready();
+
+    expect(container.textContent).toContain(reading.card.title);
+    expect(container.textContent).toContain(reading.card.light);
+    expect(container.textContent).toContain(reading.card.shadow);
+  });
+
+  it("arată atmosfera potrivită tonului zilei", async () => {
+    const { container } = show();
+    await ready();
+
+    // Tonul iese din relația cifrei de azi cu harta. Decorativ ar fi fost dacă
+    // ar fi arătat la fel în fiecare zi.
+    expect(container.querySelector(".day-sky")?.getAttribute("data-mood")).toBe(reading.mood);
   });
 });
 

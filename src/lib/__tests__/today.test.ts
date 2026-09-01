@@ -99,3 +99,41 @@ describe("buildToday", () => {
     expect(a.say).toBe(b.say);
   });
 });
+
+describe("cartea zilei și tonul", () => {
+  it("dă cifra zilei ca număr de arcană, nu trage la întâmplare", () => {
+    // O carte trasă aleator n-ar avea nicio legătură cu harta omului, iar aici
+    // tocmai legătura e produsul. Corespondența numerologie-tarot e directă:
+    // cifra zilei E numărul arcanei.
+    for (let d = 1; d <= 31; d++) {
+      const r = buildToday(NAME, BIRTH, "ro", new Date(2026, 8, d));
+      expect(r.card.n, `ziua ${d}`).toBe(r.day);
+    }
+  });
+
+  it("dă aceeași carte pentru aceeași zi", () => {
+    const a = buildToday(NAME, BIRTH, "ro", new Date(2026, 8, 1));
+    const b = buildToday(NAME, BIRTH, "ro", new Date(2026, 8, 1));
+    expect(a.card.title).toBe(b.card.title);
+  });
+
+  it("scoate tonul din relații, nu dintr-o listă separată", () => {
+    for (let d = 1; d <= 31; d++) {
+      const r = buildToday(NAME, BIRTH, "ro", new Date(2026, 8, d));
+      const expected = r.relations.some((x) => x.kind === "friction")
+        ? "charged"
+        : r.relations.some((x) => x.kind === "resonance")
+          ? "bright"
+          : "even";
+      expect(r.mood, `ziua ${d}`).toBe(expected);
+    }
+  });
+
+  it.each<Lang>(["ro", "en", "ru"])("scrie cartea, nevidă, în %s", (lang) => {
+    const r = buildToday(NAME, BIRTH, lang, new Date(2026, 8, 1));
+    expect(r.card.title.length).toBeGreaterThan(2);
+    expect(r.card.keywords.length).toBeGreaterThanOrEqual(3);
+    expect(r.card.light.length).toBeGreaterThan(30);
+    expect(r.card.shadow.length).toBeGreaterThan(30);
+  });
+});

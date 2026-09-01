@@ -19,6 +19,9 @@ import { formatCalendarDate } from "@/lib/calendarDate";
 
 interface Copy {
   kicker: string;
+  card: string;
+  light: string;
+  shadow: string;
   /** Cât se scrie ziua. O dată pe zi, deci merită spus ce se întâmplă. */
   writing: string;
 }
@@ -26,14 +29,23 @@ interface Copy {
 const COPY: Record<TodayLang, Copy> = {
   ro: {
     kicker: "ziua ta",
+    card: "cartea zilei",
+    light: "când merge",
+    shadow: "când se strică",
     writing: "se scrie ziua ta…",
   },
   en: {
     kicker: "your day",
+    card: "card of the day",
+    light: "when it works",
+    shadow: "when it breaks",
     writing: "writing your day…",
   },
   ru: {
     kicker: "ваш день",
+    card: "карта дня",
+    light: "когда работает",
+    shadow: "когда ломается",
     writing: "пишем ваш день…",
   },
 };
@@ -123,7 +135,13 @@ export const Today = ({
   const done = beats.length > 0;
 
   return (
-    <div className="mx-auto flex min-h-[calc(100vh-16rem)] w-full max-w-3xl flex-col justify-center">
+    <div className="relative mx-auto flex min-h-[calc(100vh-16rem)] w-full max-w-3xl flex-col justify-center">
+      {/* Atmosfera urmează tonul zilei, iar tonul iese din relația cifrei de
+          azi cu harta -- nu dintr-o alegere separată. Decorativ ar fi fost dacă
+          ar fi arătat la fel în fiecare zi. */}
+      <div className="day-sky" data-mood={reading.mood} aria-hidden="true">
+        <span />
+      </div>
       {!written && (
         <p className="text-center text-sm text-muted-foreground" role="status">
           {copy.writing}
@@ -131,7 +149,7 @@ export const Today = ({
       )}
 
       {written && (
-      <article className="rounded-2xl border border-line bg-surface/70 p-7 shadow-[0_1px_2px_rgba(0,0,0,.06),0_22px_48px_-30px_rgba(0,0,0,.4)] sm:p-10">
+      <article className="relative z-10 rounded-2xl border border-line bg-surface/80 p-7 shadow-[0_1px_2px_rgba(0,0,0,.06),0_22px_48px_-30px_rgba(0,0,0,.4)] backdrop-blur-sm sm:p-10">
         <span className="mb-6 block text-[0.63rem] uppercase tracking-[0.16em] text-muted-foreground">
           {copy.kicker}
         </span>
@@ -185,6 +203,44 @@ export const Today = ({
               </p>
             );
           })}
+        </div>
+
+        {/* Cartea zilei.
+            Cifra zilei E numărul arcanei -- ziua 3 e Împărăteasa, ziua 16 ar fi
+            Turnul. Nu se trage nimic la întâmplare: o carte aleatoare n-ar avea
+            nicio legătură cu harta omului, iar aici tocmai legătura e produsul.
+            Lumina și umbra stau alături fiindcă o zi le are pe amândouă, iar o
+            aplicație care arată doar partea bună devine un horoscop de ziar. */}
+        <div className="mt-8 border-t border-line pt-7">
+          <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <span className="num text-sm text-muted-foreground">{copy.card}</span>
+            {/* Numărul arcanei NU se scrie: e chiar cifra zilei, deja mare în
+                capul paginii. Scris a doua oară, ar fi exact duplicarea pe care
+                pagina asta o avea peste tot. */}
+            <span className="font-heading text-xl text-foreground">{reading.card.title}</span>
+          </div>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            {reading.card.keywords.join(" · ")}
+          </p>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 sm:gap-4">
+            <div className="rounded-xl border border-harmony/30 bg-harmony/5 p-4">
+              <span className="block text-[0.63rem] uppercase tracking-[0.16em] text-harmony">
+                {copy.light}
+              </span>
+              <p className="mt-1.5 text-[0.95rem] leading-relaxed text-foreground/85">
+                {reading.card.light}
+              </p>
+            </div>
+            <div className="rounded-xl border border-tension/30 bg-tension/5 p-4">
+              <span className="block text-[0.63rem] uppercase tracking-[0.16em] text-tension">
+                {copy.shadow}
+              </span>
+              <p className="mt-1.5 text-[0.95rem] leading-relaxed text-foreground/85">
+                {reading.card.shadow}
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Întrebarea și caseta de răspuns au fost scoase.

@@ -3,6 +3,7 @@ import { ARCHETYPES } from "@/lib/numerology-plus/content/archetypes";
 import { POSITIONS } from "@/lib/numerology-plus/content/contradiction";
 import { toBirthDate } from "@/lib/numerology-plus/core";
 import { calculatePersonalDayNumber } from "@/lib/personalCycles";
+import { ARCANA_BY_N } from "@/lib/numerology-plus/content/arcana";
 
 /**
  * Ziua, citită prin harta ta.
@@ -36,6 +37,36 @@ export interface TodayRelation {
   text: string;
 }
 
+/**
+ * Tonul zilei, din care se scoate și cum arată pagina.
+ *
+ * Nu e o decorație aleasă separat: iese din aceleași relații care compun
+ * textul. O zi care rezonează cu harta ta chiar e altă zi decât una care trage
+ * împotriva ei, iar pagina n-are de ce s-o spună doar în cuvinte.
+ */
+export type DayMood = "bright" | "even" | "charged";
+
+/**
+ * Cartea zilei.
+ *
+ * Corespondența numerologie–tarot e directă și veche: cifra zilei e numărul
+ * arcanei. Ziua 3 e Împărăteasa, ziua 16 ar fi Turnul. Nu se trage nimic la
+ * întâmplare -- o carte trasă aleator n-ar avea nicio legătură cu harta ta,
+ * iar aici tocmai legătura e produsul.
+ *
+ * Cele 22 de arcane existau deja în motor, cu lumină și umbră în trei limbi,
+ * folosite doar de matricea destinului.
+ */
+export interface DayCard {
+  n: number;
+  title: string;
+  keywords: string[];
+  /** Ce aduce cartea când ziua merge. */
+  light: string;
+  /** Ce aduce când se strică. */
+  shadow: string;
+}
+
 export interface TodayReading {
   /** Ziua personală -- a ta, nu a calendarului. */
   day: number;
@@ -50,6 +81,10 @@ export interface TodayReading {
   ask: string;
   /** De unde vine cifra, pentru cine n-a auzit de ea. */
   plain: string;
+  /** Cum se simte ziua, pentru text și pentru cum arată pagina. */
+  mood: DayMood;
+  /** Arcana cu numărul zilei. */
+  card: DayCard;
 }
 
 const archetype = (n: number) => ARCHETYPES.find((a) => a.n === n) ?? ARCHETYPES[0];
@@ -192,6 +227,25 @@ export function buildToday(
         ? join.askResonance(lead.position, lead.value)
         : join.askEcho(lead.position, lead.value, day);
 
+  /**
+   * Tonul iese din relația cea mai tare, nu dintr-o listă separată: o zi care
+   * cade pe un număr al tău chiar e altfel decât una care trage împotriva lui.
+   */
+  const mood: DayMood = relations.some((r) => r.kind === "friction")
+    ? "charged"
+    : relations.some((r) => r.kind === "resonance")
+      ? "bright"
+      : "even";
+
+  const arcana = ARCANA_BY_N[day] ?? ARCANA_BY_N[1];
+  const card: DayCard = {
+    n: arcana.n,
+    title: arcana.title[lang],
+    keywords: arcana.keywords[lang],
+    light: arcana.light[lang],
+    shadow: arcana.shadow[lang],
+  };
+
   return {
     day,
     date: today,
@@ -201,5 +255,7 @@ export function buildToday(
     relations,
     ask,
     plain: join.plain,
+    mood,
+    card,
   };
 }

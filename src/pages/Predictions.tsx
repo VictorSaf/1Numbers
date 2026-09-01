@@ -276,14 +276,13 @@ const Predictions = () => {
                       date={selectedDay}
                     />
                     <div className="card-mystic rounded-xl p-6 space-y-6">
-                      <div className="text-center">
-                        <h3 className="font-heading text-lg text-muted-foreground">{l.personalDay}</h3>
-                        <div className="number-display-large mx-auto my-4 animate-float">
-                          {dailyPrediction.number}
-                        </div>
-                        <p className="text-primary font-heading text-xl capitalize">{dailyPrediction.energy}</p>
-                      </div>
-
+                      {/* Cifra zilei personale și energia ei nu se mai scriu aici.
+                          Componenta Today, din capul paginii, le arată deja --
+                          mare, cu arhetipul, cu relația față de hartă și cu
+                          cartea zilei. Repetate la mijloc, erau aceeași cifră
+                          spusă a doua oară, cu mai puțin în jurul ei.
+                          Ce a rămas -- focusul, orele, culoarea, muzica -- nu e
+                          nicăieri altundeva. */}
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="p-4 rounded-lg bg-card/50 border border-border/30">
                           <h4 className="font-heading text-sm text-primary mb-2">{l.focus}</h4>
