@@ -72,26 +72,33 @@ const Index = () => {
     handleCalculate({ fullName: EXAMPLE_NAME, birthDate: EXAMPLE_BIRTH_DATE });
   };
 
+  // „Calculate again” duce la formular, nu înapoi la aceeași hartă. Pentru cine
+  // are cont, formularul vine precompletat -- e drumul spre altcineva sau altă
+  // dată, nu spre ce tocmai a citit.
   const handleReset = () => {
     setUserData(null);
-    if (profile) {
-      setShowDashboard(true);
-    }
+    setShowDashboard(false);
   };
 
   /**
-   * Un singur drum, pentru toată lumea: formularul, apoi harta.
+   * Cine are cont primește harta direct. Nu formularul, nu un panou: harta.
    *
-   * Omul cu cont primea altceva -- un panou, apoi un fir -- iar vizitatorul
-   * care apăsa „vezi un exemplu” primea raportul întreg. Cine își făcuse cont
-   * vedea mai puțin decât cine nu dăduse nimic.
+   * Numele și data lui sunt deja în baza noastră -- de-aia și-a făcut cont.
+   * Să i le arătăm într-un formular precompletat, ca să apese un buton care
+   * ne spune ce știm deja, e o vamă pusă exact în calea celui care ne-a dat
+   * datele. Vizitatorul o trece fiindcă n-avem de unde ști cine e; el nu.
    *
-   * Acum e aceeași pagină pentru amândoi. Diferența e că formularul vine
-   * precompletat din profil, iar omul apasă -- `NumerologyForm` știa deja să
-   * facă asta din `profileData`. Apăsarea rămâne a lui: harta se citește când
-   * o ceri, nu îți sare în față fiindcă te-ai autentificat.
+   * Formularul rămâne la un clic distanță, din „Calculate again” de pe hartă,
+   * pentru cine vrea altcineva sau altă dată.
    */
-  const shouldShowResults = userData !== null;
+  const mine =
+    isAuthenticated && profile && showDashboard
+      ? { fullName: profile.fullName, birthDate: parseCalendarDate(profile.birthDate) }
+      : null;
+  const reading =
+    userData ?? (mine && mine.birthDate ? { fullName: mine.fullName, birthDate: mine.birthDate } : null);
+
+  const shouldShowResults = reading !== null;
   const shouldShowForm = !shouldShowResults;
 
   return (
@@ -178,8 +185,8 @@ const Index = () => {
           // chapter column beside it on desktop.
           <div className="max-w-6xl mx-auto pt-4">
             <NumerologyResults
-              fullName={userData.fullName}
-              birthDate={userData.birthDate}
+              fullName={reading.fullName}
+              birthDate={reading.birthDate}
               onReset={handleReset}
             />
           </div>

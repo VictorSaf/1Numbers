@@ -48,32 +48,37 @@ beforeEach(() => {
 });
 
 describe("Index, autentificat", () => {
-  it("îți completează numele și data, și te lasă pe tine să apeși", async () => {
-    show();
-
-    await waitFor(() =>
-      expect(screen.getByDisplayValue("Victor Ion Safta")).toBeInTheDocument(),
-    );
-    expect(screen.getByRole("button", { name: /descoperă|discover|узнать/i })).toBeInTheDocument();
-  });
-
-  it("nu-i aruncă harta în față fiindcă s-a autentificat", async () => {
+  it("dă harta direct, fără să mai ceară ce știe deja", async () => {
+    // Numele și data lui sunt în baza noastră -- de-aia și-a făcut cont. Un
+    // formular precompletat, pus în calea lui, e o vamă pentru exact omul care
+    // ne-a dat datele.
     const { container } = show();
-    await waitFor(() => expect(getProfile).toHaveBeenCalled());
-
-    // Navigația pe capitole e semnătura raportului: nu apare până nu apeși.
-    expect(container.querySelector('nav[aria-label="Capitole"]')).toBeNull();
-  });
-
-  it("dă harta întreagă după apăsare, în formatul exemplului", async () => {
-    const { container } = show();
-    await waitFor(() => expect(screen.getByDisplayValue("Victor Ion Safta")).toBeInTheDocument());
-
-    fireEvent.click(screen.getByRole("button", { name: /descoperă|discover|узнать/i }));
 
     await waitFor(() =>
       expect(container.querySelector('nav[aria-label="Capitole"]')).toBeInTheDocument(),
     );
     expect(container.textContent).not.toMatch(/Maria Elena Popescu/);
+  });
+
+  it("nu-i mai arată formularul la intrare", async () => {
+    show();
+    await waitFor(() => expect(getProfile).toHaveBeenCalled());
+
+    await waitFor(() =>
+      expect(screen.queryByRole("button", { name: /descoperă|discover your numbers/i })).toBeNull(),
+    );
+  });
+
+  it("„calculează din nou” duce la formular, precompletat", async () => {
+    const { container } = show();
+    await waitFor(() =>
+      expect(container.querySelector('nav[aria-label="Capitole"]')).toBeInTheDocument(),
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /calculate again|calculează din nou/i }));
+
+    await waitFor(() =>
+      expect(screen.getByDisplayValue("Victor Ion Safta")).toBeInTheDocument(),
+    );
   });
 });
