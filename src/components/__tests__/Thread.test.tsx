@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { Thread } from "../Thread";
 import { buildThread } from "@/lib/thread";
@@ -21,9 +22,11 @@ const TODAY = new Date(2026, 8, 1);
 
 const show = () =>
   render(
-    <LanguageProvider>
-      <Thread fullName={NAME} birthDate={BIRTH} today={TODAY} />
-    </LanguageProvider>,
+    <MemoryRouter>
+      <LanguageProvider>
+        <Thread fullName={NAME} birthDate={BIRTH} today={TODAY} />
+      </LanguageProvider>
+    </MemoryRouter>,
   );
 
 const steps = buildThread(NAME, BIRTH, "en", TODAY);
@@ -152,6 +155,20 @@ describe("Thread", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /whole map/i }));
     expect(container.querySelectorAll("[data-step]")).toHaveLength(steps.length);
+  });
+
+  it("trimite spre ziua de azi când harta s-a terminat", () => {
+    // Harta se citește o dată. Fără ieșirea asta, capătul ei e un capăt mort:
+    // afli cine ești și nu ai ce face cu asta mâine.
+    show();
+    for (let i = 0; i < 200; i++) {
+      const btn = screen.queryByRole("button", { name: /go on|continue/i });
+      if (!btn) break;
+      fireEvent.click(btn);
+    }
+
+    const out = screen.getByRole("link", { name: /today/i });
+    expect(out).toHaveAttribute("href", "/azi");
   });
 
   it("ascunde butonul când firul s-a terminat", () => {

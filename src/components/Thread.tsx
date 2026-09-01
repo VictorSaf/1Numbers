@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { buildThread, type ThreadLang, type ThreadStep } from "@/lib/thread";
 import { Words } from "@/components/Words";
@@ -48,12 +49,14 @@ interface Copy {
   breaks: string;
   /** Scurtătura, pentru cine a mai citit harta o dată. */
   whole: string;
+  /** Ieșirea. Harta se citește o dată; ziua, în fiecare zi. */
+  today: string;
 }
 
 const COPY: Record<ThreadLang, Copy> = {
-  ro: { more: "mai departe", next: "continuă", done: "Ai citit toată harta.", works: "când funcționează", breaks: "când se strică", whole: "sari la harta întreagă" },
-  en: { more: "go on", next: "continue", done: "You have read the whole map.", works: "when it works", breaks: "when it breaks", whole: "skip to the whole map" },
-  ru: { more: "дальше", next: "продолжить", done: "Вы прочитали всю карту.", works: "когда работает", breaks: "когда ломается", whole: "перейти ко всей карте" },
+  ro: { more: "mai departe", next: "continuă", done: "Ai citit toată harta.", works: "când funcționează", breaks: "când se strică", whole: "sari la harta întreagă", today: "Vezi ce cere ziua de azi" },
+  en: { more: "go on", next: "continue", done: "You have read the whole map.", works: "when it works", breaks: "when it breaks", whole: "skip to the whole map", today: "See what today asks" },
+  ru: { more: "дальше", next: "продолжить", done: "Вы прочитали всю карту.", works: "когда работает", breaks: "когда ломается", whole: "перейти ко всей карте", today: "Посмотреть, чего требует сегодня" },
 };
 
 type BeatKind = "say" | "works" | "breaks" | "detail" | "plain";
@@ -254,7 +257,15 @@ export const Thread = ({
             {teaser && <span className="opacity-70"> → {teaser}</span>}
           </button>
         ) : (
-          <span className="text-sm text-muted-foreground">{copy.done}</span>
+          <>
+            {/* Capătul hărții era un capăt mort: aflai cine ești și nu aveai
+                ce face cu asta mâine. Harta se citește o dată, ziua în fiecare
+                zi -- deci de aici se pleacă spre zi, nu se rămâne. */}
+            <Link to="/azi" className="btn-primary text-sm">
+              {copy.today}
+            </Link>
+            <span className="text-sm text-muted-foreground">{copy.done}</span>
+          </>
         )}
 
         {!done && readBefore && (
