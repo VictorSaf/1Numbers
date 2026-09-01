@@ -48,8 +48,7 @@ function relatives(p: Pattern): string[] {
 }
 
 export function composeMeaning(pattern: Pattern): AngelNumberMeaning | null {
-  const frame: PatternFrame | undefined = PATTERN_FRAMES[pattern.kind];
-  if (!frame) return null;
+  const frame: PatternFrame = PATTERN_FRAMES[pattern.kind];
 
   const a = archetypeFor(pattern.digitA);
   const b = archetypeFor(pattern.digitB);

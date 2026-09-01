@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { CATALOG, parseSequence } from "../patterns";
+import { CATALOG } from "../patterns";
 import { getAngelNumberMeaning } from "../index";
 
 /**
@@ -18,12 +18,11 @@ const NO_PLACEHOLDER =
 /** Interpretările scurte sunt exact critica pe care piața o aduce concurenților. */
 const MIN_FULL_MEANING = 600;
 
-// Task 4 adaugă restul; până atunci se verifică ce e implementat.
-const COVERED = CATALOG.filter((s) => ["triple", "quad"].includes(parseSequence(s)!.kind));
+const COVERED = CATALOG;
 
-describe("secvențele de repetare", () => {
+describe("catalogul", () => {
   it("acoperă toate cele douăzeci", () => {
-    expect(COVERED).toHaveLength(20);
+    expect(COVERED).toHaveLength(35);
     for (const seq of COVERED) expect(getAngelNumberMeaning(seq), seq).not.toBeNull();
   });
 
@@ -62,5 +61,30 @@ describe("secvențele de repetare", () => {
 
   it("leagă un triplu de rudele lui", () => {
     expect(getAngelNumberMeaning("444")!.relatedNumbers).toEqual(["4", "44", "4444"]);
+  });
+});
+
+describe("formele relaționale", () => {
+  it("numește ambele cifre într-o alternanță", () => {
+    const m = getAngelNumberMeaning("1212")!;
+    expect(m.fullMeaning.ro).toContain("1212");
+    expect(m.relatedNumbers).toEqual(["1", "2", "2121"]);
+  });
+
+  it("ia câte două cuvinte-cheie din fiecare cifră", () => {
+    const m = getAngelNumberMeaning("1221")!;
+    expect(m.keywords.ro).toHaveLength(4);
+    expect(m.keywords.en).toHaveLength(4);
+    expect(m.keywords.ru).toHaveLength(4);
+  });
+
+  it("citește un urcuș de la prima la ultima cifră", () => {
+    const m = getAngelNumberMeaning("1234")!;
+    expect(m.fullMeaning.en).toContain("1234");
+    expect(m.frequency).toBe("rare");
+  });
+
+  it("compune o alternanță care nu e în catalog", () => {
+    expect(getAngelNumberMeaning("3434")).not.toBeNull();
   });
 });
