@@ -700,6 +700,28 @@
    ============================================ */
 @layer components {
   /* === Buttons === */
+
+  /* Dezvăluirea cuvânt cu cuvânt.
+   *
+   * Decalajul e în CSS, nu pe cronometre JavaScript: textul e ÎNTOTDEAUNA în
+   * pagină, doar apare eșalonat. Un cititor de ecran îl citește întreg din
+   * prima, testele îl găsesc fără să aștepte, iar o pagină lăsată deschisă nu
+   * rămâne cu jumătate de frază dacă tabul a fost în fundal.
+   *
+   * Cine a cerut mai puțină mișcare primește fraza dintr-o dată. */
+  .word-reveal > span {
+    animation: word-in 520ms ease-out both;
+  }
+
+  @keyframes word-in {
+    from { opacity: 0; transform: translateY(0.18em); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .word-reveal > span { animation: none; }
+  }
+
   .btn-primary {
     @apply relative overflow-hidden;
     @apply bg-gradient-to-r from-primary to-primary-dark;

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { buildThread, type ThreadLang, type ThreadStep } from "@/lib/thread";
+import { Words } from "@/components/Words";
 
 /**
  * Harta, spusă pe rând -- o frază pe rând.
@@ -19,6 +20,11 @@ import { buildThread, type ThreadLang, type ThreadStep } from "@/lib/thread";
  * De aceea unitatea dezvăluirii e fraza, nu cardul. Apeși, apare o idee. O
  * citești. Apeși din nou. Cardul se umple sub ochii tăi, iar când s-a umplut,
  * următoarea apăsare începe pasul următor.
+ *
+ * 4. Cardurile se stivuiau, iar ecranul devenea o listă de derulat -- adică
+ *    tot un depozit, doar dezvăluit mai încet. Acum e un pas pe ecran, centrat,
+ *    cu cuvintele care apar eșalonat. Harta întreagă se așază în pagină abia
+ *    la final, când chiar există o hartă de privit dintr-o dată.
  */
 
 const seenKey = (fullName: string, birthDate: Date) =>
@@ -115,13 +121,26 @@ export const Thread = ({
   const label = crossing ? copy.next : copy.more;
   const teaser = crossing ? current?.step.teaser : undefined;
 
-  // Pașii deschiși, fiecare cu frazele lui dezvăluite până acum.
-  const open = steps
-    .map((step) => ({ step, mine: shown.filter((b) => b.step.key === step.key) }))
-    .filter((g) => g.mine.length > 0);
+  // În timpul citirii: doar pasul curent, singur pe ecran. La final: toată
+  // harta, fiindcă abia atunci există ceva de privit dintr-o dată.
+  const open = done
+    ? steps.map((step) => ({ step, mine: beats.filter((b) => b.step.key === step.key) }))
+    : (() => {
+        const step = current?.step ?? steps[0];
+        return [{ step, mine: shown.filter((b) => b.step.key === step.key) }];
+      })();
+
+  // Se animează doar fraza tocmai dezvăluită. La revenire, ce era citit e citit.
+  const freshest = shown[shown.length - 1];
 
   return (
-    <div className="mx-auto w-full max-w-3xl">
+    <div
+      className={
+        done
+          ? "mx-auto w-full max-w-3xl"
+          : "mx-auto flex min-h-[calc(100vh-16rem)] w-full max-w-3xl flex-col justify-center"
+      }
+    >
       <div className="space-y-5">
         {open.map(({ step, mine }) => (
           <article
@@ -163,7 +182,7 @@ export const Thread = ({
                       data-beat="say"
                       className="font-heading text-xl leading-relaxed text-foreground sm:text-[1.6rem] sm:leading-[1.45]"
                     >
-                      {beat.text}
+                      <Words text={beat.text} animate={!done && beat === freshest} />
                     </p>
                   );
 
@@ -174,7 +193,8 @@ export const Thread = ({
                       data-beat="plain"
                       className="border-t border-line pt-4 text-sm leading-relaxed text-muted-foreground"
                     >
-                      <span className="text-foreground/70">{step.name}</span> · {beat.text}
+                      <span className="text-foreground/70">{step.name}</span> ·{" "}
+                      <Words text={beat.text} animate={!done && beat === freshest} step={28} />
                     </p>
                   );
 
@@ -186,7 +206,7 @@ export const Thread = ({
                       className="flex gap-3 text-[0.98rem] leading-relaxed text-foreground/85"
                     >
                       <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-primary" aria-hidden="true" />
-                      <span>{beat.text}</span>
+                      <Words text={beat.text} animate={!done && beat === freshest} step={34} />
                     </p>
                   );
 
@@ -196,7 +216,7 @@ export const Thread = ({
                       {beat.kind === "works" ? copy.works : copy.breaks}
                     </span>
                     <p className="max-w-prose text-[0.98rem] leading-relaxed text-foreground/85">
-                      {beat.text}
+                      <Words text={beat.text} animate={!done && beat === freshest} step={34} />
                     </p>
                   </div>
                 );

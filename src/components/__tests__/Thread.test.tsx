@@ -27,6 +27,15 @@ const show = () =>
   );
 
 const steps = buildThread(NAME, BIRTH, "en", TODAY);
+
+/**
+ * Frazele se dezvăluie cuvânt cu cuvânt, deci fiecare cuvânt e propriul span
+ * și potrivirea pe text exact nu mai găsește nimic. Textul E în pagină -- de
+ * asta decalajul e în CSS, nu pe cronometre -- doar că spart. Aici se
+ * recompune, ca aserțiunile să rămână despre ce citește omul.
+ */
+const says = (el: HTMLElement, text: string) =>
+  el.textContent?.replace(/\s+/g, " ").includes(text.replace(/\s+/g, " "));
 const go = (times: number) => {
   for (let i = 0; i < times; i++) {
     fireEvent.click(screen.getByRole("button", { name: /go on|continue/i }));
@@ -41,7 +50,7 @@ describe("Thread", () => {
 
     expect(container.querySelectorAll("[data-step]")).toHaveLength(1);
     expect(container.querySelectorAll("[data-beat]")).toHaveLength(1);
-    expect(screen.getByText(steps[0].say)).toBeInTheDocument();
+    expect(says(container, steps[0].say)).toBe(true);
   });
 
   it("arată cifra mare și numele arhetipului de la prima frază", () => {
@@ -59,27 +68,42 @@ describe("Thread", () => {
 
     expect(container.querySelectorAll("[data-step]")).toHaveLength(1);
     expect(container.querySelectorAll("[data-beat]")).toHaveLength(2);
-    expect(screen.getByText(steps[0].works!)).toBeInTheDocument();
+    expect(says(container, steps[0].works!)).toBe(true);
   });
 
   it("spune de unde vine cifra, la finalul pasului", () => {
-    show();
+    const { container } = show();
 
     const beatsInFirst = 3 + (steps[0].details?.length ?? 0); // say, works, breaks, plain
     go(beatsInFirst);
 
-    expect(screen.getByText(steps[0].plain, { exact: false })).toBeInTheDocument();
+    expect(says(container, steps[0].plain)).toBe(true);
   });
 
-  it("trece la pasul următor abia după ce l-a terminat pe primul", () => {
+  it("ține un singur pas pe ecran în timpul citirii", () => {
+    // Cardurile stivuite făceau din ecran o listă de derulat, adică tot un
+    // depozit. Un pas pe ecran înseamnă că citești, nu că răsfoiești.
     const { container } = show();
 
     const beatsInFirst = 4 + (steps[0].details?.length ?? 0);
     go(beatsInFirst - 1);
-    expect(container.querySelectorAll("[data-step]")).toHaveLength(1);
+    expect(container.querySelector("[data-step]")?.getAttribute("data-step")).toBe(steps[0].key);
 
     go(1);
-    expect(container.querySelectorAll("[data-step]")).toHaveLength(2);
+    expect(container.querySelectorAll("[data-step]")).toHaveLength(1);
+    expect(container.querySelector("[data-step]")?.getAttribute("data-step")).toBe(steps[1].key);
+  });
+
+  it("așază harta întreagă în pagină abia la final", () => {
+    const { container } = show();
+
+    for (let i = 0; i < 200; i++) {
+      const btn = screen.queryByRole("button", { name: /go on|continue/i });
+      if (!btn) break;
+      fireEvent.click(btn);
+    }
+
+    expect(container.querySelectorAll("[data-step]")).toHaveLength(steps.length);
   });
 
   it("anunță ce urmează doar când butonul chiar schimbă pasul", () => {
