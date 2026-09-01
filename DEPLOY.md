@@ -76,13 +76,89 @@ special.
 | `ALLOW_REGISTRATION` | înregistrarea publică e închisă (403) |
 | `ALLOW_BILLING` | `/subscriptions/create`, `/upgrade`, `/purchase` întorc 403 |
 | `ANTHROPIC_API_KEY` | consultantul AI e indisponibil — `/api/ai/consult` întoarce 503 și interfața spune că nu e disponibil |
+| `VAPID_PUBLIC_KEY` | notificările push nu pleacă; dispecerul refuză să pornească și spune de ce |
+| `VAPID_PRIVATE_KEY` | idem — perechea se generează cu `npx web-push generate-vapid-keys --json` |
+| `VAPID_SUBJECT` | idem; un `mailto:` care identifică operatorul către serverul de push |
+| `NOTIFICATIONS_ENABLED` | dispecerul zilnic nu pornește deloc. Implicit închis. |
+| `NOTIFICATIONS_ONLY_USER` | dispecerul trimite tuturor abonaților. Setat pe un UUID, trimite doar acelui cont. |
+| `VAPID_PUBLIC_KEY` | notificările push nu pleacă; dispecerul refuză să pornească și spune de ce |
+| `VAPID_PRIVATE_KEY` | idem — perechea se generează cu `npx web-push generate-vapid-keys --json` |
+| `VAPID_SUBJECT` | idem; un `mailto:` care identifică operatorul către serverul de push |
+| `NOTIFICATIONS_ENABLED` | dispecerul zilnic nu pornește deloc. Implicit închis. |
+| `NOTIFICATIONS_ONLY_USER` | dispecerul trimite tuturor abonaților. Setat pe un UUID, trimite doar acelui cont. |
 
 `ALLOW_REGISTRATION` și `ALLOW_BILLING` sunt închise în producție. Nu există
 integrare de plată.
 
-`AI_PROVIDER` nu mai există. Avea implicit valoarea `mock`, ceea ce însemna că
-un server fără cheie întorcea răspunsuri inventate ca și cum ar fi venit de la
-model. Acum furnizorul e unul singur, iar singura întrebare e dacă are cheie.
+ nu mai există. Avea implicit valoarea , ceea ce însemna cănun server fără cheie întorcea răspunsuri inventate ca și cum ar fi venit de lanmodel. Acum furnizorul e unul singur, iar singura întrebare e dacă are cheie.nn`VITE_VAPID_PUBLIC_KEY` trăiește în `.env.local` la rădăcină și trebuie să fie
+identică cu `VAPID_PUBLIC_KEY`. Cheia privată nu părăsește `server/.env`: dacă
+ajunge în bundle, oricine poate semna push-uri către utilizatorii noștri.
+
+## Prima trimitere de notificări
+
+O notificare zilnică trimisă greșit ajunge la toți abonații deodată și nu se
+poate retrage. Ordinea de mai jos există ca să nu se întâmple asta.
+
+**1. Deploy cu dispecerul închis.** `NOTIFICATIONS_ENABLED` lipsește sau e pe
+`false`. După `pm2 restart compass-api`, în log trebuie să apară:
+
+```
+[notifications] dispecerul e oprit (NOTIFICATIONS_ENABLED nu e "true")
+```
+
+**2. Abonează-te tu.** În browser, pe `/eu`, activează notificările. Verifică în
+bază că au ajuns și subscripția, și preferințele:
+
+```bash
+psql -p 5433 -d numerology_compass -c \
+  "SELECT user_id, language, left(endpoint, 40) FROM push_subscriptions;" -c \
+  "SELECT user_id, preferences FROM notification_preferences;"
+```
+
+Un rând în fiecare, cu `enabled: true`. Dacă `notification_preferences` e goală,
+clientul n-a trimis PUT-ul — nu merge mai departe.
+
+**3. Trimite-ți ție.** Cu un token de admin:
+
+```bash
+curl -s -X POST https://compass.oneaigency.com/api/notifications/test-send \
+  -H "Authorization: Bearer $ADMIN_TOKEN"
+```
+
+Așteptat: `{"success":true,"tally":{"claimed":1,"sent":1,"gone":0,"failed":0}}`
+**și** notificarea apare pe dispozitiv. `sent: 0` cu `failed: 1` înseamnă chei
+VAPID greșite; `gone: 1` înseamnă că subscripția era deja moartă — reabonează-te.
+
+Click pe notificare trebuie să deschidă `/azi`.
+
+**4. Deschide dispecerul, pentru un singur cont.** În `server/.env`:
+
+```
+NOTIFICATIONS_ENABLED=true
+NOTIFICATIONS_ONLY_USER=<uuid-ul tău>
+```
+
+`pm2 restart compass-api`. În log:
+
+```
+[notifications] dispecerul pornit, DOAR pentru <uuid>
+```
+
+Pune-ți ora de predicție cu două minute în viitor și așteaptă. Când sosește:
+
+```bash
+psql -p 5433 -d numerology_compass -c \
+  "SELECT notification_type, title, dedupe_key, sent_at FROM notification_history ORDER BY sent_at DESC LIMIT 3;"
+```
+
+Un singur rând cu `dedupe_key = 'daily-prediction:<azi>'`. **Un singur rând** e
+jumătatea care contează: dispecerul a mai bătut de zeci de ori între timp și n-a
+trimis a doua oară.
+
+**5. Deschide pentru toți.** Scoate `NOTIFICATIONS_ONLY_USER` din `server/.env`,
+`pm2 restart compass-api`, confirmă în log `pentru toți abonații`. Din acest
+moment orice greșeală de text pleacă la toată lumea; orice modificare la
+`server/src/lib/dailyNotification.ts` se reface prin pașii 3 și 4 înainte de 5.
 
 ## Verificare după deploy
 

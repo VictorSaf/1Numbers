@@ -32,6 +32,12 @@ module.exports = {
       name: 'compass-api',
       script: 'server/dist/index.js',
       cwd: __dirname,
+      // instances: 1 nu mai e o presupunere pe care se sprijină corectitudinea.
+      // Dispecerul de notificări revendică fiecare trimitere printr-un
+      // INSERT ... ON CONFLICT DO NOTHING pe indexul unic
+      // (user_id, dedupe_key) din migrația 010, deci două procese nu pot
+      // trimite aceeași notificare de două ori. Ceea ce e bine, fiindcă
+      // `pm2 restart` are exact asta, câteva secunde.
       instances: 1,
       exec_mode: 'fork',
       autorestart: true,
