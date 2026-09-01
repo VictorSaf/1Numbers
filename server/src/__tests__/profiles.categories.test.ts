@@ -65,8 +65,8 @@ describe('categoria intră în API', () => {
       .set('Authorization', auth)
       .send({ fullName: 'Ana Pop', birthDate: '1990-05-15', category: 'copil' });
     expect(response.status).toBe(201);
-    const insert = client.query.mock.calls.find(([sql]: [string]) =>
-      /INSERT INTO user_profiles/.test(sql),
+    const insert = client.query.mock.calls.find((call: unknown[]) =>
+      /INSERT INTO user_profiles/.test(call[0] as string),
     );
     expect(insert![1]).toContain('copil');
   });
@@ -89,8 +89,8 @@ describe('categoria intră în API', () => {
       .post('/api/profiles/me')
       .set('Authorization', auth)
       .send({ fullName: 'Ana Pop', birthDate: '1990-05-15' });
-    const insert = client.query.mock.calls.find(([sql]: [string]) =>
-      /INSERT INTO user_profiles/.test(sql),
+    const insert = client.query.mock.calls.find((call: unknown[]) =>
+      /INSERT INTO user_profiles/.test(call[0] as string),
     );
     expect(insert![1]).toContain('eu');
   });
@@ -151,8 +151,8 @@ describe('numai o hartă a mea poate fi cea activă', () => {
         setAsActive: true,
       });
 
-    const insert = client.query.mock.calls.find(([sql]: [string]) =>
-      /INSERT INTO user_profiles/.test(sql),
+    const insert = client.query.mock.calls.find((call: unknown[]) =>
+      /INSERT INTO user_profiles/.test(call[0] as string),
     );
     expect(insert![1][6]).toBe(false);
   });
