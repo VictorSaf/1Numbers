@@ -3,7 +3,6 @@ import { Sparkles, Moon, Sun, Stars } from "lucide-react";
 import { NumerologyForm } from "@/components/NumerologyForm";
 import { FirstVisitPromise, EXAMPLE_NAME, EXAMPLE_BIRTH_DATE } from "@/components/FirstVisitPromise";
 import { NumerologyResults } from "@/components/NumerologyResults";
-import { Thread } from "@/components/Thread";
 import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -80,10 +79,23 @@ const Index = () => {
     }
   };
 
-  // Determine what to show
-  const shouldShowDashboard = isAuthenticated && profile && showDashboard && !userData;
-  const shouldShowResults = userData !== null;
-  const shouldShowForm = !shouldShowDashboard && !shouldShowResults;
+  /**
+   * Omul autentificat primește exact ce primește vizitatorul care apasă „vezi
+   * un exemplu”: aceleași cinci capitole, aceeași navigație, pe datele lui.
+   *
+   * Până acum vizitatorul primea harta întreagă -- peste douăzeci de blocuri
+   * -- iar cel cu cont primea firul, adică o selecție de șaisprezece pași.
+   * Cine își făcuse cont vedea mai puțin decât cine nu dăduse nimic, ceea ce
+   * nu se poate apăra din nicio direcție.
+   */
+  const mine =
+    isAuthenticated && profile && showDashboard
+      ? { fullName: profile.fullName, birthDate: parseCalendarDate(profile.birthDate) }
+      : null;
+  const reading = userData ?? (mine?.birthDate ? { fullName: mine.fullName, birthDate: mine.birthDate } : null);
+
+  const shouldShowResults = reading !== null;
+  const shouldShowForm = !shouldShowResults;
 
   return (
     <PageLayout>
@@ -91,7 +103,7 @@ const Index = () => {
           the hidden secrets in your personal numbers" e o promisiune făcută
           cuiva care încă n-a intrat, iar deasupra firului concurează cu chiar
           lucrul pe care omul a venit să-l citească. */}
-      {!shouldShowDashboard && <PageHeader
+      {!shouldShowResults && <PageHeader
         title={t.title}
         subtitle={t.subtitle}
         badge={{
@@ -112,24 +124,6 @@ const Index = () => {
         {loadingProfile && isAuthenticated && (
           <div className="max-w-7xl mx-auto pt-4">
             <DashboardSkeleton />
-          </div>
-        )}
-
-        {/* Harta, spusă pe rând.
-            Aici era un panou de unsprezece blocuri, fiecare o cifră mare fără
-            propoziție, toate cu aceeași greutate: Drumul Vieții cântărea exact
-            cât „Streak: 0 days". Cine intra prima dată vedea șapte numere și
-            nicio frază care să le lege.
-            Firul spune un lucru, apoi următorul, în ordinea în care fiecare
-            fapt distinge harta asta de oricare alta. Ce a plecat de aici --
-            grila Lo Shu, calendarul lunar, compatibilitatea -- are deja o
-            adresă proprie în navigație. */}
-        {shouldShowDashboard && !loadingProfile && (
-          <div className="pt-2">
-            <Thread
-              fullName={profile.fullName}
-              birthDate={parseCalendarDate(profile.birthDate)}
-            />
           </div>
         )}
 
@@ -187,8 +181,8 @@ const Index = () => {
           // chapter column beside it on desktop.
           <div className="max-w-6xl mx-auto pt-4">
             <NumerologyResults
-              fullName={userData.fullName}
-              birthDate={userData.birthDate}
+              fullName={reading.fullName}
+              birthDate={reading.birthDate}
               onReset={handleReset}
             />
           </div>
