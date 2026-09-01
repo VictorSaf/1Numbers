@@ -3,6 +3,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { buildToday, type TodayLang } from "@/lib/today";
 import { Words } from "@/components/Words";
 import { api } from "@/services/api";
+import { formatCalendarDate } from "@/lib/calendarDate";
 
 /**
  * Ziua ta, în patru fraze și o întrebare.
@@ -89,6 +90,14 @@ export const Today = ({
    * Se întâmplă o dată pe zi; a doua vizită vine din cache, instantaneu.
    */
   const [written, setWritten] = useState<{ ziua: string; fric: string; aproape: string; intrebare: string } | null>(null);
+  /**
+   * Ce a scris omul ultima dată la aceeași cifră, citat întocmai.
+   *
+   * Aplicația întreba și nu-și amintea niciodată răspunsul, adică era un
+   * chestionar, nu o relație. Textul ăsta nu trece pe la model: interpretarea
+   * motorului se reformulează, cuvintele omului nu.
+   */
+  const [echo, setEcho] = useState<string | undefined>();
 
   useEffect(() => {
     let alive = true;
@@ -101,12 +110,12 @@ export const Today = ({
 
     api
       .getTodayReading({
-        date: reading.date.toISOString().slice(0, 10),
+        date: formatCalendarDate(reading.date),
         language: lang,
         personalDay: reading.day,
         composed,
       })
-      .then((r) => { if (alive) setWritten(r.body); })
+      .then((r) => { if (!alive) return; setWritten(r.body); setEcho(r.echo); })
       // Ziua trebuie să existe. Nu se spune nimic despre eroare: omul n-are ce
       // face cu ea, iar textul compus spune aceleași fapte.
       .catch(() => { if (alive) setWritten(composed); });
@@ -138,10 +147,10 @@ export const Today = ({
         entryType: "prediction",
         title: copy.entryTitle(reading.day),
         content: text,
-        date: reading.date.toISOString().slice(0, 10),
+        date: formatCalendarDate(reading.date),
         numerologyData: {
           personalDay: reading.day,
-          question: reading.ask,
+          question: written?.intrebare ?? reading.ask,
           relations: reading.relations.map((r) => ({ kind: r.kind, value: r.value })),
         },
       });
@@ -208,7 +217,16 @@ export const Today = ({
 
         {done && (
           <div className="mt-8 border-t border-line pt-7">
-            <p className="font-heading text-lg text-foreground sm:text-xl">{reading.ask}</p>
+            {echo && (
+              <p
+                data-echo
+                className="mb-5 border-l-2 border-primary/40 pl-4 text-[0.95rem] leading-relaxed text-muted-foreground"
+              >
+                {echo}
+              </p>
+            )}
+
+            <p className="font-heading text-lg text-foreground sm:text-xl">{written.intrebare}</p>
 
             {kept ? (
               <div className="mt-4 space-y-2">

@@ -170,6 +170,8 @@ class ApiService {
       body: { ziua: string; fric: string; aproape: string; intrebare: string };
       source: 'model' | 'composed';
       model?: string;
+      /** Ce a scris omul ultima dată la aceeași cifră, citat întocmai. */
+      echo?: string;
       cached: boolean;
     }>('/today/reading', { method: 'POST', body: data });
   }

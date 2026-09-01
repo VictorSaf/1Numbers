@@ -48,6 +48,63 @@ beforeEach(() => {
   });
 });
 
+describe('ecoul: ce a scris omul ultima dată la aceeași cifră', () => {
+  const echoRow = (over: Record<string, unknown> = {}) => ({
+    rows: [{ content: 'Am plecat din ședință.', date: '2026-08-23', ...over }], rowCount: 1,
+  });
+
+  it('caută ultima intrare de la aceeași zi personală și o citează', async () => {
+    vi.mocked(pool.query)
+      .mockResolvedValueOnce(profileRow as never)
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as never)   // cache gol
+      .mockResolvedValueOnce(echoRow() as never)                   // ecoul
+      .mockResolvedValueOnce({ rows: [{}], rowCount: 1 } as never);
+
+    const res = await post().expect(200);
+
+    expect(res.body.echo).toContain('Am plecat din ședință.');
+    expect(res.body.echo).toContain('8');
+  });
+
+  it('nu inventează un ecou când omul n-a scris niciodată la cifra asta', async () => {
+    vi.mocked(pool.query)
+      .mockResolvedValueOnce(profileRow as never)
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as never)
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as never)
+      .mockResolvedValueOnce({ rows: [{}], rowCount: 1 } as never);
+
+    const res = await post().expect(200);
+    expect(res.body.echo).toBeUndefined();
+  });
+
+  it('nu lasă modelul să atingă cuvintele omului', async () => {
+    // Modelul reformulează interpretarea. Ce a scris omul rămâne cum a scris.
+    vi.mocked(pool.query)
+      .mockResolvedValueOnce(profileRow as never)
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as never)
+      .mockResolvedValueOnce(echoRow() as never)
+      .mockResolvedValueOnce({ rows: [{}], rowCount: 1 } as never);
+
+    const res = await post().expect(200);
+
+    const sentToModel = JSON.stringify(vi.mocked(writeDay).mock.calls[0][0].composed);
+    expect(sentToModel).not.toContain('Am plecat din ședință.');
+    expect(res.body.echo).toContain('Am plecat din ședință.');
+  });
+
+  it('taie un răspuns lung, ca ecoul să rămână o frază', async () => {
+    vi.mocked(pool.query)
+      .mockResolvedValueOnce(profileRow as never)
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as never)
+      .mockResolvedValueOnce(echoRow({ content: 'x'.repeat(600) }) as never)
+      .mockResolvedValueOnce({ rows: [{}], rowCount: 1 } as never);
+
+    const res = await post().expect(200);
+    expect(res.body.echo!.length).toBeLessThan(300);
+    expect(res.body.echo).toContain('…');
+  });
+});
+
 describe('POST /api/today/reading', () => {
   it('cere autentificare', async () => {
     await request(app).post('/api/today/reading').send(body()).expect(401);
@@ -57,6 +114,7 @@ describe('POST /api/today/reading', () => {
     vi.mocked(pool.query)
       .mockResolvedValueOnce(profileRow as never)                      // profilul
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as never)       // cache gol
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as never)       // ecou: nimic
       .mockResolvedValueOnce({ rows: [{}], rowCount: 1 } as never);    // insert
 
     const res = await post().expect(200);
@@ -65,7 +123,7 @@ describe('POST /api/today/reading', () => {
     expect(res.body.body).toEqual(WRITTEN);
     expect(writeDay).toHaveBeenCalledTimes(1);
     // A treia interogare e scrierea: fără ea, mâine reîncarcă și plătim iar.
-    expect(vi.mocked(pool.query).mock.calls[2][0]).toMatch(/INSERT INTO daily_readings/i);
+    expect(vi.mocked(pool.query).mock.calls[3][0]).toMatch(/INSERT INTO daily_readings/i);
   });
 
   it('nu cheamă modelul a doua oară în aceeași zi', async () => {
@@ -109,6 +167,7 @@ describe('POST /api/today/reading', () => {
     // ecran gol azi.
     vi.mocked(pool.query)
       .mockResolvedValueOnce(profileRow as never)
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as never)
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as never)
       .mockRejectedValueOnce(new Error('disc plin') as never);
 

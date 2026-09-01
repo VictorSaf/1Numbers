@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { Today } from "../Today";
 import { buildToday } from "@/lib/today";
+import { formatCalendarDate } from "@/lib/calendarDate";
 
 /**
  * Ziua: scurtă, personală, și cu o întrebare la capăt.
@@ -165,5 +166,84 @@ describe("Today, textul scris de model", () => {
   it("nu schimbă textul sub ochii omului: nu arată nimic până nu știe ce arată", () => {
     const { container } = show();
     expect(container.querySelectorAll("[data-beat]")).toHaveLength(0);
+  });
+});
+
+describe("Today și ziua de calendar", () => {
+  it("trimite ziua din calendarul omului, nu din UTC", async () => {
+    // toISOString() convertește în UTC. La est de UTC, orele mici ale nopții
+    // cad în ziua precedentă; la vest, serile cad în ziua următoare. În ambele
+    // cazuri omul primește citirea altei zile decât cea în care trăiește.
+    const noaptea = new Date(2026, 8, 1, 1, 30);
+    render(
+      <LanguageProvider>
+        <Today fullName={NAME} birthDate={BIRTH} today={noaptea} />
+      </LanguageProvider>,
+    );
+
+    await waitFor(() => expect(read).toHaveBeenCalledTimes(1));
+    expect((read.mock.calls[0][0] as Record<string, string>).date).toBe(formatCalendarDate(noaptea));
+  });
+
+  it("datează în jurnal ziua trăită, nu ziua UTC", async () => {
+    const noaptea = new Date(2026, 8, 1, 1, 30);
+    render(
+      <LanguageProvider>
+        <Today fullName={NAME} birthDate={BIRTH} today={noaptea} />
+      </LanguageProvider>,
+    );
+    await waitFor(() => expect(on()).toBeInTheDocument());
+    toEnd();
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "ceva" } });
+    fireEvent.click(screen.getByRole("button", { name: /keep|save/i }));
+
+    await waitFor(() => expect(create).toHaveBeenCalledTimes(1));
+    expect((create.mock.calls[0][0] as Record<string, string>).date).toBe(formatCalendarDate(noaptea));
+  });
+});
+
+describe("Today își amintește", () => {
+  const withEcho = (echo?: string) =>
+    read.mockResolvedValue({
+      body: { ziua: "Z.", fric: "F.", aproape: "A.", intrebare: "Ce a câștigat azi?" },
+      source: "model", echo, cached: false,
+    });
+
+  it("arată ce ai scris ultima dată, lângă întrebare", async () => {
+    withEcho("Ultima dată când ziua a fost 8, ai scris: „Am plecat din ședință.”");
+    const { container } = show();
+    await waitFor(() => expect(on()).toBeInTheDocument());
+    toEnd();
+
+    expect(said(container, "Am plecat din ședință.")).toBe(true);
+  });
+
+  it("pune întrebarea scrisă de model, nu pe cea compusă", async () => {
+    // Modelul o rescrie în fiecare zi; dacă ecranul o arată pe cea compusă,
+    // singura frază pe care omul o citește cu adevărat rămâne mereu aceeași.
+    withEcho(undefined);
+    const { container } = show();
+    await waitFor(() => expect(on()).toBeInTheDocument());
+    toEnd();
+
+    expect(said(container, "Ce a câștigat azi?")).toBe(true);
+    expect(said(container, reading.ask)).toBe(false);
+  });
+
+  it("nu arată nimic despre trecut când nu există trecut", async () => {
+    withEcho(undefined);
+    const { container } = show();
+    await waitFor(() => expect(on()).toBeInTheDocument());
+    toEnd();
+
+    expect(container.querySelector("[data-echo]")).toBeNull();
+  });
+
+  it("nu pune trecutul peste text, ci abia la întrebare", async () => {
+    withEcho("Ultima dată când ziua a fost 8, ai scris: „ceva”");
+    const { container } = show();
+    await waitFor(() => expect(on()).toBeInTheDocument());
+
+    expect(container.querySelector("[data-echo]")).toBeNull();
   });
 });

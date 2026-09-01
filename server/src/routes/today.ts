@@ -26,6 +26,29 @@ import { parseCalendarDate, personalDayNumber } from '../lib/personalDay';
 
 const router = Router();
 
+/**
+ * Ecoul: ce a scris omul ultima dată când ziua a fost aceeași cifră.
+ *
+ * Aplicația întreba și nu-și amintea niciodată răspunsul, adică era un
+ * chestionar, nu o relație. Ziua personală se repetă la câteva zile, deci
+ * „ultima dată la cifra asta” e o comparație care chiar înseamnă ceva.
+ *
+ * Cuvintele omului NU trec pe la model. Modelul reformulează interpretarea
+ * motorului; ce a scris omul rămâne exact cum a scris, citat. Un text al meu
+ * rescris de o mașină e o îmbunătățire; cuvintele tale rescrise de o mașină
+ * sunt o falsificare.
+ */
+const ECHO_MAX = 180;
+
+const ECHO_SAYS: Record<'ro' | 'en' | 'ru', (n: number, what: string) => string> = {
+  ro: (n, what) => `Ultima dată când ziua a fost ${n}, ai scris: „${what}”`,
+  en: (n, what) => `Last time the day was ${n}, you wrote: “${what}”`,
+  ru: (n, what) => `В прошлый раз, когда день был ${n}, вы написали: «${what}»`,
+};
+
+const trim = (s: string) =>
+  s.length > ECHO_MAX ? `${s.slice(0, ECHO_MAX).trimEnd()}…` : s;
+
 const sentence = z.string().trim().min(1).max(600);
 
 const readingSchema = z.object({
@@ -72,6 +95,27 @@ router.post('/reading', authenticateToken, async (req: AuthRequest, res: Respons
       return res.json({ body: row.body, source: row.source, model: row.model, cached: true });
     }
 
+    // Ce a scris omul ultima dată la aceeași cifră. Căutat înainte de model,
+    // fiindcă nu i se dă modelului: se pune lângă textul lui, întreg.
+    let echo: string | undefined;
+    try {
+      const past = await pool.query(
+        `SELECT content, date FROM journal_entries
+          WHERE user_id = $1 AND entry_type = 'prediction'
+            AND content IS NOT NULL AND content <> ''
+            AND (numerology_data->>'personalDay')::int = $2
+            AND date < $3
+          ORDER BY date DESC LIMIT 1`,
+        [req.userId, personalDay, date],
+      );
+      if (past.rowCount) {
+        echo = ECHO_SAYS[language](personalDay, trim(String(past.rows[0].content).trim()));
+      }
+    } catch (err) {
+      // Fără ecou, ziua e mai săracă. Fără zi, nu e nimic.
+      console.error('daily_readings: ecoul nu a putut fi citit', err);
+    }
+
     const written = await writeDay({ personalDay, language, composed });
 
     try {
@@ -89,7 +133,7 @@ router.post('/reading', authenticateToken, async (req: AuthRequest, res: Respons
     }
 
     return res.json({
-      body: written.body, source: written.source, model: written.model, cached: false,
+      body: written.body, source: written.source, model: written.model, echo, cached: false,
     });
   } catch (err) {
     console.error('GET today reading failed', err);
