@@ -135,157 +135,137 @@ export const Today = ({
   const done = beats.length > 0;
 
   return (
-    <div className="relative mx-auto flex min-h-[calc(100vh-16rem)] w-full max-w-3xl flex-col justify-center">
-      {/* Atmosfera urmează tonul zilei, iar tonul iese din relația cifrei de
-          azi cu harta -- nu dintr-o alegere separată. Decorativ ar fi fost dacă
-          ar fi arătat la fel în fiecare zi. */}
+    <>
       {!written && (
-        <p className="text-center text-sm text-muted-foreground" role="status">
+        <p className="text-sm text-muted-foreground" role="status">
           {copy.writing}
         </p>
       )}
 
-      {/* Prima suprafață a zilei e o placă, ca frontispiciul hărții: același
-          fundal, aceleași astre, aceeași alamă. Cerul stă ÎN ea, nu în spatele
-          paginii -- altfel placa l-ar fi acoperit. */}
+      {/* Prima suprafață a zilei e o placă, cu ANATOMIA celorlalte plăci din
+          platformă: filet de alamă cu etichetă, titlu în Literata, figura la
+          dreapta. Înainte era o placă cu alt schelet -- eticheta fără filet,
+          cartea aruncată sub tot -- și, mai rău, sta pe `max-w-3xl`: 768px
+          într-o pagină de 1024, adică o treaptă de 256px față de tot ce urma
+          sub ea.
+          Cerul stă ÎN placă, nu în spatele paginii: altfel placa l-ar acoperi. */}
       {written && (
-      <article className="relative z-10 overflow-hidden rounded-2xl bg-plate p-7 sm:p-10">
-        <div className="day-sky" data-mood={reading.mood} aria-hidden="true">
-          <span />
-        </div>
-        <div className="relative">
-        <span className="num mb-6 block text-[0.63rem] uppercase tracking-[0.18em] text-plate-gilt">
-          {copy.kicker}
-        </span>
+        <section className="relative overflow-hidden rounded-2xl bg-plate">
+          <div className="day-sky" data-mood={reading.mood} aria-hidden="true">
+            <span />
+          </div>
 
-        <div className="mb-7 flex items-center gap-5">
-          <span className="num text-6xl leading-none text-plate-gilt-hi sm:text-7xl">{reading.day}</span>
-          <span className="flex min-w-0 flex-col gap-1.5">
-            <span className="font-heading text-lg text-plate-ink sm:text-xl">{reading.title}</span>
-            <span className="text-sm text-plate-muted">{reading.keywords.join(" · ")}</span>
-          </span>
-        </div>
+          <div className="relative grid gap-8 px-6 py-10 sm:px-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,300px)] lg:items-start lg:gap-12 lg:py-12">
+            <div>
+              <div className="flex items-center gap-3">
+                <span className="h-px w-10 shrink-0 bg-plate-gilt-dim" aria-hidden="true" />
+                <span className="num text-[0.63rem] uppercase tracking-[0.18em] text-plate-gilt">
+                  {copy.kicker}
+                </span>
+              </div>
 
-        <div className="space-y-6">
-          {beats.map((text, i) => {
-            /**
-             * Toate frazele sunt în pagină de la început; ce se eșalonează e
-             * scrierea lor. Fiecare pornește după ce s-a terminat cea de
-             * dinainte, altfel patru fraze s-ar scrie una peste alta și
-             * ochiul n-ar avea unde să se așeze.
-             *
-             * Decalajul se calculează din lungimile de dinainte, nu se
-             * ghicește: o frază lungă întârzie mai mult pe următoarea, exact
-             * cât îi ia să se scrie. 260ms de pauză între ele.
-             */
-            const stepOf = (n: number) => (n === 0 ? 55 : n === beats.length - 1 ? 28 : 34);
-            const from = beats
-              .slice(0, i)
-              .reduce((acc, prev, j) => acc + prev.split(" ").length * stepOf(j) + 260, 0);
+              <div className="mt-5 flex items-center gap-5">
+                <span className="num text-6xl leading-none text-plate-gilt-hi sm:text-7xl">
+                  {reading.day}
+                </span>
+                <span className="flex min-w-0 flex-col gap-1.5">
+                  <span className="font-heading text-xl text-plate-ink sm:text-2xl">
+                    {reading.title}
+                  </span>
+                  <span className="num text-[0.68rem] uppercase tracking-[0.12em] text-plate-muted">
+                    {reading.keywords.join(" · ")}
+                  </span>
+                </span>
+              </div>
 
-            if (i === beats.length - 1)
-              return (
-                <p
-                  key={i}
-                  data-beat="plain"
-                  className="border-t border-plate-gilt-dim pt-4 text-sm leading-relaxed text-plate-muted"
-                >
-                  <Words text={text} step={28} from={from} />
-                </p>
-              );
-            return (
-              <p
-                key={i}
-                data-beat={i === 0 ? "say" : "relation"}
-                className={
-                  i === 0
-                    ? "font-heading text-xl leading-relaxed text-plate-ink sm:text-[1.6rem] sm:leading-[1.45]"
-                    : "text-[0.98rem] leading-relaxed text-plate-ink/85"
-                }
-              >
-                <Words text={text} step={stepOf(i)} from={from} />
-              </p>
-            );
-          })}
-        </div>
+              <div className="mt-7 space-y-6">
+                {beats.map((text, i) => {
+                  /**
+                   * Toate frazele sunt în pagină de la început; ce se eșalonează
+                   * e scrierea lor. Decalajul se calculează din lungimile de
+                   * dinainte: o frază lungă întârzie mai mult pe următoarea,
+                   * exact cât îi ia să se scrie.
+                   */
+                  const stepOf = (n: number) => (n === 0 ? 55 : n === beats.length - 1 ? 28 : 34);
+                  const from = beats
+                    .slice(0, i)
+                    .reduce((acc, prev, j) => acc + prev.split(" ").length * stepOf(j) + 260, 0);
 
-        {/* Cartea zilei.
-            Cifra zilei E numărul arcanei -- ziua 3 e Împărăteasa, ziua 16 ar fi
-            Turnul. Nu se trage nimic la întâmplare: o carte aleatoare n-ar avea
-            nicio legătură cu harta omului, iar aici tocmai legătura e produsul.
-            Lumina și umbra stau alături fiindcă o zi le are pe amândouă, iar o
-            aplicație care arată doar partea bună devine un horoscop de ziar. */}
-        <div className="mt-8 border-t border-plate-gilt-dim pt-7">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-7">
-            {/* Cartea, arătată.
-                Scanul ediției originale Rider & Son, 1909 -- domeniu public din
-                31 decembrie 2021, la 70 de ani de la moartea Pamelei Colman
-                Smith. NU recolorarea din 1971, care are drepturi proprii.
-                Numele pachetului e marcă înregistrată, deci nu apare nicăieri:
-                cartea se numește Împărăteasa, care nu e marcă.
-                Fișierele poartă numerele arcanelor DIN MOTORUL NOSTRU. Contează:
-                motorul are 8 = Dreptatea și 11 = Forța, iar pachetul le are
-                invers, fiindcă Waite le-a schimbat locul. Maparea s-a făcut la
-                descărcare, pe identitatea cărții. */}
-            <img
-              src={`/tarot/${reading.card.n}.jpg`}
-              alt={reading.card.title}
-              width={140}
-              height={239}
-              loading="lazy"
-              decoding="async"
-              className="w-[120px] shrink-0 self-start rounded-md border border-plate-gilt-dim shadow-[0_12px_28px_-14px_rgba(0,0,0,.9)] sm:w-[140px]"
-            />
+                  if (i === beats.length - 1)
+                    return (
+                      <p
+                        key={i}
+                        data-beat="plain"
+                        className="border-t border-plate-gilt-dim pt-4 text-sm leading-relaxed text-plate-muted"
+                      >
+                        <Words text={text} step={28} from={from} />
+                      </p>
+                    );
+                  return (
+                    <p
+                      key={i}
+                      data-beat={i === 0 ? "say" : "relation"}
+                      className={
+                        i === 0
+                          ? "font-heading text-xl leading-relaxed text-plate-ink sm:text-[1.6rem] sm:leading-[1.45]"
+                          : "text-[0.98rem] leading-relaxed text-plate-ink/85"
+                      }
+                    >
+                      <Words text={text} step={stepOf(i)} from={from} />
+                    </p>
+                  );
+                })}
+              </div>
+            </div>
 
+            {/* Cartea zilei e FIGURA plăcii, ca în celelalte pagini -- coloana
+                din dreapta, nu un bloc aruncat sub text.
+                Cifra zilei E numărul arcanei: ziua 3 e Împărăteasa. Nu se trage
+                nimic la întâmplare -- o carte aleatoare n-ar avea nicio legătură
+                cu harta omului, iar aici tocmai legătura e produsul. */}
             <div className="min-w-0">
-          <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-            <span className="num text-sm text-plate-gilt">{copy.card}</span>
-            {/* Numărul arcanei NU se scrie: e chiar cifra zilei, deja mare în
-                capul paginii. Scris a doua oară, ar fi exact duplicarea pe care
-                pagina asta o avea peste tot. */}
-            <span className="font-heading text-xl text-plate-ink">{reading.card.title}</span>
-          </div>
-          <p className="mt-1.5 text-sm text-plate-muted">
-            {reading.card.keywords.join(" · ")}
-          </p>
-
-          <div className="mt-5 grid gap-3 sm:gap-4">
-            <div className="border-t border-plate-harmony pt-3">
-              <span className="num block text-[0.6rem] uppercase tracking-[0.18em] text-plate-harmony">
-                {copy.light}
-              </span>
-              <p className="mt-2 text-[0.95rem] leading-relaxed text-plate-ink/85">
-                {reading.card.light}
+              <img
+                src={`/tarot/${reading.card.n}.jpg`}
+                alt={reading.card.title}
+                width={140}
+                height={239}
+                loading="lazy"
+                decoding="async"
+                className="w-[120px] rounded-md border border-plate-gilt-dim shadow-[0_12px_28px_-14px_rgba(0,0,0,.9)] sm:w-[140px]"
+              />
+              <div className="mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <span className="num text-[0.6rem] uppercase tracking-[0.18em] text-plate-gilt">
+                  {copy.card}
+                </span>
+                <span className="font-heading text-lg text-plate-ink">{reading.card.title}</span>
+              </div>
+              <p className="num mt-1.5 text-[0.63rem] uppercase tracking-[0.12em] text-plate-muted">
+                {reading.card.keywords.join(" · ")}
               </p>
-            </div>
-            <div className="border-t border-plate-tension pt-3">
-              <span className="num block text-[0.6rem] uppercase tracking-[0.18em] text-plate-tension">
-                {copy.shadow}
-              </span>
-              <p className="mt-2 text-[0.95rem] leading-relaxed text-plate-ink/85">
-                {reading.card.shadow}
-              </p>
-            </div>
-          </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Întrebarea și caseta de răspuns au fost scoase.
-            „Sufletul tău e 5, ziua e 3. Ce a ieșit din asta azi?” cerea omului
-            să facă singur legătura dintre două cifre, adică munca pe care ar
-            trebui s-o facem noi. O întrebare la care nu știi ce să răspunzi nu
-            e o invitație, e un blocaj.
-            Odată cu ea a plecat și bucla de jurnal: nimic nu se mai scrie,
-            deci nici ecoul „ultima dată când ziua a fost 8 ai scris…” n-are de
-            unde. Serverul le păstrează pe amândouă -- ruta scrie în jurnal și
-            citește ecoul -- ca să se poată întoarce cu o întrebare mai bună,
-            una concretă, despre ce ai făcut, nu despre ce înseamnă. */}
-        </div>
-      </article>
+              <div className="mt-5 space-y-4">
+                <div className="border-t border-plate-harmony pt-3">
+                  <span className="num block text-[0.6rem] uppercase tracking-[0.18em] text-plate-harmony">
+                    {copy.light}
+                  </span>
+                  <p className="mt-2 text-sm leading-relaxed text-plate-ink/85">
+                    {reading.card.light}
+                  </p>
+                </div>
+                <div className="border-t border-plate-tension pt-3">
+                  <span className="num block text-[0.6rem] uppercase tracking-[0.18em] text-plate-tension">
+                    {copy.shadow}
+                  </span>
+                  <p className="mt-2 text-sm leading-relaxed text-plate-ink/85">
+                    {reading.card.shadow}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       )}
-
-    </div>
+    </>
   );
 };
 

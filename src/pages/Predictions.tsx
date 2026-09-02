@@ -7,6 +7,7 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PageLayout } from '@/components/layout/PageLayout';
+import { SectionHead } from '@/components/layout/SectionHead';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Today } from '@/components/Today';
@@ -195,15 +196,13 @@ const Predictions = () => {
 
       {/* Main Content */}
       <main className="relative z-10 pb-16">
-        {mine && (
-          <div className="pt-2">
-            <Today fullName={mine.fullName} birthDate={mine.birthDate} />
-          </div>
-        )}
-
         <div className="page-measure pt-4 page-rhythm">
+          {mine && <Today fullName={mine.fullName} birthDate={mine.birthDate} />}
+
           
           {/* Universal Day Energy */}
+          <SectionHead index={1} title={l.universalDay} />
+
           <div className="card-mystic rounded-lg p-6 text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
               <Sun className="h-6 w-6" />
@@ -226,6 +225,8 @@ const Predictions = () => {
               <BirthDateSelect value={birthDate} onChange={setBirthDate} />
             </div>
           )}
+
+          <SectionHead index={2} title={l.title} question={l.subtitle} />
 
           {/* Personal Predictions */}
           {birthDate && (
