@@ -175,8 +175,6 @@ const Remedies = () => {
       <div className="page-measure py-4 page-rhythm">
       <PagePlate eyebrow="remedii numerologice" title={t.title} subtitle={t.description} />
 
-      <div className="mt-10" />
-
       <Tabs defaultValue="personal" className="space-y-6">
         <TabsList>
           <TabsTrigger value="personal" className="flex items-center gap-2">

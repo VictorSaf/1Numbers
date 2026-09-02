@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { SectionHead } from "@/components/layout/SectionHead";
 
 /**
  * A chapter of the reading.
@@ -43,31 +44,7 @@ export const Chapter = ({
   children: ReactNode;
 }) => (
   <section id={meta.id} className="scroll-mt-24 space-y-8">
-    <header className="relative overflow-hidden rounded-xl bg-plate px-6 py-7 sm:px-8 sm:py-8">
-      <div className="plate-sky" aria-hidden="true" />
-      <div
-        className={
-          aside
-            ? "relative grid gap-6 sm:grid-cols-[minmax(0,1fr)_minmax(0,300px)] sm:items-center sm:gap-8"
-            : "relative"
-        }
-      >
-        <div className="flex items-start gap-5 sm:gap-6">
-          {/* Cifra e cap curent, nu etichetă: la 12px se pierdea, iar capitolul
-              începea fără să se vadă că începe. */}
-          <span className="num shrink-0 text-4xl leading-[0.85] text-plate-gilt/60 sm:text-5xl">
-            {String(index).padStart(2, "0")}
-          </span>
-          <div className="min-w-0 pt-0.5">
-            <h2 className="font-heading text-2xl leading-tight text-plate-ink sm:text-3xl">
-              {meta.title}
-            </h2>
-            <p className="mt-2 max-w-[52ch] text-plate-muted">{meta.question}</p>
-          </div>
-        </div>
-        {aside && <div className="min-w-0">{aside}</div>}
-      </div>
-    </header>
+    <SectionHead index={index} title={meta.title} question={meta.question} aside={aside} />
     {children}
   </section>
 );

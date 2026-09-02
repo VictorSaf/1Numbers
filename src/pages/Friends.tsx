@@ -325,8 +325,6 @@ const Friends = () => {
       <div className="page-measure py-4 page-rhythm">
       <PagePlate eyebrow="cercul meu" title={t.title} subtitle={t.description} />
 
-      <div className="mt-10" />
-
       {/* Error display */}
       {error && (
         <Alert variant="destructive" className="mb-4">

@@ -32,6 +32,7 @@ import { ProfileComparison } from '@/components/ProfileComparison';
 import { AIConsultant } from '@/components/AIConsultant';
 import { NotificationSettings } from '@/components/NotificationSettings';
 import { PageLayout } from '@/components/layout/PageLayout';
+import { SectionHead } from '@/components/layout/SectionHead';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { parseCalendarDate } from '@/lib/calendarDate';
 import { PeopleFilter } from '@/components/people/PeopleFilter';
@@ -312,11 +313,10 @@ const Profile = () => {
           {/* Profile Switcher */}
           {profiles.length > 0 && (
             <div className="space-y-4">
+              <SectionHead index={1} title={t.people.title} question={t.people.subtitle} />
               <div className="flex flex-wrap items-center justify-between gap-4">
-                <h2 className="font-heading text-xl text-foreground">{t.people.title}</h2>
                 <ProfileSwitcher onProfileSwitch={(id) => startEditing(id)} />
               </div>
-              <p className="text-sm text-muted-foreground font-raleway">{t.people.subtitle}</p>
 
               <PeopleFilter selected={filter} counts={counts} onSelect={setFilter} />
 
@@ -344,6 +344,8 @@ const Profile = () => {
           )}
 
           {/* Profile Form */}
+          <SectionHead index={2} title={t.profilePageTitle} question={t.profilePageSubtitle} />
+
           <div className="card-mystic rounded-lg p-8">
             {profiles.length === 0 && (
               <div className="mb-6 p-4 rounded-lg bg-muted/30 border border-border/30">

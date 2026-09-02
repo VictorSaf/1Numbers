@@ -24,6 +24,7 @@ import {
 import { parseCalendarDate } from '@/lib/calendarDate';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { PagePlate } from '@/components/layout/PagePlate';
+import { SectionHead } from '@/components/layout/SectionHead';
 import { formatCalendarDate } from '@/lib/calendarDate';
 import {
   Star,
@@ -290,13 +291,9 @@ const ChaldeanAnalysis = () => {
         subtitle={t.description}
       />
 
-      <div className="mt-10 space-y-4">
-        <div className="flex items-center gap-3">
-          <span className="h-px w-10 shrink-0 bg-gilt" aria-hidden="true" />
-          <h2 className="num text-[0.63rem] uppercase tracking-[0.18em] text-gilt">
-            {t.howItWorks}
-          </h2>
-        </div>
+      <SectionHead index={1} title={t.howItWorks} />
+
+      <div className="space-y-4">
         <div>
           <p className="max-w-[65ch] text-sm text-muted-foreground">{t.howItWorksDesc}</p>
           <div className="mt-4 flex gap-1 flex-wrap">
@@ -309,7 +306,9 @@ const ChaldeanAnalysis = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="personal" className="mt-10 space-y-6">
+      <SectionHead index={2} title={t.personalTab} />
+
+      <Tabs defaultValue="personal" className="space-y-6">
         <TabsList>
           <TabsTrigger value="personal" className="flex items-center gap-2">
             <User className="h-4 w-4" />

@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { api } from '@/services/api';
 import { PageLayout } from '@/components/layout/PageLayout';
+import { SectionHead } from '@/components/layout/SectionHead';
 import { PagePlate } from '@/components/layout/PagePlate';
 import { getTierById, type PremiumTier } from '@/lib/premium';
 
@@ -173,8 +174,10 @@ const Premium = () => {
 
   return (
     <PageLayout>
-      <div className="container mx-auto px-4 py-8 space-y-8">
+      <div className="page-measure py-4 page-rhythm">
         <PagePlate eyebrow="abonament" title={t.title} subtitle={t.subtitle} />
+
+        <SectionHead index={1} title={t.title} question={t.subtitle} />
 
         {/* Current Subscription Status */}
         {!loading && subscriptionStatus && currentTier !== 'free' && (
