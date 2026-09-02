@@ -412,14 +412,14 @@ const Profile = () => {
                 <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                   <PopoverTrigger asChild>
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       disabled={identityIsFixed}
                       className={cn(
-                        "w-full justify-start text-left font-normal h-12 input-mystic",
+                        "h-11 w-full justify-start rounded-none border-b border-line px-0 text-left font-normal hover:bg-transparent hover:border-gilt",
                         !formData.birthDate && "text-muted-foreground"
                       )}
                     >
-                      <CalendarIcon className="mr-2 h-4 w-4 text-primary" />
+                      <CalendarIcon className="mr-2 h-4 w-4" />
                       {formData.birthDate ? (
                         format(formData.birthDate, "d MMMM yyyy", { locale: dateLocale })
                       ) : (

@@ -14,7 +14,7 @@ const buttonVariants = cva(
            închisă și textul iese deschis, pe temă închisă invers. Un
            `text-white` fix ar fi fost ilizibil pe una dintre ele. */
         default: "bg-gilt text-background hover:bg-gilt/90",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        destructive: "border border-crit bg-transparent text-crit hover:bg-crit/10",
         outline: "border border-gilt bg-transparent text-gilt hover:bg-gilt-soft",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",

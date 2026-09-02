@@ -230,10 +230,9 @@ export const AIConsultant = () => {
     <div className="space-y-6">
       {/* Daily Energy Card */}
       {dailySuggestion && (
-        <Card className="border-line bg-gradient-to-br from-primary/5 to-accent-ink/5">
+        <Card>
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
-              <Sun className="h-5 w-5 text-warn" />
               <CardTitle className="text-lg">{tr.dailyEnergy}</CardTitle>
             </div>
           </CardHeader>

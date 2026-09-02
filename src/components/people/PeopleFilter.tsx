@@ -1,11 +1,20 @@
-import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { cn } from "@/lib/utils";
 import { PROFILE_CATEGORIES, type ProfileCategory } from "@/lib/profileCategories";
 
 /**
- * Chip-urile de filtrare. Se arată numai categoriile care au hărți: un chip cu
- * zero în el ocupă un rând ca să nu spună nimic.
+ * Filtrele. Se arată numai categoriile care au hărți: un filtru cu zero în el
+ * ocupă un rând ca să nu spună nimic.
+ *
+ * Gramatica e a filelor -- etichetă cu filet dedesubt. Butoane pline și
+ * conturate unul lângă altul spuneau „apasă-mă" de patru ori într-un rând
+ * care doar filtrează o listă.
  */
+
+const FILTER =
+  "num flex min-h-11 items-center border-b-2 px-1 pb-1 text-[0.68rem] uppercase tracking-[0.14em] transition-colors";
+const FILTER_ON = "border-gilt text-gilt";
+const FILTER_OFF = "border-transparent text-muted-foreground hover:border-line hover:text-foreground";
 
 interface PeopleFilterProps {
   selected: ProfileCategory | null;
@@ -19,27 +28,25 @@ export const PeopleFilter = ({ selected, counts, onSelect }: PeopleFilterProps) 
 
   return (
     <div className="flex flex-wrap gap-2">
-      <Button
-        variant={selected === null ? "default" : "outline"}
-        size="sm"
+      <button
+        type="button"
         aria-pressed={selected === null}
         onClick={() => onSelect(null)}
-        className="font-raleway"
+        className={cn(FILTER, selected === null ? FILTER_ON : FILTER_OFF)}
       >
-        {t.people.all} <span className="num ml-2">{total}</span>
-      </Button>
+        {t.people.all} <span className="ml-2 opacity-70">{total}</span>
+      </button>
 
       {PROFILE_CATEGORIES.filter((category) => counts[category] > 0).map((category) => (
-        <Button
+        <button
           key={category}
-          variant={selected === category ? "default" : "outline"}
-          size="sm"
+          type="button"
           aria-pressed={selected === category}
           onClick={() => onSelect(category)}
-          className="font-raleway"
+          className={cn(FILTER, selected === category ? FILTER_ON : FILTER_OFF)}
         >
-          {t.people.categories[category]} <span className="num ml-2">{counts[category]}</span>
-        </Button>
+          {t.people.categories[category]} <span className="ml-2 opacity-70">{counts[category]}</span>
+        </button>
       ))}
     </div>
   );

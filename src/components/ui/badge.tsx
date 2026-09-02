@@ -4,16 +4,18 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
-  // Colț mic și mono, ca etichetele hărții. Pastila plină rotundă era
-  // semnătura stilului dinaintea plăcii.
-  "num inline-flex items-center rounded-sm border px-2 py-0.5 text-[0.63rem] uppercase tracking-[0.14em] transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  // Doar literă. Chenarul de 1px pe patru laturi în jurul a două cuvinte era
+  // ultima cutie din sistem; înainte de el fusese pastila plină și rotundă.
+  // Ce distinge o etichetă de textul din jur e corpul mic, spațierea și
+  // culoarea -- nu o casetă.
+  "num inline-flex items-center text-[0.63rem] uppercase tracking-[0.14em] transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
   {
     variants: {
       variant: {
-        default: "border-gilt/40 bg-gilt-soft text-gilt",
-        secondary: "border-line text-muted-foreground",
-        destructive: "border-crit text-crit",
-        outline: "border-line text-foreground",
+        default: "text-gilt",
+        secondary: "text-muted-foreground",
+        destructive: "text-tension",
+        outline: "text-foreground",
       },
     },
     defaultVariants: {

@@ -39,8 +39,8 @@ export const PeopleGroup = ({ category, profiles, onEdit, onDelete }: PeopleGrou
           <li
             key={profile.id}
             className={cn(
-              "flex items-center justify-between gap-4 rounded-lg border p-3",
-              profile.isActive ? "bg-sunken border-line" : "bg-muted/30 border-border/30",
+              "flex items-center justify-between gap-4 border-t border-line py-3 pl-3",
+              profile.isActive && "border-l-2 border-l-gilt",
             )}
           >
             <div className="min-w-0">
