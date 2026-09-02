@@ -3,15 +3,16 @@ import { cn } from "@/lib/utils";
 import type { ChapterMeta } from "./Chapter";
 
 /**
- * Where you are in the reading, and how to get somewhere else.
+ * Unde ești în citire, pe telefon.
  *
- * A sticky column on desktop, a scrollable row of pills on mobile. Both mark
- * the chapter currently in view, which is the part that matters: with five
- * chapters all open the page is long, and without a position marker a reader
- * cannot tell how much is left.
+ * Coloana lipită de pe desktop a plecat. Odată ce fiecare capitol se deschide
+ * cu o placă -- bandă întunecată, cifra la 48px, titlul în Literata -- poziția
+ * se citește din pagină, iar o listă de șase titluri repetate lângă ea spunea
+ * a doua oară același lucru și îngusta citirea cu treisprezece rem.
  *
- * Marcajul e un filet de alamă, nu o pastilă albastră: coloana stă lângă o
- * pagină care nu mai are pastile nicăieri.
+ * Pe telefon rămâne: acolo placa ocupă tot ecranul pe rând, deci nu vezi
+ * niciodată două deodată, iar pagina e de câteva ori mai lungă în derulare.
+ * Banda e singurul mod de a sări în alt capitol fără să treci prin tot.
  */
 
 const useActiveChapter = (chapters: ChapterMeta[]) => {
@@ -51,73 +52,39 @@ export const ChapterNav = ({ chapters }: { chapters: ChapterMeta[] }) => {
   };
 
   return (
-    <>
-      {/* Desktop: a column beside the reading. */}
-      <nav aria-label="Capitole" className="hidden lg:block">
-        <div className="num sticky top-24 space-y-3">
-          <span className="block text-[0.6rem] uppercase tracking-[0.18em] text-muted-foreground">
-            {chapters.length} capitole
-          </span>
-          <ol>
-            {chapters.map((chapter, i) => (
-              <li key={chapter.id}>
-                <button
-                  type="button"
-                  onClick={() => go(chapter.id)}
-                  aria-current={active === chapter.id ? "true" : undefined}
-                  className={cn(
-                    "flex w-full items-baseline gap-2.5 border-l-2 py-2 pl-3 text-left text-sm transition-colors",
-                    active === chapter.id
-                      ? "border-gilt text-foreground"
-                      : "border-transparent text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "num text-[0.68rem]",
-                      active === chapter.id ? "text-gilt" : "opacity-60",
-                    )}
-                  >
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span className="font-raleway">{chapter.title}</span>
-                </button>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </nav>
-
-      {/* Mobile: pills that scroll sideways rather than wrap to three rows. */}
-      <nav
-        aria-label="Capitole"
-        className="lg:hidden sticky top-0 z-30 -mx-4 border-b border-line bg-background/95 px-4 py-2 backdrop-blur"
-      >
-        <ol className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {chapters.map((chapter, i) => (
-            <li key={chapter.id} className="shrink-0">
-              <button
-                type="button"
-                onClick={() => go(chapter.id)}
-                aria-current={active === chapter.id ? "true" : undefined}
-                className={cn(
-                  // 44px e pragul din ghidul iOS. Chip-urile aveau 31: pe o bandă
-                  // orizontală de elemente lipite, degetul nimerea vecinul.
-                  "inline-flex min-h-11 items-center gap-2 rounded-sm border px-4 text-xs whitespace-nowrap transition-colors",
-                  active === chapter.id
-                    ? "border-gilt bg-gilt-soft text-foreground"
-                    : "border-line text-muted-foreground",
-                )}
-              >
-                <span className={cn("num", active === chapter.id ? "text-gilt" : "opacity-60")}>
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <span>{chapter.title}</span>
-              </button>
-            </li>
-          ))}
-        </ol>
-      </nav>
-    </>
+    <nav
+      aria-label="Capitole"
+      /* top-16, nu top-0. Antetul aplicației e `fixed`, înalt de 65px și pe
+         z-50: lipită la zero, banda stătea complet sub el. Era așa de când a
+         fost scrisă -- adică navigația pe capitole n-a funcționat niciodată pe
+         telefon, iar nimeni n-a putut să raporteze un buton pe care nu-l
+         vedea. */
+      className="lg:hidden sticky top-16 z-30 -mx-4 border-b border-line bg-background/95 px-4 py-2 backdrop-blur"
+    >
+      <ol className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {chapters.map((chapter, i) => (
+          <li key={chapter.id} className="shrink-0">
+            <button
+              type="button"
+              onClick={() => go(chapter.id)}
+              aria-current={active === chapter.id ? "true" : undefined}
+              className={cn(
+                // 44px e pragul din ghidul iOS. Chip-urile aveau 31: pe o bandă
+                // orizontală de elemente lipite, degetul nimerea vecinul.
+                "inline-flex min-h-11 items-center gap-2 rounded-sm border px-4 text-xs whitespace-nowrap transition-colors",
+                active === chapter.id
+                  ? "border-gilt bg-gilt-soft text-foreground"
+                  : "border-line text-muted-foreground",
+              )}
+            >
+              <span className={cn("num", active === chapter.id ? "text-gilt" : "opacity-60")}>
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span>{chapter.title}</span>
+            </button>
+          </li>
+        ))}
+      </ol>
+    </nav>
   );
 };

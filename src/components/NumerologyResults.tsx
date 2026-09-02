@@ -300,7 +300,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
   const figure = useMemo(() => buildDial(fullName, birthDate, language as "ro" | "en" | "ru"), [fullName, birthDate, language]);
 
   return (
-    <div className="lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-10">
+    <div className="mx-auto max-w-5xl">
       <ChapterNav chapters={chapters} />
 
       <div className="space-y-14">

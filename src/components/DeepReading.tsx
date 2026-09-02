@@ -113,7 +113,7 @@ export const DeepReading = ({
   return (
     <section
       data-deep-reading
-      className="mb-10 rounded-2xl border border-line bg-surface/70 p-7 shadow-[0_1px_2px_rgba(0,0,0,.06),0_22px_48px_-30px_rgba(0,0,0,.4)] sm:p-10"
+      className="mb-10 border-t border-gilt pt-7"
     >
       <h2 className="font-heading text-2xl text-foreground sm:text-3xl">{copy.invite}</h2>
 
@@ -121,7 +121,7 @@ export const DeepReading = ({
         <>
           <p className="mt-3 max-w-prose leading-relaxed text-muted-foreground">{copy.why}</p>
           <div className="mt-6 flex items-center gap-4">
-            <button type="button" onClick={ask} disabled={writing} className="btn-primary text-sm">
+            <button type="button" onClick={ask} disabled={writing} className="num inline-flex min-h-11 items-center rounded-sm border border-gilt px-4 text-[0.68rem] uppercase tracking-[0.14em] text-gilt transition-colors hover:bg-gilt-soft disabled:opacity-50">
               {writing ? copy.writing : copy.ask}
             </button>
             {failed && <span className="text-sm text-tension">{copy.failed}</span>}

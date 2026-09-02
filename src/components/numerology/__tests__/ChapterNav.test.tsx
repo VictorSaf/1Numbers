@@ -46,12 +46,13 @@ const entry = (id: string, top: number) => ({
 });
 
 describe("ChapterNav", () => {
-  it("offers every chapter in both layouts", () => {
+  it("offers every chapter, once", () => {
     render(<ChapterNav chapters={CHAPTERS} />);
 
+    // Doar banda de pe telefon. Coloana de pe desktop a plecat odată ce
+    // fiecare capitol se deschide cu o placă: poziția se citea de două ori.
     for (const chapter of CHAPTERS) {
-      // One entry in the desktop column, one in the mobile pill row.
-      expect(screen.getAllByText(chapter.title)).toHaveLength(2);
+      expect(screen.getAllByText(chapter.title)).toHaveLength(1);
     }
   });
 
@@ -61,7 +62,7 @@ describe("ChapterNav", () => {
     const current = screen.getAllByText("Cine ești")
       .map((el) => el.closest("button"))
       .filter((b) => b?.getAttribute("aria-current") === "true");
-    expect(current).toHaveLength(2);
+    expect(current).toHaveLength(1);
   });
 
   it("follows the topmost chapter in view", () => {
@@ -74,7 +75,7 @@ describe("ChapterNav", () => {
       .filter((b) => b.getAttribute("aria-current") === "true")
       .map((b) => b.textContent);
     expect(marked.every((text) => text?.includes("Ce se contrazice"))).toBe(true);
-    expect(marked).toHaveLength(2);
+    expect(marked).toHaveLength(1);
   });
 
   it("scrolls to a chapter when its button is pressed", () => {
