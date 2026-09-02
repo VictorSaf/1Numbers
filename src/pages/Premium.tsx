@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { api } from '@/services/api';
 import { PageLayout } from '@/components/layout/PageLayout';
+import { PagePlate } from '@/components/layout/PagePlate';
 import { getTierById, type PremiumTier } from '@/lib/premium';
 
 // Flip to true once checkout is implemented end to end.
@@ -173,19 +174,7 @@ const Premium = () => {
   return (
     <PageLayout>
       <div className="container mx-auto px-4 py-8 space-y-8">
-        {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="flex items-center justify-center gap-3">
-            <div className="relative">
-              <Crown className="h-10 w-10 text-warn" />
-              <Sparkles className="h-4 w-4 absolute -top-1 -right-1" />
-            </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-warn to-primary bg-clip-text text-transparent">
-              {t.title}
-            </h1>
-          </div>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">{t.subtitle}</p>
-        </div>
+        <PagePlate eyebrow="abonament" title={t.title} subtitle={t.subtitle} />
 
         {/* Current Subscription Status */}
         {!loading && subscriptionStatus && currentTier !== 'free' && (

@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useProfile } from '@/hooks/use-profile';
 import { PageLayout } from '@/components/layout/PageLayout';
+import { PagePlate } from '@/components/layout/PagePlate';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -322,14 +323,9 @@ const Friends = () => {
   return (
     <PageLayout>
       <div className="container max-w-4xl mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <div className="flex justify-center mb-4">
-          <Users className="h-12 w-12" />
-        </div>
-        <h1 className="text-3xl font-bold mb-2">{t.title}</h1>
-        <p className="text-muted-foreground">{t.description}</p>
-      </div>
+      <PagePlate eyebrow="cercul meu" title={t.title} subtitle={t.description} />
+
+      <div className="mt-10" />
 
       {/* Error display */}
       {error && (
