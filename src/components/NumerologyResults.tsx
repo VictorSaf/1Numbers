@@ -24,6 +24,9 @@ import { ShareButtons } from "./ShareButtons";
 import { track } from '@/lib/analytics';
 import { Link } from "react-router-dom";
 import { Chapter, Block, type ChapterMeta } from "@/components/numerology/Chapter";
+import { Frontispiciu } from "@/components/numerology/Frontispiciu";
+import { PlateEcho } from "@/components/numerology/PlateEcho";
+import { buildDial } from "@/lib/dial";
 import { LetterMap } from "@/components/numerology/LetterMap";
 import { ChapterNav } from "@/components/numerology/ChapterNav";
 import { Deeper } from "@/components/numerology/Deeper";
@@ -208,7 +211,20 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     cycles: { ro: "Ciclurile personale", en: "Personal cycles", ru: "Личные циклы" },
     tension: { ro: "Punțile și echilibrul", en: "The bridges and the balance", ru: "Мосты и равновесие" },
     contradiction: { ro: "Ce nu se potrivește", en: "What does not fit", ru: "Что не сходится" },
-    depth: { ro: "Ce e sub suprafață", en: "What sits under the surface", ru: "Что лежит под поверхностью" }
+    depth: { ro: "Ce e sub suprafață", en: "What sits under the surface", ru: "Что лежит под поверхностью" },
+    // Ecourile NU repetă nota blocului de deasupra lor. Pusă de două ori, la
+    // patru rânduri distanță, aceeași propoziție face pagina să pară scrisă de
+    // două ori -- exact ce se reclamase la /azi.
+    echoTension: {
+      ro: "Nu se rezolvă — se traversează, în fiecare zi în care vrei ceva ce nu se vede pe tine.",
+      en: "It does not get solved — it gets crossed, every day you want something that does not show on you.",
+      ru: "Это не решается — это пересекают, каждый день, когда хотите того, чего по вам не видно.",
+    },
+    echoMissing: {
+      ro: "Nu-ți vin de la sine. De-aia sunt lecții, nu însușiri.",
+      en: "They do not come to you on their own. That is why they are lessons, not traits.",
+      ru: "Они не даются сами. Потому это уроки, а не черты.",
+    }
   };
 
   // One line per section, shown under its title whether it is open or closed.
@@ -279,6 +295,10 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
 
   const chartSkeleton = <ChartSkeleton />;
 
+  // O singură figură pentru toată pagina: frontispiciul și cele două ecouri
+  // arată același cadran. Calculat de trei ori, s-ar putea desincroniza.
+  const figure = useMemo(() => buildDial(fullName, birthDate, language as "ro" | "en" | "ru"), [fullName, birthDate, language]);
+
   return (
     <div className="lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-10">
       <ChapterNav chapters={chapters} />
@@ -294,28 +314,33 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
             mai încolo: pe desktop, tot raportul se strângea în treisprezece
             rem. Pe telefon nu se vedea nimic, fiindcă acolo grila nici nu e
             grilă. */}
+        {/* Capul paginii era antetul unui document: o insignă, numele, un
+            subtitlu fix și trei butoane. Nimic din el nu spunea nimic despre
+            omul care tocmai își deschisese harta.
+            „Calculate again" stă tot aici, lângă celelalte lucruri pe care le
+            poți face cu o citire -- nu la sfârșitul ei. Ultimul lucru de pe
+            pagină rămâne oferta de a păstra harta. */}
+        <Frontispiciu
+          fullName={fullName}
+          birthDate={birthDate}
+          actions={
+            <>
+              <ExportMenu reportData={reportData} />
+              <ShareButtons shareData={shareData} />
+              <Button
+                onClick={onReset}
+                variant="ghost"
+                size="sm"
+                className="text-plate-muted hover:bg-plate-2 hover:text-plate-ink"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                {t.calculateAgain}
+              </Button>
+            </>
+          }
+        />
+
         <DeepReading fullName={fullName} birthDate={birthDate} />
-
-        <div className="text-center space-y-4 opacity-0 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-            <Star className="h-4 w-4 text-primary" />
-            <span className="text-sm font-raleway text-primary">{t.profileTitle}</span>
-          </div>
-          <h2 className="font-heading text-2xl md:text-3xl text-foreground">{fullName}</h2>
-          <p className="text-muted-foreground">{t.profileSubtitle}</p>
-
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
-            <ExportMenu reportData={reportData} />
-            <ShareButtons shareData={shareData} />
-            {/* Starting over belongs beside the other things you can do with a
-                reading, not at the end of it. The last thing on the page is the
-                offer to keep the map. */}
-            <Button onClick={onReset} variant="ghost" size="sm" className="text-muted-foreground">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {t.calculateAgain}
-            </Button>
-          </div>
-        </div>
 
         {/* 1 — Cine ești */}
         <Chapter meta={chapters[0]} index={1}>
@@ -365,6 +390,21 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
         <Chapter meta={chapters[1]} index={2}>
           {/* The chapter's answer, before its parts. */}
           <Block title={sectionLabels.contradiction[language]} icon={<AlertTriangle className="h-5 w-5 text-warn" />} note={teasers.contradiction[language]}>
+            {/* Cadranul se întoarce acolo unde coarda e chiar subiectul. */}
+            {figure.chord && (
+              <PlateEcho figure={figure}>
+                <span className="num text-[0.63rem] uppercase tracking-[0.18em] text-plate-gilt">
+                  {sectionLabels.contradiction[language]}
+                </span>
+                <p className="mt-3 font-heading text-lg leading-relaxed text-plate-ink sm:text-xl">
+                  {figure.chord.fromLabel} <span className="num">{figure.chord.from}</span>,{" "}
+                  {figure.chord.toLabel} <span className="num">{figure.chord.to}</span>.
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-plate-muted">
+                  {sectionLabels.echoTension[language]}
+                </p>
+              </PlateEcho>
+            )}
             <Suspense fallback={chartSkeleton}>
               <Contradictions fullName={fullName} birthDate={birthDate} />
             </Suspense>
@@ -401,6 +441,23 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
               </p>
             )}
           </Block>
+
+          {/* Al doilea ecou: aici subiectul sunt golurile, nu coarda. */}
+          {figure.missing.length > 0 && (
+            <PlateEcho figure={figure}>
+              <span className="num text-[0.63rem] uppercase tracking-[0.18em] text-plate-gilt">
+                {sectionLabels.lessons[language]}
+              </span>
+              <p className="mt-3 font-heading text-lg leading-relaxed text-plate-ink sm:text-xl">
+                {figure.missing.map((n) => (
+                  <span key={n} className="num mr-2">{n}</span>
+                ))}
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-plate-muted">
+                {sectionLabels.echoMissing[language]}
+              </p>
+            </PlateEcho>
+          )}
 
           <Block title={sectionLabels.lessons[language]} icon={<Sparkles className="h-5 w-5 text-primary" />} note={teasers.lessons[language]}>
             {karmicLessons.length > 0 ? (

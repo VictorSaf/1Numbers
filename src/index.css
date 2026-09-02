@@ -1752,6 +1752,49 @@ html {
    pentru fricțiune, nimic nou. Sub `prefers-reduced-motion` rămâne doar
    gradientul, fără nicio mișcare -- atmosfera e informație, animația e
    podoabă, iar cine cere mai puțină mișcare pierde doar podoaba. */
+/* Cerul plăcii.
+   Aceeași idee ca .day-sky de pe /azi -- un singur element, astrele desenate
+   prin background, nu o sută de noduri -- dar pe tokenii plăcii, care nu
+   urmează tema. Placa e un obiect: nu se face albă când omul trece pe temă
+   deschisă. */
+.plate-sky {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.plate-sky::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background: radial-gradient(
+    ellipse at 62% 0%,
+    hsl(var(--plate-gilt) / 0.10) 0%,
+    transparent 60%
+  );
+}
+
+.plate-sky::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 22%, hsl(var(--plate-gilt) / 0.5), transparent),
+    radial-gradient(1px 1px at 34% 12%, hsl(var(--plate-ink) / 0.3), transparent),
+    radial-gradient(1.5px 1.5px at 58% 30%, hsl(var(--plate-gilt) / 0.38), transparent),
+    radial-gradient(1px 1px at 77% 16%, hsl(var(--plate-ink) / 0.26), transparent),
+    radial-gradient(1.5px 1.5px at 89% 44%, hsl(var(--plate-gilt) / 0.34), transparent),
+    radial-gradient(1px 1px at 22% 52%, hsl(var(--plate-ink) / 0.2), transparent),
+    radial-gradient(1px 1px at 46% 72%, hsl(var(--plate-gilt) / 0.26), transparent),
+    radial-gradient(1.5px 1.5px at 8% 78%, hsl(var(--plate-ink) / 0.18), transparent);
+  animation: sky-breathe 9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plate-sky::after { animation: none; opacity: 0.5; }
+}
+
 .day-sky {
   position: absolute;
   inset: 0;
