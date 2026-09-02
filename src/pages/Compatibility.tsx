@@ -8,6 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { PageLayout } from "@/components/layout/PageLayout";
 import { PagePlate } from "@/components/layout/PagePlate";
 import { Chapter } from "@/components/numerology/Chapter";
+import { SectionHead } from "@/components/layout/SectionHead";
 import { Dial } from "@/components/numerology/Dial";
 import { buildDial, type DialLang } from "@/lib/dial";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -46,6 +47,18 @@ const locales = { ro, en: enUS, ru };
 const Compatibility = () => {
   const { language, t } = useLanguage();
   const lang = (["ro", "en", "ru"].includes(language) ? language : "ro") as DialLang;
+
+  const sections = {
+    // Întrebarea fiecărei secțiuni spune ALTCEVA decât subtitlul plăcii.
+    // Repetat cuvânt cu cuvânt la două rânduri distanță, textul face pagina să
+    // pară scrisă de două ori -- același defect pe care l-am scos de pe /azi.
+    ro: { pereche: "Cele două hărți", perecheQ: "Numele întreg și data nașterii, pentru fiecare. Din ele ies toate cifrele.",
+          scoruri: "Scorurile pe rând", procent: "Ce ascunde procentul", dinamica: "Dinamica relației" },
+    en: { pereche: "The two maps", perecheQ: "Full name and birth date, for each. Every number comes out of those.",
+          scoruri: "The scores, one by one", procent: "What the percentage hides", dinamica: "How the relationship moves" },
+    ru: { pereche: "Две карты", perecheQ: "Полное имя и дата рождения — для каждого. Из них выходят все числа.",
+          scoruri: "Оценки по отдельности", procent: "Что скрывает процент", dinamica: "Динамика отношений" },
+  }[lang];
   const { profileData, hasProfile } = useProfile();
   const [person1, setPerson1] = useState<PersonData>({ fullName: "", birthDate: undefined });
   const [person2, setPerson2] = useState<PersonData>({ fullName: "", birthDate: undefined });
@@ -170,9 +183,15 @@ const Compatibility = () => {
             }
           />
 
-          <div className="mt-10">
+          <div className="page-rhythm mt-14">
           {!result ? (
-            <div className="card-mystic rounded-lg p-8 max-w-2xl mx-auto">
+            <>
+              {/* Starea de formular e o secțiune ca oricare alta: cifră, titlu,
+                  întrebare. Cardul stătea pe `max-w-2xl` -- 672px într-o pagină
+                  de 1024, o treaptă de 352px față de placa de deasupra lui. */}
+              <SectionHead index={1} title={sections.pereche} question={sections.perecheQ} />
+
+              <div className="card-mystic rounded-lg p-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Person 1 */}
                 <div className="space-y-4">
@@ -248,9 +267,10 @@ const Compatibility = () => {
                 <Sparkles className="mr-2 h-5 w-5" />
                 {t.calculateCompatibility}
               </Button>
-            </div>
+              </div>
+            </>
           ) : (
-            <div className="space-y-14 animate-fade-in">
+            <div className="page-rhythm animate-fade-in">
               <Chapter
                 meta={{
                   id: "scor",
@@ -282,6 +302,8 @@ const Compatibility = () => {
                   {t.compatibilityDescriptions[getCompatibilityLevel(result.overallScore)]}
                 </p>
               </div>
+
+              <SectionHead index={2} title={sections.scoruri} />
 
               {/* Detailed Scores */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -325,6 +347,8 @@ const Compatibility = () => {
                 ))}
               </div>
 
+              <SectionHead index={3} title={sections.procent} />
+
               {/* Ce ascunde procentul, și ce spune a doua tradiție.
                   Procentul de deasupra e o medie ponderată: două perechi cu
                   același 74% pot fi una echilibrată pe toate liniile și alta
@@ -338,6 +362,8 @@ const Compatibility = () => {
                   b={{ name: person2.fullName, birthDate: person2.birthDate }}
                 />
               )}
+
+              <SectionHead index={4} title={sections.dinamica} />
 
               {/* Relationship Dynamics Card */}
               {detailedResult && (
