@@ -132,10 +132,10 @@ const Compatibility = () => {
   };
 
   const getScoreBg = (score: number) => {
-    if (score >= 85) return "from-ok/20 to-ok-ink/10 border-ok/30";
-    if (score >= 70) return "from-primary/20 to-accent-ink/10 border-primary/30";
-    if (score >= 55) return "from-warn/20 to-warn-ink/10 border-warn/30";
-    return "from-crit/20 to-crit-ink/10 border-crit/30";
+    if (score >= 85) return "from-ok/20 to-ok-ink/10 border-ok";
+    if (score >= 70) return "from-primary/20 to-accent-ink/10 border-line";
+    if (score >= 55) return "from-warn/20 to-warn-ink/10 border-warn";
+    return "from-crit/20 to-crit-ink/10 border-crit";
   };
 
   return (
@@ -153,12 +153,12 @@ const Compatibility = () => {
       <main className="relative z-10 px-4 pb-16">
         <div className="max-w-4xl mx-auto pt-4">
           {!result ? (
-            <div className="card-mystic rounded-2xl p-8 max-w-2xl mx-auto">
+            <div className="card-mystic rounded-lg p-8 max-w-2xl mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Person 1 */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full bg-sunken border border-line flex items-center justify-center">
                       <span className="text-primary num text-sm">1</span>
                     </div>
                     <h3 className="font-heading text-lg text-foreground">{t.person1}</h3>
@@ -283,12 +283,12 @@ const Compatibility = () => {
                     weight: "20%"
                   },
                 ].map((item, i) => (
-                  <div key={i} className="card-mystic rounded-xl p-5 text-center">
+                  <div key={i} className="card-mystic rounded-lg p-5 text-center">
                     <span className="text-xs uppercase tracking-[0.15em] text-primary/70">
                       {item.title}
                     </span>
                     <div className="flex items-center justify-center gap-3 my-4">
-                      <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center num text-lg text-primary">
+                      <div className="w-12 h-12 rounded-full bg-sunken border border-line flex items-center justify-center num text-lg text-primary">
                         {item.data.person1}
                       </div>
                       <span className="text-muted-foreground">+</span>
@@ -360,7 +360,7 @@ const Compatibility = () => {
                 <Button
                   onClick={handleReset}
                   variant="outline"
-                  className="border-primary/30 text-primary hover:bg-primary/10"
+                  className="border-line text-primary hover:bg-sunken"
                 >
                   <Users className="mr-2 h-4 w-4" />
                   {t.tryAnotherPair}

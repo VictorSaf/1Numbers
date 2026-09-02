@@ -169,10 +169,10 @@ const Auth = () => {
   return (
     <PageLayout className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12">
       <div className="relative z-10 w-full max-w-md">
-        <div className="card-mystic rounded-2xl p-8">
+        <div className="card-mystic rounded-lg p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 border border-primary/20 mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-sunken border border-line mb-4">
               <Sparkles className="h-8 w-8" />
             </div>
             <h1 className="font-heading text-2xl text-foreground mb-2">

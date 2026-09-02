@@ -57,7 +57,7 @@ export const RelationshipTypeSelector = ({
               "flex flex-col items-center gap-2 h-auto py-3",
               selectedType === type
                 ? "bg-primary text-primary-foreground border-primary"
-                : "hover:bg-primary/10"
+                : "hover:bg-sunken"
             )}
           >
             {icon}

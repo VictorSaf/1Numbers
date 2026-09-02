@@ -149,7 +149,7 @@ export const Today = ({
       )}
 
       {written && (
-      <article className="relative z-10 rounded-2xl border border-line bg-surface/80 p-7 shadow-[0_1px_2px_rgba(0,0,0,.06),0_22px_48px_-30px_rgba(0,0,0,.4)] backdrop-blur-sm sm:p-10">
+      <article className="relative z-10 rounded-lg border border-line bg-surface/80 p-7 shadow-[0_1px_2px_rgba(0,0,0,.06),0_22px_48px_-30px_rgba(0,0,0,.4)] backdrop-blur-sm sm:p-10">
         <span className="mb-6 block text-[0.63rem] uppercase tracking-[0.16em] text-muted-foreground">
           {copy.kicker}
         </span>
@@ -246,7 +246,7 @@ export const Today = ({
           </p>
 
           <div className="mt-5 grid gap-3 sm:gap-4">
-            <div className="rounded-xl border border-harmony/30 bg-harmony/5 p-4">
+            <div className="rounded-lg border border-harmony p-4">
               <span className="block text-[0.63rem] uppercase tracking-[0.16em] text-harmony">
                 {copy.light}
               </span>
@@ -254,7 +254,7 @@ export const Today = ({
                 {reading.card.light}
               </p>
             </div>
-            <div className="rounded-xl border border-tension/30 bg-tension/5 p-4">
+            <div className="rounded-lg border border-tension p-4">
               <span className="block text-[0.63rem] uppercase tracking-[0.16em] text-tension">
                 {copy.shadow}
               </span>

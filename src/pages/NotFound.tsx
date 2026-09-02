@@ -11,7 +11,7 @@ const NotFound = () => {
     <PageLayout>
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center space-y-6 max-w-md mx-auto px-4">
-          <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-primary/10 border border-primary/20 mb-4">
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-sunken border border-line mb-4">
             <AlertCircle className="h-12 w-12" />
           </div>
           <h1 className="num text-6xl md:text-7xl text-primary">404</h1>

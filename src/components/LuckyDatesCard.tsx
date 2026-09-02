@@ -105,9 +105,9 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
   };
 
   const getScoreBg = (score: number) => {
-    if (score >= 70) return "bg-ok/20 border-ok/30";
-    if (score >= 50) return "bg-warn/20 border-warn/30";
-    return "bg-primary/20 border-primary/30";
+    if (score >= 70) return "border-ok";
+    if (score >= 50) return "border-warn";
+    return "bg-sunken border-line";
   };
 
   const renderDateCard = (luckyDate: LuckyDate, isNext: boolean = false) => (
@@ -115,7 +115,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
       key={luckyDate.date.toISOString()}
       className={cn(
         "p-4 rounded-xl border backdrop-blur-sm transition-all hover:scale-[1.02]",
-        isNext ? "bg-primary/10 border-primary/30" : "bg-card/30 border-border/50"
+        isNext ? "bg-sunken border-line" : "bg-card/30 border-border/50"
       )}
     >
       <div className="flex items-start justify-between gap-3">
@@ -210,7 +210,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
             {monthDates.bestDates.map((date) => renderDateCard(date))}
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground p-4 rounded-xl bg-muted/20 border border-border/30">
+          <p className="text-sm text-muted-foreground p-4 rounded-lg bg-muted/20 border border-border/30">
             {t.noLuckyDates}
           </p>
         )}

@@ -366,7 +366,7 @@ const Tutorials = () => {
 
           {/* Current Lesson Content */}
           {lesson && step && (
-            <div className="card-mystic rounded-xl p-6 md:p-8">
+            <div className="card-mystic rounded-lg p-6 md:p-8">
               {/* Progress */}
               <div className="mb-6">
                 <div className="flex justify-between text-sm text-muted-foreground mb-2">
@@ -382,7 +382,7 @@ const Tutorials = () => {
                 <p className="text-foreground/90 leading-relaxed">{step.content}</p>
 
                 {step.example && (
-                  <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
+                  <div className="p-4 rounded-lg bg-sunken border border-line">
                     <h4 className="font-heading text-sm text-primary mb-2">Exemplu:</h4>
                     <pre className="text-sm text-foreground/80 whitespace-pre-wrap font-mono">
                       {step.example}
@@ -403,9 +403,9 @@ const Tutorials = () => {
                             "p-3 rounded-lg border text-left transition-all",
                             quizAnswer === idx 
                               ? idx === step.quiz!.correct
-                                ? "bg-ok/20 border-ok text-ok"
+                                ? "border-ok text-ok"
                                 : "bg-destructive/20 border-destructive text-destructive"
-                              : "border-border/50 hover:border-primary/50 text-foreground/80"
+                              : "border-border/50 hover:border-line text-foreground/80"
                           )}
                         >
                           {option}
@@ -430,7 +430,7 @@ const Tutorials = () => {
                   variant="outline"
                   onClick={handlePrevious}
                   disabled={currentStep === 0}
-                  className="border-primary/30 text-foreground hover:bg-primary/10"
+                  className="border-line text-foreground hover:bg-sunken"
                 >
                   <ChevronLeft className="mr-2 h-4 w-4" />
                   {l.previous}

@@ -11,7 +11,7 @@ const LetterAnalysisChart = lazy(() =>
 );
 
 const ChartSkeleton = () => (
-  <div className="h-48 animate-pulse rounded border border-primary/20 bg-primary/10" />
+  <div className="h-48 animate-pulse rounded border border-line bg-sunken" />
 );
 
 /**
@@ -66,7 +66,7 @@ export const LetterMap = ({ fullName }: { fullName: string }) => {
             {letters.map((letter, i) => (
               <div
                 key={`${letter.letter}-${i}`}
-                className="rounded-md border border-primary/10 bg-primary/5 p-2 text-center"
+                className="rounded-md border border-line bg-sunken p-2 text-center"
               >
                 <div className="num text-lg text-primary">{letter.letter}</div>
                 <div className="num text-xs text-muted-foreground">

@@ -88,7 +88,7 @@ export const WeeklyMonthlyPredictionCard = ({
           
           <div>
             <h3 className="font-heading text-sm text-primary mb-2">{labels.energy}</h3>
-            <Badge className="bg-primary/20 text-primary border-primary/30">
+            <Badge className="bg-sunken text-primary border-line">
               {weeklyData.overallEnergy}
             </Badge>
           </div>
@@ -126,7 +126,7 @@ export const WeeklyMonthlyPredictionCard = ({
             </div>
           )}
           
-          <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+          <div className="p-3 rounded-lg bg-sunken border border-line">
             <h3 className="font-heading text-sm text-primary mb-1">{labels.advice}</h3>
             <p className="text-sm text-foreground/90">{weeklyData.advice}</p>
           </div>

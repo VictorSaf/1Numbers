@@ -233,7 +233,7 @@ const Remedies = () => {
           ) : (
             <>
               {/* Your Numbers Summary */}
-              <Card className="border-primary/20 bg-primary/5">
+              <Card className="border-line bg-sunken">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg">{t.yourNumbers}</CardTitle>
                 </CardHeader>
@@ -300,7 +300,7 @@ const Remedies = () => {
         <TabsContent value="today" className="space-y-6">
           {todayRemedy && (
             <>
-              <Card className="border-warn/20 bg-warn/5">
+              <Card className="border-warn">
                 <CardHeader>
                   <div className="flex items-center gap-3">
                     <Sun className="h-8 w-8 text-warn" />

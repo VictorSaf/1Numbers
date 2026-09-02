@@ -288,8 +288,8 @@ const Profile = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-pulse flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-primary/20 border-2 border-primary/40" />
-          <div className="h-4 w-32 bg-primary/20 rounded" />
+          <div className="w-16 h-16 rounded-full bg-sunken border-2 border-line" />
+          <div className="h-4 w-32 bg-sunken rounded" />
         </div>
       </div>
     );
@@ -344,7 +344,7 @@ const Profile = () => {
           )}
 
           {/* Profile Form */}
-          <div className="card-mystic rounded-2xl p-8">
+          <div className="card-mystic rounded-lg p-8">
             {profiles.length === 0 && (
               <div className="mb-6 p-4 rounded-lg bg-muted/30 border border-border/30">
                 <p className="text-sm text-muted-foreground text-center">

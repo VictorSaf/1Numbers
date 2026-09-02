@@ -60,7 +60,7 @@ export const DailyPredictionCard = ({ prediction, birthDate, date }: DailyPredic
             {predExt.daily}
           </CardTitle>
           <div 
-            className="w-8 h-8 rounded-full border-2 border-primary/30"
+            className="w-8 h-8 rounded-full border-2 border-line"
             style={{ backgroundColor: color.hex }}
             title={color.name}
           />
@@ -89,7 +89,7 @@ export const DailyPredictionCard = ({ prediction, birthDate, date }: DailyPredic
             <Palette className="h-5 w-5" />
             <h3 className="font-heading text-sm text-foreground">{labels.color}</h3>
           </div>
-          <Badge className="bg-primary/20 text-primary border-primary/30">
+          <Badge className="bg-sunken text-primary border-line">
             {color.name}
           </Badge>
         </div>
@@ -117,7 +117,7 @@ export const DailyPredictionCard = ({ prediction, birthDate, date }: DailyPredic
           </div>
           <div className="flex flex-wrap gap-2">
             {prediction.luckyHours.map((hour, index) => (
-              <Badge key={index} className="bg-warn/20 text-warn border-warn/30">
+              <Badge key={index} className="text-warn border-warn">
                 {hour}
               </Badge>
             ))}

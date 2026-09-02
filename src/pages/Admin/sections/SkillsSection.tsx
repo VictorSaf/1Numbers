@@ -66,7 +66,7 @@ export const SkillsSection = () => {
       <Card className="card-mystic">
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
-            <div className="p-3 rounded-lg bg-primary/10">
+            <div className="p-3 rounded-lg bg-sunken">
               <Zap className="h-6 w-6" />
             </div>
             <div>
@@ -99,7 +99,7 @@ export const SkillsSection = () => {
                 className="flex items-center justify-between p-4 rounded-lg bg-muted/30 border border-border/30"
               >
                 <div className="flex items-center gap-4">
-                  <div className="p-2 rounded-lg bg-warn/10">
+                  <div className="p-2 rounded-lg">
                     <Terminal className="h-5 w-5 text-warn" />
                   </div>
                   <div>
@@ -131,10 +131,10 @@ export const SkillsSection = () => {
       </Card>
 
       {/* Info Card */}
-      <Card className="card-mystic border-primary/30">
+      <Card className="card-mystic border-line">
         <CardContent className="p-6">
           <div className="flex items-start gap-4">
-            <div className="p-2 rounded-lg bg-primary/10">
+            <div className="p-2 rounded-lg bg-sunken">
               <Zap className="h-5 w-5" />
             </div>
             <div>

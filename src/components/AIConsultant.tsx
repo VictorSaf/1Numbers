@@ -230,7 +230,7 @@ export const AIConsultant = () => {
     <div className="space-y-6">
       {/* Daily Energy Card */}
       {dailySuggestion && (
-        <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-accent-ink/5">
+        <Card className="border-line bg-gradient-to-br from-primary/5 to-accent-ink/5">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
               <Sun className="h-5 w-5 text-warn" />
@@ -312,14 +312,14 @@ export const AIConsultant = () => {
             <TabsContent value="chat" className="space-y-4 mt-4">
               {/* No profile warning */}
               {!profile && (
-                <div className="p-4 rounded-lg bg-warn/10 border border-warn/30 text-sm text-warn">
+                <div className="p-4 rounded-lg border border-warn text-sm text-warn">
                   {tr.noProfile}
                 </div>
               )}
 
               {/* Said instead of an answer, never alongside one. */}
               {problem && (
-                <div className="p-4 rounded-lg bg-warn/10 border border-warn/30 text-sm text-warn">
+                <div className="p-4 rounded-lg border border-warn text-sm text-warn">
                   {problem === 'unavailable' && tr.unavailable}
                   {problem === 'busy' && tr.rateLimited}
                   {problem === 'failed' && tr.error}
@@ -336,11 +336,7 @@ export const AIConsultant = () => {
                     >
                       <div
                         data-role={msg.role}
-                        className={`max-w-[85%] p-3 rounded-lg ${
-                          msg.role === 'user'
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-muted'
-                        }`}
+                        className={`max-w-[85%] p-3 rounded-lg ${ msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted' }`}
                       >
                         {/* Întrebarea omului e text simplu, cum a scris-o.
                             Răspunsul modelului vine în markdown -- titluri,

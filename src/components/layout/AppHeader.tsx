@@ -69,7 +69,7 @@ const AppHeader = () => {
           {/* Logo / Home */}
           <Link to="/" className="flex items-center gap-2 group">
             <div className="relative">
-              <div className="absolute inset-0 bg-primary/20 rounded-full blur-md group-hover:bg-primary/30 transition-colors" />
+              <div className="absolute inset-0 bg-sunken rounded-full blur-md group-hover:bg-sunken transition-colors" />
               <div className="relative w-8 h-8 rounded-full bg-gradient-to-br from-primary to-warn flex items-center justify-center">
                 <span className="text-primary-foreground font-heading font-bold text-lg">N</span>
               </div>
@@ -94,8 +94,8 @@ const AppHeader = () => {
                       // icon-only ones did not.
                       "h-9 gap-2 px-3 font-raleway text-sm transition-all",
                       active
-                        ? "bg-primary/10 text-primary border-b-2 border-primary"
-                        : "text-foreground/90 hover:text-primary hover:bg-primary/5"
+                        ? "bg-sunken text-primary border-b-2 border-primary"
+                        : "text-foreground/90 hover:text-primary hover:bg-sunken"
                     )}
                   >
                     <Icon className="h-4 w-4" />
@@ -119,8 +119,8 @@ const AppHeader = () => {
                     className={cn(
                       "h-9 gap-2 px-3 font-raleway text-sm",
                       ACCOUNT_NAV.some((i) => isActive(i.path))
-                        ? "bg-primary/10 text-primary"
-                        : "text-foreground/90 hover:text-primary hover:bg-primary/5"
+                        ? "bg-sunken text-primary"
+                        : "text-foreground/90 hover:text-primary hover:bg-sunken"
                     )}
                   >
                     <User className="h-4 w-4" />
@@ -165,7 +165,7 @@ const AppHeader = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-9 gap-2 px-3 font-raleway text-sm text-foreground/90 hover:text-primary hover:bg-primary/5"
+                  className="h-9 gap-2 px-3 font-raleway text-sm text-foreground/90 hover:text-primary hover:bg-sunken"
                 >
                   <User className="h-4 w-4" />
                   <span className="hidden sm:inline">{say(SIGN_IN)}</span>
@@ -209,8 +209,8 @@ const AppHeader = () => {
                       className={cn(
                         "w-full justify-start h-10 px-4 gap-3 font-raleway text-sm",
                         isActive(item.path)
-                          ? "bg-primary/10 text-primary"
-                          : "text-foreground/90 hover:text-primary hover:bg-primary/5"
+                          ? "bg-sunken text-primary"
+                          : "text-foreground/90 hover:text-primary hover:bg-sunken"
                       )}
                     >
                       <Icon className="h-4 w-4" />
@@ -234,8 +234,8 @@ const AppHeader = () => {
                           className={cn(
                             "w-full justify-start h-10 px-4 gap-3 font-raleway text-sm",
                             isActive(item.path)
-                              ? "bg-primary/10 text-primary"
-                              : "text-foreground/90 hover:text-primary hover:bg-primary/5"
+                              ? "bg-sunken text-primary"
+                              : "text-foreground/90 hover:text-primary hover:bg-sunken"
                           )}
                         >
                           <Icon className="h-4 w-4" />
@@ -262,8 +262,8 @@ const AppHeader = () => {
                     className={cn(
                       "w-full justify-start h-10 px-4 gap-3 font-raleway text-sm",
                       isActive('/admin')
-                        ? "bg-primary/10 text-primary"
-                        : "text-foreground/90 hover:text-primary hover:bg-primary/5"
+                        ? "bg-sunken text-primary"
+                        : "text-foreground/90 hover:text-primary hover:bg-sunken"
                     )}
                   >
                     <Shield className="h-4 w-4" />

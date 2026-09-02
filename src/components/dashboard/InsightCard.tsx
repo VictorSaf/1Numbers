@@ -20,15 +20,15 @@ const variantStyles = {
   },
   positive: {
     theme: 'text-ok',
-    bg: 'bg-ok/5',
+    bg: '',
   },
   caution: {
     theme: 'text-warn',
-    bg: 'bg-warn/5',
+    bg: '',
   },
   special: {
     theme: 'text-primary',
-    bg: 'bg-primary/5',
+    bg: 'bg-sunken',
   },
 };
 

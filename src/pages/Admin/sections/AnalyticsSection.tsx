@@ -138,7 +138,7 @@ export const AnalyticsSection = () => {
         <Card className="card-mystic">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-lg bg-info/10">
+              <div className="p-3 rounded-lg">
                 <Calculator className="h-6 w-6 text-info" />
               </div>
               <div>
@@ -156,7 +156,7 @@ export const AnalyticsSection = () => {
         <Card className="card-mystic">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-lg bg-ok/10">
+              <div className="p-3 rounded-lg">
                 <Users className="h-6 w-6 text-ok" />
               </div>
               <div>
@@ -174,7 +174,7 @@ export const AnalyticsSection = () => {
         <Card className="card-mystic">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-lg bg-primary/10">
+              <div className="p-3 rounded-lg bg-sunken">
                 <TrendingUp className="h-6 w-6" />
               </div>
               <div>

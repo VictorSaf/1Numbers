@@ -32,9 +32,9 @@ export const AngelNumberCard = ({
   };
 
   const frequencyColors = {
-    common: "bg-ok/20 text-ok",
-    uncommon: "bg-info/20 text-info",
-    rare: "bg-primary/20 text-primary",
+    common: "text-ok",
+    uncommon: "text-info",
+    rare: "bg-sunken text-primary",
   };
 
   const sectionLabels = {
@@ -45,7 +45,7 @@ export const AngelNumberCard = ({
   };
 
   return (
-    <div className="card-mystic rounded-xl overflow-hidden">
+    <div className="card-mystic rounded-lg overflow-hidden">
       {/* Header - Always visible */}
       <div
         className="p-4 cursor-pointer hover:bg-muted/20 transition-colors"
@@ -54,7 +54,7 @@ export const AngelNumberCard = ({
         <div className="flex items-start gap-4">
           {/* Number Display */}
           <div className="relative flex-shrink-0">
-            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary/20 to-accent-ink/20 border border-primary/30 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-primary/20 to-accent-ink/20 border border-line flex items-center justify-center">
               <span className="num text-2xl">
                 {meaning.number}
               </span>
@@ -92,7 +92,7 @@ export const AngelNumberCard = ({
           {meaning.keywords[language].map((keyword, idx) => (
             <span
               key={idx}
-              className="px-2 py-0.5 text-xs rounded-full bg-primary/10 text-primary border border-primary/20"
+              className="px-2 py-0.5 text-xs rounded-full bg-sunken text-primary border border-line"
             >
               {keyword}
             </span>
@@ -162,7 +162,7 @@ export const AngelNumberCard = ({
               {meaning.relatedNumbers.map((num) => (
                 <span
                   key={num}
-                  className="px-3 py-1 rounded-lg bg-info/10 text-info text-sm font-medium"
+                  className="px-3 py-1 rounded-lg text-info text-sm font-medium"
                 >
                   {num}
                 </span>
@@ -190,7 +190,7 @@ export const AngelNumberCompact = ({
   return (
     <button
       onClick={onClick}
-      className="w-full p-3 rounded-xl bg-card/50 border border-border/50 hover:bg-card/70 transition-colors text-left"
+      className="w-full p-3 rounded-lg bg-card/50 border border-border/50 hover:bg-card/70 transition-colors text-left"
     >
       <div className="flex items-center gap-3">
         <span className="num text-xl text-primary">{meaning.number}</span>

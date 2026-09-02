@@ -66,7 +66,7 @@ const ICONS = {
 
 const PanelSkeleton = () => (
   <div className="mx-auto max-w-4xl px-4 py-12">
-    <div className="h-64 animate-pulse rounded-xl border border-primary/20 bg-primary/5" />
+    <div className="h-64 animate-pulse rounded-lg border border-line bg-sunken" />
   </div>
 );
 

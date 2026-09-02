@@ -369,7 +369,7 @@ export const UsersSection = () => {
                 className="flex items-center justify-between p-4 rounded-lg bg-muted/30 border border-border/30"
               >
                 <div className="flex items-center gap-4">
-                  <div className="p-2 rounded-full bg-primary/10">
+                  <div className="p-2 rounded-full bg-sunken">
                     {user.role === 'admin' ? (
                       <Shield className="h-5 w-5" />
                     ) : (

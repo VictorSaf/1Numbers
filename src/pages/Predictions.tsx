@@ -204,7 +204,7 @@ const Predictions = () => {
         <div className="max-w-4xl mx-auto space-y-8 pt-4">
           
           {/* Universal Day Energy */}
-          <div className="card-mystic rounded-xl p-6 text-center">
+          <div className="card-mystic rounded-lg p-6 text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
               <Sun className="h-6 w-6" />
               <h2 className="font-heading text-xl text-foreground">{l.universalDay}</h2>
@@ -220,7 +220,7 @@ const Predictions = () => {
 
           {/* Birth Date Selector */}
           {!birthDate && (
-            <div className="card-mystic rounded-xl p-8 text-center">
+            <div className="card-mystic rounded-lg p-8 text-center">
               <Sparkles className="h-12 w-12 mx-auto mb-4" />
               <h3 className="font-heading text-xl text-foreground mb-2">{l.enterBirthDate}</h3>
               <BirthDateSelect value={birthDate} onChange={setBirthDate} />
@@ -248,7 +248,7 @@ const Predictions = () => {
                     <DayNavigator date={selectedDay} today={today} onChange={selectDay} />
 
                     {dayContent && (
-                      <div className="card-mystic grid grid-cols-3 gap-3 rounded-xl p-4 text-center">
+                      <div className="card-mystic grid grid-cols-3 gap-3 rounded-lg p-4 text-center">
                         <div>
                           <p className="font-raleway text-xs text-muted-foreground">{t.today.personalDay}</p>
                           <p className="num text-2xl text-primary">{dayContent.personalDay}</p>
@@ -275,7 +275,7 @@ const Predictions = () => {
                       birthDate={birthDate}
                       date={selectedDay}
                     />
-                    <div className="card-mystic rounded-xl p-6 space-y-6">
+                    <div className="card-mystic rounded-lg p-6 space-y-6">
                       {/* Cifra zilei personale și energia ei nu se mai scriu aici.
                           Componenta Today, din capul paginii, le arată deja --
                           mare, cu arhetipul, cu relația față de hartă și cu
@@ -294,7 +294,7 @@ const Predictions = () => {
                         </div>
                       </div>
 
-                      <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
+                      <div className="p-4 rounded-lg bg-sunken border border-line">
                         <h4 className="font-heading text-sm text-primary mb-2">{l.advice}</h4>
                         <p className="text-foreground/90">{dailyPrediction.advice}</p>
                       </div>
@@ -333,7 +333,7 @@ const Predictions = () => {
                       />
                     )}
                     {annualTheme && (
-                      <div className="card-mystic rounded-xl p-6 space-y-4">
+                      <div className="card-mystic rounded-lg p-6 space-y-4">
                         <h3 className="font-heading text-xl">{l.personalMonth} - {selectedYear}</h3>
                         <div>
                           <h4 className="font-heading text-sm text-primary mb-2">{annualTheme.theme}</h4>
@@ -367,7 +367,7 @@ const Predictions = () => {
                         )}
                       </div>
                     )}
-                    <div className="card-mystic rounded-xl p-6 space-y-6">
+                    <div className="card-mystic rounded-lg p-6 space-y-6">
                     <div className="text-center">
                       <h3 className="font-heading text-lg text-muted-foreground">{l.personalMonth}</h3>
                       <div className="number-display-large mx-auto my-4 animate-float">
@@ -376,7 +376,7 @@ const Predictions = () => {
                       <p className="text-primary font-heading text-xl">{monthlyPrediction.theme}</p>
                     </div>
 
-                    <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
+                    <div className="p-4 rounded-lg bg-sunken border border-line">
                       <h4 className="font-heading text-sm text-primary mb-2">{l.overview}</h4>
                       <p className="text-foreground/90">{monthlyPrediction.overview}</p>
                     </div>
@@ -409,7 +409,7 @@ const Predictions = () => {
                       <h4 className="font-heading text-sm text-primary mb-2">{l.keyDays}</h4>
                       <div className="flex flex-wrap gap-2">
                         {monthlyPrediction.keyDays.map(day => (
-                          <span key={day} className="px-3 py-1 rounded-full bg-primary/20 text-primary text-sm num">
+                          <span key={day} className="px-3 py-1 rounded-full bg-sunken text-primary text-sm num">
                             {day}
                           </span>
                         ))}
@@ -428,7 +428,7 @@ const Predictions = () => {
               <Button
                 variant="outline"
                 onClick={() => setBirthDate(undefined)}
-                className="border-primary/30 text-primary hover:bg-primary/10"
+                className="border-line text-primary hover:bg-sunken"
               >
                 <Calendar className="mr-2 h-4 w-4" />
                 {l.selectBirthDate}

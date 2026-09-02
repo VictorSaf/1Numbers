@@ -65,7 +65,7 @@ const NumerologyGuide = () => {
                   onClick={() => setSelectedNumber(selectedNumber === num ? null : num)}
                   className={cn(
                     "number-display cursor-pointer transition-all duration-300 hover:scale-110",
-                    "border-2 border-primary/60",
+                    "border-2 border-line",
                     selectedNumber === num && "number-display-large  scale-110"
                   )}
                 >
@@ -77,7 +77,7 @@ const NumerologyGuide = () => {
 
           {/* Selected Number Detail */}
           {selectedNumber && (
-            <section className="card-mystic rounded-2xl p-8 animate-scale-in">
+            <section className="card-mystic rounded-lg p-8 animate-scale-in">
               <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
                 <div className="number-display-large shrink-0 animate-float">
                   {selectedNumber}
@@ -97,7 +97,7 @@ const NumerologyGuide = () => {
                     {getMeaning(selectedNumber).traits.map((trait, index) => (
                       <span
                         key={index}
-                        className="px-4 py-1.5 text-sm rounded-full bg-primary/10 text-primary border border-primary/20"
+                        className="px-4 py-1.5 text-sm rounded-full bg-sunken text-primary border border-line"
                       >
                         {trait}
                       </span>
@@ -135,7 +135,7 @@ const NumerologyGuide = () => {
                     className={cn(
                       "card-mystic rounded-xl p-5 opacity-0 animate-fade-in cursor-pointer",
                       " transition-all duration-300 hover:scale-[1.02]",
-                      isMaster && "border-primary/40",
+                      isMaster && "border-line",
                       getDelayClass(index * 50)
                     )}
                     onClick={() => setSelectedNumber(num)}
@@ -144,8 +144,8 @@ const NumerologyGuide = () => {
                       <div className={cn(
                         "w-14 h-14 rounded-full flex items-center justify-center",
                         "bg-gradient-to-br from-primary/20 to-accent/20",
-                        "border border-primary/30 font-heading text-xl text-primary",
-                        isMaster && "border-2 border-primary/60"
+                        "border border-line font-heading text-xl text-primary",
+                        isMaster && "border-2 border-line"
                       )}>
                         {num}
                       </div>

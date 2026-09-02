@@ -147,7 +147,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
     >
       {/* Header */}
       <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sunken border border-line">
           <Layers className="h-4 w-4" />
           <span className="text-sm font-raleway text-primary">
             {labels.title[language]}
@@ -163,7 +163,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
         {/* Grid Visualization */}
         <div className="flex-shrink-0 mx-auto lg:mx-0">
           <TooltipProvider>
-            <div className="grid grid-cols-3 gap-2 p-4 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm">
+            <div className="grid grid-cols-3 gap-2 p-4 rounded-lg bg-card/50 border border-border/50 backdrop-blur-sm">
               {LO_SHU_GRID_LAYOUT.map((row, rowIndex) =>
                 row.map((num, colIndex) => {
                   const count = result.grid[rowIndex][colIndex];
@@ -181,8 +181,8 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
                             "w-16 h-16 md:w-20 md:h-20 rounded-xl flex flex-col items-center justify-center transition-all duration-300",
                             "hover:scale-105 cursor-pointer",
                             isMissing && "bg-muted/30 border border-dashed border-border/50",
-                            !isMissing && !isRepeated && "bg-primary/10 border border-primary/30",
-                            isRepeated && "bg-gradient-to-br from-primary/20 to-accent-ink/20 border-2 border-primary/50",
+                            !isMissing && !isRepeated && "bg-sunken border border-line",
+                            isRepeated && "bg-gradient-to-br from-primary/20 to-accent-ink/20 border-2 border-line",
                             isSelected && "ring-2 ring-primary ring-offset-2 ring-offset-background"
                           )}
                         >
@@ -242,7 +242,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
             return (
               <div
                 data-cell-details
-                className="mt-4 rounded-xl border border-primary/30 bg-primary/5 p-4"
+                className="mt-4 rounded-lg border border-line bg-sunken p-4"
               >
                 <div className="flex items-baseline gap-3">
                   <span className="num text-2xl text-primary">{selectedNumber}</span>
@@ -267,7 +267,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
           {/* Present & Missing Numbers */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Present Numbers */}
-            <div className="p-4 rounded-xl bg-ok/10 border border-ok/20">
+            <div className="p-4 rounded-lg border border-ok">
               <h4 className="text-sm font-medium text-ok mb-2 flex items-center gap-2">
                 <Sparkles className="h-4 w-4" />
                 {labels.presentNumbers[language]}
@@ -278,7 +278,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
                     key={num}
                     className={cn(
                       "px-3 py-1 rounded-full text-sm font-medium",
-                      "bg-ok/20 text-ok"
+                      "text-ok"
                     )}
                   >
                     {num}
@@ -288,7 +288,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
             </div>
 
             {/* Missing Numbers */}
-            <div className="p-4 rounded-xl bg-warn/10 border border-warn/20">
+            <div className="p-4 rounded-lg border border-warn">
               <h4 className="text-sm font-medium text-warn mb-2 flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4" />
                 {labels.missingNumbers[language]}
@@ -300,7 +300,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
                       key={num}
                       className={cn(
                         "px-3 py-1 rounded-full text-sm font-medium",
-                        "bg-warn/20 text-warn"
+                        "text-warn"
                       )}
                     >
                       {num}
@@ -321,7 +321,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
 
           {/* Repeated Numbers */}
           {result.repeatedNumbers.length > 0 && (
-            <div className="p-4 rounded-xl bg-primary/10 border border-primary/20">
+            <div className="p-4 rounded-lg bg-sunken border border-line">
               <h4 className="text-sm font-medium text-primary mb-2">
                 {labels.repeatedNumbers[language]}
               </h4>
@@ -329,7 +329,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
                 {result.repeatedNumbers.map(({ number, count }) => (
                   <span
                     key={number}
-                    className="px-3 py-1 rounded-full text-sm font-medium bg-primary/20 text-primary"
+                    className="px-3 py-1 rounded-full text-sm font-medium bg-sunken text-primary"
                   >
                     {number} × {count}
                   </span>
@@ -339,7 +339,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
           )}
 
           {/* Planes */}
-          <div className="p-4 rounded-xl bg-card/50 border border-border/50">
+          <div className="p-4 rounded-lg bg-card/50 border border-border/50">
             <h4 className="text-sm font-medium text-foreground mb-3">
               {labels.planes[language]}
             </h4>
@@ -350,10 +350,10 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
                   className={cn(
                     "p-2 rounded-lg text-xs",
                     plane.strength === "empty" && "bg-muted/30 text-muted-foreground",
-                    plane.strength === "weak" && "bg-warn/10 text-warn",
-                    plane.strength === "balanced" && "bg-info/10 text-info",
-                    plane.strength === "strong" && "bg-ok/10 text-ok",
-                    plane.strength === "dominant" && "bg-primary/10 text-primary"
+                    plane.strength === "weak" && "text-warn",
+                    plane.strength === "balanced" && "text-info",
+                    plane.strength === "strong" && "text-ok",
+                    plane.strength === "dominant" && "bg-sunken text-primary"
                   )}
                 >
                   <div className="font-medium">
@@ -375,7 +375,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
           variant="outline"
           size="sm"
           onClick={() => setShowArrows(!showArrows)}
-          className="border-primary/30 text-primary hover:bg-primary/10"
+          className="border-line text-primary hover:bg-sunken"
         >
           {showArrows ? (
             <>
@@ -395,7 +395,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
             variant="outline"
             size="sm"
             onClick={() => setShowRemedies(!showRemedies)}
-            className="border-primary/30 text-primary hover:bg-primary/10"
+            className="border-line text-primary hover:bg-sunken"
           >
             {showRemedies ? (
               <>
@@ -414,7 +414,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
 
       {/* Arrows Section */}
       {showArrows && result.arrows.length > 0 && (
-        <div className="p-4 rounded-xl bg-card/50 border border-border/50 animate-fade-in">
+        <div className="p-4 rounded-lg bg-card/50 border border-border/50 animate-fade-in">
           <h4 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
             <ArrowRight className="h-4 w-4" />
             {labels.arrows[language]}
@@ -426,8 +426,8 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
                 className={cn(
                   "p-3 rounded-lg",
                   arrow.direction === "positive"
-                    ? "bg-ok/10 border border-ok/20"
-                    : "bg-warn/10 border border-warn/20"
+                    ? "border border-ok"
+                    : "border border-warn"
                 )}
               >
                 <div className="flex items-center gap-2 mb-1">
@@ -453,7 +453,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
 
       {/* Remedies Section */}
       {showRemedies && result.missingNumbers.length > 0 && (
-        <div className="p-4 rounded-xl bg-card/50 border border-border/50 animate-fade-in">
+        <div className="p-4 rounded-lg bg-card/50 border border-border/50 animate-fade-in">
           <h4 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
             <Gem className="h-4 w-4" />
             {labels.remedies[language]}
@@ -475,7 +475,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Strengths */}
         {result.analysis.strengths[language].length > 0 && (
-          <div className="p-4 rounded-xl bg-ok/10 border border-ok/20">
+          <div className="p-4 rounded-lg border border-ok">
             <h4 className="text-sm font-medium text-ok mb-2">
               {labels.strengths[language]}
             </h4>
@@ -492,7 +492,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
 
         {/* Weaknesses */}
         {result.analysis.weaknesses[language].length > 0 && (
-          <div className="p-4 rounded-xl bg-warn/10 border border-warn/20">
+          <div className="p-4 rounded-lg border border-warn">
             <h4 className="text-sm font-medium text-warn mb-2">
               {labels.weaknesses[language]}
             </h4>
@@ -521,7 +521,7 @@ const RemedyCard = ({ remedy, language }: RemedyCardProps) => {
   return (
     <div className="p-3 rounded-lg bg-muted/30 border border-border/30 space-y-3">
       <div className="flex items-center gap-3">
-        <span className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center num text-lg text-primary">
+        <span className="w-10 h-10 rounded-full bg-sunken flex items-center justify-center num text-lg text-primary">
           {remedy.number}
         </span>
         <div>

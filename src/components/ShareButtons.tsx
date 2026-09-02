@@ -117,7 +117,7 @@ export const ShareButtons = ({
           variant="outline"
           size="sm"
           onClick={handleNativeShare}
-          className="min-h-11 border-primary/30 text-primary hover:bg-primary/10"
+          className="min-h-11 border-line text-primary hover:bg-sunken"
         >
           <Share2 className="h-4 w-4 mr-2" />
           {labels.nativeShare}
@@ -130,7 +130,7 @@ export const ShareButtons = ({
           <Button
             variant="outline"
             size="sm"
-            className="min-h-11 border-primary/30 text-primary hover:bg-primary/10"
+            className="min-h-11 border-line text-primary hover:bg-sunken"
           >
             <Share2 className="h-4 w-4 mr-2" />
             {labels.share}

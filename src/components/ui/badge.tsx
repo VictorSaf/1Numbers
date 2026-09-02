@@ -12,7 +12,7 @@ const badgeVariants = cva(
       variant: {
         default: "border-gilt/40 bg-gilt-soft text-gilt",
         secondary: "border-line text-muted-foreground",
-        destructive: "border-crit/40 text-crit",
+        destructive: "border-crit text-crit",
         outline: "border-line text-foreground",
       },
     },

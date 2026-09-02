@@ -39,7 +39,7 @@ export const DayNavigator = ({ date, today, onChange }: DayNavigatorProps) => {
   const atEdge = !canGoBack || !canGoForward;
 
   return (
-    <div className="card-mystic rounded-xl p-4">
+    <div className="card-mystic rounded-lg p-4">
       <div className="flex items-center justify-between gap-3">
         <Button
           variant="ghost"
@@ -85,7 +85,7 @@ export const DayNavigator = ({ date, today, onChange }: DayNavigatorProps) => {
               variant="outline"
               size="sm"
               onClick={() => onChange(today)}
-              className="h-8 gap-2 border-primary/30 font-raleway text-xs text-primary hover:bg-primary/10"
+              className="h-8 gap-2 border-line font-raleway text-xs text-primary hover:bg-sunken"
             >
               <RotateCcw className="h-3 w-3" />
               {t.today.backToToday}

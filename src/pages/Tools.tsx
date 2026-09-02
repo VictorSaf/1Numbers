@@ -309,9 +309,9 @@ const Tools = () => {
 
   const getImpactColor = (impact: string) => {
     switch (impact) {
-      case 'positive': return 'bg-ok/20 text-ok';
-      case 'negative': return 'bg-crit/20 text-crit';
-      case 'mixed': return 'bg-warn/20 text-warn';
+      case 'positive': return 'text-ok';
+      case 'negative': return 'text-crit';
+      case 'mixed': return 'text-warn';
       default: return 'bg-muted text-muted-foreground';
     }
   };
@@ -377,7 +377,7 @@ const Tools = () => {
             </TabsList>
 
             <TabsContent value="angel">
-              <Suspense fallback={<div className="h-64 animate-pulse rounded-xl border border-primary/20 bg-primary/5" />}>
+              <Suspense fallback={<div className="h-64 animate-pulse rounded-lg border border-line bg-sunken" />}>
                 <AngelNumbers />
               </Suspense>
             </TabsContent>
@@ -540,7 +540,7 @@ const Tools = () => {
                         <div className="number-display">{businessAnalysis.destinyNumber}</div>
                         <div>
                           <div className="text-lg font-heading text-foreground">{businessAnalysis.name}</div>
-                          <Badge className={businessAnalysis.vibrationalEnergy === 'strong' ? 'bg-ok/20 text-ok' : businessAnalysis.vibrationalEnergy === 'moderate' ? 'bg-warn/20 text-warn' : 'bg-crit/20 text-crit'}>
+                          <Badge className={businessAnalysis.vibrationalEnergy === 'strong' ? 'text-ok' : businessAnalysis.vibrationalEnergy === 'moderate' ? 'text-warn' : 'text-crit'}>
                             {t.vibrationalEnergy}: {t[businessAnalysis.vibrationalEnergy]}
                           </Badge>
                         </div>
@@ -604,7 +604,7 @@ const Tools = () => {
                         <div className="flex gap-2 flex-wrap">
                           <span className="text-sm text-muted-foreground">{t.keyMonths}:</span>
                           {yearForecast.keyMonths.map(m => (
-                            <Badge key={m} className="bg-primary/20 text-primary">{yearForecast.monthlyForecasts[m-1].monthName}</Badge>
+                            <Badge key={m} className="bg-sunken text-primary">{yearForecast.monthlyForecasts[m-1].monthName}</Badge>
                           ))}
                         </div>
                       )}
@@ -679,7 +679,7 @@ const Tools = () => {
                                 <span className="font-medium text-foreground">{s.name}</span>
                                 <span className="text-sm text-muted-foreground ml-2">- {s.reason}</span>
                               </div>
-                              <Badge className="bg-primary/20 text-primary">{s.destinyNumber}</Badge>
+                              <Badge className="bg-sunken text-primary">{s.destinyNumber}</Badge>
                             </CardContent>
                           </Card>
                         ))
@@ -714,7 +714,7 @@ const Tools = () => {
                           <button
                             key={number}
                             onClick={() => setSelectedCompatNumber(selectedCompatNumber === number ? null : number)}
-                            className={`p-3 rounded-lg border transition-all ${selectedCompatNumber === number ? 'border-primary bg-primary/20' : 'border-border/30 bg-card/30 hover:bg-card/50'}`}
+                            className={`p-3 rounded-lg border transition-all ${selectedCompatNumber === number ? 'border-primary bg-sunken' : 'border-border/30 bg-card/30 hover:bg-card/50'}`}
                           >
                             <div className="text-2xl num text-primary">{number}</div>
                             <div className={`text-sm font-bold ${getScoreColor(detail.score)}`}>{detail.score}%</div>
@@ -733,7 +733,7 @@ const Tools = () => {
                               return (
                                 <>
                                   <div className="flex gap-2">
-                                    <Badge className={detail.level === 'excellent' ? 'bg-ok/20 text-ok' : detail.level === 'good' ? 'bg-ok/20 text-ok' : detail.level === 'moderate' ? 'bg-warn/20 text-warn' : 'bg-warn/20 text-warn'}>
+                                    <Badge className={detail.level === 'excellent' ? 'text-ok' : detail.level === 'good' ? 'text-ok' : detail.level === 'moderate' ? 'text-warn' : 'text-warn'}>
                                       {t[detail.level] || detail.level}
                                     </Badge>
                                     <span className={`font-bold ${getScoreColor(detail.score)}`}>{detail.score}%</span>

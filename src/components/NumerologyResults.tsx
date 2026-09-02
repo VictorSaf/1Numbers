@@ -56,7 +56,7 @@ const ChartSkeleton = () => (
   <div className="h-64 flex items-center justify-center">
     <div className="animate-pulse flex flex-col items-center gap-2">
       <div className="h-32 w-32 rounded-full border border-gilt/30" />
-      <div className="h-3 w-24 bg-primary/10 rounded" />
+      <div className="h-3 w-24 bg-sunken rounded" />
     </div>
   </div>
 );

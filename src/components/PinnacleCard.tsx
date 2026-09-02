@@ -101,7 +101,7 @@ export const PinnacleCard = ({ pinnacle, challenge, isCurrentPeriod, delay = 0 }
                   {pinnacleInfo?.description[language]}
                 </p>
               </div>
-              <div className="border-t border-tension/40 pt-3">
+              <div className="border-t border-tension pt-3">
                 <span className="num text-[0.6rem] uppercase tracking-[0.18em] text-tension">{copy.chal}</span>
                 <p className="mt-2 text-sm leading-relaxed text-foreground/85">
                   {challengeInfo?.description[language]}

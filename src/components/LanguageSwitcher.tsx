@@ -25,7 +25,7 @@ export const LanguageSwitcher = () => {
         <Button
           variant="outline"
           size="sm"
-          className="border-primary/30 bg-card/50 hover:bg-primary/10 hover:border-primary/50 gap-2"
+          className="border-line bg-card/50 hover:bg-sunken hover:border-line gap-2"
         >
           <Globe className="h-4 w-4" />
           <span className="text-sm">{currentLang?.flag}</span>
@@ -40,9 +40,7 @@ export const LanguageSwitcher = () => {
           <DropdownMenuItem
             key={lang.code}
             onClick={() => setLanguage(lang.code)}
-            className={`cursor-pointer gap-2 ${
-              language === lang.code ? "bg-primary/10 text-primary" : ""
-            }`}
+            className={`cursor-pointer gap-2 ${ language === lang.code ? "bg-sunken text-primary" : "" }`}
           >
             <span>{lang.flag}</span>
             <span>{lang.name}</span>

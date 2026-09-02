@@ -51,10 +51,10 @@ const Detail = ({
   <div
     className={cn(
       "border-t pt-3",
-      tone === "ok" && "border-ok/40",
-      tone === "warn" && "border-warn/40",
-      tone === "info" && "border-info/40",
-      tone === "tension" && "border-tension/40",
+      tone === "ok" && "border-ok",
+      tone === "warn" && "border-warn",
+      tone === "info" && "border-info",
+      tone === "tension" && "border-tension",
       tone === "gilt" && "border-gilt/40",
     )}
   >

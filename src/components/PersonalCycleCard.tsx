@@ -53,7 +53,7 @@ export const PersonalCycleCard = ({ birthDate, delay = 0 }: PersonalCycleCardPro
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {/* Personal Day */}
-        <div className="text-center p-3 rounded-xl bg-primary/10 border border-primary/20">
+        <div className="text-center p-3 rounded-lg bg-sunken border border-line">
           <Sun className="h-4 w-4 mx-auto mb-1" />
           <p className="text-xs text-muted-foreground">{labels.personalDay[language]}</p>
           <p className="num text-2xl text-primary">{personalDay}</p>
@@ -61,7 +61,7 @@ export const PersonalCycleCard = ({ birthDate, delay = 0 }: PersonalCycleCardPro
         </div>
 
         {/* Personal Month */}
-        <div className="text-center p-3 rounded-xl bg-primary/10 border border-primary/20">
+        <div className="text-center p-3 rounded-lg bg-sunken border border-line">
           <Moon className="h-4 w-4 mx-auto mb-1" />
           <p className="text-xs text-muted-foreground">{labels.personalMonth[language]}</p>
           <p className="num text-2xl text-primary">{personalMonth}</p>
@@ -69,14 +69,14 @@ export const PersonalCycleCard = ({ birthDate, delay = 0 }: PersonalCycleCardPro
         </div>
 
         {/* Universal Day */}
-        <div className="text-center p-3 rounded-xl bg-muted/50 border border-border/50">
+        <div className="text-center p-3 rounded-lg bg-muted/50 border border-border/50">
           <Sun className="h-4 w-4 mx-auto text-muted-foreground mb-1" />
           <p className="text-xs text-muted-foreground">{labels.universalDay[language]}</p>
           <p className="num text-2xl text-foreground">{universalDay}</p>
         </div>
 
         {/* Universal Month */}
-        <div className="text-center p-3 rounded-xl bg-muted/50 border border-border/50">
+        <div className="text-center p-3 rounded-lg bg-muted/50 border border-border/50">
           <Moon className="h-4 w-4 mx-auto text-muted-foreground mb-1" />
           <p className="text-xs text-muted-foreground">{labels.universalMonth[language]}</p>
           <p className="num text-2xl text-foreground">{universalMonth}</p>
@@ -85,12 +85,12 @@ export const PersonalCycleCard = ({ birthDate, delay = 0 }: PersonalCycleCardPro
 
       {/* Daily Energy */}
       <div className="space-y-4">
-        <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
+        <div className="p-4 rounded-lg bg-sunken border border-line">
           <p className="text-sm font-medium text-primary mb-2">{labels.todayEnergy[language]}</p>
           <p className="text-sm text-muted-foreground">{dayInfo?.dayMeaning[language]}</p>
         </div>
 
-        <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
+        <div className="p-4 rounded-lg bg-sunken border border-line">
           <p className="text-sm font-medium text-primary mb-2">{labels.monthEnergy[language]}</p>
           <p className="text-sm text-muted-foreground">{monthInfo?.monthMeaning[language]}</p>
         </div>

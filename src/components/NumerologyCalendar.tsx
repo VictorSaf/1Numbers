@@ -174,13 +174,13 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
     }
     
     if (day.isLucky && day.isMasterDay) {
-      classes += "bg-gradient-to-br from-warn/30 to-primary/30 border-warn/50 hover:from-warn/40 hover:to-primary/40 ";
+      classes += "bg-gradient-to-br from-warn/30 to-primary/30 border-warn hover:from-warn/40 hover:to-primary/40";
     } else if (day.isMasterDay) {
-      classes += "bg-primary/20 border-primary/40 hover:bg-primary/30 ";
+      classes += "bg-sunken border-line hover:bg-sunken";
     } else if (day.isLucky) {
-      classes += "bg-warn/20 border-warn/40 hover:bg-warn/30 ";
+      classes += "border-warn hover:";
     } else if (day.luckyScore >= 25) {
-      classes += "bg-ok/10 border-ok/20 hover:bg-ok/20 ";
+      classes += "border-ok hover:";
     } else {
       classes += "bg-card/50 border-border/30 hover:bg-card ";
     }
@@ -211,7 +211,7 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
               variant="outline"
               size="icon"
               onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-              className="h-8 w-8 border-primary/30"
+              className="h-8 w-8 border-line"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -222,7 +222,7 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
               variant="outline"
               size="icon"
               onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-              className="h-8 w-8 border-primary/30"
+              className="h-8 w-8 border-line"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
@@ -233,15 +233,15 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
         {/* Legend */}
         <div className="flex flex-wrap gap-3 mb-4 text-xs">
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded bg-warn/40 border border-warn/60" />
+            <div className="w-3 h-3 rounded border border-warn" />
             <span className="text-muted-foreground">{t.luckyDays}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded bg-primary/40 border border-primary/60" />
+            <div className="w-3 h-3 rounded bg-sunken border border-line" />
             <span className="text-muted-foreground">{t.masterDays}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded bg-ok/20 border border-ok/40" />
+            <div className="w-3 h-3 rounded border border-ok" />
             <span className="text-muted-foreground">{t.highEnergy}</span>
           </div>
         </div>
@@ -289,7 +289,7 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
                     </div>
                   </DialogTrigger>
                   
-                  <DialogContent className="sm:max-w-md bg-card border-primary/20">
+                  <DialogContent className="sm:max-w-md bg-card border-line">
                     <DialogHeader>
                       <DialogTitle className="font-heading text-xl">
                         {format(day.date, "EEEE, d MMMM yyyy", { locale })}
@@ -299,12 +299,12 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
                     <div className="space-y-4">
                       {/* Numbers row */}
                       <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-primary/10 rounded-lg p-3 text-center">
+                        <div className="bg-sunken rounded-lg p-3 text-center">
                           <Sun className="h-5 w-5 mx-auto mb-1" />
                           <div className="text-2xl num text-primary font-bold">{day.personalDay}</div>
                           <div className="text-xs text-muted-foreground">{t.personalDay}</div>
                         </div>
-                        <div className="bg-warn/10 rounded-lg p-3 text-center">
+                        <div className="rounded-lg p-3 text-center">
                           <Moon className="h-5 w-5 text-warn mx-auto mb-1" />
                           <div className="text-2xl num text-warn font-bold">{day.universalDay}</div>
                           <div className="text-xs text-muted-foreground">{t.universalDay}</div>
@@ -324,13 +324,13 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
                       {/* Badges */}
                       <div className="flex flex-wrap gap-2">
                         {day.isMasterDay && (
-                          <Badge className="bg-primary/20 text-primary border-primary/30">
+                          <Badge className="bg-sunken text-primary border-line">
                             <Sparkles className="h-3 w-3 mr-1" />
                             {t.masterDay}
                           </Badge>
                         )}
                         {day.isLucky && (
-                          <Badge className="bg-warn/20 text-warn border-warn/30">
+                          <Badge className="text-warn border-warn">
                             <Star className="h-3 w-3 mr-1" />
                             {t.luckyDay}
                           </Badge>
@@ -356,7 +356,7 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
                         <div className="space-y-2 pt-2 border-t border-border/50">
                           <h4 className="text-sm font-medium text-foreground">{t.dayEnergy}</h4>
                           <div className="flex items-center gap-2 mb-2">
-                            <Badge className="bg-primary/20 text-primary border-primary/30">
+                            <Badge className="bg-sunken text-primary border-line">
                               {PERSONAL_CYCLE_MEANINGS[day.personalDay].keywords[language as 'ro' | 'en' | 'ru']}
                             </Badge>
                           </div>
@@ -378,25 +378,25 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
         {/* Month Summary */}
         <div className="mt-6 pt-4 border-t border-border/50">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-            <div className="bg-warn/10 rounded-lg p-3">
+            <div className="rounded-lg p-3">
               <div className="text-2xl font-bold text-warn">
                 {monthData.filter(d => d.isLucky).length}
               </div>
               <div className="text-xs text-muted-foreground">{t.luckyDays}</div>
             </div>
-            <div className="bg-primary/10 rounded-lg p-3">
+            <div className="bg-sunken rounded-lg p-3">
               <div className="text-2xl font-bold text-primary">
                 {monthData.filter(d => d.isMasterDay).length}
               </div>
               <div className="text-xs text-muted-foreground">{t.masterDays}</div>
             </div>
-            <div className="bg-ok/10 rounded-lg p-3">
+            <div className="rounded-lg p-3">
               <div className="text-2xl font-bold text-ok">
                 {monthData.filter(d => d.luckyScore >= 25 && !d.isLucky).length}
               </div>
               <div className="text-xs text-muted-foreground">{t.highEnergy}</div>
             </div>
-            <div className="bg-primary/10 rounded-lg p-3">
+            <div className="bg-sunken rounded-lg p-3">
               <div className="text-2xl font-bold text-primary">
                 {Math.max(...monthData.map(d => d.luckyScore))}%
               </div>

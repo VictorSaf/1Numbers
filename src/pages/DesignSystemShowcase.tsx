@@ -167,19 +167,19 @@ const DesignSystemShowcase = () => {
             <DSCard variant="elevated" title="Primary Palette">
               <div className="flex flex-wrap gap-4">
                 <div className="text-center">
-                  <div className="w-16 h-16 rounded-xl bg-primary mb-2" />
+                  <div className="w-16 h-16 rounded-lg bg-primary mb-2" />
                   <span className="ds-caption">Primary</span>
                 </div>
                 <div className="text-center">
-                  <div className="w-16 h-16 rounded-xl bg-primary-hover mb-2" />
+                  <div className="w-16 h-16 rounded-lg bg-primary-hover mb-2" />
                   <span className="ds-caption">Hover</span>
                 </div>
                 <div className="text-center">
-                  <div className="w-16 h-16 rounded-xl bg-primary-light mb-2" />
+                  <div className="w-16 h-16 rounded-lg bg-primary-light mb-2" />
                   <span className="ds-caption">Light</span>
                 </div>
                 <div className="text-center">
-                  <div className="w-16 h-16 rounded-xl bg-primary-dark mb-2" />
+                  <div className="w-16 h-16 rounded-lg bg-primary-dark mb-2" />
                   <span className="ds-caption">Dark</span>
                 </div>
               </div>
@@ -189,19 +189,19 @@ const DesignSystemShowcase = () => {
             <DSCard variant="elevated" title="Secondary & Accent">
               <div className="flex flex-wrap gap-4">
                 <div className="text-center">
-                  <div className="w-16 h-16 rounded-xl bg-secondary mb-2" />
+                  <div className="w-16 h-16 rounded-lg bg-secondary mb-2" />
                   <span className="ds-caption">Secondary</span>
                 </div>
                 <div className="text-center">
-                  <div className="w-16 h-16 rounded-xl bg-secondary-hover mb-2" />
+                  <div className="w-16 h-16 rounded-lg bg-secondary-hover mb-2" />
                   <span className="ds-caption">Sec. Hover</span>
                 </div>
                 <div className="text-center">
-                  <div className="w-16 h-16 rounded-xl bg-accent mb-2" />
+                  <div className="w-16 h-16 rounded-lg bg-accent mb-2" />
                   <span className="ds-caption">Accent</span>
                 </div>
                 <div className="text-center">
-                  <div className="w-16 h-16 rounded-xl bg-accent-hover mb-2" />
+                  <div className="w-16 h-16 rounded-lg bg-accent-hover mb-2" />
                   <span className="ds-caption">Acc. Hover</span>
                 </div>
               </div>
@@ -211,19 +211,19 @@ const DesignSystemShowcase = () => {
             <DSCard variant="elevated" title="Semantic Colors">
               <div className="flex flex-wrap gap-4">
                 <div className="text-center">
-                  <div className="w-16 h-16 rounded-xl bg-success mb-2" />
+                  <div className="w-16 h-16 rounded-lg bg-success mb-2" />
                   <span className="ds-caption">Success</span>
                 </div>
                 <div className="text-center">
-                  <div className="w-16 h-16 rounded-xl bg-warning mb-2" />
+                  <div className="w-16 h-16 rounded-lg bg-warning mb-2" />
                   <span className="ds-caption">Warning</span>
                 </div>
                 <div className="text-center">
-                  <div className="w-16 h-16 rounded-xl bg-error mb-2" />
+                  <div className="w-16 h-16 rounded-lg bg-error mb-2" />
                   <span className="ds-caption">Error</span>
                 </div>
                 <div className="text-center">
-                  <div className="w-16 h-16 rounded-xl bg-info mb-2" />
+                  <div className="w-16 h-16 rounded-lg bg-info mb-2" />
                   <span className="ds-caption">Info</span>
                 </div>
               </div>
@@ -565,7 +565,7 @@ const DesignSystemShowcase = () => {
                 {['sm', 'md', 'lg', 'xl', '2xl', 'full'].map((size) => (
                   <div key={size} className="text-center">
                     <div
-                      className={`w-16 h-16 bg-primary/20 border border-primary`}
+                      className={`w-16 h-16 bg-sunken border border-primary`}
                       style={{ borderRadius: `var(--radius-${size})` }}
                     />
                     <span className="ds-caption mt-2 block">{size}</span>
@@ -579,7 +579,7 @@ const DesignSystemShowcase = () => {
                 {['sm', 'md', 'lg', 'xl'].map((size) => (
                   <div key={size} className="text-center">
                     <div
-                      className={`w-20 h-20 bg-card rounded-xl shadow-${size}`}
+                      className={`w-20 h-20 bg-card rounded-lg shadow-${size}`}
                     />
                     <span className="ds-caption mt-2 block">shadow-{size}</span>
                   </div>

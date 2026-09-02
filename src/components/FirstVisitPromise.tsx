@@ -40,7 +40,7 @@ export const FirstVisitPromise = ({ onTryExample }: FirstVisitPromiseProps) => {
         <Button
           variant="outline"
           onClick={onTryExample}
-          className="gap-2 border-primary/30 font-raleway text-primary hover:bg-primary/10"
+          className="gap-2 border-line font-raleway text-primary hover:bg-sunken"
         >
           {t.firstVisit.tryExample}
           <ArrowRight className="h-4 w-4" />

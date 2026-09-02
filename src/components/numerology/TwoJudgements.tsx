@@ -20,9 +20,9 @@ import { findCoupleDisagreements, type CoupleLang } from "@/lib/coupleDisagreeme
  */
 
 const TONE = {
-  aligned: "border-harmony/40 bg-harmony/5",
+  aligned: "border-harmony",
   mixed: "border-line bg-surface/60",
-  split: "border-tension/40 bg-tension/5",
+  split: "border-tension",
 } as const;
 
 const COPY: Record<CoupleLang, { hides: string; both: string; agreeYes: string; agreeNo: string; gap: string }> = {
@@ -68,7 +68,7 @@ export const TwoJudgements = ({
   return (
     <div data-two-judgements className="space-y-4">
       {/* ── Ce ascunde media ─────────────────────────────────────── */}
-      <div data-block="spread" className={`rounded-2xl border p-5 sm:p-6 ${TONE[spread.agreement]}`}>
+      <div data-block="spread" className={`rounded-lg border p-5 sm:p-6 ${TONE[spread.agreement]}`}>
         <div className="mb-4 flex flex-wrap items-baseline gap-x-4 gap-y-1">
           <h4 className="font-heading text-base text-foreground sm:text-lg">{t.hides}</h4>
           <span className="num text-xs text-muted-foreground">
@@ -84,13 +84,7 @@ export const TwoJudgements = ({
               <span className="w-28 shrink-0 text-sm text-foreground/85 sm:w-36">{p.label}</span>
               <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-line">
                 <span
-                  className={`block h-1.5 rounded-full ${
-                    p.score === spread.best.score
-                      ? "bg-harmony"
-                      : p.score === spread.worst.score
-                        ? "bg-tension"
-                        : "bg-primary"
-                  }`}
+                  className={`block h-1.5 rounded-full ${ p.score === spread.best.score ? "bg-harmony" : p.score === spread.worst.score ? "bg-tension" : "bg-primary" }`}
                   style={{ width: `${Math.max(2, p.score)}%` }}
                 />
               </span>
@@ -107,7 +101,7 @@ export const TwoJudgements = ({
       {/* ── Două tradiții, aceeași pereche ────────────────────────── */}
       <div
         data-block="traditions"
-        className={`rounded-2xl border p-5 sm:p-6 ${traditions.agree ? TONE.aligned : TONE.split}`}
+        className={`rounded-lg border p-5 sm:p-6 ${traditions.agree ? TONE.aligned : TONE.split}`}
       >
         <div className="mb-4 flex flex-wrap items-baseline gap-x-4 gap-y-1">
           <h4 className="font-heading text-base text-foreground sm:text-lg">{t.both}</h4>
@@ -128,13 +122,7 @@ export const TwoJudgements = ({
           <div>
             <p className="text-sm text-foreground/90">{traditions.vedic.label}</p>
             <p
-              className={`mt-1 font-heading text-xl ${
-                traditions.vedic.relation === "friends"
-                  ? "text-harmony"
-                  : traditions.vedic.relation === "enemies"
-                    ? "text-tension"
-                    : "text-foreground/80"
-              }`}
+              className={`mt-1 font-heading text-xl ${ traditions.vedic.relation === "friends" ? "text-harmony" : traditions.vedic.relation === "enemies" ? "text-tension" : "text-foreground/80" }`}
             >
               {traditions.vedic.reads}
             </p>

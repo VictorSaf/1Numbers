@@ -95,7 +95,7 @@ export const ProfileSwitcher = ({ className, onProfileSwitch }: ProfileSwitcherP
               value={profile.id}
               className={cn(
                 "cursor-pointer",
-                profile.isActive && "bg-primary/10"
+                profile.isActive && "bg-sunken"
               )}
             >
               <div className="flex items-center justify-between w-full">

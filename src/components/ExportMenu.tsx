@@ -126,7 +126,7 @@ export const ExportMenu = ({ reportData, elementId }: ExportMenuProps) => {
       <DropdownMenuTrigger asChild>
         <Button 
           variant="outline" 
-          className="border-primary/30 text-primary hover:bg-primary/10"
+          className="border-line text-primary hover:bg-sunken"
           disabled={isExporting}
         >
           {isExporting ? (

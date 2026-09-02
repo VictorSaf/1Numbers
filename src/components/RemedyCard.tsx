@@ -259,7 +259,7 @@ export const RemedyCard = ({ remedy, showAll = false }: RemedyCardProps) => {
                 {remedy.mantras.vedic}
               </p>
             </div>
-            <div className="p-3 bg-primary/5 rounded-lg">
+            <div className="p-3 bg-sunken rounded-lg">
               <p className="text-xs text-muted-foreground mb-1">{t.affirmation}</p>
               <p className="italic">{remedy.mantras.affirmation}</p>
             </div>

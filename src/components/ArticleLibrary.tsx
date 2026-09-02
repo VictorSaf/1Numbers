@@ -55,7 +55,7 @@ export const ArticleLibrary = ({ articles, onArticleSelect, className }: Article
               "px-3 py-1 rounded-full text-sm border transition-all",
               selectedCategory === 'all'
                 ? "bg-primary text-primary-foreground border-primary"
-                : "border-border hover:border-primary/50"
+                : "border-border hover:border-line"
             )}
           >
             Toate
@@ -68,7 +68,7 @@ export const ArticleLibrary = ({ articles, onArticleSelect, className }: Article
                 "px-3 py-1 rounded-full text-sm border transition-all",
                 selectedCategory === cat.value
                   ? "bg-primary text-primary-foreground border-primary"
-                  : "border-border hover:border-primary/50"
+                  : "border-border hover:border-line"
               )}
             >
               {cat.label}

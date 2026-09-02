@@ -65,7 +65,7 @@ export const MCPServersSection = () => {
       <Card className="card-mystic">
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
-            <div className={`p-3 rounded-lg ${configured ? 'bg-ok/10' : 'bg-warn/10'}`}>
+            <div className={`p-3 rounded-lg ${configured ? '' : ''}`}>
               <Server className={`h-6 w-6 ${configured ? 'text-ok' : 'text-warn'}`} />
             </div>
             <div>
@@ -109,7 +109,7 @@ export const MCPServersSection = () => {
                   className="flex items-center justify-between p-4 rounded-lg bg-muted/30 border border-border/30"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="p-2 rounded-lg bg-ok/10">
+                    <div className="p-2 rounded-lg">
                       <CheckCircle className="h-5 w-5 text-ok" />
                     </div>
                     <div>
@@ -140,10 +140,10 @@ export const MCPServersSection = () => {
       )}
 
       {/* Info Card */}
-      <Card className="card-mystic border-primary/30">
+      <Card className="card-mystic border-line">
         <CardContent className="p-6">
           <div className="flex items-start gap-4">
-            <div className="p-2 rounded-lg bg-primary/10">
+            <div className="p-2 rounded-lg bg-sunken">
               <Settings className="h-5 w-5" />
             </div>
             <div>

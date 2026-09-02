@@ -66,7 +66,7 @@ export const ResearchSection = () => {
       <Card className="card-mystic">
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
-            <div className="p-3 rounded-lg bg-primary/10">
+            <div className="p-3 rounded-lg bg-sunken">
               <FileSearch className="h-6 w-6" />
             </div>
             <div>
@@ -99,7 +99,7 @@ export const ResearchSection = () => {
                 className="flex items-center justify-between p-4 rounded-lg bg-muted/30 border border-border/30"
               >
                 <div className="flex items-center gap-4">
-                  <div className="p-2 rounded-lg bg-info/10">
+                  <div className="p-2 rounded-lg">
                     <FileText className="h-5 w-5 text-info" />
                   </div>
                   <div className="flex-1">
@@ -134,10 +134,10 @@ export const ResearchSection = () => {
       </Card>
 
       {/* Info Card */}
-      <Card className="card-mystic border-primary/30">
+      <Card className="card-mystic border-line">
         <CardContent className="p-6">
           <div className="flex items-start gap-4">
-            <div className="p-2 rounded-lg bg-primary/10">
+            <div className="p-2 rounded-lg bg-sunken">
               <FileSearch className="h-5 w-5" />
             </div>
             <div>

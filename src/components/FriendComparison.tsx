@@ -162,7 +162,7 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
   return (
     <div className="space-y-6">
       {/* Overall Compatibility Card */}
-      <Card className="border-2 border-primary/20">
+      <Card className="border-2 border-line">
         <CardHeader className="text-center pb-2">
           <div className="flex justify-center mb-2">
             <Heart className="h-8 w-8 text-crit fill-crit" />
@@ -348,7 +348,7 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
       {(compatibility.strengths || compatibility.challenges) && (
         <div className="grid md:grid-cols-2 gap-4">
           {/* Strengths */}
-          <Card className="border-ok/20">
+          <Card className="border-ok">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg text-ok">{t.strengths}</CardTitle>
             </CardHeader>
@@ -365,7 +365,7 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
           </Card>
 
           {/* Challenges */}
-          <Card className="border-warn/20">
+          <Card className="border-warn">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg text-warn">{t.challenges}</CardTitle>
             </CardHeader>

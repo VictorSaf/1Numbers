@@ -143,8 +143,8 @@ export const UISettingsSection = () => {
                 className={cn(
                   "p-4 rounded-lg border-2 transition-all text-left",
                   settings.defaultTheme === theme.id
-                    ? "border-primary bg-primary/10"
-                    : "border-border hover:border-primary/50"
+                    ? "border-primary bg-sunken"
+                    : "border-border hover:border-line"
                 )}
               >
                 <div className="flex gap-1 mb-2">

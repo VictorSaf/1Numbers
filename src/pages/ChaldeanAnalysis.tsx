@@ -294,7 +294,7 @@ const ChaldeanAnalysis = () => {
       </div>
 
       {/* How It Works */}
-      <Card className="mb-8 border-warn/20 bg-warn/5">
+      <Card className="mb-8 border-warn">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg flex items-center gap-2">
             <Hash className="h-5 w-5 text-warn" />
@@ -383,7 +383,7 @@ const ChaldeanAnalysis = () => {
                         <span className="text-sm text-warn">{item.value}</span>
                       </div>
                     ))}
-                    <div className="flex flex-col items-center p-2 bg-primary/20 rounded-lg min-w-[40px]">
+                    <div className="flex flex-col items-center p-2 bg-sunken rounded-lg min-w-[40px]">
                       <span className="font-bold">=</span>
                       <span className="text-sm text-primary">
                         {analysis.nameNumber.compound}
@@ -478,7 +478,7 @@ const ChaldeanAnalysis = () => {
 
           {businessName && businessAnalysis && (
             <>
-              <Card className={businessAnalysis.isLucky ? 'border-ok/50' : 'border-crit/50'}>
+              <Card className={businessAnalysis.isLucky ? 'border-ok' : 'border-crit'}>
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-4">
@@ -530,7 +530,7 @@ const ChaldeanAnalysis = () => {
               </Card>
 
               <div className="grid md:grid-cols-2 gap-4">
-                <Card className="border-ok/20">
+                <Card className="border-ok">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg flex items-center gap-2 text-ok">
                       <CheckCircle className="h-5 w-5" />
@@ -560,7 +560,7 @@ const ChaldeanAnalysis = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="border-crit/20">
+                <Card className="border-crit">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg flex items-center gap-2 text-crit">
                       <AlertTriangle className="h-5 w-5" />

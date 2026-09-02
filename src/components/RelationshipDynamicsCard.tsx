@@ -65,7 +65,7 @@ export const RelationshipDynamicsCard = ({ compatibility }: RelationshipDynamics
                 <Badge
                   key={idx}
                   variant="outline"
-                  className="bg-ok/10 text-ok border-ok/20"
+                  className="text-ok border-ok"
                 >
                   {strength}
                 </Badge>
@@ -90,7 +90,7 @@ export const RelationshipDynamicsCard = ({ compatibility }: RelationshipDynamics
                 <Badge
                   key={idx}
                   variant="outline"
-                  className="bg-warn/10 text-warn border-warn/20"
+                  className="text-warn border-warn"
                 >
                   {challenge}
                 </Badge>

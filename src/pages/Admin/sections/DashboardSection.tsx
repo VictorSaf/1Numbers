@@ -49,14 +49,14 @@ export const DashboardSection = () => {
       value: stats.totalUsers,
       icon: Users,
       color: 'text-info',
-      bgColor: 'bg-info/10',
+      bgColor: '',
     },
     {
       title: 'Active Users',
       value: stats.activeUsers,
       icon: UserCheck,
       color: 'text-ok',
-      bgColor: 'bg-ok/10',
+      bgColor: '',
       subtitle: 'Last 7 days',
     },
     {
@@ -64,14 +64,14 @@ export const DashboardSection = () => {
       value: stats.premiumUsers,
       icon: Crown,
       color: 'text-warn',
-      bgColor: 'bg-warn/10',
+      bgColor: '',
     },
     {
       title: 'New This Week',
       value: stats.newUsersThisWeek,
       icon: TrendingUp,
       color: 'text-primary',
-      bgColor: 'bg-primary/10',
+      bgColor: 'bg-sunken',
     },
   ];
 
