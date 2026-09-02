@@ -39,7 +39,7 @@ const NumerologyGuide = () => {
                   onClick={() => setSelectedNumber(selectedNumber === num ? null : num)}
                   className={cn(
                     "number-display cursor-pointer transition-all duration-300 hover:scale-110",
-                    selectedNumber === num && "number-display-large glow-gold scale-110"
+                    selectedNumber === num && "number-display-large  scale-110"
                   )}
                 >
                   {num}
@@ -66,7 +66,7 @@ const NumerologyGuide = () => {
                   className={cn(
                     "number-display cursor-pointer transition-all duration-300 hover:scale-110",
                     "border-2 border-primary/60",
-                    selectedNumber === num && "number-display-large glow-gold scale-110"
+                    selectedNumber === num && "number-display-large  scale-110"
                   )}
                 >
                   {num}
@@ -77,7 +77,7 @@ const NumerologyGuide = () => {
 
           {/* Selected Number Detail */}
           {selectedNumber && (
-            <section className="card-mystic rounded-2xl p-8 glow-gold-subtle animate-scale-in">
+            <section className="card-mystic rounded-2xl p-8 animate-scale-in">
               <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
                 <div className="number-display-large shrink-0 animate-float">
                   {selectedNumber}
@@ -134,7 +134,7 @@ const NumerologyGuide = () => {
                     key={num}
                     className={cn(
                       "card-mystic rounded-xl p-5 opacity-0 animate-fade-in cursor-pointer",
-                      "hover:glow-gold-subtle transition-all duration-300 hover:scale-[1.02]",
+                      " transition-all duration-300 hover:scale-[1.02]",
                       isMaster && "border-primary/40",
                       getDelayClass(index * 50)
                     )}

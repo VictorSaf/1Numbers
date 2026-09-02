@@ -55,7 +55,7 @@ export const AngelNumberCard = ({
           {/* Number Display */}
           <div className="relative flex-shrink-0">
             <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary/20 to-accent-ink/20 border border-primary/30 flex items-center justify-center">
-              <span className="num text-2xl text-gradient-gold">
+              <span className="num text-2xl">
                 {meaning.number}
               </span>
             </div>

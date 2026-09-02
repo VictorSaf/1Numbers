@@ -72,7 +72,7 @@ export const WeeklyMonthlyPredictionCard = ({
     return (
       <Card className="card-mystic">
         <CardHeader>
-          <CardTitle className="font-heading text-xl text-gradient-gold flex items-center gap-2">
+          <CardTitle className="font-heading text-xl flex items-center gap-2">
             <Calendar className="h-5 w-5" />
             {labels.weekly}
           </CardTitle>
@@ -142,7 +142,7 @@ export const WeeklyMonthlyPredictionCard = ({
     return (
       <Card className="card-mystic">
         <CardHeader>
-          <CardTitle className="font-heading text-xl text-gradient-gold flex items-center gap-2">
+          <CardTitle className="font-heading text-xl flex items-center gap-2">
             <Calendar className="h-5 w-5" />
             {labels.monthly}
           </CardTitle>

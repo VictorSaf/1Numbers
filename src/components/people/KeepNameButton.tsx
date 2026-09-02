@@ -146,7 +146,7 @@ export const KeepNameButton = ({ name, defaultCategory }: KeepNameButtonProps) =
             <Button variant="outline" onClick={() => setOpen(false)}>
               {t.cancel}
             </Button>
-            <Button onClick={save} disabled={!date || saving} className="btn-mystic gap-2">
+            <Button onClick={save} disabled={!date || saving} className="gap-2">
               {saving && <Loader2 className="h-4 w-4 animate-spin" />}
               {t.save}
             </Button>

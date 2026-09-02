@@ -22,7 +22,7 @@ const NotFound = () => {
             {t.notFound?.description || "Pagina pe care o căutați nu există sau a fost mutată."}
           </p>
           <div className="pt-4">
-            <Button asChild className="btn-mystic">
+            <Button asChild>
               <Link to="/">
                 <Home className="mr-2 h-4 w-4" />
                 {t.notFound?.backHome || "Înapoi la Pagina Principală"}

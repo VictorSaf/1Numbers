@@ -191,7 +191,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
                               "num text-2xl md:text-3xl",
                               isMissing && "text-muted-foreground/50",
                               !isMissing && "text-primary",
-                              isRepeated && "text-gradient-gold"
+                              isRepeated && ""
                             )}
                           >
                             {num}

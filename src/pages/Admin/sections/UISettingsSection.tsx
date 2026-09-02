@@ -212,7 +212,7 @@ export const UISettingsSection = () => {
 
       {/* Save Button */}
       <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={saving} className="btn-mystic">
+        <Button onClick={handleSave} disabled={saving}>
           <Save className="h-4 w-4 mr-2" />
           {saving ? 'Saving...' : 'Save Settings'}
         </Button>

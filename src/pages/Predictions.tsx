@@ -334,7 +334,7 @@ const Predictions = () => {
                     )}
                     {annualTheme && (
                       <div className="card-mystic rounded-xl p-6 space-y-4">
-                        <h3 className="font-heading text-xl text-gradient-gold">{l.personalMonth} - {selectedYear}</h3>
+                        <h3 className="font-heading text-xl">{l.personalMonth} - {selectedYear}</h3>
                         <div>
                           <h4 className="font-heading text-sm text-primary mb-2">{annualTheme.theme}</h4>
                           <p className="text-foreground/90">{annualTheme.description}</p>

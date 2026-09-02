@@ -346,8 +346,8 @@ const Tutorials = () => {
                 key={index}
                 onClick={() => startLesson(index)}
                 className={cn(
-                  "card-mystic rounded-xl p-5 text-left transition-all duration-300 hover:glow-gold-subtle",
-                  currentLesson === index && "ring-2 ring-primary glow-gold-subtle"
+                  "card-mystic rounded-xl p-5 text-left transition-all duration-300 ",
+                  currentLesson === index && "ring-2 ring-primary "
                 )}
               >
                 <div className="flex items-start justify-between mb-3">
@@ -439,7 +439,6 @@ const Tutorials = () => {
                 <Button
                   onClick={handleNext}
                   disabled={step.quiz && quizAnswer !== step.quiz.correct}
-                  className="btn-mystic"
                 >
                   {currentStep === lesson.steps.length - 1 ? l.complete : l.next}
                   <ChevronRight className="ml-2 h-4 w-4" />

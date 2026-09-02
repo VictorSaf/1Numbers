@@ -344,7 +344,7 @@ const Profile = () => {
           )}
 
           {/* Profile Form */}
-          <div className="card-mystic rounded-2xl p-8 glow-gold-subtle">
+          <div className="card-mystic rounded-2xl p-8">
             {profiles.length === 0 && (
               <div className="mb-6 p-4 rounded-lg bg-muted/30 border border-border/30">
                 <p className="text-sm text-muted-foreground text-center">
@@ -487,7 +487,7 @@ const Profile = () => {
               <div className="flex gap-4 pt-4">
                 <Button
                   type="submit"
-                  className="btn-mystic flex-1 h-12"
+                  className="flex-1 h-12"
                   disabled={saving || !formData.fullName.trim() || !formData.birthDate}
                 >
                   <Save className="mr-2 h-4 w-4" />

@@ -7,7 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 /**
  * Capul unei pagini, în registrul hărții.
  *
- * Era o insignă albastră rotundă, un titlu centrat pe `text-gradient-gold` --
+ * Era o insignă albastră rotundă, un titlu centrat pe `` --
  * o clasă care nu există în CSS-ul emis, deci titlul n-avea nicio culoare
  * proprie -- și un subtitlu. Acum: filet de alamă cu etichetă mono, titlu în
  * Literata, aliniate la stânga ca tot restul citirii.

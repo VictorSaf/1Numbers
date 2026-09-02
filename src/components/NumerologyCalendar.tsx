@@ -200,7 +200,7 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="font-heading text-xl md:text-2xl text-gradient-gold flex items-center gap-2">
+            <CardTitle className="font-heading text-xl md:text-2xl flex items-center gap-2">
               <CalendarIcon className="h-5 w-5 md:h-6 md:w-6" />
               {t.title}
             </CardTitle>
@@ -291,7 +291,7 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
                   
                   <DialogContent className="sm:max-w-md bg-card border-primary/20">
                     <DialogHeader>
-                      <DialogTitle className="font-heading text-xl text-gradient-gold">
+                      <DialogTitle className="font-heading text-xl">
                         {format(day.date, "EEEE, d MMMM yyyy", { locale })}
                       </DialogTitle>
                     </DialogHeader>

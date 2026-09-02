@@ -135,7 +135,7 @@ const Index = () => {
         {shouldShowForm && !loadingProfile && (
           <div className="max-w-4xl mx-auto pt-4">
             <div className="max-w-md mx-auto">
-              <div className="card-mystic rounded-2xl p-8 glow-gold-subtle">
+              <div className="card-mystic rounded-2xl p-8">
                 <div className="text-center mb-8">
                   <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 border border-primary/20 mb-4">
                     <Sparkles className="h-8 w-8 text-primary" />

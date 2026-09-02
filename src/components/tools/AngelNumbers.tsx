@@ -155,7 +155,6 @@ const AngelNumbers = () => {
                   const meaning = getAngelNumberMeaning(searchInput);
                   if (meaning) setSelectedNumber(meaning);
                 }}
-                className="btn-mystic"
               >
                 {t.search}
               </Button>
@@ -172,8 +171,8 @@ const AngelNumbers = () => {
                     size="sm"
                     onClick={() => handleQuickSearch(num)}
                     className={`border-primary/30 hover:bg-primary/10 ${
-                      searchInput === num ? "bg-primary/20" : ""
-                    }`}
+ searchInput === num ? "bg-primary/20" : ""
+ }`}
                   >
                     {num}
                   </Button>

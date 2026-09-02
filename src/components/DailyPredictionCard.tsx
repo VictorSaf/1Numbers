@@ -56,7 +56,7 @@ export const DailyPredictionCard = ({ prediction, birthDate, date }: DailyPredic
     <Card className="card-mystic">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="font-heading text-xl text-gradient-gold">
+          <CardTitle className="font-heading text-xl">
             {predExt.daily}
           </CardTitle>
           <div 

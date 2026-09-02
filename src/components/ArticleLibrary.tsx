@@ -83,7 +83,7 @@ export const ArticleLibrary = ({ articles, onArticleSelect, className }: Article
           {filteredArticles.map((article) => (
             <Card
               key={article.id}
-              className="card-mystic hover:glow-gold-subtle transition-all duration-300 cursor-pointer h-full"
+              className="card-mystic transition-all duration-300 cursor-pointer h-full"
               onClick={() => onArticleSelect?.(article)}
             >
               <CardHeader>

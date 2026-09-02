@@ -51,7 +51,7 @@ export class ChunkErrorBoundary extends Component<Props, State> {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-4">
         <div className="max-w-md text-center space-y-4">
-          <h2 className="font-heading text-2xl text-gradient-gold">{title}</h2>
+          <h2 className="font-heading text-2xl">{title}</h2>
           <p className="text-muted-foreground">{body}</p>
           <Button onClick={() => this.setState({ failedAt: null })} className="gap-2">
             <RefreshCw className="h-4 w-4" />

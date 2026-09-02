@@ -255,7 +255,7 @@ const Journal = () => {
               if (!open) resetForm();
             }}>
               <DialogTrigger asChild>
-                <Button className="btn-mystic">
+                <Button>
                   <Plus className="h-4 w-4 mr-2" />
                   Adaugă Intrare
                 </Button>
@@ -337,7 +337,7 @@ const Journal = () => {
                     }}>
                       Anulează
                     </Button>
-                    <Button onClick={handleSave} className="btn-mystic">
+                    <Button onClick={handleSave}>
                       Salvează
                     </Button>
                   </div>

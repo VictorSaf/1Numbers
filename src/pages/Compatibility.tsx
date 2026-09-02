@@ -153,7 +153,7 @@ const Compatibility = () => {
       <main className="relative z-10 px-4 pb-16">
         <div className="max-w-4xl mx-auto pt-4">
           {!result ? (
-            <div className="card-mystic rounded-2xl p-8 glow-gold-subtle max-w-2xl mx-auto">
+            <div className="card-mystic rounded-2xl p-8 max-w-2xl mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Person 1 */}
                 <div className="space-y-4">
@@ -224,7 +224,7 @@ const Compatibility = () => {
               <Button
                 onClick={handleCalculate}
                 disabled={!canCalculate}
-                className="btn-mystic w-full h-14 text-lg"
+                className="w-full h-14 text-lg"
               >
                 <Sparkles className="mr-2 h-5 w-5" />
                 {t.calculateCompatibility}
