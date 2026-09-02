@@ -346,7 +346,7 @@ const Tutorials = () => {
                 key={index}
                 onClick={() => startLesson(index)}
                 className={cn(
-                  "card-mystic p-5 text-left transition-colors duration-200",
+                  "card-mystic py-5 text-left transition-colors duration-200",
                   currentLesson === index && "border-gilt"
                 )}
               >
@@ -366,7 +366,7 @@ const Tutorials = () => {
 
           {/* Current Lesson Content */}
           {lesson && step && (
-            <div className="card-mystic rounded-lg p-6 md:p-8">
+            <div className="card-mystic py-6 md:py-8">
               {/* Progress */}
               <div className="mb-6">
                 <div className="flex justify-between text-sm text-muted-foreground mb-2">
@@ -382,7 +382,7 @@ const Tutorials = () => {
                 <p className="text-foreground/90 leading-relaxed">{step.content}</p>
 
                 {step.example && (
-                  <div className="p-4 rounded-lg bg-sunken border border-line">
+                  <div className="pt-4 border-t border-line">
                     <h4 className="font-heading text-sm text-foreground mb-2">Exemplu:</h4>
                     <pre className="text-sm text-foreground/80 whitespace-pre-wrap font-mono">
                       {step.example}
@@ -391,7 +391,7 @@ const Tutorials = () => {
                 )}
 
                 {step.quiz && (
-                  <div className="p-4 rounded-lg bg-card/50 border border-border/30">
+                  <div className="pt-4 border-t border-line">
                     <h4 className="font-heading text-sm text-foreground mb-3">Quiz:</h4>
                     <p className="text-foreground mb-4">{step.quiz.question}</p>
                     <div className="grid grid-cols-2 gap-2">

@@ -191,13 +191,13 @@ const Compatibility = () => {
                   de 1024, o treaptă de 352px față de placa de deasupra lui. */}
               <SectionHead index={1} title={sections.pereche} question={sections.perecheQ} />
 
-              <div className="card-mystic rounded-lg p-8">
+              <div className="card-mystic py-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Person 1 */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 rounded-full bg-sunken border border-line flex items-center justify-center">
-                      <span className="text-primary num text-sm">1</span>
+                    <div className="flex items-center justify-center">
+                      <span className="num text-2xl leading-none text-accent">1</span>
                     </div>
                     <h3 className="font-heading text-lg text-foreground">{t.person1}</h3>
                   </div>
@@ -221,8 +221,8 @@ const Compatibility = () => {
                 {/* Person 2 */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 rounded-full bg-accent/20 border border-accent/30 flex items-center justify-center">
-                      <span className="text-accent-foreground num text-sm">2</span>
+                    <div className="flex items-center justify-center">
+                      <span className="num text-2xl leading-none text-accent">2</span>
                     </div>
                     <h3 className="font-heading text-lg text-foreground">{t.person2}</h3>
                   </div>
@@ -282,7 +282,7 @@ const Compatibility = () => {
 
               {/* Overall Score */}
               <div className={cn(
-                "card-mystic p-8 text-center",
+                "card-mystic py-8 text-center",
                 "bg-gradient-to-br border",
                 getScoreBg(result.overallScore)
               )}>
@@ -324,16 +324,16 @@ const Compatibility = () => {
                     weight: "20%"
                   },
                 ].map((item, i) => (
-                  <div key={i} className="card-mystic rounded-lg p-5 text-center">
+                  <div key={i} className="card-mystic py-5 text-center">
                     <span className="text-xs uppercase tracking-[0.15em] text-primary/70">
                       {item.title}
                     </span>
                     <div className="flex items-center justify-center gap-3 my-4">
-                      <div className="w-12 h-12 rounded-full bg-sunken border border-line flex items-center justify-center num text-lg text-primary">
+                      <div className="num text-3xl leading-none text-accent">
                         {item.data.person1}
                       </div>
                       <span className="text-muted-foreground">+</span>
-                      <div className="w-12 h-12 rounded-full bg-accent/10 border border-accent/30 flex items-center justify-center num text-lg text-accent-foreground">
+                      <div className="num text-3xl leading-none text-accent">
                         {item.data.person2}
                       </div>
                     </div>

@@ -147,7 +147,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
     >
       {/* Header */}
       <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sunken border border-line">
+        <div className="inline-flex items-center gap-2 num text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">
           <Layers className="h-4 w-4" />
           <span className="text-sm font-raleway text-primary">
             {labels.title[language]}
@@ -163,7 +163,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
         {/* Grid Visualization */}
         <div className="flex-shrink-0 mx-auto lg:mx-0">
           <TooltipProvider>
-            <div className="grid grid-cols-3 gap-2 p-4 rounded-lg bg-card/50 border border-border/50 backdrop-blur-sm">
+            <div className="grid grid-cols-3 gap-2 pt-4 border-t border-line backdrop-blur-sm">
               {LO_SHU_GRID_LAYOUT.map((row, rowIndex) =>
                 row.map((num, colIndex) => {
                   const count = result.grid[rowIndex][colIndex];
@@ -242,7 +242,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
             return (
               <div
                 data-cell-details
-                className="mt-4 rounded-lg border border-line bg-sunken p-4"
+                className="mt-4 border-t border-line pt-4"
               >
                 <div className="flex items-baseline gap-3">
                   <span className="num text-2xl text-primary">{selectedNumber}</span>
@@ -321,7 +321,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
 
           {/* Repeated Numbers */}
           {result.repeatedNumbers.length > 0 && (
-            <div className="p-4 rounded-lg bg-sunken border border-line">
+            <div className="pt-4 border-t border-line">
               <h4 className="text-sm font-medium text-foreground mb-2">
                 {labels.repeatedNumbers[language]}
               </h4>
@@ -329,7 +329,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
                 {result.repeatedNumbers.map(({ number, count }) => (
                   <span
                     key={number}
-                    className="px-3 py-1 rounded-full text-sm font-medium bg-sunken text-primary"
+                    className="num text-[0.68rem] uppercase tracking-[0.14em] text-accent"
                   >
                     {number} × {count}
                   </span>
@@ -339,7 +339,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
           )}
 
           {/* Planes */}
-          <div className="p-4 rounded-lg bg-card/50 border border-border/50">
+          <div className="pt-4 border-t border-line">
             <h4 className="text-sm font-medium text-foreground mb-3">
               {labels.planes[language]}
             </h4>
@@ -414,7 +414,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
 
       {/* Arrows Section */}
       {showArrows && result.arrows.length > 0 && (
-        <div className="p-4 rounded-lg bg-card/50 border border-border/50 animate-fade-in">
+        <div className="pt-4 border-t border-line animate-fade-in">
           <h4 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
             <ArrowRight className="h-4 w-4" />
             {labels.arrows[language]}
@@ -453,7 +453,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
 
       {/* Remedies Section */}
       {showRemedies && result.missingNumbers.length > 0 && (
-        <div className="p-4 rounded-lg bg-card/50 border border-border/50 animate-fade-in">
+        <div className="pt-4 border-t border-line animate-fade-in">
           <h4 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
             <Gem className="h-4 w-4" />
             {labels.remedies[language]}
@@ -519,7 +519,7 @@ interface RemedyCardProps {
 
 const RemedyCard = ({ remedy, language }: RemedyCardProps) => {
   return (
-    <div className="p-3 rounded-lg bg-muted/30 border border-border/30 space-y-3">
+    <div className="pt-3 border-t border-line space-y-3">
       <div className="flex items-center gap-3">
         <span className="w-10 h-10 rounded-full bg-sunken flex items-center justify-center num text-lg text-primary">
           {remedy.number}

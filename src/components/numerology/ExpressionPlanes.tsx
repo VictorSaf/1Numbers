@@ -106,7 +106,7 @@ const ExpressionPlanes = ({ fullName }: ExpressionPlanesProps) => {
                     Showing only the sum put the column in different units from
                     the large number beside it: a row reading 2, 1, 0 totalling 7
                     invites the reader to think the arithmetic is wrong. */}
-                <td className="rounded-md bg-surface-2 p-2 text-center text-ink-2">
+                <td className="border-t border-line pt-2 text-center text-ink-2">
                   <span className="num block text-sm leading-none">{planeTotals[plane].count}</span>
                   <span className="num block text-[10px] opacity-70">{planeTotals[plane].sum}</span>
                 </td>
@@ -117,7 +117,7 @@ const ExpressionPlanes = ({ fullName }: ExpressionPlanesProps) => {
                 {l.total}
               </th>
               {NATURES.map((n) => (
-                <td key={n} className="rounded-md bg-surface-2 p-2 text-center text-ink-2">
+                <td key={n} className="border-t border-line pt-2 text-center text-ink-2">
                   <span className="num block text-sm leading-none">{natureTotals[n].count}</span>
                   <span className="num block text-[10px] opacity-70">{natureTotals[n].sum}</span>
                 </td>

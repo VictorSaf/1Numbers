@@ -346,9 +346,9 @@ const Profile = () => {
           {/* Profile Form */}
           <SectionHead index={2} title={t.profilePageTitle} question={t.profilePageSubtitle} />
 
-          <div className="card-mystic rounded-lg p-8">
+          <div className="card-mystic py-8">
             {profiles.length === 0 && (
-              <div className="mb-6 p-4 rounded-lg bg-muted/30 border border-border/30">
+              <div className="mb-6 pt-4 border-t border-line">
                 <p className="text-sm text-muted-foreground text-center">
                   {t.profileNotCreated}
                 </p>

@@ -52,10 +52,10 @@ export const ArticleLibrary = ({ articles, onArticleSelect, className }: Article
           <button
             onClick={() => setSelectedCategory('all')}
             className={cn(
-              "px-3 py-1 rounded-full text-sm border transition-all",
+              "num border-b-2 px-1 pb-1 text-[0.68rem] uppercase tracking-[0.14em] transition-colors",
               selectedCategory === 'all'
-                ? "bg-primary text-primary-foreground border-primary"
-                : "border-border hover:border-line"
+                ? "border-gilt text-gilt"
+                : "border-transparent text-muted-foreground hover:border-line hover:text-foreground"
             )}
           >
             Toate
@@ -65,10 +65,10 @@ export const ArticleLibrary = ({ articles, onArticleSelect, className }: Article
               key={cat.value}
               onClick={() => setSelectedCategory(cat.value)}
               className={cn(
-                "px-3 py-1 rounded-full text-sm border transition-all",
+                "num border-b-2 px-1 pb-1 text-[0.68rem] uppercase tracking-[0.14em] transition-colors",
                 selectedCategory === cat.value
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "border-border hover:border-line"
+                  ? "border-gilt text-gilt"
+                  : "border-transparent text-muted-foreground hover:border-line hover:text-foreground"
               )}
             >
               {cat.label}
@@ -83,7 +83,7 @@ export const ArticleLibrary = ({ articles, onArticleSelect, className }: Article
           {filteredArticles.map((article) => (
             <Card
               key={article.id}
-              className="card-mystic transition-all duration-300 cursor-pointer h-full"
+              className="card-mystic-link transition-all duration-300 cursor-pointer h-full"
               onClick={() => onArticleSelect?.(article)}
             >
               <CardHeader>

@@ -196,7 +196,7 @@ const Premium = () => {
                     <p className="text-sm text-muted-foreground">{t.currentPlan}</p>
                     <p className="text-2xl font-bold capitalize flex items-center gap-2">
                       {tierInfo?.name[language] || subscriptionStatus.planName}
-                      <Badge variant="secondary" className="bg-ok-soft text-ok">
+                      <Badge variant="secondary" className="text-harmony">
                         <CheckCircle className="h-3 w-3 mr-1" />
                         {t.active}
                       </Badge>
@@ -225,22 +225,22 @@ const Premium = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="flex flex-col items-center text-center p-4 rounded-lg bg-muted/50">
+                <div className="border-t border-line flex flex-col items-center text-center pt-4">
                   <FileText className="h-8 w-8 mb-3" />
                   <h3 className="font-semibold mb-1">{t.benefit1Title}</h3>
                   <p className="text-sm text-muted-foreground">{t.benefit1Desc}</p>
                 </div>
-                <div className="flex flex-col items-center text-center p-4 rounded-lg bg-muted/50">
+                <div className="border-t border-line flex flex-col items-center text-center pt-4">
                   <MessageSquare className="h-8 w-8 mb-3" />
                   <h3 className="font-semibold mb-1">{t.benefit2Title}</h3>
                   <p className="text-sm text-muted-foreground">{t.benefit2Desc}</p>
                 </div>
-                <div className="flex flex-col items-center text-center p-4 rounded-lg bg-muted/50">
+                <div className="border-t border-line flex flex-col items-center text-center pt-4">
                   <FileText className="h-8 w-8 text-warn mb-3" />
                   <h3 className="font-semibold mb-1">{t.benefit3Title}</h3>
                   <p className="text-sm text-muted-foreground">{t.benefit3Desc}</p>
                 </div>
-                <div className="flex flex-col items-center text-center p-4 rounded-lg bg-muted/50">
+                <div className="border-t border-line flex flex-col items-center text-center pt-4">
                   <Zap className="h-8 w-8 text-ok mb-3" />
                   <h3 className="font-semibold mb-1">{t.benefit4Title}</h3>
                   <p className="text-sm text-muted-foreground">{t.benefit4Desc}</p>
@@ -276,21 +276,21 @@ const Premium = () => {
                 the page cannot make promises the flow cannot keep. */}
             {PAYMENTS_ENABLED && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="flex items-center gap-3 p-4 rounded-lg border bg-card">
+                <div className="flex items-center gap-3 border-t border-line pt-4">
                   <Shield className="h-8 w-8 text-ok" />
                   <div>
                     <p className="font-semibold">{t.guarantee}</p>
                     <p className="text-sm text-muted-foreground">{t.guaranteeDesc}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 p-4 rounded-lg border bg-card">
+                <div className="flex items-center gap-3 border-t border-line pt-4">
                   <Shield className="h-8 w-8 text-info" />
                   <div>
                     <p className="font-semibold">{t.securePayment}</p>
                     <p className="text-sm text-muted-foreground">{t.securePaymentDesc}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 p-4 rounded-lg border bg-card">
+                <div className="flex items-center gap-3 border-t border-line pt-4">
                   <Clock className="h-8 w-8" />
                   <div>
                     <p className="font-semibold">{t.support}</p>

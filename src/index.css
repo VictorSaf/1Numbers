@@ -818,32 +818,40 @@
   }
 
   /* Suprafața obișnuită a aplicației.
-     Era un card cu degrade pe două direcții, umbră mare, chenar în accent,
-     halou și o creștere de 1% la hover -- adică patru efecte pe un dreptunghi
-     care ține text. Harta a rămas fără niciunul dintre ele; restul aplicației
-     îl moștenea din 37 de fișiere, printr-o singură clasă. Se schimbă tot de
-     aici: plan, filet subțire, colț mic. */
+     Nu mai e o cutie. În hartă un bloc se anunță cu o LINIE și un titlu, iar
+     conținutul stă direct pe pagină; nimic nu e închis într-un dreptunghi cu
+     fundal propriu. Restul aplicației moștenea cutia din 37 de fișiere,
+     printr-o singură clasă -- deci se desface tot de aici.
+     Rămâne linia de sus: separă egalii într-o listă sau într-o grilă, fără să
+     mai deseneze patru laturi în jurul textului. */
   .card-mystic {
-    @apply bg-card text-card-foreground;
-    @apply rounded-lg border border-line;
+    @apply border-t border-line bg-transparent text-foreground;
     @apply transition-colors duration-200;
   }
 
+  /* Un card pe care se apasă nu se mai umflă și nu-și mai schimbă fundalul:
+     i se aprinde linia. Singurul lucru pe care îl are e chiar linia. */
+  .card-mystic-link {
+    @apply card-mystic;
+    @apply hover:border-gilt;
+  }
+
   /* === Inputs === */
+  /* Un câmp e un RÂND pe care se scrie, nu o casetă. Caseta rotunjită cu
+     fundal propriu era ultimul loc din pagină care mai desena patru laturi în
+     jurul unui text; aici rămâne linia pe care stă scrisul, iar la focus
+     linia trece în alamă. */
   .input {
-    @apply w-full px-4 py-3;
-    @apply bg-input border border-border rounded-lg;
+    @apply w-full rounded-none px-0 py-2.5;
+    @apply border-0 border-b border-line bg-transparent;
     @apply text-foreground placeholder:text-muted-foreground;
-    @apply transition-all duration-200;
-    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
-    @apply focus:border-primary;
-    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply transition-colors duration-200;
+    @apply focus:border-gilt focus:outline-none;
+    @apply disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .input-mystic {
     @apply input;
-    @apply bg-muted/50 border-border/50;
-    @apply focus:border-primary/50 focus:ring-primary/20;
   }
 
   /* === Number Display === */
@@ -870,31 +878,33 @@
   }
 
   /* === Badges === */
+  /* O etichetă e un cuvânt mic, cu spațiere -- registrul plăcii. Pastila
+     plină și rotundă, cu chenar în aceeași culoare cu fundalul ei, era
+     semnătura stilului dinaintea hărții. Culoarea rămâne, dar în literă. */
   .badge {
     @apply inline-flex items-center gap-1.5;
-    @apply px-3 py-1 rounded-full;
-    @apply text-sm font-medium;
-    @apply transition-all duration-200;
+    @apply num text-[0.63rem] uppercase tracking-[0.14em];
+    @apply transition-colors duration-200;
   }
 
   .badge-primary {
     @apply badge;
-    @apply bg-primary/20 text-primary border border-primary/30;
+    @apply text-gilt;
   }
 
   .badge-secondary {
     @apply badge;
-    @apply bg-secondary/20 text-secondary-foreground border border-secondary/30;
+    @apply text-muted-foreground;
   }
 
   .badge-success {
     @apply badge;
-    @apply bg-success/20 text-success border border-success/30;
+    @apply text-ok;
   }
 
   .badge-warning {
     @apply badge;
-    @apply bg-warning/20 text-warning border border-warning/30;
+    @apply text-warn;
   }
 
   /* === Navigation === */

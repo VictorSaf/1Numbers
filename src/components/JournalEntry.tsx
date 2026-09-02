@@ -95,7 +95,7 @@ export const JournalEntry = ({ entry, onEdit, onDelete, className }: JournalEntr
         )}
 
         {entry.numerologyData && (
-          <div className="p-3 rounded-lg bg-muted/30 border border-border/30">
+          <div className="pt-3 border-t border-line">
             <p className="text-xs text-muted-foreground mb-1">Date numerologice:</p>
             <div className="flex flex-wrap gap-2">
               {Object.entries(entry.numerologyData).map(([key, value]) => (

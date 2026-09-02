@@ -20,7 +20,7 @@ export const PeopleGroup = ({ category, profiles, onEdit, onDelete }: PeopleGrou
   const dateLabel = category === "afacere" ? t.people.foundedLabel : t.people.dateLabel;
 
   return (
-    <section className="card-mystic rounded-lg p-6 space-y-4">
+    <section className="card-mystic py-6 space-y-4">
       <header className="flex items-center gap-3">
         <h3 className="font-heading text-lg text-foreground">{t.people.categories[category]}</h3>
         <Badge variant="secondary" className="num">{profiles.length}</Badge>
@@ -29,7 +29,7 @@ export const PeopleGroup = ({ category, profiles, onEdit, onDelete }: PeopleGrou
       <p className="text-sm text-muted-foreground font-raleway">{t.people.categoryHints[category]}</p>
 
       {someoneElse && (
-        <p className="text-xs text-muted-foreground font-raleway rounded-lg border border-border/40 bg-muted/30 p-3">
+        <p className="text-xs text-muted-foreground font-raleway border-t border-line pt-3">
           {t.people.aboutSomeoneElse}
         </p>
       )}

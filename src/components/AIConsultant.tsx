@@ -406,7 +406,7 @@ export const AIConsultant = () => {
                     className="w-full p-3 rounded-lg text-left hover:bg-muted transition-colors flex items-center justify-between group"
                   >
                     <span className="text-sm">{item.question}</span>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground group-hover: transition-colors" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground transition-colors" />
                   </button>
                 ))}
               </div>

@@ -231,11 +231,11 @@ const ChaldeanAnalysis = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-4 bg-muted rounded-lg">
+            <div className="border-t border-line text-center pt-4">
               <div className="text-3xl font-bold text-primary">{compound}</div>
               <div className="text-sm text-muted-foreground">{t.compoundNumber}</div>
             </div>
-            <div className="text-center p-4 bg-muted rounded-lg">
+            <div className="border-t border-line text-center pt-4">
               <div className="text-3xl font-bold text-warn">{single}</div>
               <div className="text-sm text-muted-foreground">{t.singleDigit}</div>
             </div>
@@ -296,11 +296,14 @@ const ChaldeanAnalysis = () => {
       <div className="space-y-4">
         <div>
           <p className="max-w-[65ch] text-sm text-muted-foreground">{t.howItWorksDesc}</p>
-          <div className="mt-4 flex gap-1 flex-wrap">
+          {/* Tabelul literelor e un TABEL: perechi aliniate, cu spațiu între
+              ele. Douăzeci și șase de pastile conturate desenau 104 laturi în
+              jurul a 26 de cifre. */}
+          <div className="mt-5 grid grid-cols-[repeat(auto-fill,minmax(3.5rem,1fr))] gap-x-4 gap-y-2 border-t border-line pt-4">
             {['A=1', 'B=2', 'C=3', 'D=4', 'E=5', 'F=8', 'G=3', 'H=5', 'I=1', 'J=1', 'K=2', 'L=3', 'M=4', 'N=5', 'O=7', 'P=8', 'Q=1', 'R=2', 'S=3', 'T=4', 'U=6', 'V=6', 'W=6', 'X=5', 'Y=1', 'Z=7'].map((pair) => (
-              <Badge key={pair} variant="outline" className="font-mono text-xs">
+              <span key={pair} className="num text-[0.72rem] text-muted-foreground">
                 {pair}
-              </Badge>
+              </span>
             ))}
           </div>
         </div>
@@ -372,13 +375,13 @@ const ChaldeanAnalysis = () => {
                     {analysis.letterBreakdown.map((item, idx) => (
                       <div
                         key={idx}
-                        className="flex flex-col items-center p-2 bg-muted rounded-lg min-w-[40px]"
+                        className="border-t border-line flex flex-col items-center pt-2 min-w-[40px]"
                       >
                         <span className="font-bold">{item.letter}</span>
                         <span className="text-sm text-warn">{item.value}</span>
                       </div>
                     ))}
-                    <div className="flex flex-col items-center p-2 bg-sunken rounded-lg min-w-[40px]">
+                    <div className="border-t border-line flex flex-col items-center pt-2 min-w-[40px]">
                       <span className="font-bold">=</span>
                       <span className="text-sm text-primary">
                         {analysis.nameNumber.compound}

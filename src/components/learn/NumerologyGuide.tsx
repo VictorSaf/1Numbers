@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Sparkles, Crown, Star } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import { getDelayClass } from "@/components/design-system";
@@ -24,8 +23,8 @@ const NumerologyGuide = () => {
           
           {/* Core Numbers Section */}
           <section className="space-y-6">
-            <div className="flex items-center gap-3">
-              <Star className="h-6 w-6" />
+            <div className="space-y-3">
+              <span className="block h-px w-10 bg-gilt" aria-hidden="true" />
               <h2 className="font-heading text-2xl text-foreground">{t.coreNumbersTitle}</h2>
             </div>
             <p className="text-muted-foreground max-w-3xl">
@@ -50,8 +49,8 @@ const NumerologyGuide = () => {
 
           {/* Master Numbers Section */}
           <section className="space-y-6">
-            <div className="flex items-center gap-3">
-              <Crown className="h-6 w-6" />
+            <div className="space-y-3">
+              <span className="block h-px w-10 bg-gilt" aria-hidden="true" />
               <h2 className="font-heading text-2xl text-foreground">{t.masterNumbersTitle}</h2>
             </div>
             <p className="text-muted-foreground max-w-3xl">
@@ -64,9 +63,8 @@ const NumerologyGuide = () => {
                   key={num}
                   onClick={() => setSelectedNumber(selectedNumber === num ? null : num)}
                   className={cn(
-                    "number-display cursor-pointer transition-colors duration-200",
-                    "border-2 border-line",
-                    selectedNumber === num && "number-display-large text-gilt"
+                    "number-display cursor-pointer text-gilt transition-colors duration-200",
+                    selectedNumber === num && "number-display-large"
                   )}
                 >
                   {num}
@@ -77,7 +75,7 @@ const NumerologyGuide = () => {
 
           {/* Selected Number Detail */}
           {selectedNumber && (
-            <section className="card-mystic rounded-lg p-8 animate-scale-in">
+            <section className="card-mystic py-8 animate-scale-in">
               <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
                 <div className="number-display-large shrink-0">
                   {selectedNumber}
@@ -122,7 +120,10 @@ const NumerologyGuide = () => {
 
           {/* All Numbers Grid */}
           <section className="space-y-6">
-            <h2 className="font-heading text-2xl text-foreground text-center">{t.allNumbersTitle}</h2>
+            <div className="space-y-3">
+              <span className="block h-px w-10 bg-gilt" aria-hidden="true" />
+              <h2 className="font-heading text-2xl text-foreground">{t.allNumbersTitle}</h2>
+            </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[...coreNumbers, ...masterNumbers].map((num, index) => {
@@ -133,18 +134,16 @@ const NumerologyGuide = () => {
                   <div
                     key={num}
                     className={cn(
-                      "card-mystic p-5 opacity-0 animate-fade-in cursor-pointer",
-                      " transition-all duration-300 hover:scale-[1.02]",
-                      isMaster && "border-line",
+                      "card-mystic-link py-5 opacity-0 animate-fade-in cursor-pointer",
+                      "transition-colors duration-200",
                       getDelayClass(index * 50)
                     )}
                     onClick={() => setSelectedNumber(num)}
                   >
                     <div className="flex items-center gap-4">
                       <div className={cn(
-                        "w-14 h-14 rounded-full flex items-center justify-center",
-                        "border border-line font-heading text-xl text-foreground",
-                        isMaster && "border-2 border-line"
+                        "num w-14 shrink-0 text-right text-4xl leading-none",
+                        isMaster ? "text-gilt" : "text-accent",
                       )}>
                         {num}
                       </div>
@@ -154,9 +153,6 @@ const NumerologyGuide = () => {
                           <h3 className="font-heading text-lg text-foreground truncate">
                             {meaning.title}
                           </h3>
-                          {isMaster && (
-                            <Crown className="h-4 w-4 shrink-0" />
-                          )}
                         </div>
                         <p className="text-xs text-muted-foreground truncate">
                           {meaning.traits.slice(0, 3).join(" • ")}

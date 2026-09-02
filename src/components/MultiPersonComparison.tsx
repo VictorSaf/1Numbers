@@ -58,7 +58,7 @@ export const MultiPersonComparison = ({ comparison }: MultiPersonComparisonProps
       <CardContent className="space-y-6">
         {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-4 rounded-lg bg-card/50 border border-border/30">
+          <div className="pt-4 border-t border-line">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-muted-foreground">
                 {t.compatibility?.averageCompatibility || "Compatibilitate Medie"}
@@ -68,7 +68,7 @@ export const MultiPersonComparison = ({ comparison }: MultiPersonComparisonProps
               </Badge>
             </div>
           </div>
-          <div className="p-4 rounded-lg bg-card/50 border border-border/30">
+          <div className="pt-4 border-t border-line">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-muted-foreground">
                 {t.compatibility?.groupHarmony || "Armonie Grup"}
@@ -96,7 +96,7 @@ export const MultiPersonComparison = ({ comparison }: MultiPersonComparisonProps
                 return (
                   <div
                     key={idx}
-                    className="p-3 rounded-lg bg-card/50 border border-border/30"
+                    className="pt-3 border-t border-line"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
@@ -161,7 +161,7 @@ export const MultiPersonComparison = ({ comparison }: MultiPersonComparisonProps
                 return (
                   <div
                     key={idx}
-                    className="p-3 rounded-lg bg-card/50 border border-border/30"
+                    className="pt-3 border-t border-line"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1">

@@ -315,7 +315,7 @@ const WhiteLabelSettings = () => {
                 placeholder={t.logoPlaceholder}
               />
               {config.logo && (
-                <div className="mt-2 p-4 bg-muted rounded-lg">
+                <div className="border-t border-line mt-2 pt-4">
                   <img
                     src={config.logo}
                     alt="Logo preview"

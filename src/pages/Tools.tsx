@@ -384,7 +384,7 @@ const Tools = () => {
 
             {/* Numerology Calendar */}
             <TabsContent value="calendar">
-              <Card className="card-mystic">
+              <Card className="border-t-0">
                 <CardHeader>
                   <CardTitle className="font-heading text-foreground">{t.calendar}</CardTitle>
                   <CardDescription>{t.calendarSubtitle}</CardDescription>
@@ -432,7 +432,7 @@ const Tools = () => {
 
             {/* Lo Shu Grid */}
             <TabsContent value="loshu">
-              <Card className="card-mystic">
+              <Card className="border-t-0">
                 <CardHeader>
                   <CardTitle className="font-heading text-foreground">{t.loShuGrid}</CardTitle>
                   <CardDescription>{t.loShuSubtitle}</CardDescription>
@@ -466,7 +466,7 @@ const Tools = () => {
 
             {/* Name Change Analyzer */}
             <TabsContent value="name-change">
-              <Card className="card-mystic">
+              <Card className="border-t-0">
                 <CardHeader>
                   <CardTitle className="font-heading text-foreground">{t.nameChange}</CardTitle>
                 </CardHeader>
@@ -523,7 +523,7 @@ const Tools = () => {
 
             {/* Business Name Analyzer */}
             <TabsContent value="business">
-              <Card className="card-mystic">
+              <Card className="border-t-0">
                 <CardHeader>
                   <CardTitle className="font-heading text-foreground">{t.businessName}</CardTitle>
                 </CardHeader>
@@ -572,7 +572,7 @@ const Tools = () => {
 
             {/* Year Forecast */}
             <TabsContent value="forecast">
-              <Card className="card-mystic">
+              <Card className="border-t-0">
                 <CardHeader>
                   <CardTitle className="font-heading text-foreground">{t.yearForecast}</CardTitle>
                 </CardHeader>
@@ -640,7 +640,7 @@ const Tools = () => {
 
             {/* Name Optimizer */}
             <TabsContent value="optimizer">
-              <Card className="card-mystic">
+              <Card className="border-t-0">
                 <CardHeader>
                   <CardTitle className="font-heading text-foreground">{t.nameOptimizer}</CardTitle>
                 </CardHeader>
@@ -696,7 +696,7 @@ const Tools = () => {
 
             {/* Compatibility Matrix */}
             <TabsContent value="matrix">
-              <Card className="card-mystic">
+              <Card className="border-t-0">
                 <CardHeader>
                   <CardTitle className="font-heading text-foreground">{t.compatMatrix}</CardTitle>
                 </CardHeader>

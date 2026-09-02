@@ -135,7 +135,7 @@ const Index = () => {
         {shouldShowForm && !loadingProfile && (
           <div className="page-measure pt-4">
             <div className="max-w-md mx-auto">
-              <div className="card-mystic rounded-lg p-8">
+              <div className="card-mystic py-8">
                 <div className="text-center mb-8">
                   <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-sunken border border-line mb-4">
                     <Sparkles className="h-8 w-8" />
@@ -168,7 +168,7 @@ const Index = () => {
                 ].map((item, i) => (
                   <div
                     key={i}
-                    className="text-center p-4 rounded-lg bg-card/30 border border-border/30"
+                    className="text-center pt-4 border-t border-line"
                   >
                     <h3 className="font-heading text-sm text-foreground mb-1">{item.title}</h3>
                     <p className="text-xs text-muted-foreground">{item.desc}</p>

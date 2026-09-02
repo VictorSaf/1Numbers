@@ -180,7 +180,7 @@ export const NotificationSettings = () => {
         )}
 
         {/* Main toggle */}
-        <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
+        <div className="border-t border-line flex items-center justify-between pt-4">
           <div className="flex items-center gap-3">
             {isSubscribed ? (
               <BellRing className="h-5 w-5 text-ok" />

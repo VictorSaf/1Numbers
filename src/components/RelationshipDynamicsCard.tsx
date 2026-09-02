@@ -108,7 +108,7 @@ export const RelationshipDynamicsCard = ({ compatibility }: RelationshipDynamics
             {t.compatibility?.dynamics || "Dinamica"}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-3 rounded-lg bg-card/50 border border-border/30">
+            <div className="pt-3 border-t border-line">
               <div className="flex items-center gap-2 mb-2">
                 <MessageSquare className="h-4 w-4 text-info" />
                 <span className="text-sm font-medium text-foreground">
@@ -119,7 +119,7 @@ export const RelationshipDynamicsCard = ({ compatibility }: RelationshipDynamics
                 {compatibility.dynamics.communication[language]}
               </p>
             </div>
-            <div className="p-3 rounded-lg bg-card/50 border border-border/30">
+            <div className="pt-3 border-t border-line">
               <div className="flex items-center gap-2 mb-2">
                 <Heart className="h-4 w-4 text-crit" />
                 <span className="text-sm font-medium text-foreground">
@@ -130,7 +130,7 @@ export const RelationshipDynamicsCard = ({ compatibility }: RelationshipDynamics
                 {compatibility.dynamics.emotional[language]}
               </p>
             </div>
-            <div className="p-3 rounded-lg bg-card/50 border border-border/30">
+            <div className="pt-3 border-t border-line">
               <div className="flex items-center gap-2 mb-2">
                 <Briefcase className="h-4 w-4" />
                 <span className="text-sm font-medium text-foreground">

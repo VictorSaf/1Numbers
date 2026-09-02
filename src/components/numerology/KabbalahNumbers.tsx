@@ -109,7 +109,7 @@ export const KabbalahNumbers = ({ fullName }: KabbalahNumbersProps) => {
         </div>
       </div>
 
-      <p className="rounded-lg bg-warn-soft/60 p-3 text-sm text-foreground/90">{l.warning}</p>
+      <p className="border-t border-tension pt-3 text-sm text-foreground/90">{l.warning}</p>
     </div>
   );
 };

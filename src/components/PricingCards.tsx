@@ -234,7 +234,7 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
           className={billingPeriod === 'yearly' ? 'font-semibold' : 'text-muted-foreground'}
         >
           {t.yearly}
-          <Badge variant="secondary" className="ml-2 bg-ok-soft text-ok">
+          <Badge variant="secondary" className="ml-2 text-harmony">
             {t.savePercent} 33%
           </Badge>
         </Label>
@@ -435,7 +435,7 @@ export const OneTimePurchases = () => {
               {products.map((product) => (
                 <div
                   key={product.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
+                  className="border-t border-line flex items-center justify-between pt-3"
                 >
                   <div>
                     <p className="font-medium text-sm">

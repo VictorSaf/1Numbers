@@ -45,7 +45,7 @@ export const AngelNumberCard = ({
   };
 
   return (
-    <div className="card-mystic rounded-lg overflow-hidden">
+    <div className="card-mystic overflow-hidden">
       {/* Header - Always visible */}
       <div
         className="p-4 cursor-pointer hover:bg-muted/20 transition-colors"
@@ -92,7 +92,7 @@ export const AngelNumberCard = ({
           {meaning.keywords[language].map((keyword, idx) => (
             <span
               key={idx}
-              className="px-2 py-0.5 text-xs rounded-full bg-sunken text-primary border border-line"
+              className="num text-[0.63rem] uppercase tracking-[0.14em] text-accent"
             >
               {keyword}
             </span>
@@ -190,7 +190,7 @@ export const AngelNumberCompact = ({
   return (
     <button
       onClick={onClick}
-      className="w-full p-3 rounded-lg bg-card/50 border border-border/50 hover:bg-card/70 transition-colors text-left"
+      className="w-full border-t border-line pt-3 text-left transition-colors hover:border-gilt"
     >
       <div className="flex items-center gap-3">
         <span className="num text-xl text-primary">{meaning.number}</span>

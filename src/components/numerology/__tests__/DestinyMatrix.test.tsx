@@ -98,7 +98,9 @@ describe("DestinyMatrix", () => {
 
   it("keeps the keyword chips free of placeholders", () => {
     const { container } = renderMatrix();
-    const chips = [...container.querySelectorAll(".bg-sunken")].map((c) => c.textContent ?? "");
+    // Legat de rolul elementului, nu de culoarea lui: selectorul era `.bg-sunken`
+    // și a picat la prima schimbare de stil, deși cuvintele erau întregi.
+    const chips = [...container.querySelectorAll("[data-keyword]")].map((c) => c.textContent ?? "");
     expect(chips.length).toBeGreaterThan(0);
     for (const chip of chips) {
       expect(chip.trim().length).toBeGreaterThan(0);

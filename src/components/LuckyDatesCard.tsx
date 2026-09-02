@@ -130,7 +130,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
             {luckyDate.reasons.map((reason) => (
               <span
                 key={reason}
-                className="text-xs px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground"
+                className="num text-[0.6rem] uppercase tracking-[0.14em] text-muted-foreground"
               >
                 {t.reasons[reason as keyof typeof t.reasons] || reason}
               </span>
@@ -154,7 +154,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
   return (
     <div
       className={cn(
-        "rounded-lg border border-line bg-card p-6 opacity-0 animate-fade-in",
+        "border-t border-line pt-6 opacity-0 animate-fade-in",
         getDelayClass(delay)
       )}
     >
@@ -210,7 +210,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
             {monthDates.bestDates.map((date) => renderDateCard(date))}
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground p-4 rounded-lg bg-muted/20 border border-border/30">
+          <p className="text-sm text-muted-foreground pt-4 border-t border-line">
             {t.noLuckyDates}
           </p>
         )}

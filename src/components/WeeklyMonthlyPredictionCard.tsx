@@ -126,7 +126,7 @@ export const WeeklyMonthlyPredictionCard = ({
             </div>
           )}
           
-          <div className="p-3 rounded-lg bg-sunken border border-line">
+          <div className="pt-3 border-t border-line">
             <h3 className="font-heading text-sm text-foreground mb-1">{labels.advice}</h3>
             <p className="text-sm text-foreground/90">{weeklyData.advice}</p>
           </div>

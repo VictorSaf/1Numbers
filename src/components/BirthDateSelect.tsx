@@ -66,8 +66,8 @@ export const BirthDateSelect = ({ value, onChange, className, disabled, id }: Bi
   };
 
   const selectClass =
-    "h-11 rounded-md border border-input bg-background px-3 text-sm text-foreground " +
-    "focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50";
+    "h-11 rounded-none border-0 border-b border-line bg-transparent px-0 text-sm text-foreground " +
+    "transition-colors focus:border-gilt focus:outline-none disabled:opacity-50";
 
   const labels = {
     ro: { day: "Ziua", month: "Luna", year: "Anul" },

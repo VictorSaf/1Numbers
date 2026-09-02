@@ -76,7 +76,7 @@ export const PersonalStatistics = ({ statistics, className }: PersonalStatistics
               {statistics.topTags.map((tag) => (
                 <div
                   key={tag.tag}
-                  className="flex items-center gap-2 px-3 py-1 rounded-full bg-sunken border border-line"
+                  className="flex items-center gap-2 num text-[0.63rem] uppercase tracking-[0.14em] text-muted-foreground"
                 >
                   <span className="text-sm font-medium">{tag.tag}</span>
                   <span className="text-xs text-muted-foreground">({tag.count})</span>

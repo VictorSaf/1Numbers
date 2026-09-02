@@ -105,7 +105,7 @@ const TransitsTimeline = ({ fullName, birthDate, today }: TransitsTimelineProps)
                   data-duality={r.duality ? "true" : undefined}
                   className={cn(
                     "border-b border-line/50",
-                    r.duality && "bg-accent-soft/60",
+                    r.duality && "border-l-2 border-gilt pl-3",
                     isNow && "outline outline-1 outline-primary/60",
                   )}
                 >

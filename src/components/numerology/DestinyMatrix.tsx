@@ -122,20 +122,22 @@ const DestinyMatrix = ({ birthDate }: DestinyMatrixProps) => {
           {positionFrame && <p className="text-sm text-muted-foreground">{positionFrame}</p>}
           <div className="flex flex-wrap gap-1.5">
             {arcana.keywords[language as "ro" | "en" | "ru"].map((k) => (
-              <span key={k} className="rounded bg-sunken px-2 py-0.5 text-xs text-ink-2">{k}</span>
+              <span key={k} data-keyword className="num text-[0.6rem] uppercase tracking-[0.14em] text-muted-foreground">{k}</span>
             ))}
           </div>
           <dl className="grid gap-2 text-sm">
             {/* Class names are written out rather than composed. Tailwind scans the
                 source for complete strings, so a template literal like
                 `bg-${tone}-soft` generates nothing and the panel loses its
-                background without any error to show for it. */}
+                background without any error to show for it.
+                Tenta a devenit FILET: culoarea spune care e blocul, nu îl
+                inundă. */}
             {([
-              ["light", "bg-ok-soft/60"],
-              ["shadow", "bg-warn-soft/60"],
-              ["task", "bg-accent-soft/60"],
+              ["light", "border-t border-harmony pt-3"],
+              ["shadow", "border-t border-tension pt-3"],
+              ["task", "border-t border-line pt-3"],
             ] as const).map(([field, tone]) => (
-              <div key={field} className={`rounded-lg p-3 ${tone}`}>
+              <div key={field} className={tone}>
                 <dt className="mb-1 text-[11px] uppercase tracking-wider text-muted-foreground">
                   {l[field]}
                 </dt>

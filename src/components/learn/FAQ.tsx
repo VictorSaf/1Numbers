@@ -260,9 +260,9 @@ const FAQ = () => {
           {Object.entries(groupedFaqs).map(([category, faqs]) => {
             const Icon = categoryIcons[category as keyof typeof categoryIcons] || HelpCircle;
             return (
-              <section key={category} className="card-mystic rounded-lg p-6">
+              <section key={category} className="card-mystic py-6">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 rounded-lg bg-sunken">
+                  <div className="border-t border-line pt-2">
                     <Icon className="h-5 w-5" />
                   </div>
                   <h2 className="font-heading text-xl text-foreground">

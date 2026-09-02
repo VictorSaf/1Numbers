@@ -19,7 +19,7 @@ export const CourseCard = ({ course, progress, className }: CourseCardProps) => 
   return (
     <Link to={`/courses/${course.id}`}>
       <Card className={cn(
-        "card-mystic  transition-all duration-300 cursor-pointer h-full",
+        "card-mystic-link  transition-all duration-300 cursor-pointer h-full",
         isCompleted && "ring-2 ring-primary/50",
         className
       )}>

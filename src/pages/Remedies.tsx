@@ -305,21 +305,21 @@ const Remedies = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="grid md:grid-cols-3 gap-4">
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-background">
+                    <div className="border-t border-line flex items-center gap-3 pt-3">
                       <Palette className="h-5 w-5" style={{ color: todayRemedy.remedy.colors.hex }} />
                       <div>
                         <p className="text-sm text-muted-foreground">Color</p>
                         <p className="font-medium">{todayRemedy.remedy.colors.primary}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-background">
+                    <div className="border-t border-line flex items-center gap-3 pt-3">
                       <Gem className="h-5 w-5" />
                       <div>
                         <p className="text-sm text-muted-foreground">Gemstone</p>
                         <p className="font-medium">{todayRemedy.remedy.gemstones.primary}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-background">
+                    <div className="border-t border-line flex items-center gap-3 pt-3">
                       <Quote className="h-5 w-5 text-warn" />
                       <div>
                         <p className="text-sm text-muted-foreground">Mantra</p>

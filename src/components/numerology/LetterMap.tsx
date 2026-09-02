@@ -66,7 +66,7 @@ export const LetterMap = ({ fullName }: { fullName: string }) => {
             {letters.map((letter, i) => (
               <div
                 key={`${letter.letter}-${i}`}
-                className="rounded-md border border-line bg-sunken p-2 text-center"
+                className="border-t border-line pt-2 text-center"
               >
                 <div className="num text-lg text-primary">{letter.letter}</div>
                 <div className="num text-xs text-muted-foreground">

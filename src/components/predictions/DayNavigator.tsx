@@ -39,7 +39,7 @@ export const DayNavigator = ({ date, today, onChange }: DayNavigatorProps) => {
   const atEdge = !canGoBack || !canGoForward;
 
   return (
-    <div className="card-mystic rounded-lg p-4">
+    <div className="card-mystic py-4">
       <div className="flex items-center justify-between gap-3">
         <Button
           variant="ghost"

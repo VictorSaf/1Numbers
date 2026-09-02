@@ -21,9 +21,9 @@ import type { AlignmentBand, RelationshipTiming } from "@/lib/relationshipTiming
 const locales = { ro, en: enUS, ru };
 
 const BAND_CLASS: Record<AlignmentBand, string> = {
-  harmony: "bg-harmony-soft text-harmony border-harmony",
-  mixed: "bg-muted/40 text-muted-foreground border-border/40",
-  tension: "bg-tension-soft text-tension border-tension",
+  harmony: "border-t border-harmony pt-3 text-harmony",
+  mixed: "border-t border-line pt-3 text-muted-foreground",
+  tension: "border-t border-tension pt-3 text-tension",
 };
 
 interface RelationshipTimingCardProps {
@@ -38,7 +38,7 @@ export const RelationshipTimingCard = ({ timing, name1, name2 }: RelationshipTim
   const { year, months } = timing;
 
   return (
-    <section className="card-mystic rounded-lg p-6 space-y-6">
+    <section className="card-mystic py-6 space-y-6">
       <header className="space-y-2">
         <h3 className="font-heading text-xl text-foreground">{t.timing.title}</h3>
         <p className="text-sm text-muted-foreground font-raleway">{t.timing.subtitle}</p>

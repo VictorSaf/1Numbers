@@ -135,7 +135,7 @@ const AngelNumbers = () => {
       <main className="relative z-10 px-4 pb-16">
         <div className="space-y-8">
           {/* Search Section */}
-          <div className="card-mystic rounded-lg p-6">
+          <div className="card-mystic py-6">
             <div className="flex gap-3">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -227,7 +227,7 @@ const AngelNumbers = () => {
           {/* Info Section */}
           {!searchInput && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="card-mystic rounded-lg p-6">
+              <div className="card-mystic py-6">
                 <h3 className="font-heading text-lg text-foreground mb-3">
                   {t.whatAreAngelNumbers}
                 </h3>
@@ -236,7 +236,7 @@ const AngelNumbers = () => {
                 </p>
               </div>
 
-              <div className="card-mystic rounded-lg p-6">
+              <div className="card-mystic py-6">
                 <h3 className="font-heading text-lg text-foreground mb-3">
                   {t.howToUse}
                 </h3>

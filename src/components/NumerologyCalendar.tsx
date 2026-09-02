@@ -299,7 +299,7 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
                     <div className="space-y-4">
                       {/* Numbers row */}
                       <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-sunken rounded-lg p-3 text-center">
+                        <div className="border-t border-line pt-3 text-center">
                           <Sun className="h-5 w-5 mx-auto mb-1" />
                           <div className="text-2xl num text-primary font-bold">{day.personalDay}</div>
                           <div className="text-xs text-muted-foreground">{t.personalDay}</div>
@@ -313,7 +313,7 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
 
                       {/* Lucky Score */}
                       {day.luckyScore > 0 && (
-                        <div className="flex items-center justify-between bg-card/50 rounded-lg p-3 border border-border/50">
+                        <div className="flex items-center justify-between pt-3 border-t border-line">
                           <span className="text-sm text-muted-foreground">{t.score}</span>
                           <span className={`text-xl font-bold ${getScoreColor(day.luckyScore)}`}>
                             {day.luckyScore}%
@@ -384,7 +384,7 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
               </div>
               <div className="text-xs text-muted-foreground">{t.luckyDays}</div>
             </div>
-            <div className="bg-sunken rounded-lg p-3">
+            <div className="border-t border-line pt-3">
               <div className="text-2xl font-bold text-primary">
                 {monthData.filter(d => d.isMasterDay).length}
               </div>
@@ -396,7 +396,7 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
               </div>
               <div className="text-xs text-muted-foreground">{t.highEnergy}</div>
             </div>
-            <div className="bg-sunken rounded-lg p-3">
+            <div className="border-t border-line pt-3">
               <div className="text-2xl font-bold text-primary">
                 {Math.max(...monthData.map(d => d.luckyScore))}%
               </div>

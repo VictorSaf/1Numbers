@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Sun, Moon, Calendar, TrendingUp, Sparkles } from 'lucide-react';
+import { Sun, Moon, Calendar, TrendingUp } from 'lucide-react';
 import { format } from 'date-fns';
 import { ro, enUS, ru } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
@@ -203,25 +203,24 @@ const Predictions = () => {
           {/* Universal Day Energy */}
           <SectionHead index={1} title={l.universalDay} />
 
-          <div className="card-mystic rounded-lg p-6 text-center">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <Sun className="h-6 w-6" />
-              <h2 className="font-heading text-xl text-foreground">{l.universalDay}</h2>
+          {/* Cifra e vizualul, ca peste tot. Blocul era centrat, într-o casetă,
+              cu titlul repetat sub placa numerotată care tocmai îl spusese. */}
+          <div className="flex items-baseline gap-6">
+            <span className="num text-6xl leading-none text-accent">{universalEnergy.number}</span>
+            <div className="min-w-0">
+              <p className="font-heading text-xl capitalize text-foreground">
+                {ENERGY_LABELS[universalEnergy.energy]?.[language] ?? universalEnergy.energy}
+              </p>
+              <p className="num mt-1.5 text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">
+                {format(today, 'EEEE, d MMMM yyyy', { locale: dateLocale })}
+              </p>
             </div>
-            <div className="number-display mx-auto mb-4">
-              {universalEnergy.number}
-            </div>
-            <p className="text-muted-foreground capitalize">{l.energy}: {ENERGY_LABELS[universalEnergy.energy]?.[language] ?? universalEnergy.energy}</p>
-            <p className="text-xs text-muted-foreground mt-2">
-              {format(today, 'EEEE, d MMMM yyyy', { locale: dateLocale })}
-            </p>
           </div>
 
           {/* Birth Date Selector */}
           {!birthDate && (
-            <div className="card-mystic rounded-lg p-8 text-center">
-              <Sparkles className="h-12 w-12 mx-auto mb-4" />
-              <h3 className="font-heading text-xl text-foreground mb-2">{l.enterBirthDate}</h3>
+            <div className="border-t border-line pt-6">
+              <h3 className="mb-4 font-heading text-xl text-foreground">{l.enterBirthDate}</h3>
               <BirthDateSelect value={birthDate} onChange={setBirthDate} />
             </div>
           )}
@@ -232,11 +231,11 @@ const Predictions = () => {
           {birthDate && (
             <Tabs defaultValue="daily" className="w-full">
               <TabsList className="mb-6">
-                <TabsTrigger value="daily" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsTrigger value="daily">
                   <Sun className="h-4 w-4 mr-2" />
                   {l.daily}
                 </TabsTrigger>
-                <TabsTrigger value="monthly" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsTrigger value="monthly">
                   <Moon className="h-4 w-4 mr-2" />
                   {l.monthly}
                 </TabsTrigger>
@@ -249,7 +248,7 @@ const Predictions = () => {
                     <DayNavigator date={selectedDay} today={today} onChange={selectDay} />
 
                     {dayContent && (
-                      <div className="card-mystic grid grid-cols-3 gap-3 rounded-lg p-4 text-center">
+                      <div className="card-mystic grid grid-cols-3 gap-3 py-4 text-center">
                         <div>
                           <p className="font-raleway text-xs text-muted-foreground">{t.today.personalDay}</p>
                           <p className="num text-2xl text-primary">{dayContent.personalDay}</p>
@@ -276,7 +275,7 @@ const Predictions = () => {
                       birthDate={birthDate}
                       date={selectedDay}
                     />
-                    <div className="card-mystic rounded-lg p-6 space-y-6">
+                    <div className="card-mystic py-6 space-y-6">
                       {/* Cifra zilei personale și energia ei nu se mai scriu aici.
                           Componenta Today, din capul paginii, le arată deja --
                           mare, cu arhetipul, cu relația față de hartă și cu
@@ -285,28 +284,28 @@ const Predictions = () => {
                           Ce a rămas -- focusul, orele, culoarea, muzica -- nu e
                           nicăieri altundeva. */}
                       <div className="grid md:grid-cols-2 gap-4">
-                        <div className="p-4 rounded-lg bg-card/50 border border-border/30">
+                        <div className="pt-4 border-t border-line">
                           <h4 className="font-heading text-sm text-foreground mb-2">{l.focus}</h4>
                           <p className="text-foreground/90 capitalize">{dailyPrediction.focus}</p>
                         </div>
-                        <div className="p-4 rounded-lg bg-card/50 border border-border/30">
+                        <div className="pt-4 border-t border-line">
                           <h4 className="font-heading text-sm text-foreground mb-2">{l.luckyHours}</h4>
                           <p className="text-foreground/90">{dailyPrediction.luckyHours.join(', ')}</p>
                         </div>
                       </div>
 
-                      <div className="p-4 rounded-lg bg-sunken border border-line">
+                      <div className="pt-4 border-t border-line">
                         <h4 className="font-heading text-sm text-foreground mb-2">{l.advice}</h4>
                         <p className="text-foreground/90">{dailyPrediction.advice}</p>
                       </div>
 
                       <div className="grid md:grid-cols-2 gap-4">
-                        <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                          <h4 className="font-heading text-sm text-destructive/80 mb-2">{l.challenges}</h4>
+                        <div className="pt-4 border-t border-line">
+                          <h4 className="mb-2 font-heading text-sm text-tension">{l.challenges}</h4>
                           <p className="text-foreground/80 text-sm">{dailyPrediction.challenges}</p>
                         </div>
-                        <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                          <h4 className="font-heading text-sm text-ok mb-2">{l.opportunities}</h4>
+                        <div className="pt-4 border-t border-line">
+                          <h4 className="mb-2 font-heading text-sm text-harmony">{l.opportunities}</h4>
                           <p className="text-foreground/80 text-sm">{dailyPrediction.opportunities}</p>
                         </div>
                       </div>
@@ -334,7 +333,7 @@ const Predictions = () => {
                       />
                     )}
                     {annualTheme && (
-                      <div className="card-mystic rounded-lg p-6 space-y-4">
+                      <div className="card-mystic py-6 space-y-4">
                         <h3 className="font-heading text-xl">{l.personalMonth} - {selectedYear}</h3>
                         <div>
                           <h4 className="font-heading text-sm text-foreground mb-2">{annualTheme.theme}</h4>
@@ -355,7 +354,7 @@ const Predictions = () => {
                         )}
                         {annualChallenges && annualChallenges.length > 0 && (
                           <div>
-                            <h4 className="font-heading text-sm text-destructive/80 mb-2">Provocări</h4>
+                            <h4 className="mb-2 font-heading text-sm text-tension">Provocări</h4>
                             <ul className="space-y-1">
                               {annualChallenges.slice(0, 5).map((challenge, index) => (
                                 <li key={index} className="text-sm text-foreground/80 flex items-start gap-2">
@@ -368,7 +367,7 @@ const Predictions = () => {
                         )}
                       </div>
                     )}
-                    <div className="card-mystic rounded-lg p-6 space-y-6">
+                    <div className="card-mystic py-6 space-y-6">
                     <div className="text-center">
                       <h3 className="font-heading text-lg text-muted-foreground">{l.personalMonth}</h3>
                       <div className="number-display-large mx-auto my-4">
@@ -377,40 +376,40 @@ const Predictions = () => {
                       <p className="text-foreground font-heading text-xl">{monthlyPrediction.theme}</p>
                     </div>
 
-                    <div className="p-4 rounded-lg bg-sunken border border-line">
+                    <div className="pt-4 border-t border-line">
                       <h4 className="font-heading text-sm text-foreground mb-2">{l.overview}</h4>
                       <p className="text-foreground/90">{monthlyPrediction.overview}</p>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-4">
-                      <div className="p-4 rounded-lg bg-card/50 border border-border/30">
+                      <div className="pt-4 border-t border-line">
                         <h4 className="font-heading text-sm text-foreground mb-2">{l.career}</h4>
                         <p className="text-foreground/80 text-sm">{monthlyPrediction.career}</p>
                       </div>
-                      <div className="p-4 rounded-lg bg-card/50 border border-border/30">
+                      <div className="pt-4 border-t border-line">
                         <h4 className="font-heading text-sm text-foreground mb-2">{l.relationships}</h4>
                         <p className="text-foreground/80 text-sm">{monthlyPrediction.relationships}</p>
                       </div>
-                      <div className="p-4 rounded-lg bg-card/50 border border-border/30">
+                      <div className="pt-4 border-t border-line">
                         <h4 className="font-heading text-sm text-foreground mb-2">{l.health}</h4>
                         <p className="text-foreground/80 text-sm">{monthlyPrediction.health}</p>
                       </div>
-                      <div className="p-4 rounded-lg bg-card/50 border border-border/30">
+                      <div className="pt-4 border-t border-line">
                         <h4 className="font-heading text-sm text-foreground mb-2">{l.finances}</h4>
                         <p className="text-foreground/80 text-sm">{monthlyPrediction.finances}</p>
                       </div>
                     </div>
 
-                    <div className="p-4 rounded-lg bg-card/50 border border-border/30">
+                    <div className="pt-4 border-t border-line">
                       <h4 className="font-heading text-sm text-foreground mb-2">{l.spirituality}</h4>
                       <p className="text-foreground/80 text-sm">{monthlyPrediction.spirituality}</p>
                     </div>
 
-                    <div className="p-4 rounded-lg bg-card/50 border border-border/30">
+                    <div className="pt-4 border-t border-line">
                       <h4 className="font-heading text-sm text-foreground mb-2">{l.keyDays}</h4>
                       <div className="flex flex-wrap gap-2">
                         {monthlyPrediction.keyDays.map(day => (
-                          <span key={day} className="px-3 py-1 rounded-full bg-sunken text-primary text-sm num">
+                          <span key={day} className="num text-[0.68rem] uppercase tracking-[0.14em] text-accent">
                             {day}
                           </span>
                         ))}

@@ -201,7 +201,7 @@ export const RemedyCard = ({ remedy, showAll = false }: RemedyCardProps) => {
             </div>
             <div className="flex flex-wrap gap-1">
               {remedy.days.favorable.map((day) => (
-                <Badge key={day} variant="secondary" className="bg-ok-soft text-ok">
+                <Badge key={day} variant="secondary" className="text-harmony">
                   <CheckCircle className="h-3 w-3 mr-1" />
                   {day}
                 </Badge>
@@ -215,7 +215,7 @@ export const RemedyCard = ({ remedy, showAll = false }: RemedyCardProps) => {
             </div>
             <div className="flex flex-wrap gap-1">
               {remedy.days.avoid.map((day) => (
-                <Badge key={day} variant="secondary" className="bg-crit-soft text-crit">
+                <Badge key={day} variant="secondary" className="text-tension">
                   <XCircle className="h-3 w-3 mr-1" />
                   {day}
                 </Badge>
@@ -253,13 +253,13 @@ export const RemedyCard = ({ remedy, showAll = false }: RemedyCardProps) => {
             <h3 className="font-semibold">{t.mantras}</h3>
           </div>
           <div className="space-y-3">
-            <div className="p-3 bg-warn-soft rounded-lg">
+            <div className="border-t border-tension pt-3">
               <p className="text-xs text-muted-foreground mb-1">{t.vedic}</p>
               <p className="font-medium text-warn">
                 {remedy.mantras.vedic}
               </p>
             </div>
-            <div className="p-3 bg-sunken rounded-lg">
+            <div className="border-t border-line pt-3">
               <p className="text-xs text-muted-foreground mb-1">{t.affirmation}</p>
               <p className="italic">{remedy.mantras.affirmation}</p>
             </div>
