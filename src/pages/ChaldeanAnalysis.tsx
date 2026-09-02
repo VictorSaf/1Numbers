@@ -23,6 +23,7 @@ import {
 } from '@/lib/chaldean';
 import { parseCalendarDate } from '@/lib/calendarDate';
 import { PageLayout } from '@/components/layout/PageLayout';
+import { PagePlate } from '@/components/layout/PagePlate';
 import { formatCalendarDate } from '@/lib/calendarDate';
 import {
   Star,
@@ -281,28 +282,23 @@ const ChaldeanAnalysis = () => {
   return (
     <PageLayout>
       <div className="container max-w-4xl mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <div className="flex justify-center mb-4">
-          <div className="relative">
-            <Star className="h-12 w-12 text-warn" />
-            <Sparkles className="h-6 w-6 text-warn absolute -top-1 -right-1" />
-          </div>
-        </div>
-        <h1 className="text-3xl font-bold mb-2">{t.title}</h1>
-        <p className="text-muted-foreground">{t.description}</p>
-      </div>
+      {/* Placa de deschidere, ca la hartă. Figura ei e chiar alfabetul: opt
+          valori în loc de nouă, adică toată deosebirea sistemului. */}
+      <PagePlate
+        eyebrow="numerologie caldeeană"
+        title={t.title}
+        subtitle={t.description}
+      />
 
-      {/* How It Works */}
-      <Card className="mb-8 border-warn">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Hash className="h-5 w-5 text-warn" />
+      <div className="mt-10 space-y-4">
+        <div className="flex items-center gap-3">
+          <span className="h-px w-10 shrink-0 bg-gilt" aria-hidden="true" />
+          <h2 className="num text-[0.63rem] uppercase tracking-[0.18em] text-gilt">
             {t.howItWorks}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">{t.howItWorksDesc}</p>
+          </h2>
+        </div>
+        <div>
+          <p className="max-w-[65ch] text-sm text-muted-foreground">{t.howItWorksDesc}</p>
           <div className="mt-4 flex gap-1 flex-wrap">
             {['A=1', 'B=2', 'C=3', 'D=4', 'E=5', 'F=8', 'G=3', 'H=5', 'I=1', 'J=1', 'K=2', 'L=3', 'M=4', 'N=5', 'O=7', 'P=8', 'Q=1', 'R=2', 'S=3', 'T=4', 'U=6', 'V=6', 'W=6', 'X=5', 'Y=1', 'Z=7'].map((pair) => (
               <Badge key={pair} variant="outline" className="font-mono text-xs">
@@ -310,10 +306,10 @@ const ChaldeanAnalysis = () => {
               </Badge>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <Tabs defaultValue="personal" className="space-y-6">
+      <Tabs defaultValue="personal" className="mt-10 space-y-6">
         <TabsList>
           <TabsTrigger value="personal" className="flex items-center gap-2">
             <User className="h-4 w-4" />
