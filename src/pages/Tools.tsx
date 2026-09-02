@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { RefreshCcw, Building2, TrendingUp, Sparkles, Grid3X3, ChevronRight, ChevronDown, CalendarDays, Wrench, Layers } from "lucide-react";
+import { ChevronRight, ChevronDown, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { ToolTiles } from "@/components/tools/ToolTiles";
 import { useSearchParams } from "react-router-dom";
 import { lazy, Suspense } from "react";
 
@@ -32,9 +33,12 @@ const Tools = () => {
   // The tab is in the query string: /unelte?s=angel is where the 301 from
   // /angel-numbers lands, and a link to one tool has to stay a link to that tool.
   const [params, setParams] = useSearchParams();
-  const activeTab = params.get("s") ?? "calendar";
-  const setActiveTab = (next: string) =>
-    setParams(next === "calendar" ? {} : { s: next }, { replace: true });
+  // Fără `s`, pagina e LANSATORUL: opt uși, nu un document deschis la primul
+  // capitol. `/unelte?s=angel` -- unde aterizează 301-ul de la /angel-numbers --
+  // rămâne un link către unealta aceea.
+  const activeTab = params.get("s");
+  const setActiveTab = (next: string | null) =>
+    setParams(next ? { s: next } : {}, { replace: true });
   
   // Name Change State
   const [originalName, setOriginalName] = useState("");
@@ -95,6 +99,15 @@ const Tools = () => {
       title: "Instrumente Numerologice",
       subtitle: "Analize avansate pentru decizii importante",
       back: "Înapoi",
+      allTools: "Toate uneltele",
+      n_calendar: "Fiecare zi a lunii, cu cifra ei.",
+      n_loshu: "Ce ai din belșug și ce lipsește, în pătratul chinezesc.",
+      n_angel: "Ce înseamnă cifrele care ți se tot arată.",
+      n_nameChange: "Ce se schimbă dacă îți schimbi numele.",
+      n_business: "Cifra unui nume de firmă, înainte s-o înregistrezi.",
+      n_forecast: "Anul care vine, lună cu lună.",
+      n_optimizer: "Variante de nume, sortate după cifră.",
+      n_matrix: "Toate perechile dintr-un grup, deodată.",
       nameChange: "Schimbare Nume",
       businessName: "Nume Afacere",
       yearForecast: "Previziune An",
@@ -156,6 +169,15 @@ const Tools = () => {
       title: "Numerology Tools",
       subtitle: "Advanced analysis for important decisions",
       back: "Back",
+      allTools: "All tools",
+      n_calendar: "Every day of the month, with its own number.",
+      n_loshu: "What you have in abundance and what is missing, in the Chinese square.",
+      n_angel: "What the digits that keep showing up mean.",
+      n_nameChange: "What changes if you change your name.",
+      n_business: "A company name's number, before you register it.",
+      n_forecast: "The year ahead, month by month.",
+      n_optimizer: "Name variants, sorted by number.",
+      n_matrix: "Every pair in a group, at once.",
       nameChange: "Name Change",
       businessName: "Business Name",
       yearForecast: "Year Forecast",
@@ -217,6 +239,15 @@ const Tools = () => {
       title: "Нумерологические инструменты",
       subtitle: "Расширенный анализ для важных решений",
       back: "Назад",
+      allTools: "Все инструменты",
+      n_calendar: "Каждый день месяца — со своим числом.",
+      n_loshu: "Чего в избытке и чего не хватает — в китайском квадрате.",
+      n_angel: "Что значат цифры, которые всё время попадаются.",
+      n_nameChange: "Что изменится, если сменить имя.",
+      n_business: "Число названия компании — до регистрации.",
+      n_forecast: "Год впереди, месяц за месяцем.",
+      n_optimizer: "Варианты имени, по числу.",
+      n_matrix: "Все пары в группе — сразу.",
       nameChange: "Смена имени",
       businessName: "Название бизнеса",
       yearForecast: "Прогноз на год",
@@ -275,6 +306,18 @@ const Tools = () => {
       challenging: "Сложная"
     }
   }[language];
+
+  const TOOLS = [
+    { value: "calendar", label: t.calendar, note: t.n_calendar },
+    { value: "loshu", label: t.loShuGrid, note: t.n_loshu },
+    { value: "angel", label: t.angelNumbers, note: t.n_angel },
+    { value: "name-change", label: t.nameChange, note: t.n_nameChange },
+    { value: "business", label: t.businessName, note: t.n_business },
+    { value: "forecast", label: t.yearForecast, note: t.n_forecast },
+    { value: "optimizer", label: t.nameOptimizer, note: t.n_optimizer },
+    { value: "matrix", label: t.compatMatrix, note: t.n_matrix },
+  ];
+
 
   const handleNameCompare = () => {
     if (originalName && newName) {
@@ -336,45 +379,21 @@ const Tools = () => {
 
       <main className="relative z-10 px-4 pb-16">
         <div className="max-w-5xl mx-auto pt-4">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            {/* Eight tools. The labels used to be hidden below 640px, which
-                left eight icon-only buttons wrapping onto three rows with
-                nothing to say what any of them did. They scroll sideways now
-                and keep their names. */}
-            <TabsList className="mb-8">
-              <TabsTrigger value="calendar" className="shrink-0 gap-1 text-xs sm:text-sm">
-                <CalendarDays className="h-4 w-4" />
-                {t.calendar}
-              </TabsTrigger>
-              <TabsTrigger value="loshu" className="shrink-0 gap-1 text-xs sm:text-sm">
-                <Layers className="h-4 w-4" />
-                {t.loShuGrid}
-              </TabsTrigger>
-              <TabsTrigger value="angel" className="shrink-0 gap-1 text-xs sm:text-sm">
-                <Sparkles className="h-4 w-4" />
-                {t.angelNumbers}
-              </TabsTrigger>
-              <TabsTrigger value="name-change" className="shrink-0 gap-1 text-xs sm:text-sm">
-                <RefreshCcw className="h-4 w-4" />
-                {t.nameChange}
-              </TabsTrigger>
-              <TabsTrigger value="business" className="shrink-0 gap-1 text-xs sm:text-sm">
-                <Building2 className="h-4 w-4" />
-                {t.businessName}
-              </TabsTrigger>
-              <TabsTrigger value="forecast" className="shrink-0 gap-1 text-xs sm:text-sm">
-                <TrendingUp className="h-4 w-4" />
-                {t.yearForecast}
-              </TabsTrigger>
-              <TabsTrigger value="optimizer" className="shrink-0 gap-1 text-xs sm:text-sm">
-                <Sparkles className="h-4 w-4" />
-                {t.nameOptimizer}
-              </TabsTrigger>
-              <TabsTrigger value="matrix" className="shrink-0 gap-1 text-xs sm:text-sm">
-                <Grid3X3 className="h-4 w-4" />
-                {t.compatMatrix}
-              </TabsTrigger>
-            </TabsList>
+          {!activeTab ? (
+            <ToolTiles tools={TOOLS} onOpen={setActiveTab} />
+          ) : (
+          <Tabs value={activeTab} className="w-full">
+            {/* Întoarcerea la hol. Banda de file spunea „ești aici, printre
+                altele"; o unealtă e o destinație, deci ce trebuie e drumul
+                înapoi, nu celelalte șapte deschise permanent lângă ea. */}
+            <button
+              type="button"
+              onClick={() => setActiveTab(null)}
+              className="num mb-8 flex min-h-11 items-center gap-2.5 text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-gilt"
+            >
+              <span aria-hidden="true">←</span>
+              {t.allTools}
+            </button>
 
             <TabsContent value="angel">
               <Suspense fallback={<div className="h-64 animate-pulse rounded-lg border border-line bg-sunken" />}>
@@ -753,6 +772,7 @@ const Tools = () => {
               </Card>
             </TabsContent>
           </Tabs>
+          )}
         </div>
       </main>
     </PageLayout>
