@@ -154,7 +154,7 @@ const Remedies = () => {
 
   if (selectedRemedy) {
     return (
-      <div className="page-measure py-8">
+      <div className="page-measure py-4 page-rhythm">
         <Button
           variant="ghost"
           onClick={() => setSelectedNumber(null)}
@@ -172,7 +172,7 @@ const Remedies = () => {
   // the language a reader had chosen was simply not changeable from here.
   return (
     <PageLayout>
-      <div className="page-measure py-8">
+      <div className="page-measure py-4 page-rhythm">
       <PagePlate eyebrow="remedii numerologice" title={t.title} subtitle={t.description} />
 
       <div className="mt-10" />

@@ -308,7 +308,7 @@ const Profile = () => {
 
       {/* Main Content */}
       <main className="relative z-10 pb-16">
-        <div className="page-measure pt-4 space-y-6">
+        <div className="page-measure pt-4 page-rhythm">
           {/* Profile Switcher */}
           {profiles.length > 0 && (
             <div className="space-y-4">

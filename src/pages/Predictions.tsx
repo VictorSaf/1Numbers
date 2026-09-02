@@ -201,7 +201,7 @@ const Predictions = () => {
           </div>
         )}
 
-        <div className="page-measure space-y-8 pt-4">
+        <div className="page-measure pt-4 page-rhythm">
           
           {/* Universal Day Energy */}
           <div className="card-mystic rounded-lg p-6 text-center">

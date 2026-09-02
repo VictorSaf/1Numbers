@@ -65,7 +65,7 @@ const ICONS = {
 } as const;
 
 const PanelSkeleton = () => (
-  <div className="page-measure py-12">
+  <div className="page-measure py-4 page-rhythm">
     <div className="h-64 animate-pulse rounded-lg border border-line bg-sunken" />
   </div>
 );

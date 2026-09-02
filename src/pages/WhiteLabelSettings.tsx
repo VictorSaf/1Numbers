@@ -245,7 +245,7 @@ const WhiteLabelSettings = () => {
 
   return (
     <PageLayout>
-      <div className="page-measure py-8 space-y-6">
+      <div className="page-measure py-4 page-rhythm">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>

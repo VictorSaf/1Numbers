@@ -1759,6 +1759,19 @@ html {
    la fiecare scroll.
    Cine are nevoie de o măsură mai îngustă pentru proză o pune pe paragraf
    (`max-w-[65ch]`), nu pe containerul paginii. */
+/* Ritmul vertical al hărții, măsurat în browser.
+   56px între blocurile de nivel înalt -- placă, citire, capitol, capitol.
+   32px între capul unei secțiuni și primul ei bloc.
+   Restul platformei avea py-8, space-y-6, mb-8 și mb-2, fiecare pagină cu
+   pasul ei: aceleași componente, alt tempo. */
+.page-rhythm > * + * {
+  margin-top: 3.5rem; /* 56px */
+}
+
+.section-rhythm > * + * {
+  margin-top: 2rem; /* 32px */
+}
+
 .page-measure {
   width: 100%;
   /* 66rem − 2×1rem de padding = 64rem de conținut, exact cât are harta.

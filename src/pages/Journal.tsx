@@ -233,7 +233,7 @@ const Journal = () => {
       />
 
       <main className="relative z-10 pb-16">
-        <div className="page-measure space-y-6">
+        <div className="page-measure page-rhythm">
           {/* Actions Bar */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">

@@ -281,7 +281,7 @@ const ChaldeanAnalysis = () => {
   // the language a reader had chosen was simply not changeable from here.
   return (
     <PageLayout>
-      <div className="page-measure py-8">
+      <div className="page-measure py-4 page-rhythm">
       {/* Placa de deschidere, ca la hartă. Figura ei e chiar alfabetul: opt
           valori în loc de nouă, adică toată deosebirea sistemului. */}
       <PagePlate
