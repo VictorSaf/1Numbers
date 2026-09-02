@@ -66,7 +66,7 @@ export const AgentsSection = () => {
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
             <div className="p-3 rounded-lg bg-primary/10">
-              <Bot className="h-6 w-6 text-primary" />
+              <Bot className="h-6 w-6" />
             </div>
             <div>
               <div className="text-2xl font-bold">{agents.length} Agents</div>
@@ -99,7 +99,7 @@ export const AgentsSection = () => {
               >
                 <div className="flex items-center gap-4">
                   <div className="p-2 rounded-lg bg-primary/10">
-                    <Bot className="h-5 w-5 text-primary" />
+                    <Bot className="h-5 w-5" />
                   </div>
                   <div>
                     <div className="font-medium flex items-center gap-2">

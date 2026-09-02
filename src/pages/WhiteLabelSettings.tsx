@@ -214,7 +214,7 @@ const WhiteLabelSettings = () => {
       <PageLayout>
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center min-h-[400px]">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <Loader2 className="h-8 w-8 animate-spin" />
           </div>
         </div>
       </PageLayout>
@@ -228,7 +228,7 @@ const WhiteLabelSettings = () => {
           <Card className="max-w-lg mx-auto text-center">
             <CardContent className="pt-12 pb-12">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary flex items-center justify-center">
-                <Crown className="h-8 w-8 text-primary" />
+                <Crown className="h-8 w-8" />
               </div>
               <h2 className="text-2xl font-bold mb-2">{t.title}</h2>
               <p className="text-muted-foreground mb-6">{t.proOnly}</p>
@@ -250,7 +250,7 @@ const WhiteLabelSettings = () => {
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <Crown className="h-6 w-6 text-primary" />
+              <Crown className="h-6 w-6" />
               <h1 className="text-2xl font-bold">{t.title}</h1>
               <Badge variant="secondary" className="bg-primary text-primary">
                 Pro

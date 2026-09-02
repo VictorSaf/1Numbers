@@ -199,7 +199,7 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
         <Card>
           <CardHeader className="pb-2">
             <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-primary" />
+              <Users className="h-5 w-5" />
               <CardTitle className="text-lg">{t.yourNumbers}</CardTitle>
             </div>
           </CardHeader>
@@ -276,7 +276,7 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
+            <Sparkles className="h-5 w-5" />
             <CardTitle>{t.analysis}</CardTitle>
           </div>
         </CardHeader>

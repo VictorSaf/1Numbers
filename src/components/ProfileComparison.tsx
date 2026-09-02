@@ -55,7 +55,7 @@ export const ProfileComparison = ({ className }: ProfileComparisonProps) => {
       <Card className={cn("card-mystic", className)}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-primary" />
+            <Users className="h-5 w-5" />
             {t.profileComparison}
           </CardTitle>
         </CardHeader>
@@ -72,7 +72,7 @@ export const ProfileComparison = ({ className }: ProfileComparisonProps) => {
     <Card className={cn("card-mystic", className)}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Users className="h-5 w-5 text-primary" />
+          <Users className="h-5 w-5" />
           {t.profileComparison}
         </CardTitle>
       </CardHeader>

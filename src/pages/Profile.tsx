@@ -301,7 +301,7 @@ const Profile = () => {
         title={t.profilePageTitle}
         subtitle={t.profilePageSubtitle}
         badge={{
-          icon: <User className="h-4 w-4 text-primary" />,
+          icon: <User className="h-4 w-4" />,
           label: t.myProfile
         }}
       />

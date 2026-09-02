@@ -203,7 +203,7 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
       case 'premium':
         return <Star className="h-6 w-6 text-warn" />;
       case 'pro':
-        return <Crown className="h-6 w-6 text-primary" />;
+        return <Crown className="h-6 w-6" />;
     }
   };
 

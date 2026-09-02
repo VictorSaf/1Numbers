@@ -187,7 +187,7 @@ const Predictions = () => {
           title={l.title}
           subtitle={l.subtitle}
           badge={{
-            icon: <TrendingUp className="h-4 w-4 text-primary" />,
+            icon: <TrendingUp className="h-4 w-4" />,
             label: l.label
           }}
         />
@@ -206,7 +206,7 @@ const Predictions = () => {
           {/* Universal Day Energy */}
           <div className="card-mystic rounded-xl p-6 text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
-              <Sun className="h-6 w-6 text-primary" />
+              <Sun className="h-6 w-6" />
               <h2 className="font-heading text-xl text-foreground">{l.universalDay}</h2>
             </div>
             <div className="number-display mx-auto mb-4">
@@ -221,7 +221,7 @@ const Predictions = () => {
           {/* Birth Date Selector */}
           {!birthDate && (
             <div className="card-mystic rounded-xl p-8 text-center">
-              <Sparkles className="h-12 w-12 text-primary mx-auto mb-4" />
+              <Sparkles className="h-12 w-12 mx-auto mb-4" />
               <h3 className="font-heading text-xl text-foreground mb-2">{l.enterBirthDate}</h3>
               <BirthDateSelect value={birthDate} onChange={setBirthDate} />
             </div>

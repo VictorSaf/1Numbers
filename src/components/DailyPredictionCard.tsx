@@ -70,7 +70,7 @@ export const DailyPredictionCard = ({ prediction, birthDate, date }: DailyPredic
         {/* Recommendations */}
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <Lightbulb className="h-5 w-5 text-primary" />
+            <Lightbulb className="h-5 w-5" />
             <h3 className="font-heading text-lg text-foreground">{labels.recommendations}</h3>
           </div>
           <ul className="space-y-2">
@@ -86,7 +86,7 @@ export const DailyPredictionCard = ({ prediction, birthDate, date }: DailyPredic
         {/* Color */}
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <Palette className="h-5 w-5 text-primary" />
+            <Palette className="h-5 w-5" />
             <h3 className="font-heading text-sm text-foreground">{labels.color}</h3>
           </div>
           <Badge className="bg-primary/20 text-primary border-primary/30">
@@ -97,7 +97,7 @@ export const DailyPredictionCard = ({ prediction, birthDate, date }: DailyPredic
         {/* Music */}
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <Music className="h-5 w-5 text-primary" />
+            <Music className="h-5 w-5" />
             <h3 className="font-heading text-sm text-foreground">{labels.music}</h3>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -112,7 +112,7 @@ export const DailyPredictionCard = ({ prediction, birthDate, date }: DailyPredic
         {/* Lucky Hours */}
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <Clock className="h-5 w-5 text-primary" />
+            <Clock className="h-5 w-5" />
             <h3 className="font-heading text-sm text-foreground">{labels.luckyHours}</h3>
           </div>
           <div className="flex flex-wrap gap-2">

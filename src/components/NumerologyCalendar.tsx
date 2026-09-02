@@ -273,7 +273,7 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
                       {/* Day indicators */}
                       <div className="flex gap-0.5 mt-0.5">
                         {day.isMasterDay && (
-                          <Sparkles className="h-3 w-3 text-primary" />
+                          <Sparkles className="h-3 w-3" />
                         )}
                         {day.isLucky && (
                           <Star className="h-3 w-3 text-warn fill-warn/50" />
@@ -300,7 +300,7 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
                       {/* Numbers row */}
                       <div className="grid grid-cols-2 gap-4">
                         <div className="bg-primary/10 rounded-lg p-3 text-center">
-                          <Sun className="h-5 w-5 text-primary mx-auto mb-1" />
+                          <Sun className="h-5 w-5 mx-auto mb-1" />
                           <div className="text-2xl num text-primary font-bold">{day.personalDay}</div>
                           <div className="text-xs text-muted-foreground">{t.personalDay}</div>
                         </div>

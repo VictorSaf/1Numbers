@@ -131,7 +131,7 @@ export const RemedyCard = ({ remedy, showAll = false }: RemedyCardProps) => {
         {/* Colors Section */}
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <Palette className="h-5 w-5 text-primary" />
+            <Palette className="h-5 w-5" />
             <h3 className="font-semibold">{t.colors}</h3>
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -169,7 +169,7 @@ export const RemedyCard = ({ remedy, showAll = false }: RemedyCardProps) => {
         {/* Gemstones Section */}
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <Gem className="h-5 w-5 text-primary" />
+            <Gem className="h-5 w-5" />
             <h3 className="font-semibold">{t.gemstones}</h3>
           </div>
           <div className="space-y-2">

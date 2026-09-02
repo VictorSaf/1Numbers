@@ -144,7 +144,7 @@ export const MCPServersSection = () => {
         <CardContent className="p-6">
           <div className="flex items-start gap-4">
             <div className="p-2 rounded-lg bg-primary/10">
-              <Settings className="h-5 w-5 text-primary" />
+              <Settings className="h-5 w-5" />
             </div>
             <div>
               <div className="font-medium mb-1">About MCP</div>

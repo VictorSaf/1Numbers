@@ -371,7 +371,7 @@ export const UsersSection = () => {
                 <div className="flex items-center gap-4">
                   <div className="p-2 rounded-full bg-primary/10">
                     {user.role === 'admin' ? (
-                      <Shield className="h-5 w-5 text-primary" />
+                      <Shield className="h-5 w-5" />
                     ) : (
                       <UserIcon className="h-5 w-5 text-muted-foreground" />
                     )}

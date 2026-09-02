@@ -67,7 +67,7 @@ export const SkillsSection = () => {
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
             <div className="p-3 rounded-lg bg-primary/10">
-              <Zap className="h-6 w-6 text-primary" />
+              <Zap className="h-6 w-6" />
             </div>
             <div>
               <div className="text-2xl font-bold">{skills.length} Skills</div>
@@ -135,7 +135,7 @@ export const SkillsSection = () => {
         <CardContent className="p-6">
           <div className="flex items-start gap-4">
             <div className="p-2 rounded-lg bg-primary/10">
-              <Zap className="h-5 w-5 text-primary" />
+              <Zap className="h-5 w-5" />
             </div>
             <div>
               <div className="font-medium mb-1">Using Skills</div>

@@ -148,7 +148,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
       {/* Header */}
       <div className="text-center space-y-2">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-          <Layers className="h-4 w-4 text-primary" />
+          <Layers className="h-4 w-4" />
           <span className="text-sm font-raleway text-primary">
             {labels.title[language]}
           </span>
@@ -416,7 +416,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
       {showArrows && result.arrows.length > 0 && (
         <div className="p-4 rounded-xl bg-card/50 border border-border/50 animate-fade-in">
           <h4 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
-            <ArrowRight className="h-4 w-4 text-primary" />
+            <ArrowRight className="h-4 w-4" />
             {labels.arrows[language]}
           </h4>
           <div className="space-y-3">
@@ -455,7 +455,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
       {showRemedies && result.missingNumbers.length > 0 && (
         <div className="p-4 rounded-xl bg-card/50 border border-border/50 animate-fade-in">
           <h4 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
-            <Gem className="h-4 w-4 text-primary" />
+            <Gem className="h-4 w-4" />
             {labels.remedies[language]}
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

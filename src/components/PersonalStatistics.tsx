@@ -16,7 +16,7 @@ export const PersonalStatistics = ({ statistics, className }: PersonalStatistics
         <Card className="card-mystic">
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-2">
-              <BarChart3 className="h-4 w-4 text-primary" />
+              <BarChart3 className="h-4 w-4" />
               <span className="text-sm text-muted-foreground">Total</span>
             </div>
             <p className="text-2xl font-heading font-bold text-foreground">
@@ -28,7 +28,7 @@ export const PersonalStatistics = ({ statistics, className }: PersonalStatistics
         <Card className="card-mystic">
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-2">
-              <Calendar className="h-4 w-4 text-primary" />
+              <Calendar className="h-4 w-4" />
               <span className="text-sm text-muted-foreground">Jurnal</span>
             </div>
             <p className="text-2xl font-heading font-bold text-foreground">
@@ -40,7 +40,7 @@ export const PersonalStatistics = ({ statistics, className }: PersonalStatistics
         <Card className="card-mystic">
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="h-4 w-4 text-primary" />
+              <TrendingUp className="h-4 w-4" />
               <span className="text-sm text-muted-foreground">Previziuni</span>
             </div>
             <p className="text-2xl font-heading font-bold text-foreground">
@@ -52,7 +52,7 @@ export const PersonalStatistics = ({ statistics, className }: PersonalStatistics
         <Card className="card-mystic">
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-2">
-              <Tag className="h-4 w-4 text-primary" />
+              <Tag className="h-4 w-4" />
               <span className="text-sm text-muted-foreground">Tag-uri</span>
             </div>
             <p className="text-2xl font-heading font-bold text-foreground">
@@ -67,7 +67,7 @@ export const PersonalStatistics = ({ statistics, className }: PersonalStatistics
         <Card className="card-mystic">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Tag className="h-5 w-5 text-primary" />
+              <Tag className="h-5 w-5" />
               Tag-uri Populare
             </CardTitle>
           </CardHeader>
@@ -92,7 +92,7 @@ export const PersonalStatistics = ({ statistics, className }: PersonalStatistics
         <Card className="card-mystic">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Smile className="h-5 w-5 text-primary" />
+              <Smile className="h-5 w-5" />
               Distribuție Stări
             </CardTitle>
           </CardHeader>
@@ -126,7 +126,7 @@ export const PersonalStatistics = ({ statistics, className }: PersonalStatistics
         <Card className="card-mystic">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Calendar className="h-5 w-5 text-primary" />
+              <Calendar className="h-5 w-5" />
               Activitate Lunară
             </CardTitle>
           </CardHeader>

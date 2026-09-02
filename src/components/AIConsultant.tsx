@@ -284,7 +284,7 @@ export const AIConsultant = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Bot className="h-5 w-5 text-primary" />
+              <Bot className="h-5 w-5" />
               <CardTitle>{tr.title}</CardTitle>
             </div>
             {conversation.length > 0 && (
@@ -410,7 +410,7 @@ export const AIConsultant = () => {
                     className="w-full p-3 rounded-lg text-left hover:bg-muted transition-colors flex items-center justify-between group"
                   >
                     <span className="text-sm">{item.question}</span>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground group-hover: transition-colors" />
                   </button>
                 ))}
               </div>

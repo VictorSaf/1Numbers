@@ -47,7 +47,7 @@ const Admin = () => {
         title="Admin Panel"
         subtitle="Manage your platform settings and users"
         badge={{
-          icon: <Shield className="h-4 w-4 text-primary" />,
+          icon: <Shield className="h-4 w-4" />,
           label: 'Administrator',
         }}
       />

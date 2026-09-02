@@ -263,7 +263,7 @@ const FAQ = () => {
               <section key={category} className="card-mystic rounded-xl p-6">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="p-2 rounded-lg bg-primary/10">
-                    <Icon className="h-5 w-5 text-primary" />
+                    <Icon className="h-5 w-5" />
                   </div>
                   <h2 className="font-heading text-xl text-foreground">
                     {l.categories[category as keyof typeof l.categories]}

@@ -83,7 +83,7 @@ const Learn = () => {
       <PageHeader
         title={t.title}
         subtitle={t.subtitle}
-        badge={{ icon: <BookOpen className="h-4 w-4 text-primary" />, label: t.badge }}
+        badge={{ icon: <BookOpen className="h-4 w-4" />, label: t.badge }}
       />
 
       <Tabs

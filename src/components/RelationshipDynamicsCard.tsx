@@ -104,7 +104,7 @@ export const RelationshipDynamicsCard = ({ compatibility }: RelationshipDynamics
         {/* Dynamics */}
         <div className="space-y-4">
           <h3 className="font-heading text-lg text-foreground flex items-center gap-2">
-            <MessageSquare className="h-5 w-5 text-primary" />
+            <MessageSquare className="h-5 w-5" />
             {t.compatibility?.dynamics || "Dinamica"}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -132,7 +132,7 @@ export const RelationshipDynamicsCard = ({ compatibility }: RelationshipDynamics
             </div>
             <div className="p-3 rounded-lg bg-card/50 border border-border/30">
               <div className="flex items-center gap-2 mb-2">
-                <Briefcase className="h-4 w-4 text-primary" />
+                <Briefcase className="h-4 w-4" />
                 <span className="text-sm font-medium text-foreground">
                   {t.compatibility?.practical || "Practic"}
                 </span>

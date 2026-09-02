@@ -25,7 +25,7 @@ const NumerologyGuide = () => {
           {/* Core Numbers Section */}
           <section className="space-y-6">
             <div className="flex items-center gap-3">
-              <Star className="h-6 w-6 text-primary" />
+              <Star className="h-6 w-6" />
               <h2 className="font-heading text-2xl text-foreground">{t.coreNumbersTitle}</h2>
             </div>
             <p className="text-muted-foreground max-w-3xl">
@@ -51,7 +51,7 @@ const NumerologyGuide = () => {
           {/* Master Numbers Section */}
           <section className="space-y-6">
             <div className="flex items-center gap-3">
-              <Crown className="h-6 w-6 text-primary" />
+              <Crown className="h-6 w-6" />
               <h2 className="font-heading text-2xl text-foreground">{t.masterNumbersTitle}</h2>
             </div>
             <p className="text-muted-foreground max-w-3xl">
@@ -156,7 +156,7 @@ const NumerologyGuide = () => {
                             {meaning.title}
                           </h3>
                           {isMaster && (
-                            <Crown className="h-4 w-4 text-primary shrink-0" />
+                            <Crown className="h-4 w-4 shrink-0" />
                           )}
                         </div>
                         <p className="text-xs text-muted-foreground truncate">

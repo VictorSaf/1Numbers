@@ -176,7 +176,7 @@ const Remedies = () => {
       <div className="text-center mb-8">
         <div className="flex justify-center mb-4">
           <div className="relative">
-            <Gem className="h-12 w-12 text-primary" />
+            <Gem className="h-12 w-12" />
             <Sparkles className="h-6 w-6 text-warn absolute -top-1 -right-1" />
           </div>
         </div>
@@ -286,7 +286,7 @@ const Remedies = () => {
               {destinyRemedy && userNumbers.destiny !== userNumbers.lifePath && (
                 <div>
                   <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                    <Star className="h-5 w-5 text-primary" />
+                    <Star className="h-5 w-5" />
                     {t.destiny} {userNumbers.destiny} - {destinyRemedy.planet.name}
                   </h2>
                   <RemedyCard remedy={destinyRemedy} showAll />
@@ -322,7 +322,7 @@ const Remedies = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-3 rounded-lg bg-background">
-                      <Gem className="h-5 w-5 text-primary" />
+                      <Gem className="h-5 w-5" />
                       <div>
                         <p className="text-sm text-muted-foreground">Gemstone</p>
                         <p className="font-medium">{todayRemedy.remedy.gemstones.primary}</p>
@@ -401,7 +401,7 @@ const Remedies = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Gem className="h-5 w-5 text-primary" />
+                  <Gem className="h-5 w-5" />
                   Gemstones
                 </CardTitle>
               </CardHeader>

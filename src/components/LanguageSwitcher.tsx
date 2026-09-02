@@ -27,7 +27,7 @@ export const LanguageSwitcher = () => {
           size="sm"
           className="border-primary/30 bg-card/50 hover:bg-primary/10 hover:border-primary/50 gap-2"
         >
-          <Globe className="h-4 w-4 text-primary" />
+          <Globe className="h-4 w-4" />
           <span className="text-sm">{currentLang?.flag}</span>
           <span className="hidden sm:inline text-foreground/80">{currentLang?.name}</span>
         </Button>

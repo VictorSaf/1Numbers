@@ -157,7 +157,7 @@ export const NotificationSettings = () => {
     <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <Bell className="h-5 w-5 text-primary" />
+          <Bell className="h-5 w-5" />
           <CardTitle>{t.title}</CardTitle>
         </div>
         <CardDescription>{t.description}</CardDescription>
@@ -270,7 +270,7 @@ export const NotificationSettings = () => {
             {/* Special Dates */}
             <div className="flex items-center justify-between p-3 rounded-lg border">
               <div className="flex items-center gap-3">
-                <Calendar className="h-5 w-5 text-primary" />
+                <Calendar className="h-5 w-5" />
                 <div>
                   <Label htmlFor="special-dates" className="font-medium">
                     {t.specialDates}

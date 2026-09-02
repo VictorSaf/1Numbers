@@ -44,7 +44,7 @@ export const ThemeSelector = () => {
         className="min-h-11 w-11 justify-center px-0 sm:w-[150px] sm:justify-between sm:px-3 input-mystic"
       >
         <div className="flex items-center gap-2">
-          <Icon className="h-4 w-4 text-primary" />
+          <Icon className="h-4 w-4" />
           <SelectValue className="hidden sm:inline">
             <span className="hidden sm:inline">{labels[theme]}</span>
           </SelectValue>

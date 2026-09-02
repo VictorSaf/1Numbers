@@ -83,7 +83,7 @@ export const AnalyticsSection = () => {
       <Card className="card-mystic">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Calculator className="h-5 w-5 text-primary" />
+            <Calculator className="h-5 w-5" />
             <CardTitle>Calculations by Type</CardTitle>
           </div>
           <CardDescription>Most popular calculation types</CardDescription>
@@ -110,7 +110,7 @@ export const AnalyticsSection = () => {
       <Card className="card-mystic">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-primary" />
+            <BarChart3 className="h-5 w-5" />
             <CardTitle>Page Views</CardTitle>
           </div>
           <CardDescription>Most visited pages</CardDescription>
@@ -175,7 +175,7 @@ export const AnalyticsSection = () => {
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-lg bg-primary/10">
-                <TrendingUp className="h-6 w-6 text-primary" />
+                <TrendingUp className="h-6 w-6" />
               </div>
               <div>
                 <div className="text-2xl font-bold">+12%</div>

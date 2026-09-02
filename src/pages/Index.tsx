@@ -113,9 +113,9 @@ const Index = () => {
         badge={{
           icon: (
             <>
-              <Moon className="h-4 w-4 text-primary animate-pulse-glow" />
-              <Stars className="h-5 w-5 text-primary" />
-              <Sun className="h-4 w-4 text-primary animate-pulse-glow" />
+              <Moon className="h-4 w-4 animate-pulse-glow" />
+              <Stars className="h-5 w-5" />
+              <Sun className="h-4 w-4 animate-pulse-glow" />
             </>
           ),
           label: t.title
@@ -138,7 +138,7 @@ const Index = () => {
               <div className="card-mystic rounded-2xl p-8">
                 <div className="text-center mb-8">
                   <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 border border-primary/20 mb-4">
-                    <Sparkles className="h-8 w-8 text-primary" />
+                    <Sparkles className="h-8 w-8" />
                   </div>
                   <h2 className="font-heading text-2xl text-foreground mb-2">
                     {t.formTitle}

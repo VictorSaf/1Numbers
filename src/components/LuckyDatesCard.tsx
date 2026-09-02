@@ -121,7 +121,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
-            <Calendar className="h-4 w-4 text-primary" />
+            <Calendar className="h-4 w-4" />
             <span className="font-heading text-foreground">
               {format(luckyDate.date, "EEEE, d MMMM", { locale })}
             </span>
@@ -159,7 +159,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
       )}
     >
       <div className="flex items-center gap-2 mb-2">
-        <Sparkles className="h-5 w-5 text-primary" />
+        <Sparkles className="h-5 w-5" />
         <h3 className="font-heading text-lg text-foreground">{t.title}</h3>
       </div>
       <p className="text-sm text-muted-foreground mb-6">{t.subtitle}</p>
@@ -201,7 +201,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
       {/* Best Dates */}
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-3">
-          <TrendingUp className="h-4 w-4 text-primary" />
+          <TrendingUp className="h-4 w-4" />
           <span className="text-sm font-medium text-foreground">{t.bestDates}</span>
           <span className="text-xs text-muted-foreground">({monthDates.bestDates.length})</span>
         </div>

@@ -227,7 +227,7 @@ const Journal = () => {
         title="Jurnal Numerologic"
         subtitle="Ține evidența experiențelor tale numerologice și previziunilor"
         badge={{
-          icon: <BookOpen className="h-4 w-4 text-primary" />,
+          icon: <BookOpen className="h-4 w-4" />,
           label: 'Jurnal'
         }}
       />

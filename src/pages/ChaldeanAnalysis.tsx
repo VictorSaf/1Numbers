@@ -399,7 +399,7 @@ const ChaldeanAnalysis = () => {
                   t.nameNumber,
                   analysis.nameNumber.compound,
                   analysis.nameNumber.single,
-                  <User className="h-5 w-5 text-primary" />
+                  <User className="h-5 w-5" />
                 )}
                 {renderNumberCard(
                   t.birthNumber,
@@ -438,7 +438,7 @@ const ChaldeanAnalysis = () => {
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg flex items-center gap-2">
-                      <Moon className="h-5 w-5 text-primary" />
+                      <Moon className="h-5 w-5" />
                       {t.compatibleNumbers}
                     </CardTitle>
                   </CardHeader>

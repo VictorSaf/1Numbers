@@ -325,7 +325,7 @@ const Friends = () => {
       {/* Header */}
       <div className="text-center mb-8">
         <div className="flex justify-center mb-4">
-          <Users className="h-12 w-12 text-primary" />
+          <Users className="h-12 w-12" />
         </div>
         <h1 className="text-3xl font-bold mb-2">{t.title}</h1>
         <p className="text-muted-foreground">{t.description}</p>
@@ -406,7 +406,7 @@ const Friends = () => {
           {/* Friends List */}
           {isLoading ? (
             <div className="flex justify-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <Loader2 className="h-8 w-8 animate-spin" />
             </div>
           ) : friends.length === 0 ? (
             <Card>

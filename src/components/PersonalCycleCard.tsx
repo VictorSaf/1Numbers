@@ -45,7 +45,7 @@ export const PersonalCycleCard = ({ birthDate, delay = 0 }: PersonalCycleCardPro
       )}
     >
       <div className="flex items-center gap-2 mb-4">
-        <Calendar className="h-5 w-5 text-primary" />
+        <Calendar className="h-5 w-5" />
         <h3 className="font-heading text-lg text-foreground">
           {language === 'ro' ? 'Ciclurile Personale' : language === 'ru' ? 'Личные Циклы' : 'Personal Cycles'}
         </h3>
@@ -54,7 +54,7 @@ export const PersonalCycleCard = ({ birthDate, delay = 0 }: PersonalCycleCardPro
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {/* Personal Day */}
         <div className="text-center p-3 rounded-xl bg-primary/10 border border-primary/20">
-          <Sun className="h-4 w-4 mx-auto text-primary mb-1" />
+          <Sun className="h-4 w-4 mx-auto mb-1" />
           <p className="text-xs text-muted-foreground">{labels.personalDay[language]}</p>
           <p className="num text-2xl text-primary">{personalDay}</p>
           <p className="text-xs text-primary/70">{dayInfo?.keywords[language]}</p>
@@ -62,7 +62,7 @@ export const PersonalCycleCard = ({ birthDate, delay = 0 }: PersonalCycleCardPro
 
         {/* Personal Month */}
         <div className="text-center p-3 rounded-xl bg-primary/10 border border-primary/20">
-          <Moon className="h-4 w-4 mx-auto text-primary mb-1" />
+          <Moon className="h-4 w-4 mx-auto mb-1" />
           <p className="text-xs text-muted-foreground">{labels.personalMonth[language]}</p>
           <p className="num text-2xl text-primary">{personalMonth}</p>
           <p className="text-xs text-primary/70">{monthInfo?.keywords[language]}</p>

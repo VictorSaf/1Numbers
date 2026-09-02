@@ -178,7 +178,7 @@ const Premium = () => {
           <div className="flex items-center justify-center gap-3">
             <div className="relative">
               <Crown className="h-10 w-10 text-warn" />
-              <Sparkles className="h-4 w-4 text-primary absolute -top-1 -right-1" />
+              <Sparkles className="h-4 w-4 absolute -top-1 -right-1" />
             </div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-warn to-primary bg-clip-text text-transparent">
               {t.title}
@@ -195,7 +195,7 @@ const Premium = () => {
                 <div className="flex items-center gap-4">
                   <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
                     {currentTier === 'pro' ? (
-                      <Crown className="h-6 w-6 text-primary" />
+                      <Crown className="h-6 w-6" />
                     ) : (
                       <Star className="h-6 w-6 text-warn" />
                     )}
@@ -234,12 +234,12 @@ const Premium = () => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="flex flex-col items-center text-center p-4 rounded-lg bg-muted/50">
-                  <FileText className="h-8 w-8 text-primary mb-3" />
+                  <FileText className="h-8 w-8 mb-3" />
                   <h3 className="font-semibold mb-1">{t.benefit1Title}</h3>
                   <p className="text-sm text-muted-foreground">{t.benefit1Desc}</p>
                 </div>
                 <div className="flex flex-col items-center text-center p-4 rounded-lg bg-muted/50">
-                  <MessageSquare className="h-8 w-8 text-primary mb-3" />
+                  <MessageSquare className="h-8 w-8 mb-3" />
                   <h3 className="font-semibold mb-1">{t.benefit2Title}</h3>
                   <p className="text-sm text-muted-foreground">{t.benefit2Desc}</p>
                 </div>
@@ -299,7 +299,7 @@ const Premium = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-4 rounded-lg border bg-card">
-                  <Clock className="h-8 w-8 text-primary" />
+                  <Clock className="h-8 w-8" />
                   <div>
                     <p className="font-semibold">{t.support}</p>
                     <p className="text-sm text-muted-foreground">{t.supportDesc}</p>

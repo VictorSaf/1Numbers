@@ -144,7 +144,7 @@ const Compatibility = () => {
         title={t.compatibilityTitle}
         subtitle={t.compatibilitySubtitle}
         badge={{
-          icon: <Heart className="h-4 w-4 text-primary" />,
+          icon: <Heart className="h-4 w-4" />,
           label: t.compatibilityLabel
         }}
       />
@@ -236,7 +236,7 @@ const Compatibility = () => {
               <div className="text-center space-y-4">
                 <div className="flex items-center justify-center gap-4 flex-wrap">
                   <span className="font-heading text-xl md:text-2xl text-foreground">{person1.fullName}</span>
-                  <Heart className="h-6 w-6 text-primary animate-pulse-glow" />
+                  <Heart className="h-6 w-6 animate-pulse-glow" />
                   <span className="font-heading text-xl md:text-2xl text-foreground">{person2.fullName}</span>
                 </div>
               </div>

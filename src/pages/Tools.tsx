@@ -329,7 +329,7 @@ const Tools = () => {
         title={t.title}
         subtitle={t.subtitle}
         badge={{
-          icon: <Wrench className="h-4 w-4 text-primary" />,
+          icon: <Wrench className="h-4 w-4" />,
           label: t.title
         }}
       />
