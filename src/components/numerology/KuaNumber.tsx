@@ -133,7 +133,7 @@ export const KuaNumber = ({ birthDate }: KuaNumberProps) => {
 
   if (!kua) {
     return (
-      <div className="space-y-3 rounded-xl border border-line bg-surface/60 p-4">
+      <div className="space-y-3 border-t border-gilt/40 pt-4">
         <p className="text-sm text-foreground/85">{l.ask}</p>
         <p className="text-xs text-faint">{l.askPrivacy}</p>
         <div className="flex flex-wrap gap-2">
@@ -142,7 +142,7 @@ export const KuaNumber = ({ birthDate }: KuaNumberProps) => {
               key={b}
               type="button"
               onClick={() => choose(b)}
-              className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-2 text-sm text-primary transition-colors hover:bg-primary/10"
+              className="num min-h-11 rounded-sm border border-gilt px-4 text-[0.68rem] uppercase tracking-[0.14em] text-gilt transition-colors hover:bg-gilt-soft"
             >
               {l[b]}
             </button>

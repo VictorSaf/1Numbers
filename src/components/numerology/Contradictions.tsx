@@ -33,22 +33,22 @@ const Contradictions = ({ fullName, birthDate }: ContradictionsProps) => {
   }, [fullName, birthDate, language]);
 
   return (
-    <div className="space-y-4">
+    <div>
       {found.map((c) => (
-        <article
-          key={c.key}
-          className="rounded-xl border border-border/50 bg-card/50 p-5 space-y-3"
-        >
-          <div className="flex items-baseline justify-between gap-4">
-            <h4 className="font-heading text-base text-foreground">{c.label}</h4>
-            <span
-              className="num shrink-0 text-2xl text-primary"
-              aria-label={`${c.label}: ${c.distance}`}
-            >
-              {c.distance}
-            </span>
+        <article key={c.key} className="flex items-start gap-5 border-b border-line py-5 sm:gap-7">
+          {/* Distanța e cifra, nu o notiță din colț: ea e chiar subiectul.
+              O distanță de 6 nu e o eroare -- de-aia stă în tensiune, nu în
+              culoarea de alarmă. */}
+          <span
+            className="num w-14 shrink-0 text-right text-4xl leading-[0.86] text-tension sm:w-[88px] sm:text-5xl"
+            aria-label={`${c.label}: ${c.distance}`}
+          >
+            {c.distance}
+          </span>
+          <div className="min-w-0 flex-1">
+            <h4 className="font-heading text-lg text-foreground sm:text-xl">{c.label}</h4>
+            <p className="mt-2 max-w-[65ch] text-sm leading-relaxed text-foreground/85">{c.text}</p>
           </div>
-          <p className="text-sm leading-relaxed text-foreground/85">{c.text}</p>
         </article>
       ))}
     </div>

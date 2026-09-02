@@ -1,5 +1,5 @@
 import { useMemo, useState, lazy, Suspense, useEffect } from "react";
-import { ArrowLeft, Star, BarChart3, Target, Mountain, AlertTriangle, Sparkles, CalendarCheck, Type, Grid3x3, Compass, CalendarRange, Activity } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NumberCard } from "./NumberCard";
 import { PinnacleCard } from "./PinnacleCard";
@@ -55,7 +55,7 @@ const NumerologyRadarChart = lazy(() => import("./charts/NumerologyRadarChart").
 const ChartSkeleton = () => (
   <div className="h-64 flex items-center justify-center">
     <div className="animate-pulse flex flex-col items-center gap-2">
-      <div className="w-32 h-32 rounded-full bg-primary/10 border border-primary/20" />
+      <div className="h-32 w-32 rounded-full border border-gilt/30" />
       <div className="h-3 w-24 bg-primary/10 rounded" />
     </div>
   </div>
@@ -344,8 +344,8 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
 
         {/* 1 — Cine ești */}
         <Chapter meta={chapters[0]} index={1}>
-          <Block title={sectionLabels.core[language]} icon={<Star className="h-5 w-5 text-primary" />}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Block title={sectionLabels.core[language]}>
+            <div>
               <NumberCard title={t.lifePathTitle} number={results.lifePath} raw={lifePathRaw} resolve={isFirstReading} delay={100} isMain />
               <NumberCard title={t.destinyTitle} number={results.destiny} delay={200} />
               <NumberCard title={t.soulUrgeTitle} number={results.soulUrge} delay={300} />
@@ -353,7 +353,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
             </div>
           </Block>
 
-          <Block title={sectionLabels.newNumbers[language]} icon={<Sparkles className="h-5 w-5 text-primary" />}>
+          <Block title={sectionLabels.newNumbers[language]}>
             <Suspense fallback={chartSkeleton}>
               <NewNumbers fullName={fullName} birthDate={birthDate} keys={CHAPTER_SELF} />
             </Suspense>
@@ -368,7 +368,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
               răspunde direct la „din ce ești făcut” -- miezul și numerele noi --
               rămâne mereu deschis. */}
           <Deeper label={sectionLabels.deeperSelf[language]}>
-          <Block title={sectionLabels.stones[language]} icon={<Type className="h-5 w-5 text-primary" />} note={teasers.stones[language]}>
+          <Block title={sectionLabels.stones[language]} note={teasers.stones[language]}>
             <Suspense fallback={chartSkeleton}>
               <LetterStones fullName={fullName} birthDate={birthDate} />
             </Suspense>
@@ -376,7 +376,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
           {/* The one diagram of this chapter: the five core numbers on one
               scale, which is the only place they can be seen against each
               other. It used to sit orphaned at the very bottom of the page. */}
-          <Block title={sectionLabels.profile[language]} icon={<Target className="h-5 w-5 text-primary" />} note={teasers.profile[language]}>
+          <Block title={sectionLabels.profile[language]} note={teasers.profile[language]}>
             <WhenVisible fallback={chartSkeleton}>
               <Suspense fallback={chartSkeleton}>
                 <NumerologyRadarChart lifePath={results.lifePath} destiny={results.destiny} soulUrge={results.soulUrge} personality={results.personality} personalYear={results.personalYear} />
@@ -389,7 +389,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
         {/* 2 — Ce se contrazice în tine */}
         <Chapter meta={chapters[1]} index={2}>
           {/* The chapter's answer, before its parts. */}
-          <Block title={sectionLabels.contradiction[language]} icon={<AlertTriangle className="h-5 w-5 text-warn" />} note={teasers.contradiction[language]}>
+          <Block title={sectionLabels.contradiction[language]} note={teasers.contradiction[language]}>
             {/* Cadranul se întoarce acolo unde coarda e chiar subiectul. */}
             {figure.chord && (
               <PlateEcho figure={figure}>
@@ -410,7 +410,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
             </Suspense>
           </Block>
 
-          <Block title={sectionLabels.tension[language]} icon={<AlertTriangle className="h-5 w-5 text-warn" />} note={teasers.tension[language]}>
+          <Block title={sectionLabels.tension[language]} note={teasers.tension[language]}>
             <Suspense fallback={chartSkeleton}>
               <NewNumbers fullName={fullName} birthDate={birthDate} keys={CHAPTER_TENSION} />
             </Suspense>
@@ -421,14 +421,14 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
               întrebare -- alt fel de dezacord, dar același capitol: „ce se
               contrazice în tine”. Existau de la început, împrăștiate prin
               raport, și nimic nu le punea față în față. */}
-          <Block title={sectionLabels.twoAnswers[language]} icon={<AlertTriangle className="h-5 w-5 text-warn" />} note={teasers.twoAnswers[language]}>
+          <Block title={sectionLabels.twoAnswers[language]} note={teasers.twoAnswers[language]}>
             <TwoAnswers fullName={fullName} birthDate={birthDate} />
           </Block>
         </Chapter>
 
         {/* 3 — Ce ai de învățat */}
         <Chapter meta={chapters[2]} index={3}>
-          <Block title={sectionLabels.karmic[language]} icon={<AlertTriangle className="h-5 w-5 text-warn" />} note={teasers.karmic[language]}>
+          <Block title={sectionLabels.karmic[language]} note={teasers.karmic[language]}>
             {karmicDebts.length > 0 ? (
               <div className="space-y-4">
                 {karmicDebts.map((debt, i) => (
@@ -436,7 +436,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground p-4 rounded-xl bg-ok/10 border border-ok/20">
+              <p className="border-l-2 border-ok py-1 pl-4 text-sm leading-relaxed text-muted-foreground">
                 ✓ {sectionLabels.noDebts[language]}
               </p>
             )}
@@ -459,18 +459,18 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
             </PlateEcho>
           )}
 
-          <Block title={sectionLabels.lessons[language]} icon={<Sparkles className="h-5 w-5 text-primary" />} note={teasers.lessons[language]}>
+          <Block title={sectionLabels.lessons[language]} note={teasers.lessons[language]}>
             {karmicLessons.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
+              <div>
                 {karmicLessons.map((num) => (
-                  <div key={num} className="px-3 py-2 rounded-lg bg-muted/50 border border-border/50">
-                    <span className="num text-primary mr-2">{num}</span>
-                    <span className="text-xs text-muted-foreground">{KARMIC_LESSON_MEANINGS[num]?.title[language]}</span>
+                  <div key={num} className="flex items-baseline gap-3 border-b border-line py-3">
+                    <span className="num w-8 shrink-0 text-right text-2xl leading-none text-warn">{num}</span>
+                    <span className="text-sm text-foreground/85">{KARMIC_LESSON_MEANINGS[num]?.title[language]}</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground p-4 rounded-xl bg-ok/10 border border-ok/20">
+              <p className="border-l-2 border-ok py-1 pl-4 text-sm leading-relaxed text-muted-foreground">
                 ✓ {sectionLabels.noLessons[language]}
               </p>
             )}
@@ -480,7 +480,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
               datoriile și lecțiile karmice -- rămâne deschis; grilele de aici
               arată aceleași absențe din alte unghiuri. */}
           <Deeper label={sectionLabels.deeperLessons[language]}>
-          <Block title={sectionLabels.depth[language]} icon={<Grid3x3 className="h-5 w-5 text-primary" />} note={teasers.depth[language]}>
+          <Block title={sectionLabels.depth[language]} note={teasers.depth[language]}>
             <Suspense fallback={chartSkeleton}>
               <NewNumbers fullName={fullName} birthDate={birthDate} keys={CHAPTER_LESSONS} />
             </Suspense>
@@ -491,13 +491,13 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
               at the foot of the page showed the same counts without the split,
               so it is gone rather than duplicated. Behind the visibility gate --
               it is the only Recharts mount in this chapter. */}
-          <Block title={sectionLabels.distribution[language]} icon={<BarChart3 className="h-5 w-5 text-primary" />} note={teasers.distribution[language]}>
+          <Block title={sectionLabels.distribution[language]} note={teasers.distribution[language]}>
             <WhenVisible fallback={chartSkeleton}>
               <LetterMap fullName={fullName} />
             </WhenVisible>
           </Block>
 
-          <Block title={sectionLabels.planes[language]} icon={<Grid3x3 className="h-5 w-5 text-primary" />} note={teasers.planes[language]}>
+          <Block title={sectionLabels.planes[language]} note={teasers.planes[language]}>
             <Suspense fallback={chartSkeleton}>
               <ExpressionPlanes fullName={fullName} />
             </Suspense>
@@ -507,14 +507,14 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
 
         {/* 4 — Unde ești acum */}
         <Chapter meta={chapters[3]} index={4}>
-          <Block title={sectionLabels.cycles[language]} icon={<CalendarCheck className="h-5 w-5 text-primary" />}>
+          <Block title={sectionLabels.cycles[language]}>
             <div className="space-y-6">
               <NumberCard title={`${t.personalYearTitle} ${currentYear}`} number={results.personalYear} delay={100} />
               <PersonalCycleCard birthDate={birthDate} delay={150} />
             </div>
           </Block>
 
-          <Block title={sectionLabels.transits[language]} icon={<CalendarRange className="h-5 w-5 text-primary" />} note={teasers.transits[language]}>
+          <Block title={sectionLabels.transits[language]} note={teasers.transits[language]}>
             <Suspense fallback={chartSkeleton}>
               <NewNumbers fullName={fullName} birthDate={birthDate} keys={CHAPTER_NOW} />
             </Suspense>
@@ -523,13 +523,13 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
           {/* Al doilea strat. Ciclurile și tranzitele spun unde ești; zilele
               favorabile și bioritmurile sunt unelte, nu răspunsul. */}
           <Deeper label={sectionLabels.deeperNow[language]}>
-          <Block title={sectionLabels.luckyDates[language]} icon={<CalendarCheck className="h-5 w-5 text-primary" />} note={teasers.luckyDates[language]}>
+          <Block title={sectionLabels.luckyDates[language]} note={teasers.luckyDates[language]}>
             <LuckyDatesCard birthDate={birthDate} fullName={fullName} delay={200} />
           </Block>
 
           {/* This chapter's diagram. Recharts lives inside it, so it stays behind
               the visibility gate like the other two. */}
-          <Block title={sectionLabels.biorhythms[language]} icon={<Activity className="h-5 w-5 text-primary" />} note={teasers.biorhythms[language]}>
+          <Block title={sectionLabels.biorhythms[language]} note={teasers.biorhythms[language]}>
             <WhenVisible fallback={chartSkeleton}>
               <Suspense fallback={chartSkeleton}>
                 <Biorhythms birthDate={birthDate} />
@@ -541,8 +541,8 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
 
         {/* 5 — Ce urmează */}
         <Chapter meta={chapters[4]} index={5}>
-          <Block title={sectionLabels.pinnacles[language]} icon={<Mountain className="h-5 w-5 text-primary" />} note={teasers.pinnacles[language]}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Block title={sectionLabels.pinnacles[language]} note={teasers.pinnacles[language]}>
+            <div>
               {pinnacles.map((pinnacle, i) => (
                 <PinnacleCard
                   key={i}
@@ -555,7 +555,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
             </div>
           </Block>
 
-          <Block title={sectionLabels.transits[language]} icon={<CalendarRange className="h-5 w-5 text-primary" />} note={teasers.transits[language]}>
+          <Block title={sectionLabels.transits[language]} note={teasers.transits[language]}>
             <Suspense fallback={chartSkeleton}>
               <TransitsTimeline fullName={fullName} birthDate={birthDate} />
             </Suspense>
@@ -574,7 +574,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
         <Chapter meta={chapters[5]} index={6}>
           {/* Octograma. SVG inline, nu Recharts, deci nu are nevoie de poartă
               de vizibilitate. */}
-          <Block title={sectionLabels.matrix[language]} icon={<Compass className="h-5 w-5 text-primary" />} note={teasers.matrix[language]}>
+          <Block title={sectionLabels.matrix[language]} note={teasers.matrix[language]}>
             <Suspense fallback={chartSkeleton}>
               <DestinyMatrix birthDate={birthDate} />
             </Suspense>
@@ -586,25 +586,25 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
               vedicProfile, kuaNumber or hebrewGematria outside
               src/lib/numerology-plus came back empty. The comment that used to
               sit here promised these blocks and pointed at /chaldean instead. */}
-          <Block title={sectionLabels.vedic[language]} icon={<Star className="h-5 w-5 text-primary" />} note={teasers.vedic[language]}>
+          <Block title={sectionLabels.vedic[language]} note={teasers.vedic[language]}>
             <VedicNumbers fullName={fullName} birthDate={birthDate} />
           </Block>
 
-          <Block title={sectionLabels.kua[language]} icon={<Compass className="h-5 w-5 text-primary" />} note={teasers.kua[language]}>
+          <Block title={sectionLabels.kua[language]} note={teasers.kua[language]}>
             <KuaNumber birthDate={birthDate} />
           </Block>
 
-          <Block title={sectionLabels.kabbalah[language]} icon={<Type className="h-5 w-5 text-primary" />} note={teasers.kabbalah[language]}>
+          <Block title={sectionLabels.kabbalah[language]} note={teasers.kabbalah[language]}>
             <KabbalahNumbers fullName={fullName} />
           </Block>
 
           {/* The Chaldean page keeps its link: it carries the 52-entry compound
               table, the favourable days and the business-name reading, none of
               which the three blocks above do. It is depth now, not the entrance. */}
-          <Block title={sectionLabels.parallel[language]} icon={<Compass className="h-5 w-5 text-primary" />} note={teasers.parallel[language]}>
+          <Block title={sectionLabels.parallel[language]} note={teasers.parallel[language]}>
             <Link
               to="/chaldean"
-              className="inline-flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-primary transition-colors hover:bg-primary/10"
+              className="num inline-flex min-h-11 items-center gap-2.5 rounded-sm border border-gilt px-4 text-[0.68rem] uppercase tracking-[0.14em] text-gilt transition-colors hover:bg-gilt-soft"
             >
               {sectionLabels.openChaldean[language]}
             </Link>

@@ -97,10 +97,13 @@ const LABELS: Record<Lang, Record<string, string>> = {
 };
 
 /** A wide bridge is a distance, not an error -- hence harmony/tension, not ok/crit. */
+/* Verdictul se citește din filetul de sus, nu dintr-un fundal colorat: pagina
+   nu mai are cutii nicăieri, iar relația prieten/neutru/dușman e o distanță,
+   nu o stare de alarmă. */
 const TONE: Record<Verdict, string> = {
-  friend: "bg-harmony-soft text-ink",
-  neutral: "bg-sunken text-ink-2",
-  enemy: "bg-tension-soft text-ink",
+  friend: "border-harmony text-ink",
+  neutral: "border-line text-ink-2",
+  enemy: "border-tension text-ink",
 };
 
 interface VedicNumbersProps {
@@ -136,7 +139,7 @@ export const VedicNumbers = ({ fullName, birthDate }: VedicNumbersProps) => {
         {figures.map((f) => {
           const planet = PLANETS[f.value];
           return (
-            <div key={f.key} className="space-y-1 rounded-xl border border-line bg-surface/60 p-4">
+            <div key={f.key} className="space-y-1 border-t border-gilt/40 pt-3">
               <div className="flex items-baseline gap-2">
                 <span className="num text-3xl text-primary" data-figure={f.key}>{f.value}</span>
                 <h4 className="font-heading text-base text-foreground">{f.title}</h4>
@@ -168,7 +171,7 @@ export const VedicNumbers = ({ fullName, birthDate }: VedicNumbersProps) => {
               key={r.key}
               data-relation={r.key}
               data-verdict={r.verdict}
-              className={`rounded-lg px-3 py-2 text-sm ${TONE[r.verdict]}`}
+              className={`border-t py-2.5 pl-3 text-sm ${TONE[r.verdict]}`}
             >
               <span className="block text-xs opacity-70">{r.label}</span>
               {l[r.verdict]}
@@ -178,7 +181,7 @@ export const VedicNumbers = ({ fullName, birthDate }: VedicNumbersProps) => {
         <p className="text-xs text-faint">{l.relationsNote}</p>
       </div>
 
-      <div className="space-y-2 rounded-xl bg-sunken p-4">
+      <div className="space-y-2 border-t border-gilt/40 pt-4">
         <h4 className="font-heading text-base text-foreground">{l.driftTitle}</h4>
         <div className="flex flex-wrap gap-6">
           <div>

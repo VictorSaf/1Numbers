@@ -112,7 +112,7 @@ const DestinyMatrix = ({ birthDate }: DestinyMatrixProps) => {
       </figure>
 
       {arcana && (
-        <div className="space-y-3 rounded-xl border border-line bg-surface/60 p-4">
+        <div className="space-y-3 border-t border-gilt/40 pt-4">
           <div className="flex flex-wrap items-baseline gap-x-2">
             <span className="num text-2xl text-primary">{point.arcana}</span>
             <h4 className="font-heading text-lg text-foreground">

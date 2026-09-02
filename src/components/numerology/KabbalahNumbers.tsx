@@ -66,7 +66,7 @@ export const KabbalahNumbers = ({ fullName }: KabbalahNumbersProps) => {
   return (
     <div className="space-y-4">
       <div className="grid gap-3 sm:grid-cols-2">
-        <div className="space-y-2 rounded-xl border border-line bg-surface/60 p-4">
+        <div className="space-y-2 border-t border-gilt/40 pt-3">
           <h4 className="font-heading text-base text-foreground">{l.popularTitle}</h4>
           <div className="flex flex-wrap gap-6">
             <div>
@@ -81,7 +81,7 @@ export const KabbalahNumbers = ({ fullName }: KabbalahNumbersProps) => {
           <p className="text-xs text-muted-foreground">{l.popularNote}</p>
         </div>
 
-        <div className="space-y-2 rounded-xl border border-line bg-surface/60 p-4">
+        <div className="space-y-2 border-t border-gilt/40 pt-3">
           <h4 className="font-heading text-base text-foreground">{l.hebrewTitle}</h4>
           <div className="flex flex-wrap gap-6">
             <div>

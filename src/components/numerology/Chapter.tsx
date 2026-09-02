@@ -11,6 +11,11 @@ import { ReactNode } from "react";
  * A chapter is always open. What it keeps from the accordion is the one line
  * that said what was inside; that line is now the question the chapter answers,
  * and it earns its place by being the thing a reader scans for.
+ *
+ * Registrul e cel al plăcii din capul paginii: cifra capitolului mare, în
+ * alamă, și un filet în locul unei iconițe colorate. Placa pusă peste capitole
+ * desenate altfel lăsa cusătura la vedere -- două stiluri pe o pagină sunt mai
+ * rău decât oricare dintre ele singur.
  */
 
 export interface ChapterMeta {
@@ -24,15 +29,19 @@ export interface ChapterMeta {
 export const Chapter = ({
   meta, index, children,
 }: { meta: ChapterMeta; index: number; children: ReactNode }) => (
-  <section id={meta.id} className="scroll-mt-24 space-y-6">
-    <header className="space-y-1 border-b border-border/60 pb-4">
-      <div className="flex items-baseline gap-3">
-        <span className="font-mono text-sm tabular-nums text-muted-foreground">
-          {String(index).padStart(2, "0")}
-        </span>
-        <h2 className="font-heading text-2xl text-foreground">{meta.title}</h2>
+  <section id={meta.id} className="scroll-mt-24 space-y-8">
+    <header className="flex items-start gap-5 border-b border-line pb-5 sm:gap-6">
+      {/* Cifra e cap curent, nu etichetă: la 12px se pierdea, iar capitolul
+          începea fără să se vadă că începe. */}
+      <span className="num shrink-0 text-4xl leading-[0.85] text-gilt/45 sm:text-5xl">
+        {String(index).padStart(2, "0")}
+      </span>
+      <div className="min-w-0 pt-0.5">
+        <h2 className="font-heading text-2xl leading-tight text-foreground sm:text-3xl">
+          {meta.title}
+        </h2>
+        <p className="mt-2 text-muted-foreground">{meta.question}</p>
       </div>
-      <p className="pl-9 text-muted-foreground">{meta.question}</p>
     </header>
     {children}
   </section>
@@ -41,20 +50,21 @@ export const Chapter = ({
 /**
  * A block inside a chapter: a heading and its content, nothing to click.
  *
- * The icon and one-line note are what the accordion header used to carry, minus
- * the toggle -- the description of a block is worth as much when the block is
- * simply there as it was when it was hidden.
+ * Titlul e o etichetă de alamă cu filet, nu o iconiță lucide colorată plus un
+ * titlu. Iconițele -- steluțe albastre, triunghiuri de avertisment chihlimbar --
+ * erau chiar semnătura stilului vechi, și pe lângă asta spuneau alarmă acolo
+ * unde harta vorbește despre distanțe. O distanță de 6 nu e o eroare.
  */
 export const Block = ({
-  title, icon, note, children,
-}: { title: string; icon?: ReactNode; note?: string; children: ReactNode }) => (
-  <div className="space-y-3">
-    <div className="space-y-1">
-      <div className="flex items-center gap-2">
-        {icon}
-        <h3 className="font-heading text-lg text-foreground">{title}</h3>
+  title, note, children,
+}: { title: string; note?: string; children: ReactNode }) => (
+  <div className="space-y-4">
+    <div className="space-y-1.5">
+      <div className="flex items-center gap-3">
+        <span className="h-px w-10 shrink-0 bg-gilt" aria-hidden="true" />
+        <h3 className="num text-[0.63rem] uppercase tracking-[0.18em] text-gilt">{title}</h3>
       </div>
-      {note && <p className="text-sm text-muted-foreground">{note}</p>}
+      {note && <p className="max-w-[65ch] text-sm text-muted-foreground">{note}</p>}
     </div>
     {children}
   </div>

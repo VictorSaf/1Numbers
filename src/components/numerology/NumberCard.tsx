@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 import type { Interpretation } from "@/lib/numerology-plus/content/interpret";
 
 /**
@@ -11,6 +11,10 @@ import type { Interpretation } from "@/lib/numerology-plus/content/interpret";
  * rather than markup: the engine returns an Interpretation and this draws it.
  * The alternative -- a component per number -- is how a codebase ends up with
  * fourteen near-identical cards that drift apart.
+ *
+ * Registrul e cel al plăcii: rând cu filet, nu chenar rotunjit. Cifra e
+ * vizualul -- la 30px într-un card ca oricare altul, chiar produsul paginii
+ * cântărea cât o notă de subsol.
  */
 
 interface NumberCardProps {
@@ -23,6 +27,12 @@ interface NumberCardProps {
   className?: string;
 }
 
+const COPY = {
+  ro: { works: "când merge", breaks: "când se strică", master: "maestru", debt: "datorie karmică", from: "din" },
+  en: { works: "when it works", breaks: "when it breaks", master: "master", debt: "karmic debt", from: "from" },
+  ru: { works: "когда работает", breaks: "когда ломается", master: "мастер", debt: "кармический долг", from: "из" },
+} as const;
+
 export const NumberCard = ({
   interpretation,
   raw,
@@ -31,71 +41,83 @@ export const NumberCard = ({
   className,
 }: NumberCardProps) => {
   const [open, setOpen] = useState(false);
+  const { language } = useLanguage();
+  const t = COPY[(language in COPY ? language : "ro") as keyof typeof COPY];
   const { label, question, value, title, keywords, lead, works, breaks } = interpretation;
   const showsRaw = raw !== undefined && raw !== value;
 
   return (
-    <article
-      className={cn(
-        "rounded-xl border border-line bg-surface/60 backdrop-blur-sm transition-colors",
-        "hover:border-primary/40",
-        className,
-      )}
-    >
+    <article className={cn("border-b border-line", className)}>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="w-full flex items-start gap-4 p-4 text-left group"
+        className="group flex w-full items-start gap-5 py-5 text-left sm:gap-7"
       >
         <span
           className={cn(
-            "num shrink-0 text-3xl leading-none w-12 text-center",
-            isMaster ? "text-primary" : "text-ink-2",
+            "num shrink-0 text-right text-4xl leading-[0.86] sm:w-[88px] sm:text-5xl",
+            "w-14",
+            isMaster ? "text-gilt" : "text-accent",
           )}
         >
           {value}
         </span>
 
         <span className="min-w-0 flex-1">
-          <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-            <span className="font-heading text-base text-foreground">{label}</span>
+          <span className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <span className="font-heading text-lg text-foreground sm:text-xl">{label}</span>
             {isMaster && (
-              <span className="num text-[10px] uppercase tracking-wider text-primary">master</span>
+              <span className="num text-[0.6rem] uppercase tracking-[0.16em] text-gilt">
+                {t.master}
+              </span>
             )}
             {karmicDebt != null && (
-              <span className="num rounded bg-crit-soft px-1.5 py-0.5 text-[10px] text-crit">
-                {karmicDebt} · datorie karmică
+              <span className="num text-[0.6rem] uppercase tracking-[0.16em] text-crit">
+                {karmicDebt} · {t.debt}
               </span>
             )}
             {showsRaw && karmicDebt == null && (
-              <span className="num text-[10px] text-faint">din {raw}</span>
+              <span className="num text-[0.68rem] text-muted-foreground">
+                {t.from} {raw}
+              </span>
             )}
           </span>
-          <span className="mt-1 block text-sm text-muted-foreground">{question}</span>
+          <span className="mt-1.5 block max-w-[60ch] text-sm text-muted-foreground">{question}</span>
         </span>
 
-        <span className="shrink-0 flex items-center gap-2 pt-1">
-          <span className="hidden sm:inline text-xs text-faint">{title}</span>
-          <ChevronDown
-            className={cn("h-4 w-4 text-faint transition-transform", open && "rotate-180")}
-          />
+        <span className="num flex shrink-0 items-center gap-2.5 pt-1.5 text-[0.68rem] text-muted-foreground">
+          <span className="hidden sm:inline">{title}</span>
+          <span
+            aria-hidden="true"
+            className={cn("transition-transform", open && "rotate-180")}
+          >
+            ▾
+          </span>
         </span>
       </button>
 
       {open && (
-        <div className="border-t border-line px-4 pb-4 pt-3 space-y-3">
-          <div className="flex flex-wrap gap-1.5">
-            {keywords.map((k) => (
-              <span key={k} className="rounded bg-sunken px-2 py-0.5 text-xs text-ink-2">
-                {k}
+        <div className="space-y-5 pb-6 sm:pl-[116px]">
+          <p className="num text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">
+            {keywords.join(" · ")}
+          </p>
+          <p className="max-w-[65ch] font-heading text-[1.05rem] leading-relaxed text-foreground/90">
+            {lead}
+          </p>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div className="border-t border-harmony pt-3">
+              <span className="num text-[0.6rem] uppercase tracking-[0.18em] text-harmony">
+                {t.works}
               </span>
-            ))}
-          </div>
-          <p className="text-sm text-foreground/90">{lead}</p>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <p className="rounded-lg bg-ok-soft/60 p-3 text-sm text-foreground/90">{works}</p>
-            <p className="rounded-lg bg-warn-soft/60 p-3 text-sm text-foreground/90">{breaks}</p>
+              <p className="mt-2 text-sm leading-relaxed text-foreground/85">{works}</p>
+            </div>
+            <div className="border-t border-tension pt-3">
+              <span className="num text-[0.6rem] uppercase tracking-[0.18em] text-tension">
+                {t.breaks}
+              </span>
+              <p className="mt-2 text-sm leading-relaxed text-foreground/85">{breaks}</p>
+            </div>
           </div>
         </div>
       )}
