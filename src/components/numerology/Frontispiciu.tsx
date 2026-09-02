@@ -137,10 +137,10 @@ export const Frontispiciu = ({
             `display: block` ca stil inline, iar un stil inline bate orice
             clasă -- `hidden` n-avea nicio putere și se vedeau amândouă. */}
         <div className="order-first lg:order-none">
-          <div className="hidden lg:block">
+          <div className="hidden w-full lg:block">
             <Dial figure={figure} size="plate" />
           </div>
-          <div className="mx-auto max-w-[340px] lg:hidden">
+          <div className="mx-auto w-full max-w-[340px] lg:hidden">
             <Dial figure={figure} size="phone" />
           </div>
         </div>

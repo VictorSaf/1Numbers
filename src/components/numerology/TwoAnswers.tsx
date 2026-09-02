@@ -20,9 +20,9 @@ import { findDisagreements, type DisagreementLang, type Verdict } from "@/lib/di
  */
 
 const TONE: Record<Verdict, string> = {
-  agree: "border-harmony/40 bg-harmony/5",
-  near: "border-line bg-surface/60",
-  apart: "border-tension/40 bg-tension/5",
+  agree: "border-harmony",
+  near: "border-line",
+  apart: "border-tension",
 };
 
 const DOT: Record<Verdict, string> = {
@@ -81,7 +81,7 @@ export const TwoAnswers = ({
       <p className="max-w-prose text-sm leading-relaxed text-muted-foreground">{t.lede}</p>
 
       {pairs.map((p) => (
-        <div key={p.key} data-pair={p.key} className={`rounded-2xl border p-5 sm:p-6 ${TONE[p.verdict]}`}>
+        <div key={p.key} data-pair={p.key} className={`border-t pt-5 ${TONE[p.verdict]}`}>
           <div className="mb-4 flex items-center gap-2.5">
             <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${DOT[p.verdict]}`} aria-hidden="true" />
             <h4 className="font-heading text-base text-foreground sm:text-lg">{p.question}</h4>
@@ -113,7 +113,7 @@ export const TwoAnswers = ({
       ))}
 
       {missing && (
-        <div data-pair="missing" className={`rounded-2xl border p-5 sm:p-6 ${missing.both.length ? TONE.apart : TONE.near}`}>
+        <div data-pair="missing" className={`border-t pt-5 ${missing.both.length ? TONE.apart : TONE.near}`}>
           <div className="mb-4 flex items-center gap-2.5">
             <span
               className={`h-1.5 w-1.5 shrink-0 rounded-full ${missing.both.length ? DOT.apart : DOT.near}`}

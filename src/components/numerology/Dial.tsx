@@ -12,6 +12,9 @@ import { dialPosition, type DialFigure } from "@/lib/dial";
  * fotografiat, iar o fotografie nu se inversează când omul trece pe temă
  * deschisă. Vezi comentariul din index.css.
  *
+ * Lățimea vine din înveliș: `<div className="w-[128px]"><Dial …/></div>`.
+ * Componenta nu-și pune width inline tocmai ca învelișul să poată hotărî.
+ *
  * Pe cadran nu se folosește `--warn`. O cifră care lipsește e o absență, nu o
  * alarmă: se desenează ca inel gol. (Alama e la nuanța 46 tocmai ca să nu intre
  * peste warn, care e la 34 -- la 42 cele două citeau la fel.)
@@ -87,7 +90,11 @@ export const Dial = ({
       role="img"
       aria-label={said}
       className={className}
-      style={{ display: "block", width: "100%", height: "auto" }}
+      /* Doar `display`. Lățimea o dă ÎNVELIȘUL, nu componenta: un
+         `width: 100%` scris aici e stil inline, iar un stil inline bate orice
+         clasă -- un `w-[128px]` pus de consumator n-ar avea nicio putere.
+         Aceeași capcană a ascuns cadranul de telefon sub cel de desktop. */
+      style={{ display: "block" }}
     >
       <circle
         cx={c} cy={c} r={s.ring} fill="none"

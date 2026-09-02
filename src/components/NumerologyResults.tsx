@@ -25,8 +25,8 @@ import { track } from '@/lib/analytics';
 import { Link } from "react-router-dom";
 import { Chapter, Block, type ChapterMeta } from "@/components/numerology/Chapter";
 import { Frontispiciu } from "@/components/numerology/Frontispiciu";
-import { PlateEcho } from "@/components/numerology/PlateEcho";
 import { buildDial } from "@/lib/dial";
+import { Dial } from "@/components/numerology/Dial";
 import { LetterMap } from "@/components/numerology/LetterMap";
 import { ChapterNav } from "@/components/numerology/ChapterNav";
 import { Deeper } from "@/components/numerology/Deeper";
@@ -387,24 +387,32 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
         </Chapter>
 
         {/* 2 — Ce se contrazice în tine */}
-        <Chapter meta={chapters[1]} index={2}>
+        <Chapter
+          meta={chapters[1]}
+          index={2}
+          aside={
+            figure.chord && (
+              <div className="flex items-center gap-4 sm:gap-5">
+                <div className="w-[104px] shrink-0 sm:w-[132px]">
+                    <Dial figure={figure} size="echo" />
+                  </div>
+                <div className="min-w-0">
+                  <p className="num text-[0.63rem] uppercase tracking-[0.16em] text-plate-gilt">
+                    {figure.chord.from} <span className="text-plate-tension">⟷</span> {figure.chord.to}
+                  </p>
+                  {/* Propoziția e propoziție: majusculele mono sunt pentru
+                      etichete de două cuvinte, nu pentru o frază de patru
+                      rânduri. */}
+                  <p className="mt-1.5 text-[0.8rem] leading-relaxed text-plate-muted">
+                    {sectionLabels.echoTension[language]}
+                  </p>
+                </div>
+              </div>
+            )
+          }
+        >
           {/* The chapter's answer, before its parts. */}
           <Block title={sectionLabels.contradiction[language]} note={teasers.contradiction[language]}>
-            {/* Cadranul se întoarce acolo unde coarda e chiar subiectul. */}
-            {figure.chord && (
-              <PlateEcho figure={figure}>
-                <span className="num text-[0.63rem] uppercase tracking-[0.18em] text-plate-gilt">
-                  {sectionLabels.contradiction[language]}
-                </span>
-                <p className="mt-3 font-heading text-lg leading-relaxed text-plate-ink sm:text-xl">
-                  {figure.chord.fromLabel} <span className="num">{figure.chord.from}</span>,{" "}
-                  {figure.chord.toLabel} <span className="num">{figure.chord.to}</span>.
-                </p>
-                <p className="mt-2 text-sm leading-relaxed text-plate-muted">
-                  {sectionLabels.echoTension[language]}
-                </p>
-              </PlateEcho>
-            )}
             <Suspense fallback={chartSkeleton}>
               <Contradictions fullName={fullName} birthDate={birthDate} />
             </Suspense>
@@ -427,7 +435,25 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
         </Chapter>
 
         {/* 3 — Ce ai de învățat */}
-        <Chapter meta={chapters[2]} index={3}>
+        <Chapter
+          meta={chapters[2]}
+          index={3}
+          aside={
+            figure.missing.length > 0 && (
+              <div className="flex items-center gap-4 sm:gap-5">
+                <div className="w-[104px] shrink-0 sm:w-[132px]">
+                    <Dial figure={figure} size="echo" />
+                  </div>
+                <div className="min-w-0">
+                  <p className="num text-lg text-plate-warn">{figure.missing.join(" · ")}</p>
+                  <p className="mt-1.5 text-[0.8rem] leading-relaxed text-plate-muted">
+                    {sectionLabels.echoMissing[language]}
+                  </p>
+                </div>
+              </div>
+            )
+          }
+        >
           <Block title={sectionLabels.karmic[language]} note={teasers.karmic[language]}>
             {karmicDebts.length > 0 ? (
               <div className="space-y-4">
@@ -441,23 +467,6 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
               </p>
             )}
           </Block>
-
-          {/* Al doilea ecou: aici subiectul sunt golurile, nu coarda. */}
-          {figure.missing.length > 0 && (
-            <PlateEcho figure={figure}>
-              <span className="num text-[0.63rem] uppercase tracking-[0.18em] text-plate-gilt">
-                {sectionLabels.lessons[language]}
-              </span>
-              <p className="mt-3 font-heading text-lg leading-relaxed text-plate-ink sm:text-xl">
-                {figure.missing.map((n) => (
-                  <span key={n} className="num mr-2">{n}</span>
-                ))}
-              </p>
-              <p className="mt-2 text-sm leading-relaxed text-plate-muted">
-                {sectionLabels.echoMissing[language]}
-              </p>
-            </PlateEcho>
-          )}
 
           <Block title={sectionLabels.lessons[language]} note={teasers.lessons[language]}>
             {karmicLessons.length > 0 ? (

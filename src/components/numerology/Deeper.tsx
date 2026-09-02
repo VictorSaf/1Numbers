@@ -45,7 +45,7 @@ export const Deeper = ({
         type="button"
         onClick={() => setOpen(!open)}
         aria-expanded={open}
-        className="btn-primary inline-flex min-h-11 items-center gap-2 text-sm"
+        className="num inline-flex min-h-11 items-center gap-2.5 rounded-sm border border-gilt px-4 text-[0.68rem] uppercase tracking-[0.14em] text-gilt transition-colors hover:bg-gilt-soft"
       >
         <ChevronDown
           className={`h-4 w-4 transition-transform motion-reduce:transition-none ${open ? "rotate-180" : ""}`}

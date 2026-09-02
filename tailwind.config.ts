@@ -60,6 +60,7 @@ export default {
           ink: "hsl(var(--plate-ink))",
           muted: "hsl(var(--plate-muted))",
           tension: "hsl(var(--plate-tension))",
+          warn: "hsl(var(--plate-warn))",
         },
         harmony: {
           DEFAULT: "hsl(var(--harmony))",
