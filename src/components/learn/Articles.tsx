@@ -14,12 +14,12 @@ const Articles = () => {
     <>
 
       <main className="relative z-10 px-4 pb-16">
-        <div className="max-w-6xl mx-auto">
+        <div>
           {selectedArticle ? (
             <div className="space-y-6">
               <button
                 onClick={() => setSelectedArticle(null)}
-                className="text-primary hover:underline"
+                className="text-gilt hover:underline"
               >
                 ← {{ ro: 'Înapoi la articole', en: 'Back to articles', ru: 'Назад к статьям' }[language] ?? 'Back to articles'}
               </button>

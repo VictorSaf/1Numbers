@@ -20,7 +20,7 @@ const NumerologyGuide = () => {
 
       {/* Main Content */}
       <main className="relative z-10 px-4 pb-16">
-        <div className="max-w-5xl mx-auto space-y-12">
+        <div className="space-y-12">
           
           {/* Core Numbers Section */}
           <section className="space-y-6">
@@ -85,7 +85,7 @@ const NumerologyGuide = () => {
                 
                 <div className="flex-1 text-center md:text-left space-y-4">
                   <div>
-                    <span className="text-xs uppercase tracking-[0.2em] text-primary/70">
+                    <span className="num text-[0.63rem] uppercase tracking-[0.18em] text-gilt">
                       {masterNumbers.includes(selectedNumber) ? t.masterNumber : t.coreNumber}
                     </span>
                     <h3 className="font-heading text-3xl text-foreground mt-1">
@@ -97,7 +97,7 @@ const NumerologyGuide = () => {
                     {getMeaning(selectedNumber).traits.map((trait, index) => (
                       <span
                         key={index}
-                        className="px-4 py-1.5 text-sm rounded-full bg-sunken text-primary border border-line"
+                        className="num min-h-11 rounded-sm border border-gilt px-4 text-[0.68rem] uppercase tracking-[0.14em] text-gilt"
                       >
                         {trait}
                       </span>
@@ -143,8 +143,7 @@ const NumerologyGuide = () => {
                     <div className="flex items-center gap-4">
                       <div className={cn(
                         "w-14 h-14 rounded-full flex items-center justify-center",
-                        "bg-gradient-to-br from-primary/20 to-accent/20",
-                        "border border-line font-heading text-xl text-primary",
+                        "border border-line font-heading text-xl text-foreground",
                         isMaster && "border-2 border-line"
                       )}>
                         {num}
@@ -175,7 +174,7 @@ const NumerologyGuide = () => {
 
       {/* Footer */}
       <footer className="relative z-10 py-6 border-t border-border/30">
-        <div className="max-w-5xl mx-auto px-4 text-center">
+        <div className="px-4 text-center">
           <p className="text-sm text-muted-foreground font-raleway">
             {t.footer}
           </p>

@@ -133,7 +133,7 @@ const AngelNumbers = () => {
     <>
 
       <main className="relative z-10 px-4 pb-16">
-        <div className="max-w-4xl mx-auto space-y-8">
+        <div className="space-y-8">
           {/* Search Section */}
           <div className="card-mystic rounded-lg p-6">
             <div className="flex gap-3">

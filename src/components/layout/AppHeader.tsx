@@ -69,9 +69,8 @@ const AppHeader = () => {
           {/* Logo / Home */}
           <Link to="/" className="flex items-center gap-2 group">
             <div className="relative">
-              <div className="absolute inset-0 bg-sunken rounded-full blur-md group-hover:bg-sunken transition-colors" />
-              <div className="relative w-8 h-8 rounded-full bg-gradient-to-br from-primary to-warn flex items-center justify-center">
-                <span className="text-foreground-foreground font-heading font-bold text-lg">N</span>
+              <div className="relative flex h-8 w-8 items-center justify-center rounded-full border border-gilt">
+                <span className="font-heading text-lg text-gilt">N</span>
               </div>
             </div>
             <span className="hidden sm:inline font-heading text-xl font-semibold text-foreground group-hover:text-foreground transition-colors">
@@ -92,10 +91,13 @@ const AppHeader = () => {
                     className={cn(
                       // Five buttons with their names on them fit where seven
                       // icon-only ones did not.
-                      "h-9 gap-2 px-3 font-raleway text-sm transition-all",
+                      // Aceeași gramatică ca filele: filet de alamă dedesubt,
+                      // fără fundal. Pastila colorată cu chenar albastru dădea
+                      // două semnale pentru aceeași stare, în culoarea veche.
+                      "h-11 gap-2 rounded-none border-b-2 px-3 font-raleway text-sm transition-colors",
                       active
-                        ? "bg-sunken text-primary border-b-2 border-primary"
-                        : "text-foreground/90 hover:text-primary hover:bg-sunken"
+                        ? "border-gilt text-gilt"
+                        : "border-transparent text-foreground/80 hover:border-line hover:text-foreground"
                     )}
                   >
                     <Icon className="h-4 w-4" />
@@ -117,10 +119,10 @@ const AppHeader = () => {
                     variant="ghost"
                     size="sm"
                     className={cn(
-                      "h-9 gap-2 px-3 font-raleway text-sm",
+                      "h-11 gap-2 rounded-none border-b-2 px-3 font-raleway text-sm transition-colors",
                       ACCOUNT_NAV.some((i) => isActive(i.path))
-                        ? "bg-sunken text-primary"
-                        : "text-foreground/90 hover:text-primary hover:bg-sunken"
+                        ? "border-gilt text-gilt"
+                        : "border-transparent text-foreground/80 hover:border-line hover:text-foreground"
                     )}
                   >
                     <User className="h-4 w-4" />
@@ -165,7 +167,7 @@ const AppHeader = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-9 gap-2 px-3 font-raleway text-sm text-foreground/90 hover:text-primary hover:bg-sunken"
+                  className="h-11 gap-2 px-3 font-raleway text-sm text-foreground/80 hover:text-foreground"
                 >
                   <User className="h-4 w-4" />
                   <span className="hidden sm:inline">{say(SIGN_IN)}</span>

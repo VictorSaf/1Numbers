@@ -256,7 +256,7 @@ const FAQ = () => {
 
       {/* Main Content */}
       <main className="relative z-10 px-4 pb-16">
-        <div className="max-w-4xl mx-auto space-y-8">
+        <div className="space-y-8">
           {Object.entries(groupedFaqs).map(([category, faqs]) => {
             const Icon = categoryIcons[category as keyof typeof categoryIcons] || HelpCircle;
             return (
@@ -277,7 +277,7 @@ const FAQ = () => {
                       value={`${category}-${index}`}
                       className="border border-border/30 rounded-lg px-4 data-[state=open]:bg-card/50"
                     >
-                      <AccordionTrigger className="text-left text-foreground/90 hover:text-primary hover:no-underline">
+                      <AccordionTrigger className="text-left text-foreground/90 hover:text-gilt hover:no-underline">
                         {faq.question}
                       </AccordionTrigger>
                       <AccordionContent className="text-muted-foreground">
@@ -294,7 +294,7 @@ const FAQ = () => {
 
       {/* Footer */}
       <footer className="relative z-10 py-6 border-t border-border/30">
-        <div className="max-w-4xl mx-auto px-4 text-center">
+        <div className="px-4 text-center">
           <p className="text-sm text-muted-foreground font-raleway">{t.footer}</p>
         </div>
       </footer>

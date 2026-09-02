@@ -337,7 +337,7 @@ const Tutorials = () => {
 
       {/* Main Content */}
       <main className="relative z-10 px-4 pb-16">
-        <div className="max-w-4xl mx-auto">
+        <div>
           
           {/* Lesson List */}
           <div className="grid md:grid-cols-3 gap-4 mb-8">
@@ -347,7 +347,7 @@ const Tutorials = () => {
                 onClick={() => startLesson(index)}
                 className={cn(
                   "card-mystic p-5 text-left transition-colors duration-200",
-                  currentLesson === index && "ring-2 ring-primary "
+                  currentLesson === index && "border-gilt"
                 )}
               >
                 <div className="flex items-start justify-between mb-3">
@@ -451,7 +451,7 @@ const Tutorials = () => {
 
       {/* Footer */}
       <footer className="relative z-10 py-6 border-t border-border/30">
-        <div className="max-w-4xl mx-auto px-4 text-center">
+        <div className="px-4 text-center">
           <p className="text-sm text-muted-foreground font-raleway">{t.footer}</p>
         </div>
       </footer>
