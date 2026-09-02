@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, Users, Sparkles } from "lucide-react";
+import { Users, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -52,12 +52,9 @@ const Compatibility = () => {
     // Întrebarea fiecărei secțiuni spune ALTCEVA decât subtitlul plăcii.
     // Repetat cuvânt cu cuvânt la două rânduri distanță, textul face pagina să
     // pară scrisă de două ori -- același defect pe care l-am scos de pe /azi.
-    ro: { pereche: "Cele două hărți", perecheQ: "Numele întreg și data nașterii, pentru fiecare. Din ele ies toate cifrele.",
-          scoruri: "Scorurile pe rând", procent: "Ce ascunde procentul", dinamica: "Dinamica relației" },
-    en: { pereche: "The two maps", perecheQ: "Full name and birth date, for each. Every number comes out of those.",
-          scoruri: "The scores, one by one", procent: "What the percentage hides", dinamica: "How the relationship moves" },
-    ru: { pereche: "Две карты", perecheQ: "Полное имя и дата рождения — для каждого. Из них выходят все числа.",
-          scoruri: "Оценки по отдельности", procent: "Что скрывает процент", dinamica: "Динамика отношений" },
+    ro: { scorQ: "Cât de aproape sunt cele două hărți, într-o singură cifră.", scoruri: "Scorurile pe rând", procent: "Ce ascunde procentul", dinamica: "Dinamica relației" },
+    en: { scorQ: "How close the two maps are, in a single figure.", scoruri: "The scores, one by one", procent: "What the percentage hides", dinamica: "How the relationship moves" },
+    ru: { scorQ: "Насколько близки две карты — одним числом.", scoruri: "Оценки по отдельности", procent: "Что скрывает процент", dinamica: "Динамика отношений" },
   }[lang];
   const { profileData, hasProfile } = useProfile();
   const [person1, setPerson1] = useState<PersonData>({ fullName: "", birthDate: undefined });
@@ -141,18 +138,19 @@ const Compatibility = () => {
     setTiming(null);
   };
 
+  // Un scor de compatibilitate e o DISTANȚĂ, nu o eroare. 45% nu e o alarmă
+  // roșie, e o pereche care are de lucru. Deci aceleași culori ca punțile
+  // hărții -- armonie și tensiune -- nu `--ok`, `--warn`, `--crit`.
   const getScoreColor = (score: number) => {
-    if (score >= 85) return "text-ok";
-    if (score >= 70) return "text-primary";
-    if (score >= 55) return "text-warn";
-    return "text-crit";
+    if (score >= 70) return "text-harmony";
+    if (score >= 55) return "text-accent";
+    return "text-tension";
   };
 
-  const getScoreBg = (score: number) => {
-    if (score >= 85) return "from-ok/20 to-ok-ink/10 border-ok";
-    if (score >= 70) return "from-primary/20 to-accent-ink/10 border-line";
-    if (score >= 55) return "from-warn/20 to-warn-ink/10 border-warn";
-    return "from-crit/20 to-crit-ink/10 border-crit";
+  const getScoreRule = (score: number) => {
+    if (score >= 70) return "border-harmony";
+    if (score >= 55) return "border-line";
+    return "border-tension";
   };
 
   return (
@@ -161,7 +159,10 @@ const Compatibility = () => {
       <main className="relative z-10 pb-16">
         <div className="page-measure pt-4">
           {/* Placa de deschidere, ca la hartă. Figura ei sunt chiar cele două
-              cadrane, când există două hărți de comparat. */}
+              cadrane, când există două hărți de comparat.
+              Cât timp nu e rezultat, formularul stă ÎN placă: cele două hărți
+              pe care le ceri SUNT începutul paginii, nu un capitol de după el.
+              Rezultatul se arată dedesubt, în afara plăcii. */}
           <PagePlate
             eyebrow={t.compatibilityLabel}
             title={t.compatibilityTitle}
@@ -181,29 +182,20 @@ const Compatibility = () => {
                 </div>
               ) : undefined
             }
-          />
-
-          <div className="page-rhythm mt-14">
-          {!result ? (
-            <>
-              {/* Starea de formular e o secțiune ca oricare alta: cifră, titlu,
-                  întrebare. Cardul stătea pe `max-w-2xl` -- 672px într-o pagină
-                  de 1024, o treaptă de 352px față de placa de deasupra lui. */}
-              <SectionHead index={1} title={sections.pereche} question={sections.perecheQ} />
-
-              <div className="card-mystic py-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          >
+            {!result && (
+              <div className="grid grid-cols-1 gap-x-10 gap-y-8 md:grid-cols-2">
                 {/* Person 1 */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 mb-4">
                     <div className="flex items-center justify-center">
                       <span className="num text-2xl leading-none text-accent">1</span>
                     </div>
-                    <h3 className="font-heading text-lg text-foreground">{t.person1}</h3>
+                    <h3 className="font-heading text-lg">{t.person1}</h3>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label className="text-foreground/90 text-sm">{t.fullNameLabel}</Label>
+                    <Label className="text-sm">{t.fullNameLabel}</Label>
                     <Input
                       value={person1.fullName}
                       onChange={(e) => setPerson1({ ...person1, fullName: e.target.value })}
@@ -213,7 +205,7 @@ const Compatibility = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label className="text-foreground/90 text-sm">{t.birthDateLabel}</Label>
+                    <Label className="text-sm">{t.birthDateLabel}</Label>
                     <BirthDateSelect value={person1.birthDate} onChange={(date) => setPerson1({ ...person1, birthDate: date })} />
                   </div>
                 </div>
@@ -224,11 +216,11 @@ const Compatibility = () => {
                     <div className="flex items-center justify-center">
                       <span className="num text-2xl leading-none text-accent">2</span>
                     </div>
-                    <h3 className="font-heading text-lg text-foreground">{t.person2}</h3>
+                    <h3 className="font-heading text-lg">{t.person2}</h3>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label className="text-foreground/90 text-sm">{t.fullNameLabel}</Label>
+                    <Label className="text-sm">{t.fullNameLabel}</Label>
                     <Input
                       value={person2.fullName}
                       onChange={(e) => setPerson2({ ...person2, fullName: e.target.value })}
@@ -238,67 +230,60 @@ const Compatibility = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label className="text-foreground/90 text-sm">{t.birthDateLabel}</Label>
+                    <Label className="text-sm">{t.birthDateLabel}</Label>
                     <BirthDateSelect value={person2.birthDate} onChange={(date) => setPerson2({ ...person2, birthDate: date })} />
                   </div>
                 </div>
-              </div>
 
-              {/* Relationship Type Selector */}
-              <div className="my-6">
-                <RelationshipTypeSelector
-                  selectedType={relationshipType}
-                  onTypeChange={setRelationshipType}
-                />
-              </div>
+                <div className="md:col-span-2">
+                  <RelationshipTypeSelector
+                    selectedType={relationshipType}
+                    onTypeChange={setRelationshipType}
+                  />
+                </div>
 
-              {/* Heart divider */}
-              <div className="flex items-center justify-center my-8">
-                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-                <Heart className="mx-4 h-6 w-6 text-primary animate-pulse-glow" />
-                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+                {/* Inima plutea singură între formular și buton, fără text și
+                    fără rol -- rămăsese de la aranjarea în două coloane pe care
+                    o despărțea. */}
+                <div className="md:col-span-2">
+                  <Button onClick={handleCalculate} disabled={!canCalculate} className="w-full sm:w-auto">
+                    <Sparkles className="mr-2 h-5 w-5" />
+                    {t.calculateCompatibility}
+                  </Button>
+                </div>
               </div>
+            )}
+          </PagePlate>
 
-              <Button
-                onClick={handleCalculate}
-                disabled={!canCalculate}
-                className="w-full sm:w-auto"
-              >
-                <Sparkles className="mr-2 h-5 w-5" />
-                {t.calculateCompatibility}
-              </Button>
-              </div>
-            </>
-          ) : (
+          <div className="page-rhythm mt-14">
+          {result && (
             <div className="page-rhythm animate-fade-in">
               <Chapter
                 meta={{
                   id: "scor",
                   title: `${person1.fullName} · ${person2.fullName}`,
-                  question: t.compatibilitySubtitle,
+                  question: sections.scorQ,
                 }}
                 index={1}
               >
 
-              {/* Overall Score */}
-              <div className={cn(
-                "card-mystic py-8 text-center",
-                "bg-gradient-to-br border",
-                getScoreBg(result.overallScore)
-              )}>
-                <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              {/* Scorul e o CIFRĂ, ca peste tot: stă mare și singură, deschisă
+                  de un filet care poartă culoarea distanței. Caseta cu degrade
+                  pe două direcții și chenar colorat era ultimul loc din
+                  aplicație care mai arăta a stil vechi. */}
+              <div className={cn("border-t-2 pt-6", getScoreRule(result.overallScore))}>
+                <span className="num text-[0.63rem] uppercase tracking-[0.18em] text-muted-foreground">
                   {t.overallCompatibility}
                 </span>
-                <div className={cn(
-                  "num text-7xl md:text-8xl font-bold my-4",
-                  getScoreColor(result.overallScore)
-                )}>
-                  {result.overallScore}%
+                <div className="mt-4 flex flex-wrap items-baseline gap-x-6 gap-y-2">
+                  <span className={cn("num text-7xl leading-none md:text-8xl", getScoreColor(result.overallScore))}>
+                    {result.overallScore}%
+                  </span>
+                  <span className="font-heading text-xl text-foreground">
+                    {t.compatibilityLevels[getCompatibilityLevel(result.overallScore)]}
+                  </span>
                 </div>
-                <span className="font-heading text-xl text-foreground">
-                  {t.compatibilityLevels[getCompatibilityLevel(result.overallScore)]}
-                </span>
-                <p className="text-muted-foreground mt-4 max-w-lg mx-auto">
+                <p className="mt-4 max-w-[65ch] text-muted-foreground">
                   {t.compatibilityDescriptions[getCompatibilityLevel(result.overallScore)]}
                 </p>
               </div>

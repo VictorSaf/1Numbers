@@ -1792,6 +1792,28 @@ html {
   padding-inline: 1rem;
 }
 
+/* Un formular ÎN placă.
+   Placa e un obiect: nu se inversează cu tema. Tokenii obișnuiți -- `--line`,
+   `--foreground`, `--accent` -- se inversează, deci pe tema deschisă un câmp
+   desenat cu ei ar avea filet aproape alb pe fundal aproape negru: invizibil.
+   Se rescriu aici, o singură dată, pentru tot ce intră în placă -- așa nicio
+   componentă de formular nu are nevoie de o variantă „pe placă". */
+.on-plate {
+  --background: var(--plate);
+  --foreground: var(--plate-ink);
+  --muted-foreground: var(--plate-muted);
+  --line: var(--plate-gilt-dim);
+  --line-2: var(--plate-gilt-dim);
+  --border: var(--plate-gilt-dim);
+  --input: var(--plate-gilt-dim);
+  --gilt: var(--plate-gilt);
+  /* Albastrul plăcii, nu al paginii: pe tema deschisă `--accent` e bleumarin
+     închis, ilizibil pe fundalul plăcii. */
+  --accent: var(--plate-harmony);
+  --tension: var(--plate-tension);
+  --harmony: var(--plate-harmony);
+}
+
 /* Cerul plăcii.
    Aceeași idee ca .day-sky de pe /azi -- un singur element, astrele desenate
    prin background, nu o sută de noduri -- dar pe tokenii plăcii, care nu

@@ -88,7 +88,7 @@ export const RelationshipTimingCard = ({ timing, name1, name2 }: RelationshipTim
               key={month.month}
               data-month={month.month}
               data-band={month.band}
-              className={cn("rounded-lg border p-3 space-y-1", BAND_CLASS[month.band])}
+              className={cn("space-y-1", BAND_CLASS[month.band])}
             >
               <div className="text-xs font-raleway uppercase tracking-wide opacity-80">
                 {format(new Date(year.year, month.month - 1, 1), "LLLL", { locale: dateLocale })}

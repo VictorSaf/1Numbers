@@ -19,9 +19,10 @@ import { findCoupleDisagreements, type CoupleLang } from "@/lib/coupleDisagreeme
  * Când două judecăți corecte diferă, diferența e informația.
  */
 
+// Filet, nu cutie: culoarea spune care e blocul, nu îl încadrează.
 const TONE = {
   aligned: "border-harmony",
-  mixed: "border-line bg-surface/60",
+  mixed: "border-line",
   split: "border-tension",
 } as const;
 
@@ -68,7 +69,7 @@ export const TwoJudgements = ({
   return (
     <div data-two-judgements className="space-y-4">
       {/* ── Ce ascunde media ─────────────────────────────────────── */}
-      <div data-block="spread" className={`rounded-lg border p-5 sm:p-6 ${TONE[spread.agreement]}`}>
+      <div data-block="spread" className={`border-t-2 pt-5 sm:pt-6 ${TONE[spread.agreement]}`}>
         <div className="mb-4 flex flex-wrap items-baseline gap-x-4 gap-y-1">
           <h4 className="font-heading text-base text-foreground sm:text-lg">{t.hides}</h4>
           <span className="num text-xs text-muted-foreground">
@@ -101,7 +102,7 @@ export const TwoJudgements = ({
       {/* ── Două tradiții, aceeași pereche ────────────────────────── */}
       <div
         data-block="traditions"
-        className={`rounded-lg border p-5 sm:p-6 ${traditions.agree ? TONE.aligned : TONE.split}`}
+        className={`border-t-2 pt-5 sm:pt-6 ${traditions.agree ? TONE.aligned : TONE.split}`}
       >
         <div className="mb-4 flex flex-wrap items-baseline gap-x-4 gap-y-1">
           <h4 className="font-heading text-base text-foreground sm:text-lg">{t.both}</h4>

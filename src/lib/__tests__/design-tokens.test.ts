@@ -41,12 +41,26 @@ describe("colours live in tokens", () => {
     expect(offenders).toEqual([]);
   });
 
+  // `.on-plate` REMAPS tokens for the always-dark plate surface; it does not
+  // define a palette. Counting palettes has to skip it, or the count says five.
+  const ON_PLATE = RULES.slice(RULES.indexOf(".on-plate {"), RULES.indexOf("}", RULES.indexOf(".on-plate {")) + 1);
+  const PALETTES = RULES.replace(ON_PLATE, "");
+
   it("defines tension and harmony in every palette", () => {
     // The relations between numbers used to be drawn in the accent, so nothing
     // distinguished a wide bridge from an aligned one.
     for (const token of ["--tension", "--tension-soft", "--harmony", "--harmony-soft"]) {
-      const declarations = CSS.match(new RegExp(`${token}:`, "g")) ?? [];
+      const declarations = PALETTES.match(new RegExp(`${token}:`, "g")) ?? [];
       expect(declarations.length, `${token} declarations`).toBe(4);
+    }
+  });
+
+  it("keeps the plate scope a remapping, never a fifth palette", () => {
+    // Every value in it must point at another token. The moment one carries a
+    // raw triple, the plate has its own colours and the four palettes are five.
+    expect(ON_PLATE, ".on-plate block").toContain("--plate");
+    for (const [, value] of ON_PLATE.matchAll(/--[\w-]+:\s*([^;]+);/g)) {
+      expect(value.trim(), "value in .on-plate").toMatch(/^var\(--[\w-]+\)$/);
     }
   });
 
