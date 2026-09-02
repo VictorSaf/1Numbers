@@ -1752,6 +1752,23 @@ html {
    pentru fricțiune, nimic nou. Sub `prefers-reduced-motion` rămâne doar
    gradientul, fără nicio mișcare -- atmosfera e informație, animația e
    podoabă, iar cine cere mai puțină mișcare pierde doar podoaba. */
+/* O SINGURĂ măsură pentru toată platforma.
+   Harta ține placa, capetele de capitol și corpul citirii pe aceeași lățime --
+   1024px, la aceeași margine stângă. Restul paginilor aveau de la 672 la 1280,
+   iar placa era adesea mai lată decât conținutul de sub ea: se vedea o treaptă
+   la fiecare scroll.
+   Cine are nevoie de o măsură mai îngustă pentru proză o pune pe paragraf
+   (`max-w-[65ch]`), nu pe containerul paginii. */
+.page-measure {
+  width: 100%;
+  /* 66rem − 2×1rem de padding = 64rem de conținut, exact cât are harta.
+     Padding-ul stă AICI, o singură dată: pus uneori pe măsură și alteori pe
+     părinte, conținutul ieșea cu 32px mai îngust pe jumătate din pagini. */
+  max-width: 66rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
 /* Cerul plăcii.
    Aceeași idee ca .day-sky de pe /azi -- un singur element, astrele desenate
    prin background, nu o sută de noduri -- dar pe tokenii plăcii, care nu

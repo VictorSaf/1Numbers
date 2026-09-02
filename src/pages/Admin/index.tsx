@@ -52,8 +52,8 @@ const Admin = () => {
         }}
       />
 
-      <main className="relative z-10 px-4 pb-16">
-        <div className="max-w-6xl mx-auto">
+      <main className="relative z-10 pb-16">
+        <div className="page-measure">
           {/* Mobile Navigation */}
           <AdminMobileNav
             activeSection={activeSection}

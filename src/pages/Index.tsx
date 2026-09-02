@@ -123,17 +123,17 @@ const Index = () => {
       />}
 
       {/* Main Content */}
-      <main className="relative z-10 px-4 pb-16">
+      <main className="relative z-10 pb-16">
         {/* Dashboard Loading State */}
         {loadingProfile && isAuthenticated && (
-          <div className="max-w-7xl mx-auto pt-4">
+          <div className="page-measure pt-4">
             <DashboardSkeleton />
           </div>
         )}
 
         {/* Form for new calculations */}
         {shouldShowForm && !loadingProfile && (
-          <div className="max-w-4xl mx-auto pt-4">
+          <div className="page-measure pt-4">
             <div className="max-w-md mx-auto">
               <div className="card-mystic rounded-lg p-8">
                 <div className="text-center mb-8">
@@ -183,7 +183,7 @@ const Index = () => {
         {shouldShowResults && (
           // Wider than the rest of the page: the reading carries a sticky
           // chapter column beside it on desktop.
-          <div className="max-w-6xl mx-auto pt-4">
+          <div className="page-measure pt-4">
             <NumerologyResults
               fullName={reading.fullName}
               birthDate={reading.birthDate}
@@ -195,7 +195,7 @@ const Index = () => {
 
       {/* Footer */}
       <footer className="relative z-10 py-6 border-t border-border mt-16">
-        <div className="max-w-4xl mx-auto px-4 text-center">
+        <div className="page-measure text-center">
           <p className="text-sm text-foreground/70 font-raleway">
             {t.footer}
           </p>

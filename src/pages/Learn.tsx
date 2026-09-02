@@ -65,7 +65,7 @@ const ICONS = {
 } as const;
 
 const PanelSkeleton = () => (
-  <div className="mx-auto max-w-4xl px-4 py-12">
+  <div className="page-measure py-12">
     <div className="h-64 animate-pulse rounded-lg border border-line bg-sunken" />
   </div>
 );
@@ -91,7 +91,7 @@ const Learn = () => {
         onValueChange={(next) => setParams(next === 'ghid' ? {} : { s: next }, { replace: true })}
         className="w-full"
       >
-        <div className="mx-auto max-w-4xl px-4">
+        <div className="page-measure">
           <TabsList className="mb-2">
             {SECTIONS.map((key) => {
               const Icon = ICONS[key];
@@ -105,12 +105,17 @@ const Learn = () => {
           </TabsList>
         </div>
 
-        <Suspense fallback={<PanelSkeleton />}>
+        {/* Panourile intră ÎN măsură, ca filele de deasupra lor. Lăsate
+            afară, se întindeau pe toată fereastra, iar pagina avea două
+            lățimi -- exact treapta pe care harta n-o are. */}
+        <div className="page-measure">
+          <Suspense fallback={<PanelSkeleton />}>
           <TabsContent value="ghid"><Guide /></TabsContent>
           <TabsContent value="tutoriale"><Tutorials /></TabsContent>
           <TabsContent value="intrebari"><FAQ /></TabsContent>
           <TabsContent value="articole"><Articles /></TabsContent>
-        </Suspense>
+          </Suspense>
+        </div>
       </Tabs>
     </PageLayout>
   );

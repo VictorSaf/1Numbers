@@ -232,8 +232,8 @@ const Journal = () => {
         }}
       />
 
-      <main className="relative z-10 px-4 pb-16">
-        <div className="max-w-6xl mx-auto space-y-6">
+      <main className="relative z-10 pb-16">
+        <div className="page-measure space-y-6">
           {/* Actions Bar */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">

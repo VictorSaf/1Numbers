@@ -145,8 +145,8 @@ const Compatibility = () => {
   return (
     <PageLayout>
       {/* Main Content */}
-      <main className="relative z-10 px-4 pb-16">
-        <div className="mx-auto max-w-4xl pt-4">
+      <main className="relative z-10 pb-16">
+        <div className="page-measure pt-4">
           {/* Placa de deschidere, ca la hartă. Figura ei sunt chiar cele două
               cadrane, când există două hărți de comparat. */}
           <PagePlate

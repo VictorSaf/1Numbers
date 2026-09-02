@@ -194,14 +194,14 @@ const Predictions = () => {
       )}
 
       {/* Main Content */}
-      <main className="relative z-10 px-4 pb-16">
+      <main className="relative z-10 pb-16">
         {mine && (
           <div className="pt-2">
             <Today fullName={mine.fullName} birthDate={mine.birthDate} />
           </div>
         )}
 
-        <div className="max-w-4xl mx-auto space-y-8 pt-4">
+        <div className="page-measure space-y-8 pt-4">
           
           {/* Universal Day Energy */}
           <div className="card-mystic rounded-lg p-6 text-center">
@@ -440,7 +440,7 @@ const Predictions = () => {
 
       {/* Footer */}
       <footer className="relative z-10 py-6 border-t border-border mt-16">
-        <div className="max-w-4xl mx-auto px-4 text-center">
+        <div className="page-measure text-center">
           <p className="text-sm text-foreground/70 font-raleway">{t.footer}</p>
         </div>
       </footer>

@@ -281,7 +281,7 @@ const Friends = () => {
 
   if (!user) {
     return (
-      <div className="container max-w-4xl mx-auto px-4 py-8">
+      <div className="page-measure py-8">
         <Alert>
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>{t.loginRequired}</AlertDescription>
@@ -293,7 +293,7 @@ const Friends = () => {
   // Show comparison view if a friend is selected
   if (selectedFriend && profileData) {
     return (
-      <div className="container max-w-4xl mx-auto px-4 py-8">
+      <div className="page-measure py-8">
         <Button
           variant="ghost"
           onClick={() => setSelectedFriend(null)}
@@ -322,7 +322,7 @@ const Friends = () => {
   // the language a reader had chosen was simply not changeable from here.
   return (
     <PageLayout>
-      <div className="container max-w-4xl mx-auto px-4 py-8">
+      <div className="page-measure py-8">
       <PagePlate eyebrow="cercul meu" title={t.title} subtitle={t.description} />
 
       <div className="mt-10" />

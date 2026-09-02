@@ -46,8 +46,8 @@ export const PageHeader = ({
   const { t } = useLanguage();
 
   return (
-    <header className={`relative z-10 px-4 pt-4 ${className}`}>
-      <div className="mx-auto max-w-6xl">
+    <header className={`relative z-10 pt-4 ${className}`}>
+      <div className="page-measure">
         {showBack && (
           <Link to={backTo} className="mb-4 inline-block">
             <Button variant="ghost" className="gap-2 text-muted-foreground hover:text-foreground">
