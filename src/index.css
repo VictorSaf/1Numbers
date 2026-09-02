@@ -296,6 +296,8 @@
     --tension: 322 42% 40%;
     --harmony-soft: 218 36% 94%;
     --harmony: 218 34% 44%;
+    --gilt: 46 32% 34%;
+    --gilt-soft: 46 40% 93%;
     --ok: 162 57% 27%;
     --ok-soft: 159 35% 92%;
     --warn: 34 91% 30%;
@@ -374,6 +376,23 @@
     --sidebar-background: 240 20% 8%;
     --sidebar-foreground: 45 25% 96%;
     --sidebar-border: 260 30% 20%;
+    /* Placa. NU urmează tema, și asta e deliberat: placa cerească e un obiect
+       fotografiat, nu o suprafață de interfață -- o fotografie nu se inversează
+       când omul trece pe temă deschisă. Sunt singurii tokeni din fișier care
+       trăiesc într-o singură paletă, și de-aia poartă alt prefix.
+       Alama: nuanța 46, saturație joasă. La 42/50% intra peste --warn (34/91%)
+       și o gaură din cer citea ca o eroare. Pe placă nu se folosește --warn
+       deloc: o cifră care lipsește e o absență, nu o alarmă -- se desenează ca
+       inel gol, nu ca avertisment. */
+    --plate: 225 29% 5%;
+    --plate-2: 226 27% 10%;
+    --plate-gilt: 46 30% 58%;
+    --plate-gilt-hi: 46 44% 74%;
+    --plate-gilt-dim: 46 26% 32%;
+    --plate-ink: 231 23% 94%;
+    --plate-muted: 232 11% 62%;
+    --plate-tension: 320 58% 74%;
+
     --font-heading: 'Literata', Georgia, serif;
     --font-body: 'Raleway', sans-serif;
     --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -416,6 +435,8 @@
       --tension: 320 58% 74%;
       --harmony-soft: 214 30% 17%;
       --harmony: 212 40% 70%;
+      --gilt: 46 30% 58%;
+      --gilt-soft: 46 26% 14%;
       --ok: 161 46% 53%;
       --ok-soft: 160 36% 12%;
       --warn: 35 74% 59%;
@@ -462,6 +483,8 @@
     --tension: 322 42% 40%;
     --harmony-soft: 218 36% 94%;
     --harmony: 218 34% 44%;
+    --gilt: 46 32% 34%;
+    --gilt-soft: 46 40% 93%;
     --ok: 162 57% 27%;
     --ok-soft: 159 35% 92%;
     --warn: 34 91% 30%;
@@ -506,6 +529,8 @@
     --tension: 320 58% 74%;
     --harmony-soft: 214 30% 17%;
     --harmony: 212 40% 70%;
+    --gilt: 46 30% 58%;
+    --gilt-soft: 46 26% 14%;
     --ok: 161 46% 53%;
     --ok-soft: 160 36% 12%;
     --warn: 35 74% 59%;

@@ -46,6 +46,21 @@ export default {
           DEFAULT: "hsl(var(--tension))",
           soft: "hsl(var(--tension-soft))",
         },
+        gilt: {
+          DEFAULT: "hsl(var(--gilt))",
+          soft: "hsl(var(--gilt-soft))",
+        },
+        // Placa nu urmează tema -- vezi comentariul din index.css.
+        plate: {
+          DEFAULT: "hsl(var(--plate))",
+          2: "hsl(var(--plate-2))",
+          gilt: "hsl(var(--plate-gilt))",
+          "gilt-hi": "hsl(var(--plate-gilt-hi))",
+          "gilt-dim": "hsl(var(--plate-gilt-dim))",
+          ink: "hsl(var(--plate-ink))",
+          muted: "hsl(var(--plate-muted))",
+          tension: "hsl(var(--plate-tension))",
+        },
         harmony: {
           DEFAULT: "hsl(var(--harmony))",
           soft: "hsl(var(--harmony-soft))",
