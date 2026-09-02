@@ -10,6 +10,7 @@ import { PageLayout } from '@/components/layout/PageLayout';
 import { SectionHead } from '@/components/layout/SectionHead';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { dayFocus, dayChallenge, dayOpportunity, type GuidanceLang } from '@/lib/dayGuidance';
 import { Today } from '@/components/Today';
 import { useProfile } from '@/hooks/use-profile';
 import { 
@@ -47,6 +48,7 @@ const ENERGY_LABELS: Record<string, Record<string, string>> = {
 
 const Predictions = () => {
   const { language, t } = useLanguage();
+  const guidanceLang = (("ro en ru").split(" ").includes(language) ? language : "en") as GuidanceLang;
   const { profileData, hasProfile, loading: profileLoading } = useProfile();
   const [birthDate, setBirthDate] = useState<Date>();
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
@@ -275,38 +277,30 @@ const Predictions = () => {
                       birthDate={birthDate}
                       date={selectedDay}
                     />
-                    <div className="card-mystic py-6 space-y-6">
-                      {/* Cifra zilei personale și energia ei nu se mai scriu aici.
-                          Componenta Today, din capul paginii, le arată deja --
-                          mare, cu arhetipul, cu relația față de hartă și cu
-                          cartea zilei. Repetate la mijloc, erau aceeași cifră
-                          spusă a doua oară, cu mai puțin în jurul ei.
-                          Ce a rămas -- focusul, orele, culoarea, muzica -- nu e
-                          nicăieri altundeva. */}
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div className="pt-4 border-t border-line">
-                          <h4 className="font-heading text-sm text-foreground mb-2">{l.focus}</h4>
-                          <p className="text-foreground/90 capitalize">{dailyPrediction.focus}</p>
-                        </div>
-                        <div className="pt-4 border-t border-line">
-                          <h4 className="font-heading text-sm text-foreground mb-2">{l.luckyHours}</h4>
-                          <p className="text-foreground/90">{dailyPrediction.luckyHours.join(', ')}</p>
-                        </div>
+                    {/* Cifra zilei personale și energia ei nu se mai scriu aici.
+                        Componenta Today, din capul paginii, le arată deja --
+                        mare, cu arhetipul, cu relația față de hartă și cu
+                        cartea zilei.
+                        Orele norocoase nu se mai scriu nici ele: cardul de
+                        deasupra le are deja, cu filet, lângă culoare și muzică.
+                        Iar „Sfat" spunea cu alte cuvinte primul gest din
+                        „Recomandări", la trei centimetri sub el.
+                        Ce a rămas -- focusul, ce se strică, ce se deschide --
+                        nu e nicăieri altundeva, și e pe limba omului. */}
+                    <div className="space-y-6">
+                      <div className="border-t border-line pt-4">
+                        <h4 className="mb-2 font-heading text-sm text-foreground">{l.focus}</h4>
+                        <p className="capitalize text-foreground/90">{dayFocus(dailyPrediction.number, guidanceLang)}</p>
                       </div>
 
-                      <div className="pt-4 border-t border-line">
-                        <h4 className="font-heading text-sm text-foreground mb-2">{l.advice}</h4>
-                        <p className="text-foreground/90">{dailyPrediction.advice}</p>
-                      </div>
-
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div className="pt-4 border-t border-line">
+                      <div className="grid gap-6 md:grid-cols-2">
+                        <div className="border-t border-tension pt-4">
                           <h4 className="mb-2 font-heading text-sm text-tension">{l.challenges}</h4>
-                          <p className="text-foreground/80 text-sm">{dailyPrediction.challenges}</p>
+                          <p className="text-sm text-foreground/80">{dayChallenge(dailyPrediction.number, guidanceLang)}</p>
                         </div>
-                        <div className="pt-4 border-t border-line">
+                        <div className="border-t border-harmony pt-4">
                           <h4 className="mb-2 font-heading text-sm text-harmony">{l.opportunities}</h4>
-                          <p className="text-foreground/80 text-sm">{dailyPrediction.opportunities}</p>
+                          <p className="text-sm text-foreground/80">{dayOpportunity(dailyPrediction.number, guidanceLang)}</p>
                         </div>
                       </div>
                     </div>

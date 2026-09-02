@@ -251,3 +251,106 @@ export const dayColor = (dayNumber: number, lang: GuidanceLang): { name: string;
 
 export const dayMusic = (dayNumber: number, lang: GuidanceLang): string[] =>
   pick(MUSIC, lang, dayNumber);
+
+/**
+ * Ce cere ziua, ce se strică și ce se deschide.
+ *
+ * Ultimele patru texte care mai stăteau doar în engleză, în `predictions.ts`:
+ * focusul, provocarea și oportunitatea. Pe o pagină românească ieșeau titluri
+ * românești peste „Avoid scattering your energy on too many projects at once" --
+ * exact defectul pe care fișierul ăsta a fost scris ca să-l repare, lăsat la
+ * jumătate.
+ *
+ * Sfatul de o propoziție nu se mută aici: spunea acelaşi lucru ca primul gest
+ * din `ADVICE`, cu alte cuvinte, la trei centimetri sub el.
+ */
+
+/** Ce cere ziua, într-un cuvânt. */
+const FOCUS: Record<GuidanceLang, Record<number, string>> = {
+  ro: { 1: "începuturi", 2: "legături", 3: "exprimare", 4: "temelii", 5: "mișcare", 6: "grijă", 7: "retragere", 8: "putere", 9: "încheiere" },
+  en: { 1: "beginnings", 2: "connection", 3: "expression", 4: "foundations", 5: "movement", 6: "care", 7: "withdrawal", 8: "power", 9: "closing" },
+  ru: { 1: "начала", 2: "связи", 3: "выражение", 4: "основания", 5: "движение", 6: "забота", 7: "уединение", 8: "сила", 9: "завершение" },
+};
+
+/** Cum se strică ziua. O propoziție care descrie, nu una care avertizează. */
+const CHALLENGE: Record<GuidanceLang, Record<number, string>> = {
+  ro: {
+    1: "Azi ai dreptate repede. Ăsta e și riscul: ceilalți încă n-au ajuns acolo.",
+    2: "Aștepți să se limpezească de la sine. Nu se limpezește, doar trece ziua.",
+    3: "Începi patru lucruri și nu duci niciunul până la capăt.",
+    4: "Ții atât de strâns de plan încât nu mai vezi că s-a schimbat ceva.",
+    5: "Spui da la tot și seara n-a rămas nimic al tău.",
+    6: "Te ocupi de toți și te amâni pe tine la nesfârșit.",
+    7: "Stai singur cât să te închizi, nu cât să te limpezești.",
+    8: "Măsori totul în cât costă și uiți ce ai vrut de fapt.",
+    9: "Te agăți de ce s-a terminat, ca să nu recunoști că s-a terminat.",
+  },
+  en: {
+    1: "You are right quickly today. That is the risk: the others have not got there yet.",
+    2: "You wait for it to clear up on its own. It does not — the day just passes.",
+    3: "You start four things and finish none of them.",
+    4: "You hold the plan so tightly you stop seeing that something has changed.",
+    5: "You say yes to everything and by evening nothing was yours.",
+    6: "You look after everyone and keep putting yourself off.",
+    7: "You stay alone long enough to shut down, not long enough to think clearly.",
+    8: "You measure everything by what it costs and forget what you wanted.",
+    9: "You hold on to what has ended, so as not to admit that it has.",
+  },
+  ru: {
+    1: "Сегодня вы быстро оказываетесь правы. В этом и риск: остальные ещё не дошли.",
+    2: "Вы ждёте, что прояснится само. Не прояснится — просто пройдёт день.",
+    3: "Начинаете четыре дела и ни одно не доводите.",
+    4: "Держитесь за план так крепко, что не замечаете перемены.",
+    5: "Соглашаетесь на всё, и к вечеру своего не осталось.",
+    6: "Занимаетесь всеми, а себя откладываете без конца.",
+    7: "Остаётесь одни ровно настолько, чтобы закрыться, а не чтобы понять.",
+    8: "Меряете всё ценой и забываете, чего хотели.",
+    9: "Держитесь за то, что кончилось, чтобы не признать, что кончилось.",
+  },
+};
+
+/** Ce se deschide. */
+const OPPORTUNITY: Record<GuidanceLang, Record<number, string>> = {
+  ro: {
+    1: "E ziua în care se pornește ceva ce n-are încă nume.",
+    2: "Se repară azi lucruri pe care o discuție lungă nu le repara.",
+    3: "Ce arăți azi ajunge unde trebuie, chiar neterminat.",
+    4: "Ce așezi azi ține luni întregi.",
+    5: "Ce n-ai încercat până acum se deschide azi cel mai ușor.",
+    6: "Azi ești omul spre care vin ceilalți, și ai ce le da.",
+    7: "Vezi azi lucrul care nu se vede în zgomot.",
+    8: "Azi ceri și ți se dă — banii, timpul, recunoașterea.",
+    9: "Poți încheia azi ceva ce se tot prelungea, fără scandal.",
+  },
+  en: {
+    1: "This is the day to start the thing that has no name yet.",
+    2: "Things get mended today that a long conversation could not mend.",
+    3: "What you show today lands where it should, even unfinished.",
+    4: "What you set down today holds for months.",
+    5: "What you have never tried opens most easily today.",
+    6: "Today you are the person others come to, and you have something to give.",
+    7: "Today you see the thing that does not show in the noise.",
+    8: "Today you ask and you are given — the money, the time, the credit.",
+    9: "You can close today what kept dragging on, without a scene.",
+  },
+  ru: {
+    1: "Сегодня начинают то, у чего ещё нет названия.",
+    2: "Сегодня чинится то, чего не чинил долгий разговор.",
+    3: "То, что покажете сегодня, дойдёт куда нужно — пусть и незаконченным.",
+    4: "То, что заложите сегодня, держится месяцами.",
+    5: "То, чего вы не пробовали, сегодня открывается легче всего.",
+    6: "Сегодня к вам идут, и вам есть что дать.",
+    7: "Сегодня видно то, чего не видно в шуме.",
+    8: "Сегодня просите — и дают: деньги, время, признание.",
+    9: "Сегодня можно закрыть то, что тянулось, без скандала.",
+  },
+};
+
+export const dayFocus = (dayNumber: number, lang: GuidanceLang): string =>
+  pick(FOCUS, lang, dayNumber);
+
+export const dayChallenge = (dayNumber: number, lang: GuidanceLang): string =>
+  pick(CHALLENGE, lang, dayNumber);
+
+export const dayOpportunity = (dayNumber: number, lang: GuidanceLang): string =>
+  pick(OPPORTUNITY, lang, dayNumber);

@@ -262,7 +262,7 @@ const Compatibility = () => {
               <Button
                 onClick={handleCalculate}
                 disabled={!canCalculate}
-                className="w-full h-14 text-lg"
+                className="w-full sm:w-auto"
               >
                 <Sparkles className="mr-2 h-5 w-5" />
                 {t.calculateCompatibility}

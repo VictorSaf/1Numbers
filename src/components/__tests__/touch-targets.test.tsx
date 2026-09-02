@@ -44,11 +44,14 @@ describe("antetul pe telefon", () => {
     // ecran îngust, cuvântul ăla costă mai mult decât spune.
     const src = read("components/ThemeSelector.tsx");
 
-    // Interzisă e lățimea NECONDIȚIONATĂ. `sm:w-[150px]` e chiar remediul, și
-    // conține același șir -- de-aia lookbehind-ul după prefixul de breakpoint.
-    expect(src).not.toMatch(/(?<!:)w-\[150px\]/);
-    // Lat cât o iconiță pe mobil, cu text abia de la sm: în sus.
-    expect(src).toMatch(/sm:w-\[/);
+    // Interzisă e lățimea NECONDIȚIONATĂ pe telefon: pe 390px trebuie să fie
+    // lat cât iconița. Ce e permis e o lățime care începe de la `sm:`.
+    // Se verifică INTENȚIA, nu remediul: prima oară era scrisă `sm:w-[150px]`,
+    // iar testul cerea chiar parantezele acelea -- deci a picat când lățimea a
+    // devenit `sm:w-auto`, deși pe telefon nimic nu se schimbase.
+    expect(src).toMatch(/(?<!:)w-11\b/);
+    expect(src).not.toMatch(/(?<!:)w-(?:\[|auto|full)/);
+    expect(src).toMatch(/\bsm:w-/);
     expect(src).toMatch(/hidden sm:inline|sr-only sm:not-sr-only/);
   });
 });

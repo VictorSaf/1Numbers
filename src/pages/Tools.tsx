@@ -412,7 +412,7 @@ const Tools = () => {
                   </div>
                   <Button 
                     onClick={() => setShowCalendar(true)} 
-                    className="w-full"
+                    className="w-full sm:w-auto"
                     disabled={!calendarBirthDate || !calendarName}
                   >
                     {t.showCalendar}
@@ -449,7 +449,7 @@ const Tools = () => {
                   </div>
                   <Button
                     onClick={() => setShowLoShuGrid(true)}
-                    className="w-full"
+                    className="w-full sm:w-auto"
                     disabled={!loShuBirthDate}
                   >
                     {t.showLoShuGrid}
@@ -481,7 +481,7 @@ const Tools = () => {
                       <Input value={newName} onChange={(e) => setNewName(e.target.value)} className="input-mystic" />
                     </div>
                   </div>
-                  <Button onClick={handleNameCompare} className="w-full">{t.analyze}</Button>
+                  <Button onClick={handleNameCompare} className="w-full sm:w-auto">{t.analyze}</Button>
                   
                   {nameComparison && (
                     <div className="mt-6 space-y-4 animate-fade-in">
@@ -532,7 +532,7 @@ const Tools = () => {
                     <Label>{t.businessNameLabel}</Label>
                     <Input value={businessName} onChange={(e) => setBusinessName(e.target.value)} className="input-mystic" />
                   </div>
-                  <Button onClick={handleBusinessAnalyze} className="w-full">{t.analyze}</Button>
+                  <Button onClick={handleBusinessAnalyze} className="w-full sm:w-auto">{t.analyze}</Button>
                   
                   {businessAnalysis && (
                     <div className="mt-6 space-y-4 animate-fade-in">
@@ -587,7 +587,7 @@ const Tools = () => {
                       <Input type="number" value={forecastYear} onChange={(e) => setForecastYear(parseInt(e.target.value))} className="input-mystic" />
                     </div>
                   </div>
-                  <Button onClick={handleYearForecast} className="w-full">{t.calculate}</Button>
+                  <Button onClick={handleYearForecast} className="w-full sm:w-auto">{t.calculate}</Button>
                   
                   {yearForecast && (
                     <div className="mt-6 space-y-4 animate-fade-in">
@@ -664,7 +664,7 @@ const Tools = () => {
                       ))}
                     </div>
                   </div>
-                  <Button onClick={handleNameOptimize} className="w-full">{t.generate}</Button>
+                  <Button onClick={handleNameOptimize} className="w-full sm:w-auto">{t.generate}</Button>
                   
                   {nameSuggestions && (
                     <div className="mt-6 space-y-3 animate-fade-in">
@@ -705,7 +705,7 @@ const Tools = () => {
                     <Label>{t.birthDate}</Label>
                     <Input type="date" value={matrixBirthDate} onChange={(e) => setMatrixBirthDate(e.target.value)} className="input-mystic" />
                   </div>
-                  <Button onClick={handleCompatibilityMatrix} className="w-full">{t.calculate}</Button>
+                  <Button onClick={handleCompatibilityMatrix} className="w-full sm:w-auto">{t.calculate}</Button>
                   
                   {compatibilities && (
                     <div className="mt-6 space-y-4 animate-fade-in">

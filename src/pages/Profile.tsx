@@ -337,7 +337,7 @@ const Profile = () => {
                 ))
               )}
 
-              <Button variant="outline" className="w-full" onClick={startCreating}>
+              <Button variant="outline" className="w-full sm:w-auto" onClick={startCreating}>
                 {t.createNewProfile}
               </Button>
             </div>

@@ -41,7 +41,7 @@ export const ThemeSelector = () => {
           unde lățimea nu costă nimic. */}
       <SelectTrigger
         aria-label={labels[theme]}
-        className="min-h-11 w-11 justify-center px-0 sm:w-[150px] sm:justify-between sm:px-3 input-mystic"
+        className="h-11 w-11 justify-center gap-2 rounded-none border-0 border-b-2 border-transparent px-0 font-raleway text-sm text-foreground/80 transition-colors hover:border-line hover:text-foreground sm:w-auto sm:justify-between sm:px-3"
       >
         <div className="flex items-center gap-2">
           <Icon className="h-4 w-4" />

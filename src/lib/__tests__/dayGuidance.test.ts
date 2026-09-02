@@ -1,5 +1,13 @@
 import { describe, it, expect } from "vitest";
-import { dayAdvice, dayColor, dayMusic, type GuidanceLang } from "../dayGuidance";
+import {
+  dayAdvice,
+  dayColor,
+  dayMusic,
+  dayFocus,
+  dayChallenge,
+  dayOpportunity,
+  type GuidanceLang,
+} from "../dayGuidance";
 
 /**
  * Conținutul zilei, în limba omului.
@@ -28,7 +36,14 @@ describe("dayGuidance", () => {
   it("nu lasă engleză în română sau rusă", () => {
     for (const lang of ["ro", "ru"] as GuidanceLang[]) {
       for (const d of DAYS) {
-        const all = [...dayAdvice(d, lang), ...dayMusic(d, lang), dayColor(d, lang).name].join(" ");
+        const all = [
+          ...dayAdvice(d, lang),
+          ...dayMusic(d, lang),
+          dayColor(d, lang).name,
+          dayFocus(d, lang),
+          dayChallenge(d, lang),
+          dayOpportunity(d, lang),
+        ].join(" ");
         expect(all, `${lang}/${d}`).not.toMatch(ENGLISH);
       }
     }
@@ -50,6 +65,20 @@ describe("dayGuidance", () => {
     for (const lang of LANGS) {
       for (const d of DAYS) expect(dayMusic(d, lang).length).toBeGreaterThanOrEqual(3);
     }
+  });
+
+  it.each(LANGS)("spune ce cere ziua, ce se strică și ce se deschide, în %s", (lang) => {
+    // Astea trei au stat în engleză în `predictions.ts` până la capăt, sub
+    // titluri românești. Un tabel adăugat mai târziu într-o singură limbă e
+    // exact felul în care se întâmplă din nou.
+    for (const d of DAYS) {
+      expect(dayFocus(d, lang).length, `focus ${d}`).toBeGreaterThan(3);
+      expect(dayChallenge(d, lang).length, `provocare ${d}`).toBeGreaterThan(25);
+      expect(dayOpportunity(d, lang).length, `oportunitate ${d}`).toBeGreaterThan(25);
+    }
+    // Nouă zile, nouă texte diferite -- nu o propoziție copiată de nouă ori.
+    expect(new Set(DAYS.map((d) => dayChallenge(d, lang))).size).toBe(9);
+    expect(new Set(DAYS.map((d) => dayOpportunity(d, lang))).size).toBe(9);
   });
 
   it("nu cade pe o cifră din afara intervalului", () => {
