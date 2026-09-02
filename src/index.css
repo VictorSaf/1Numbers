@@ -748,15 +748,17 @@
     .word-reveal > span { animation: none; }
   }
 
+  /* Acțiunea principală, în alamă plină.
+     `text-background` se inversează singur: pe temă deschisă alama e închisă
+     și textul iese deschis, pe temă închisă invers. Un `text-white` fix ar fi
+     fost ilizibil pe una dintre ele. */
   .btn-primary {
-    @apply relative overflow-hidden;
-    @apply bg-gradient-to-r from-primary to-primary-dark;
-    @apply text-primary-foreground font-heading font-medium tracking-wider;
-    @apply px-6 py-3 rounded-lg;
-    @apply transition-all duration-200 ease-out;
-    @apply hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02];
-    @apply active:scale-[0.98];
-    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
+    @apply inline-flex min-h-11 items-center justify-center gap-2;
+    @apply rounded-sm px-5;
+    @apply bg-gilt text-background;
+    @apply font-mono text-[0.68rem] uppercase tracking-[0.14em];
+    @apply transition-colors duration-200 hover:bg-gilt/90;
+    @apply disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .btn-primary::before {
@@ -814,11 +816,16 @@
     @apply hover:bg-white/10;
   }
 
+  /* Suprafața obișnuită a aplicației.
+     Era un card cu degrade pe două direcții, umbră mare, chenar în accent,
+     halou și o creștere de 1% la hover -- adică patru efecte pe un dreptunghi
+     care ține text. Harta a rămas fără niciunul dintre ele; restul aplicației
+     îl moștenea din 37 de fișiere, printr-o singură clasă. Se schimbă tot de
+     aici: plan, filet subțire, colț mic. */
   .card-mystic {
-    @apply card-elevated;
-    @apply bg-gradient-to-br from-card via-card-hover to-card;
-    @apply border-primary/20;
-    @apply glow-primary-subtle;
+    @apply bg-card text-card-foreground;
+    @apply rounded-lg border border-line;
+    @apply transition-colors duration-200;
   }
 
   /* === Inputs === */
@@ -839,32 +846,26 @@
   }
 
   /* === Number Display === */
+  /* Cifra, la mărime.
+     Era un cerc de 80px cu degrade, chenar de 2px, halou și o creștere de 10%
+     la hover -- patru efecte în jurul unei cifre, iar cifra însăși ajungea la
+     30px. În hartă cifra E vizualul: stă mare și singură. La fel și aici. */
   .number-display {
     @apply relative inline-flex items-center justify-center;
-    @apply w-20 h-20 rounded-full;
-    @apply bg-gradient-to-br from-primary/20 via-primary/15 to-accent/20;
-    @apply border-2 border-primary/40;
-    @apply num text-3xl font-bold text-primary;
-    @apply glow-primary-subtle;
-    @apply transition-all duration-300;
-  }
-
-  .number-display:hover {
-    @apply scale-110 border-primary/60;
-    box-shadow: var(--glow-primary);
+    @apply h-20 w-20;
+    @apply num text-5xl leading-none text-accent;
   }
 
   .number-display-large {
     @apply number-display;
-    @apply w-28 h-28 text-4xl;
-    @apply glow-primary;
+    @apply h-28 w-28 text-6xl;
   }
 
+  /* Maestrul se deosebește prin alamă, nu prin puls: o cifră care pulsează pe
+     o pagină de citit trage ochiul din text la fiecare secundă. */
   .number-display-master {
     @apply number-display;
-    @apply border-2 border-primary;
-    @apply glow-primary;
-    @apply animate-pulse-glow;
+    @apply text-gilt;
   }
 
   /* === Badges === */
@@ -1242,16 +1243,13 @@
    RESPONSIVE UTILITIES
    ============================================ */
 @media (max-width: 640px) {
-  .card-mystic {
-    @apply rounded-lg;
-  }
   
   .number-display {
-    @apply w-16 h-16 text-2xl;
+    @apply h-16 w-16 text-4xl;
   }
-  
+
   .number-display-large {
-    @apply w-24 h-24 text-3xl;
+    @apply h-24 w-24 text-5xl;
   }
 }
 
