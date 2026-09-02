@@ -393,6 +393,7 @@
     --plate-muted: 232 11% 62%;
     --plate-tension: 320 58% 74%;
     --plate-warn: 35 74% 59%;
+    --plate-harmony: 212 40% 70%;
 
     --font-heading: 'Literata', Georgia, serif;
     --font-body: 'Raleway', sans-serif;
@@ -1813,9 +1814,14 @@ html {
   );
 }
 
-.day-sky[data-mood="bright"]  { --sky-tint: var(--harmony); }
-.day-sky[data-mood="even"]    { --sky-tint: var(--primary); }
-.day-sky[data-mood="charged"] { --sky-tint: var(--tension); }
+/* Tonul zilei, pe tokenii plăcii.
+   `--harmony`, `--primary` și `--tension` urmează tema: pe temă deschisă sunt
+   închise, iar cerul stă acum pe fundalul plăcii, care e închis în ambele.
+   Astrele ar fi dispărut pentru jumătate din vizitatori -- același bug pe care
+   l-a avut coarda cadranului. */
+.day-sky[data-mood="bright"]  { --sky-tint: var(--plate-harmony); }
+.day-sky[data-mood="even"]    { --sky-tint: var(--plate-gilt); }
+.day-sky[data-mood="charged"] { --sky-tint: var(--plate-tension); }
 
 /* Astrele. Un singur element repetat prin background, nu o sută de noduri:
    o pagină citită zilnic n-are voie să coste o sută de noduri de decor. */

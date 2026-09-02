@@ -61,6 +61,7 @@ export default {
           muted: "hsl(var(--plate-muted))",
           tension: "hsl(var(--plate-tension))",
           warn: "hsl(var(--plate-warn))",
+          harmony: "hsl(var(--plate-harmony))",
         },
         harmony: {
           DEFAULT: "hsl(var(--harmony))",

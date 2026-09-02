@@ -139,26 +139,30 @@ export const Today = ({
       {/* Atmosfera urmează tonul zilei, iar tonul iese din relația cifrei de
           azi cu harta -- nu dintr-o alegere separată. Decorativ ar fi fost dacă
           ar fi arătat la fel în fiecare zi. */}
-      <div className="day-sky" data-mood={reading.mood} aria-hidden="true">
-        <span />
-      </div>
       {!written && (
         <p className="text-center text-sm text-muted-foreground" role="status">
           {copy.writing}
         </p>
       )}
 
+      {/* Prima suprafață a zilei e o placă, ca frontispiciul hărții: același
+          fundal, aceleași astre, aceeași alamă. Cerul stă ÎN ea, nu în spatele
+          paginii -- altfel placa l-ar fi acoperit. */}
       {written && (
-      <article className="relative z-10 rounded-lg border border-line bg-surface/80 p-7 shadow-[0_1px_2px_rgba(0,0,0,.06),0_22px_48px_-30px_rgba(0,0,0,.4)] backdrop-blur-sm sm:p-10">
-        <span className="mb-6 block text-[0.63rem] uppercase tracking-[0.16em] text-muted-foreground">
+      <article className="relative z-10 overflow-hidden rounded-2xl bg-plate p-7 sm:p-10">
+        <div className="day-sky" data-mood={reading.mood} aria-hidden="true">
+          <span />
+        </div>
+        <div className="relative">
+        <span className="num mb-6 block text-[0.63rem] uppercase tracking-[0.18em] text-plate-gilt">
           {copy.kicker}
         </span>
 
         <div className="mb-7 flex items-center gap-5">
-          <span className="num text-6xl leading-none text-primary sm:text-7xl">{reading.day}</span>
+          <span className="num text-6xl leading-none text-plate-gilt-hi sm:text-7xl">{reading.day}</span>
           <span className="flex min-w-0 flex-col gap-1.5">
-            <span className="font-heading text-lg text-foreground sm:text-xl">{reading.title}</span>
-            <span className="text-sm text-muted-foreground">{reading.keywords.join(" · ")}</span>
+            <span className="font-heading text-lg text-plate-ink sm:text-xl">{reading.title}</span>
+            <span className="text-sm text-plate-muted">{reading.keywords.join(" · ")}</span>
           </span>
         </div>
 
@@ -184,7 +188,7 @@ export const Today = ({
                 <p
                   key={i}
                   data-beat="plain"
-                  className="border-t border-line pt-4 text-sm leading-relaxed text-muted-foreground"
+                  className="border-t border-plate-gilt-dim pt-4 text-sm leading-relaxed text-plate-muted"
                 >
                   <Words text={text} step={28} from={from} />
                 </p>
@@ -195,8 +199,8 @@ export const Today = ({
                 data-beat={i === 0 ? "say" : "relation"}
                 className={
                   i === 0
-                    ? "font-heading text-xl leading-relaxed text-foreground sm:text-[1.6rem] sm:leading-[1.45]"
-                    : "text-[0.98rem] leading-relaxed text-foreground/85"
+                    ? "font-heading text-xl leading-relaxed text-plate-ink sm:text-[1.6rem] sm:leading-[1.45]"
+                    : "text-[0.98rem] leading-relaxed text-plate-ink/85"
                 }
               >
                 <Words text={text} step={stepOf(i)} from={from} />
@@ -211,7 +215,7 @@ export const Today = ({
             nicio legătură cu harta omului, iar aici tocmai legătura e produsul.
             Lumina și umbra stau alături fiindcă o zi le are pe amândouă, iar o
             aplicație care arată doar partea bună devine un horoscop de ziar. */}
-        <div className="mt-8 border-t border-line pt-7">
+        <div className="mt-8 border-t border-plate-gilt-dim pt-7">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-7">
             {/* Cartea, arătată.
                 Scanul ediției originale Rider & Son, 1909 -- domeniu public din
@@ -230,35 +234,35 @@ export const Today = ({
               height={239}
               loading="lazy"
               decoding="async"
-              className="w-[120px] shrink-0 self-start rounded-lg border border-line shadow-[0_10px_30px_-14px_rgba(0,0,0,.6)] sm:w-[140px]"
+              className="w-[120px] shrink-0 self-start rounded-md border border-plate-gilt-dim shadow-[0_12px_28px_-14px_rgba(0,0,0,.9)] sm:w-[140px]"
             />
 
             <div className="min-w-0">
           <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-            <span className="num text-sm text-muted-foreground">{copy.card}</span>
+            <span className="num text-sm text-plate-gilt">{copy.card}</span>
             {/* Numărul arcanei NU se scrie: e chiar cifra zilei, deja mare în
                 capul paginii. Scris a doua oară, ar fi exact duplicarea pe care
                 pagina asta o avea peste tot. */}
-            <span className="font-heading text-xl text-foreground">{reading.card.title}</span>
+            <span className="font-heading text-xl text-plate-ink">{reading.card.title}</span>
           </div>
-          <p className="mt-1.5 text-sm text-muted-foreground">
+          <p className="mt-1.5 text-sm text-plate-muted">
             {reading.card.keywords.join(" · ")}
           </p>
 
           <div className="mt-5 grid gap-3 sm:gap-4">
-            <div className="rounded-lg border border-harmony p-4">
-              <span className="block text-[0.63rem] uppercase tracking-[0.16em] text-harmony">
+            <div className="border-t border-plate-harmony pt-3">
+              <span className="num block text-[0.6rem] uppercase tracking-[0.18em] text-plate-harmony">
                 {copy.light}
               </span>
-              <p className="mt-1.5 text-[0.95rem] leading-relaxed text-foreground/85">
+              <p className="mt-2 text-[0.95rem] leading-relaxed text-plate-ink/85">
                 {reading.card.light}
               </p>
             </div>
-            <div className="rounded-lg border border-tension p-4">
-              <span className="block text-[0.63rem] uppercase tracking-[0.16em] text-tension">
+            <div className="border-t border-plate-tension pt-3">
+              <span className="num block text-[0.6rem] uppercase tracking-[0.18em] text-plate-tension">
                 {copy.shadow}
               </span>
-              <p className="mt-1.5 text-[0.95rem] leading-relaxed text-foreground/85">
+              <p className="mt-2 text-[0.95rem] leading-relaxed text-plate-ink/85">
                 {reading.card.shadow}
               </p>
             </div>
@@ -277,6 +281,7 @@ export const Today = ({
             unde. Serverul le păstrează pe amândouă -- ruta scrie în jurnal și
             citește ecoul -- ca să se poată întoarce cu o întrebare mai bună,
             una concretă, despre ce ai făcut, nu despre ce înseamnă. */}
+        </div>
       </article>
       )}
 
