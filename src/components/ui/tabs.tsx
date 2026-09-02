@@ -14,7 +14,10 @@ const TabsList = React.forwardRef<
     className={cn(
       // Filet, nu cutie cu pastile: aceeași gramatică din hartă, unde
       // secțiunile se despart cu o linie, nu cu un chenar.
-      "inline-flex min-h-11 items-center gap-1 border-b border-line text-muted-foreground",
+      // Derulare pe orizontală, nu înghesuire: etichetele mono cu spațiere
+      // sunt mai late decât pastilele dinainte, iar opt file pe un rând se
+      // suprapuneau. Bara se ascunde -- degetul și trackpad-ul derulează.
+      "flex min-h-11 w-full items-center gap-1 overflow-x-auto border-b border-line text-muted-foreground [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
       className,
     )}
     {...props}
@@ -29,7 +32,7 @@ const TabsTrigger = React.forwardRef<
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      "num inline-flex min-h-11 items-center justify-center whitespace-nowrap border-b-2 border-transparent px-4 text-[0.68rem] uppercase tracking-[0.14em] ring-offset-background transition-colors data-[state=active]:border-gilt data-[state=active]:text-gilt hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+      "num inline-flex min-h-11 shrink-0 items-center justify-center whitespace-nowrap border-b-2 border-transparent px-4 text-[0.68rem] uppercase tracking-[0.14em] ring-offset-background transition-colors data-[state=active]:border-gilt data-[state=active]:text-gilt hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
       className,
     )}
     {...props}

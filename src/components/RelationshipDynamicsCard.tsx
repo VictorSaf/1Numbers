@@ -38,7 +38,7 @@ export const RelationshipDynamicsCard = ({ compatibility }: RelationshipDynamics
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="font-heading text-primary">
+            <CardTitle className="font-heading text-foreground">
               {t.compatibility?.relationshipDynamics || "Dinamica Relației"}
             </CardTitle>
             <CardDescription>

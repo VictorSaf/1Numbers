@@ -378,12 +378,12 @@ const Tutorials = () => {
 
               {/* Step Content */}
               <div className="space-y-6">
-                <h2 className="font-heading text-2xl text-primary">{step.title}</h2>
+                <h2 className="font-heading text-2xl text-foreground">{step.title}</h2>
                 <p className="text-foreground/90 leading-relaxed">{step.content}</p>
 
                 {step.example && (
                   <div className="p-4 rounded-lg bg-sunken border border-line">
-                    <h4 className="font-heading text-sm text-primary mb-2">Exemplu:</h4>
+                    <h4 className="font-heading text-sm text-foreground mb-2">Exemplu:</h4>
                     <pre className="text-sm text-foreground/80 whitespace-pre-wrap font-mono">
                       {step.example}
                     </pre>
@@ -392,7 +392,7 @@ const Tutorials = () => {
 
                 {step.quiz && (
                   <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                    <h4 className="font-heading text-sm text-primary mb-3">Quiz:</h4>
+                    <h4 className="font-heading text-sm text-foreground mb-3">Quiz:</h4>
                     <p className="text-foreground mb-4">{step.quiz.question}</p>
                     <div className="grid grid-cols-2 gap-2">
                       {step.quiz.options.map((option, idx) => (

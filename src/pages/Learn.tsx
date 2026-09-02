@@ -92,7 +92,7 @@ const Learn = () => {
         className="w-full"
       >
         <div className="mx-auto max-w-4xl px-4">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+          <TabsList className="mb-2">
             {SECTIONS.map((key) => {
               const Icon = ICONS[key];
               return (

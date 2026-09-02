@@ -341,7 +341,7 @@ const Tools = () => {
                 left eight icon-only buttons wrapping onto three rows with
                 nothing to say what any of them did. They scroll sideways now
                 and keep their names. */}
-            <TabsList className="mb-8 flex w-full justify-start gap-1 overflow-x-auto bg-card/50 [scrollbar-width:none] sm:grid sm:grid-cols-4 lg:grid-cols-8 [&::-webkit-scrollbar]:hidden">
+            <TabsList className="mb-8">
               <TabsTrigger value="calendar" className="shrink-0 gap-1 text-xs sm:text-sm">
                 <CalendarDays className="h-4 w-4" />
                 {t.calendar}
@@ -386,7 +386,7 @@ const Tools = () => {
             <TabsContent value="calendar">
               <Card className="card-mystic">
                 <CardHeader>
-                  <CardTitle className="font-heading text-primary">{t.calendar}</CardTitle>
+                  <CardTitle className="font-heading text-foreground">{t.calendar}</CardTitle>
                   <CardDescription>{t.calendarSubtitle}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -434,7 +434,7 @@ const Tools = () => {
             <TabsContent value="loshu">
               <Card className="card-mystic">
                 <CardHeader>
-                  <CardTitle className="font-heading text-primary">{t.loShuGrid}</CardTitle>
+                  <CardTitle className="font-heading text-foreground">{t.loShuGrid}</CardTitle>
                   <CardDescription>{t.loShuSubtitle}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -468,7 +468,7 @@ const Tools = () => {
             <TabsContent value="name-change">
               <Card className="card-mystic">
                 <CardHeader>
-                  <CardTitle className="font-heading text-primary">{t.nameChange}</CardTitle>
+                  <CardTitle className="font-heading text-foreground">{t.nameChange}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -525,7 +525,7 @@ const Tools = () => {
             <TabsContent value="business">
               <Card className="card-mystic">
                 <CardHeader>
-                  <CardTitle className="font-heading text-primary">{t.businessName}</CardTitle>
+                  <CardTitle className="font-heading text-foreground">{t.businessName}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
@@ -556,7 +556,7 @@ const Tools = () => {
                           <CardContent><ul className="text-sm space-y-1">{businessAnalysis.challenges.map((c, i) => <li key={i}>• {c}</li>)}</ul></CardContent>
                         </Card>
                         <Card className="bg-card/50">
-                          <CardHeader className="py-3"><CardTitle className="text-sm text-primary">{t.recommendations}</CardTitle></CardHeader>
+                          <CardHeader className="py-3"><CardTitle className="text-sm text-foreground">{t.recommendations}</CardTitle></CardHeader>
                           <CardContent><ul className="text-sm space-y-1">{businessAnalysis.recommendations.map((r, i) => <li key={i}>• {r}</li>)}</ul></CardContent>
                         </Card>
                       </div>
@@ -574,7 +574,7 @@ const Tools = () => {
             <TabsContent value="forecast">
               <Card className="card-mystic">
                 <CardHeader>
-                  <CardTitle className="font-heading text-primary">{t.yearForecast}</CardTitle>
+                  <CardTitle className="font-heading text-foreground">{t.yearForecast}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -642,7 +642,7 @@ const Tools = () => {
             <TabsContent value="optimizer">
               <Card className="card-mystic">
                 <CardHeader>
-                  <CardTitle className="font-heading text-primary">{t.nameOptimizer}</CardTitle>
+                  <CardTitle className="font-heading text-foreground">{t.nameOptimizer}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
@@ -698,7 +698,7 @@ const Tools = () => {
             <TabsContent value="matrix">
               <Card className="card-mystic">
                 <CardHeader>
-                  <CardTitle className="font-heading text-primary">{t.compatMatrix}</CardTitle>
+                  <CardTitle className="font-heading text-foreground">{t.compatMatrix}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>

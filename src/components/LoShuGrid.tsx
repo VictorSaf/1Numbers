@@ -322,7 +322,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
           {/* Repeated Numbers */}
           {result.repeatedNumbers.length > 0 && (
             <div className="p-4 rounded-lg bg-sunken border border-line">
-              <h4 className="text-sm font-medium text-primary mb-2">
+              <h4 className="text-sm font-medium text-foreground mb-2">
                 {labels.repeatedNumbers[language]}
               </h4>
               <div className="flex flex-wrap gap-2">

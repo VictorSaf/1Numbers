@@ -170,7 +170,7 @@ const Index = () => {
                     key={i}
                     className="text-center p-4 rounded-lg bg-card/30 border border-border/30"
                   >
-                    <h3 className="font-heading text-sm text-primary mb-1">{item.title}</h3>
+                    <h3 className="font-heading text-sm text-foreground mb-1">{item.title}</h3>
                     <p className="text-xs text-muted-foreground">{item.desc}</p>
                   </div>
                 ))}

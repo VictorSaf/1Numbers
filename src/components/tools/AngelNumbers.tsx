@@ -228,7 +228,7 @@ const AngelNumbers = () => {
           {!searchInput && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="card-mystic rounded-lg p-6">
-                <h3 className="font-heading text-lg text-primary mb-3">
+                <h3 className="font-heading text-lg text-foreground mb-3">
                   {t.whatAreAngelNumbers}
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
@@ -237,7 +237,7 @@ const AngelNumbers = () => {
               </div>
 
               <div className="card-mystic rounded-lg p-6">
-                <h3 className="font-heading text-lg text-primary mb-3">
+                <h3 className="font-heading text-lg text-foreground mb-3">
                   {t.howToUse}
                 </h3>
                 <ol className="space-y-2">

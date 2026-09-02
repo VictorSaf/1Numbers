@@ -110,7 +110,7 @@ const NumerologyGuide = () => {
 
                   {/* Extended description */}
                   <div className="pt-4 border-t border-border/30 space-y-3">
-                    <h4 className="font-heading text-lg text-primary">{t.detailedAnalysis}</h4>
+                    <h4 className="font-heading text-lg text-foreground">{t.detailedAnalysis}</h4>
                     <p className="text-muted-foreground leading-relaxed">
                       {t.extendedMeanings[selectedNumber as keyof typeof t.extendedMeanings]}
                     </p>

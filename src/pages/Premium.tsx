@@ -260,7 +260,7 @@ const Premium = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="plans" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList>
             <TabsTrigger value="plans" className="flex items-center gap-2">
               <Crown className="h-4 w-4" />
               {t.plans}

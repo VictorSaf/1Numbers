@@ -314,7 +314,7 @@ const ChaldeanAnalysis = () => {
       </Card>
 
       <Tabs defaultValue="personal" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList>
           <TabsTrigger value="personal" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             {t.personalTab}

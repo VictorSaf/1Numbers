@@ -47,7 +47,7 @@ export const MultiPersonComparison = ({ comparison }: MultiPersonComparisonProps
   return (
     <Card className="card-mystic">
       <CardHeader>
-        <CardTitle className="font-heading text-primary flex items-center gap-2">
+        <CardTitle className="font-heading text-foreground flex items-center gap-2">
           <Users className="h-5 w-5" />
           {t.compatibility?.multiPersonComparison || "Comparație Multi-Persoană"}
         </CardTitle>

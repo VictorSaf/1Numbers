@@ -298,7 +298,7 @@ export const AIConsultant = () => {
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList>
               <TabsTrigger value="chat" className="gap-2">
                 <MessageSquare className="h-4 w-4" />
                 {tr.chat}

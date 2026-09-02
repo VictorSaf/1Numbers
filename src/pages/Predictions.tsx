@@ -230,7 +230,7 @@ const Predictions = () => {
           {/* Personal Predictions */}
           {birthDate && (
             <Tabs defaultValue="daily" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6 bg-card/50">
+              <TabsList className="mb-6">
                 <TabsTrigger value="daily" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <Sun className="h-4 w-4 mr-2" />
                   {l.daily}
@@ -262,7 +262,7 @@ const Predictions = () => {
                           <p className="num text-2xl text-foreground">{dayContent.universalDay}</p>
                         </div>
                         <div className="col-span-3 border-t border-border/40 pt-3 text-left">
-                          <p className="font-heading text-sm text-primary">{dayContent.keywords}</p>
+                          <p className="font-heading text-sm text-foreground">{dayContent.keywords}</p>
                           <p className="mt-1 text-sm text-foreground/90">{dayContent.meaning}</p>
                           <p className="mt-3 font-raleway text-xs text-muted-foreground">{t.today.advice}</p>
                           <p className="text-sm text-foreground/90">{dayContent.advice}</p>
@@ -285,17 +285,17 @@ const Predictions = () => {
                           nicăieri altundeva. */}
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                          <h4 className="font-heading text-sm text-primary mb-2">{l.focus}</h4>
+                          <h4 className="font-heading text-sm text-foreground mb-2">{l.focus}</h4>
                           <p className="text-foreground/90 capitalize">{dailyPrediction.focus}</p>
                         </div>
                         <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                          <h4 className="font-heading text-sm text-primary mb-2">{l.luckyHours}</h4>
+                          <h4 className="font-heading text-sm text-foreground mb-2">{l.luckyHours}</h4>
                           <p className="text-foreground/90">{dailyPrediction.luckyHours.join(', ')}</p>
                         </div>
                       </div>
 
                       <div className="p-4 rounded-lg bg-sunken border border-line">
-                        <h4 className="font-heading text-sm text-primary mb-2">{l.advice}</h4>
+                        <h4 className="font-heading text-sm text-foreground mb-2">{l.advice}</h4>
                         <p className="text-foreground/90">{dailyPrediction.advice}</p>
                       </div>
 
@@ -336,12 +336,12 @@ const Predictions = () => {
                       <div className="card-mystic rounded-lg p-6 space-y-4">
                         <h3 className="font-heading text-xl">{l.personalMonth} - {selectedYear}</h3>
                         <div>
-                          <h4 className="font-heading text-sm text-primary mb-2">{annualTheme.theme}</h4>
+                          <h4 className="font-heading text-sm text-foreground mb-2">{annualTheme.theme}</h4>
                           <p className="text-foreground/90">{annualTheme.description}</p>
                         </div>
                         {annualOpportunities && annualOpportunities.length > 0 && (
                           <div>
-                            <h4 className="font-heading text-sm text-primary mb-2">Oportunități</h4>
+                            <h4 className="font-heading text-sm text-foreground mb-2">Oportunități</h4>
                             <ul className="space-y-1">
                               {annualOpportunities.slice(0, 5).map((opp, index) => (
                                 <li key={index} className="text-sm text-foreground/90 flex items-start gap-2">
@@ -373,40 +373,40 @@ const Predictions = () => {
                       <div className="number-display-large mx-auto my-4">
                         {monthlyPrediction.number}
                       </div>
-                      <p className="text-primary font-heading text-xl">{monthlyPrediction.theme}</p>
+                      <p className="text-foreground font-heading text-xl">{monthlyPrediction.theme}</p>
                     </div>
 
                     <div className="p-4 rounded-lg bg-sunken border border-line">
-                      <h4 className="font-heading text-sm text-primary mb-2">{l.overview}</h4>
+                      <h4 className="font-heading text-sm text-foreground mb-2">{l.overview}</h4>
                       <p className="text-foreground/90">{monthlyPrediction.overview}</p>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                        <h4 className="font-heading text-sm text-primary mb-2">{l.career}</h4>
+                        <h4 className="font-heading text-sm text-foreground mb-2">{l.career}</h4>
                         <p className="text-foreground/80 text-sm">{monthlyPrediction.career}</p>
                       </div>
                       <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                        <h4 className="font-heading text-sm text-primary mb-2">{l.relationships}</h4>
+                        <h4 className="font-heading text-sm text-foreground mb-2">{l.relationships}</h4>
                         <p className="text-foreground/80 text-sm">{monthlyPrediction.relationships}</p>
                       </div>
                       <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                        <h4 className="font-heading text-sm text-primary mb-2">{l.health}</h4>
+                        <h4 className="font-heading text-sm text-foreground mb-2">{l.health}</h4>
                         <p className="text-foreground/80 text-sm">{monthlyPrediction.health}</p>
                       </div>
                       <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                        <h4 className="font-heading text-sm text-primary mb-2">{l.finances}</h4>
+                        <h4 className="font-heading text-sm text-foreground mb-2">{l.finances}</h4>
                         <p className="text-foreground/80 text-sm">{monthlyPrediction.finances}</p>
                       </div>
                     </div>
 
                     <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                      <h4 className="font-heading text-sm text-primary mb-2">{l.spirituality}</h4>
+                      <h4 className="font-heading text-sm text-foreground mb-2">{l.spirituality}</h4>
                       <p className="text-foreground/80 text-sm">{monthlyPrediction.spirituality}</p>
                     </div>
 
                     <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                      <h4 className="font-heading text-sm text-primary mb-2">{l.keyDays}</h4>
+                      <h4 className="font-heading text-sm text-foreground mb-2">{l.keyDays}</h4>
                       <div className="flex flex-wrap gap-2">
                         {monthlyPrediction.keyDays.map(day => (
                           <span key={day} className="px-3 py-1 rounded-full bg-sunken text-primary text-sm num">
