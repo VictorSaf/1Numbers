@@ -28,7 +28,7 @@ export const KarmicDebtCard = ({ debt, delay = 0 }: KarmicDebtCardProps) => {
   return (
     <div
       className={cn(
-        "p-4 rounded-xl border border-warn backdrop-blur-sm opacity-0 animate-fade-in",
+        "border-l-2 border-warn py-3 pl-4 opacity-0 animate-fade-in",
         getDelayClass(delay)
       )}
     >

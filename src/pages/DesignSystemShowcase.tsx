@@ -246,18 +246,22 @@ const DesignSystemShowcase = () => {
               </div>
             </DSCard>
 
-            {/* Master Number Colors */}
-            <DSCard variant="elevated" title="Master Number Colors">
-              <div className="flex flex-wrap gap-6">
+            {/* Numerele maestre.
+                Aici stăteau trei cercuri colorate din `--color-number-11`,
+                `--color-number-22` și `--color-number-33` -- tokeni care nu
+                există în index.css. Swatch-ul arăta text alb pe nimic, iar
+                pagina care documentează sistemul documenta o culoare
+                inexistentă.
+                Ce e adevărat: un maestru se deosebește prin alamă, nu printr-o
+                culoare proprie. */}
+            <DSCard variant="elevated" title="Numerele maestre">
+              <div className="flex flex-wrap gap-10">
                 {[11, 22, 33].map((num) => (
                   <div key={num} className="text-center">
-                    <div
-                      className="w-16 h-16 rounded-full mx-auto mb-2 flex items-center justify-center text-white font-bold text-lg shadow-lg"
-                      style={{ background: `hsl(var(--color-number-${num}))` }}
-                    >
-                      {num}
-                    </div>
-                    <span className="ds-caption">{numberMeanings[num as keyof typeof numberMeanings]?.name}</span>
+                    <div className="number-display-master mx-auto">{num}</div>
+                    <span className="ds-caption">
+                      {numberMeanings[num as keyof typeof numberMeanings]?.name}
+                    </span>
                   </div>
                 ))}
               </div>

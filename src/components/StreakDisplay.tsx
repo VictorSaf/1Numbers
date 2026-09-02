@@ -108,7 +108,7 @@ export const StreakDisplay = memo(({ streak, showAnimation = true, size = 'md' }
     <div className="relative inline-flex items-center">
       <Badge
         className={cn(
-          'gap-2 border-0 bg-gradient-to-r text-white shadow-lg',
+          'gap-2 border-gilt text-gilt',
           getStreakColor(),
           s.container,
           animate && 'animate-bounce'

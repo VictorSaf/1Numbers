@@ -346,7 +346,7 @@ const Tutorials = () => {
                 key={index}
                 onClick={() => startLesson(index)}
                 className={cn(
-                  "card-mystic rounded-xl p-5 text-left transition-all duration-300 ",
+                  "card-mystic p-5 text-left transition-colors duration-200",
                   currentLesson === index && "ring-2 ring-primary "
                 )}
               >

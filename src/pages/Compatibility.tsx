@@ -243,7 +243,7 @@ const Compatibility = () => {
 
               {/* Overall Score */}
               <div className={cn(
-                "card-mystic rounded-2xl p-8 text-center",
+                "card-mystic p-8 text-center",
                 "bg-gradient-to-br border",
                 getScoreBg(result.overallScore)
               )}>

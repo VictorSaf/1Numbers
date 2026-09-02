@@ -45,7 +45,7 @@ export const RelationshipTimingCard = ({ timing, name1, name2 }: RelationshipTim
       </header>
 
       {/* Anul */}
-      <div className={cn("rounded-xl border p-5 space-y-4", BAND_CLASS[year.band])} data-band={year.band}>
+      <div className={cn("border-t p-5 pl-0 space-y-4", BAND_CLASS[year.band])} data-band={year.band}>
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <span className="text-xs uppercase tracking-[0.15em] font-raleway">{t.timing.thisYear}</span>
           <span className="num text-lg">{year.year}</span>

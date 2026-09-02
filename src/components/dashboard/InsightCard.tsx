@@ -43,7 +43,7 @@ export const InsightCard = memo(({
   const styles = variantStyles[variant];
 
   return (
-    <div className={cn('insight-card', styles.bg, 'rounded-xl p-1')}>
+    <div className={cn('insight-card', styles.bg, 'rounded-lg p-1')}>
       <span className={cn('insight-card-theme', styles.theme)}>{theme}</span>
       <p className="insight-card-message">{message}</p>
       {detail && (

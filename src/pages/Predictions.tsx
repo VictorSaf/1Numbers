@@ -370,7 +370,7 @@ const Predictions = () => {
                     <div className="card-mystic rounded-lg p-6 space-y-6">
                     <div className="text-center">
                       <h3 className="font-heading text-lg text-muted-foreground">{l.personalMonth}</h3>
-                      <div className="number-display-large mx-auto my-4 animate-float">
+                      <div className="number-display-large mx-auto my-4">
                         {monthlyPrediction.number}
                       </div>
                       <p className="text-primary font-heading text-xl">{monthlyPrediction.theme}</p>

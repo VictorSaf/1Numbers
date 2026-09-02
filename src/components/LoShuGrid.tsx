@@ -178,7 +178,7 @@ export const LoShuGrid = ({ birthDate, delay = 0 }: LoShuGridProps) => {
                         <button
                           onClick={() => setSelectedNumber(isSelected ? null : num)}
                           className={cn(
-                            "w-16 h-16 md:w-20 md:h-20 rounded-xl flex flex-col items-center justify-center transition-all duration-300",
+                            "w-16 h-16 md:w-20 md:h-20 rounded-sm flex flex-col items-center justify-center transition-colors duration-300",
                             "hover:scale-105 cursor-pointer",
                             isMissing && "bg-muted/30 border border-dashed border-border/50",
                             !isMissing && !isRepeated && "bg-sunken border border-line",

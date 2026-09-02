@@ -181,7 +181,7 @@ export const Thread = ({
           <article
             key={step.key}
             data-step={step.key}
-            className="rounded-2xl border border-line bg-surface/70 p-7 shadow-[0_1px_2px_rgba(0,0,0,.06),0_22px_48px_-30px_rgba(0,0,0,.4)] sm:p-10"
+            className="rounded-lg border border-line bg-surface p-7 sm:p-10"
           >
             <span className="mb-6 block text-[0.63rem] uppercase tracking-[0.16em] text-muted-foreground">
               {step.kicker}

@@ -113,7 +113,7 @@ export const QuickActions = () => {
         {quickActions.map((action) => (
           <Link key={action.id} to={action.href}>
             <div
-              className={`flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-200 ${action.bgColor}`}
+              className={`flex flex-col items-center justify-center min-h-11 p-3 rounded-sm transition-colors duration-200 ${action.bgColor}`}
             >
               <div className={action.color}>{action.icon}</div>
               <span className="text-xs font-medium mt-2 text-center">

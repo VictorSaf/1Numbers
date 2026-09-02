@@ -38,8 +38,8 @@ const NumerologyGuide = () => {
                   key={num}
                   onClick={() => setSelectedNumber(selectedNumber === num ? null : num)}
                   className={cn(
-                    "number-display cursor-pointer transition-all duration-300 hover:scale-110",
-                    selectedNumber === num && "number-display-large  scale-110"
+                    "number-display cursor-pointer transition-colors duration-200",
+                    selectedNumber === num && "number-display-large text-gilt"
                   )}
                 >
                   {num}
@@ -64,9 +64,9 @@ const NumerologyGuide = () => {
                   key={num}
                   onClick={() => setSelectedNumber(selectedNumber === num ? null : num)}
                   className={cn(
-                    "number-display cursor-pointer transition-all duration-300 hover:scale-110",
+                    "number-display cursor-pointer transition-colors duration-200",
                     "border-2 border-line",
-                    selectedNumber === num && "number-display-large  scale-110"
+                    selectedNumber === num && "number-display-large text-gilt"
                   )}
                 >
                   {num}
@@ -79,7 +79,7 @@ const NumerologyGuide = () => {
           {selectedNumber && (
             <section className="card-mystic rounded-lg p-8 animate-scale-in">
               <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
-                <div className="number-display-large shrink-0 animate-float">
+                <div className="number-display-large shrink-0">
                   {selectedNumber}
                 </div>
                 
@@ -133,7 +133,7 @@ const NumerologyGuide = () => {
                   <div
                     key={num}
                     className={cn(
-                      "card-mystic rounded-xl p-5 opacity-0 animate-fade-in cursor-pointer",
+                      "card-mystic p-5 opacity-0 animate-fade-in cursor-pointer",
                       " transition-all duration-300 hover:scale-[1.02]",
                       isMaster && "border-line",
                       getDelayClass(index * 50)

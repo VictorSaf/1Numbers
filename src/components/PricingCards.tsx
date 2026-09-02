@@ -254,7 +254,7 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
           return (
             <Card
               key={tier.id}
-              className={`relative flex flex-col transition-all duration-200 ${ isHighlighted ? 'border-primary border-2 shadow-lg scale-105 z-10' : 'hover:border-line' } ${isCurrentTier ? 'ring-2 ring-primary/20' : ''}`}
+              className={`relative flex flex-col transition-all duration-200 ${ isHighlighted ? 'border-gilt border-2 z-10' : 'hover:border-line' } ${isCurrentTier ? 'ring-2 ring-primary/20' : ''}`}
             >
               {/* Badge */}
               {isHighlighted && (

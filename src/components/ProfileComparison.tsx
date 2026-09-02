@@ -144,24 +144,24 @@ export const ProfileComparison = ({ className }: ProfileComparisonProps) => {
                         </div>
                       </td>
                       <td className="text-center p-2">
-                        <Badge variant="outline" className="number-display">
+                        <span className="number-display">
                           {numbers.lifePath}
-                        </Badge>
+                        </span>
                       </td>
                       <td className="text-center p-2">
-                        <Badge variant="outline" className="number-display">
+                        <span className="number-display">
                           {numbers.destiny}
-                        </Badge>
+                        </span>
                       </td>
                       <td className="text-center p-2">
-                        <Badge variant="outline" className="number-display">
+                        <span className="number-display">
                           {numbers.soulUrge}
-                        </Badge>
+                        </span>
                       </td>
                       <td className="text-center p-2">
-                        <Badge variant="outline" className="number-display">
+                        <span className="number-display">
                           {numbers.personality}
-                        </Badge>
+                        </span>
                       </td>
                     </tr>
                   );

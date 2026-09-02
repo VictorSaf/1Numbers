@@ -40,7 +40,7 @@ export const PersonalCycleCard = ({ birthDate, delay = 0 }: PersonalCycleCardPro
   return (
     <div
       className={cn(
-        "p-6 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm opacity-0 animate-fade-in",
+        "rounded-lg border border-line bg-card p-6 opacity-0 animate-fade-in",
         getDelayClass(delay)
       )}
     >
