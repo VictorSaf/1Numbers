@@ -6,7 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { PageLayout } from "@/components/layout/PageLayout";
-import { PageHeader } from "@/components/layout/PageHeader";
+import { PagePlate } from "@/components/layout/PagePlate";
+import { Chapter } from "@/components/numerology/Chapter";
+import { Dial } from "@/components/numerology/Dial";
+import { buildDial, type DialLang } from "@/lib/dial";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useProfile } from "@/hooks/use-profile";
 import { 
@@ -42,6 +45,7 @@ const locales = { ro, en: enUS, ru };
 
 const Compatibility = () => {
   const { language, t } = useLanguage();
+  const lang = (["ro", "en", "ru"].includes(language) ? language : "ro") as DialLang;
   const { profileData, hasProfile } = useProfile();
   const [person1, setPerson1] = useState<PersonData>({ fullName: "", birthDate: undefined });
   const [person2, setPerson2] = useState<PersonData>({ fullName: "", birthDate: undefined });
@@ -140,18 +144,33 @@ const Compatibility = () => {
 
   return (
     <PageLayout>
-      <PageHeader
-        title={t.compatibilityTitle}
-        subtitle={t.compatibilitySubtitle}
-        badge={{
-          icon: <Heart className="h-4 w-4" />,
-          label: t.compatibilityLabel
-        }}
-      />
-
       {/* Main Content */}
       <main className="relative z-10 px-4 pb-16">
-        <div className="max-w-4xl mx-auto pt-4">
+        <div className="mx-auto max-w-4xl pt-4">
+          {/* Placa de deschidere, ca la hartă. Figura ei sunt chiar cele două
+              cadrane, când există două hărți de comparat. */}
+          <PagePlate
+            eyebrow={t.compatibilityLabel}
+            title={t.compatibilityTitle}
+            subtitle={t.compatibilitySubtitle}
+            figure={
+              result && person1.birthDate && person2.birthDate ? (
+                <div className="flex items-center justify-center gap-4">
+                  <div className="w-[124px] shrink-0">
+                    <Dial figure={buildDial(person1.fullName, person1.birthDate, lang)} size="echo" />
+                  </div>
+                  <span className="num text-2xl text-plate-tension" aria-hidden="true">
+                    ⟷
+                  </span>
+                  <div className="w-[124px] shrink-0">
+                    <Dial figure={buildDial(person2.fullName, person2.birthDate, lang)} size="echo" />
+                  </div>
+                </div>
+              ) : undefined
+            }
+          />
+
+          <div className="mt-10">
           {!result ? (
             <div className="card-mystic rounded-lg p-8 max-w-2xl mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -231,15 +250,15 @@ const Compatibility = () => {
               </Button>
             </div>
           ) : (
-            <div className="space-y-8 animate-fade-in">
-              {/* Names Header */}
-              <div className="text-center space-y-4">
-                <div className="flex items-center justify-center gap-4 flex-wrap">
-                  <span className="font-heading text-xl md:text-2xl text-foreground">{person1.fullName}</span>
-                  <Heart className="h-6 w-6 animate-pulse-glow" />
-                  <span className="font-heading text-xl md:text-2xl text-foreground">{person2.fullName}</span>
-                </div>
-              </div>
+            <div className="space-y-14 animate-fade-in">
+              <Chapter
+                meta={{
+                  id: "scor",
+                  title: `${person1.fullName} · ${person2.fullName}`,
+                  question: t.compatibilitySubtitle,
+                }}
+                index={1}
+              >
 
               {/* Overall Score */}
               <div className={cn(
@@ -360,14 +379,16 @@ const Compatibility = () => {
                 <Button
                   onClick={handleReset}
                   variant="outline"
-                  className="border-line text-primary hover:bg-sunken"
+                  className="border-gilt text-gilt hover:bg-gilt-soft"
                 >
                   <Users className="mr-2 h-4 w-4" />
                   {t.tryAnotherPair}
                 </Button>
               </div>
+              </Chapter>
             </div>
           )}
+          </div>
         </div>
       </main>
       </PageLayout>

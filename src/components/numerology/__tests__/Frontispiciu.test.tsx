@@ -50,7 +50,7 @@ describe("Frontispiciu", () => {
     for (const dial of dials) {
       const wrapper = dial.parentElement;
       expect(wrapper?.className, "învelișul ascunde, nu svg-ul").toMatch(/lg:block|lg:hidden/);
-      expect(dial.className.baseVal ?? "").not.toMatch(/hidden/);
+      expect(dial.getAttribute("class") ?? "").not.toMatch(/hidden/);
     }
   });
 

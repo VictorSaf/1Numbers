@@ -55,9 +55,10 @@ export const RelationshipTypeSelector = ({
             onClick={() => onTypeChange(type)}
             className={cn(
               "flex flex-col items-center gap-2 h-auto py-3",
-              selectedType === type
-                ? "bg-primary text-primary-foreground border-primary"
-                : "hover:bg-sunken"
+              // Selecția scria peste varianta butonului cu albastrul vechi:
+              // pastila aleasă ieșea albastră lângă trei surori de alamă.
+              // Varianta `default` e deja alamă -- nu mai are ce completa.
+              selectedType !== type && "hover:bg-gilt-soft"
             )}
           >
             {icon}
