@@ -23,6 +23,11 @@ vi.mock("@/services/api", () => {
   const svc = {
     createJournalEntry: (...a: unknown[]) => create(...a),
     getTodayReading: (...a: unknown[]) => read(...a),
+    // Vizitator fără cont: preferința pentru cine scrie ziua stă în browser,
+    // fiindcă nu există pe cine să legăm dovada acordului.
+    getToken: () => null,
+    getConsents: async () => ({ consents: {}, policyVersion: "test" }),
+    setConsent: async () => ({ success: true, consents: {} }),
   };
   return { api: svc, default: svc };
 });

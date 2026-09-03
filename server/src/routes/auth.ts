@@ -7,6 +7,7 @@ import { authenticateToken, AuthRequest } from '../middleware/auth';
 import { mintToken, consumeToken, revokeTokens, TOKEN_MINUTES, TooManyRequestsError } from '../lib/authTokens';
 import { isEmailConfigured, sendLetter } from '../lib/email';
 import { mailLang, verifyEmail, resetPassword } from '../lib/emailTemplates';
+import { recordConsent } from '../lib/consents';
 
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -122,6 +123,11 @@ router.post('/register', ipRateLimit({ windowMs: 60 * 60 * 1000, max: 5 }), asyn
     );
 
     const user = result.rows[0];
+
+    // Acceptarea termenilor se notează CU versiunea politicii, ca să știm mai
+    // târziu cine a acceptat ce text. Nu e consimțământ în sensul din
+    // regulament -- temeiul e contractul -- dar are aceeași nevoie de dovadă.
+    await recordConsent(user.id, 'terms', true);
 
     // Verificarea pleacă, dar nu ține răspunsul pe loc și nu-l poate strica:
     // omul tocmai și-a făcut cont ca să-și vadă harta, nu ca să aștepte un SMTP.

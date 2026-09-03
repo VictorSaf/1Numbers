@@ -1,54 +1,95 @@
 import { useCallback, useEffect, useState } from "react";
+import { api } from "@/services/api";
 
 /**
  * Cine scrie textul zilei: un model, sau chiar aplicația.
  *
- * Calea compusă local exista deja în `Today.tsx`, dar numai ca plan B pentru
- * erori -- invizibilă, și doar când serverul cădea. Aici devine o alegere.
+ * Nu e o setare de aspect. Pe `model`, propozițiile compuse din harta omului
+ * pleacă spre un furnizor extern -- deci alegerea asta ESTE consimțământul din
+ * politica de confidențialitate, iar aplicația trebuie să rămână întreagă când
+ * omul spune nu.
  *
- * Contează dincolo de preferință: pe `model` pleacă spre un furnizor extern
- * propozițiile compuse din harta omului. Cine nu vrea asta trebuie să aibă
- * unde spune, iar aplicația trebuie să rămână întreagă când o spune.
+ * De aceea are două case:
  *
- * Stă în `localStorage` deocamdată, deci nu călătorește între dispozitive.
- * La sarcina 2.5 se mută în tabelul de consimțăminte, unde îi e locul: un
- * acord care trăiește într-un browser nu e un acord pe care îl poți dovedi.
- * Există ca hook tocmai ca mutarea aia să fie un singur fișier.
+ *   cu cont     -- tabelul `user_consents`, care e un jurnal: fiecare acordare
+ *                  și fiecare retragere e un rând, cu versiunea politicii. GDPR
+ *                  cere să poți DEMONSTRA acordul, iar o valoare care trăiește
+ *                  într-un browser nu demonstrează nimic.
+ *   fără cont   -- localStorage, fiindcă nu există pe cine să legăm dovada. Tot
+ *                  o alegere reală, doar că a browserului, nu a omului.
+ *
+ * Implicit e `model` doar pentru vizitatorul fără cont, unde nimic personal nu
+ * e salvat oricum. Pentru un cont, lipsa unui rând înseamnă „n-a fost întrebat”,
+ * iar atunci nu presupunem acordul: se așteaptă răspunsul.
  */
 
 export type DayTextSource = "model" | "local";
 
 const KEY = "day-text-source";
 
-const read = (): DayTextSource => {
+const readLocal = (): DayTextSource => {
   try {
     return localStorage.getItem(KEY) === "local" ? "local" : "model";
   } catch {
-    // Fereastră privată, stocare blocată. Implicit rămâne `model`.
     return "model";
   }
 };
 
+const writeLocal = (next: DayTextSource) => {
+  try {
+    localStorage.setItem(KEY, next);
+  } catch {
+    // Fereastră privată. Alegerea ține sesiunea asta.
+  }
+};
+
 export const useDayTextSource = (): [DayTextSource, (next: DayTextSource) => void] => {
-  const [source, setSource] = useState<DayTextSource>(read);
+  /**
+   * Are nevoie de un singur lucru -- există jeton? -- nu de tot contextul de
+   * autentificare. Legat de context, hook-ul ar fi cerut un `AuthProvider` în
+   * orice test care randează ziua, deși nu are nimic de-a face cu el.
+   */
+  const token = api.getToken();
+  const [source, setSource] = useState<DayTextSource>(readLocal);
 
-  // Alte file ale aceleiași aplicații: preferința e a omului, nu a filei.
+  // Cu cont, adevărul e pe server. Localul rămâne oglindă, ca pagina să nu
+  // pâlpâie până sosește răspunsul.
   useEffect(() => {
-    const sync = (e: StorageEvent) => {
-      if (e.key === KEY) setSource(read());
-    };
-    window.addEventListener("storage", sync);
-    return () => window.removeEventListener("storage", sync);
-  }, []);
-
-  const choose = useCallback((next: DayTextSource) => {
-    try {
-      localStorage.setItem(KEY, next);
-    } catch {
-      // Nu se poate ține minte, dar alegerea funcționează în sesiunea asta.
+    if (!token) {
+      setSource(readLocal());
+      return;
     }
-    setSource(next);
-  }, []);
+    let alive = true;
+    api
+      .getConsents()
+      .then((r) => {
+        if (!alive) return;
+        const acordat = r.consents.model;
+        // `undefined` = niciodată întrebat. Nu se presupune acordul.
+        const next: DayTextSource = acordat === true ? "model" : "local";
+        setSource(next);
+        writeLocal(next);
+      })
+      .catch(() => {
+        // Serverul nu răspunde. Rămâne ce știe browserul, fără să inventăm un
+        // acord pe care nu l-am citit.
+      });
+    return () => { alive = false; };
+  }, [token]);
+
+  const choose = useCallback(
+    (next: DayTextSource) => {
+      setSource(next);
+      writeLocal(next);
+      if (token) {
+        void api.setConsent("model", next === "model").catch(() => {
+          // Dacă scrierea nu reușește, alegerea rămâne locală pentru sesiune,
+          // dar nu pretindem că e înregistrată.
+        });
+      }
+    },
+    [token],
+  );
 
   return [source, choose];
 };

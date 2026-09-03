@@ -159,6 +159,18 @@ class ApiService {
     return res.blob();
   }
 
+  /** Ce a acordat omul. Un fel lipsă înseamnă „nu l-am întrebat niciodată”. */
+  async getConsents() {
+    return this.request<{ consents: Record<string, boolean>; policyVersion: string }>('/account/consents');
+  }
+
+  async setConsent(kind: 'model' | 'notifications', granted: boolean) {
+    return this.request<{ success: boolean; consents: Record<string, boolean> }>('/account/consents', {
+      method: 'POST',
+      body: { kind, granted },
+    });
+  }
+
   async logout() {
     // Clear token locally, backend doesn't need to do anything for JWT
     this.setToken(null);

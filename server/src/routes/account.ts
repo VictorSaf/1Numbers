@@ -5,6 +5,7 @@ import { ipRateLimit } from '../middleware/ipRateLimit';
 import { mintToken, consumeToken, TOKEN_MINUTES, TooManyRequestsError } from '../lib/authTokens';
 import { isEmailConfigured, sendLetter } from '../lib/email';
 import { mailLang, confirmDeletion } from '../lib/emailTemplates';
+import { currentConsents, recordConsent, isConsentKind, POLICY_VERSION } from '../lib/consents';
 
 /**
  * Contul, în mâna omului: să-l ia cu el, sau să-l facă să dispară.
@@ -122,6 +123,42 @@ router.get('/export', authenticateToken, async (req: AuthRequest, res: Response)
     res.send(JSON.stringify(payload, null, 2));
   } catch (error) {
     console.error('Export error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * Ce a acordat omul, și pe ce versiune de politică.
+ *
+ * Un fel care lipsește din răspuns înseamnă „nu l-am întrebat niciodată" --
+ * altceva decât „a refuzat". Interfața are nevoie de diferența asta ca să știe
+ * dacă trebuie să întrebe.
+ */
+router.get('/consents', authenticateToken, async (req: AuthRequest, res: Response) => {
+  try {
+    res.json({ consents: await currentConsents(req.userId!), policyVersion: POLICY_VERSION });
+  } catch (error) {
+    console.error('Consents read error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/** Acordă sau retrage. Adaugă un rând; nu rescrie niciunul. */
+router.post('/consents', authenticateToken, async (req: AuthRequest, res: Response) => {
+  try {
+    const { kind, granted } = req.body ?? {};
+    if (!isConsentKind(kind) || typeof granted !== 'boolean') {
+      return res.status(400).json({ error: 'kind and granted are required' });
+    }
+    // Termenii se acceptă la înregistrare, nu se comută dintr-un buton: a
+    // „retrage" acceptarea contractului înseamnă a pleca, iar pentru asta
+    // există ștergerea contului.
+    if (kind === 'terms') return res.status(400).json({ error: 'terms_not_toggleable' });
+
+    await recordConsent(req.userId!, kind, granted);
+    res.json({ success: true, consents: await currentConsents(req.userId!) });
+  } catch (error) {
+    console.error('Consent write error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
