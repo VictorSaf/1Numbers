@@ -93,6 +93,41 @@ class ApiService {
     });
   }
 
+  /**
+   * Am uitat parola.
+   *
+   * Serverul întoarce mereu succes, chiar dacă adresa n-are cont -- altfel ruta
+   * ar spune cine e înscris. Interfața trebuie să arate același lucru, deci nu
+   * are ce eroare să trateze.
+   */
+  async forgotPassword(email: string, language: string) {
+    return this.request<{ success: boolean }>('/auth/forgot', {
+      method: 'POST',
+      body: { email, language },
+    });
+  }
+
+  async resetPassword(token: string, password: string) {
+    return this.request<{ success: boolean }>('/auth/reset', {
+      method: 'POST',
+      body: { token, password },
+    });
+  }
+
+  async verifyEmail(token: string) {
+    return this.request<{ success: boolean }>('/auth/verify-email', {
+      method: 'POST',
+      body: { token },
+    });
+  }
+
+  async resendVerification(language: string) {
+    return this.request<{ success: boolean; alreadyVerified?: boolean }>('/auth/resend-verification', {
+      method: 'POST',
+      body: { language },
+    });
+  }
+
   async logout() {
     // Clear token locally, backend doesn't need to do anything for JWT
     this.setToken(null);

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, Sparkles, ArrowLeft } from 'lucide-react';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { track } from '@/lib/analytics';
 import { PageLayout } from '@/components/layout/PageLayout';
+import { api } from '@/services/api';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -44,6 +45,24 @@ const Auth = () => {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  /**
+   * Trei ecrane, nu unul.
+   *
+   * `auth` e formularul dintotdeauna. `forgot` cere adresa. `reset` primește
+   * parola nouă și apare doar când linkul din email aduce un jeton.
+   *
+   * Jetoanele vin prin adresă fiindcă vin dintr-un email: omul apasă un link,
+   * nu completează un cod.
+   */
+  const [mode, setMode] = useState<'auth' | 'forgot' | 'reset'>('auth');
+  const [notice, setNotice] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const search = useLocation().search;
+  const tokens = useMemo(() => {
+    const q = new URLSearchParams(search);
+    return { reset: q.get('reset'), verify: q.get('verify') };
+  }, [search]);
+
   const labels = {
     ro: {
       login: 'Autentificare',
@@ -64,6 +83,20 @@ const Auth = () => {
       loginSuccess: 'Te-ai conectat cu succes!',
       registerSuccess: 'Contul a fost creat cu succes!',
       error: 'Eroare',
+      forgotLink: 'Am uitat parola',
+      forgotTitle: 'Parolă nouă',
+      forgotSubtitle: 'Îți trimitem un link pe email. E valabil 30 de minute.',
+      forgotButton: 'Trimite linkul',
+      forgotSent: 'Dacă adresa are cont, linkul a plecat. Verifică-ți emailul.',
+      resetTitle: 'Alege o parolă nouă',
+      resetSubtitle: 'După ce o schimbi, te deconectăm de pe toate dispozitivele.',
+      resetButton: 'Schimbă parola',
+      resetDone: 'Parola a fost schimbată. Conectează-te cu ea.',
+      resetUsed: 'Linkul a fost deja folosit.',
+      resetExpired: 'Linkul a expirat. Cere altul.',
+      resetBad: 'Linkul nu mai e bun. Cere altul.',
+      verified: 'Adresa ta e confirmată.',
+      backToLogin: 'Înapoi la conectare',
     },
     en: {
       login: 'Login',
@@ -84,6 +117,20 @@ const Auth = () => {
       loginSuccess: 'Successfully logged in!',
       registerSuccess: 'Account created successfully!',
       error: 'Error',
+      forgotLink: 'I forgot my password',
+      forgotTitle: 'A new password',
+      forgotSubtitle: 'We will email you a link. It is valid for 30 minutes.',
+      forgotButton: 'Send the link',
+      forgotSent: 'If that address has an account, the link is on its way. Check your email.',
+      resetTitle: 'Choose a new password',
+      resetSubtitle: 'Once you change it, we sign you out on every device.',
+      resetButton: 'Change the password',
+      resetDone: 'Your password has been changed. Sign in with it.',
+      resetUsed: 'That link has already been used.',
+      resetExpired: 'That link has expired. Ask for another.',
+      resetBad: 'That link is no longer good. Ask for another.',
+      verified: 'Your address is confirmed.',
+      backToLogin: 'Back to sign in',
     },
     ru: {
       login: 'Вход',
@@ -104,10 +151,76 @@ const Auth = () => {
       loginSuccess: 'Вы успешно вошли!',
       registerSuccess: 'Аккаунт успешно создан!',
       error: 'Ошибка',
+      forgotLink: 'Я забыл пароль',
+      forgotTitle: 'Новый пароль',
+      forgotSubtitle: 'Мы отправим ссылку на почту. Она действует 30 минут.',
+      forgotButton: 'Отправить ссылку',
+      forgotSent: 'Если у этого адреса есть аккаунт, ссылка отправлена. Проверьте почту.',
+      resetTitle: 'Выберите новый пароль',
+      resetSubtitle: 'После смены мы выйдем из аккаунта на всех устройствах.',
+      resetButton: 'Сменить пароль',
+      resetDone: 'Пароль изменён. Войдите с ним.',
+      resetUsed: 'Ссылка уже использована.',
+      resetExpired: 'Срок ссылки истёк. Запросите новую.',
+      resetBad: 'Ссылка больше не действует. Запросите новую.',
+      verified: 'Ваш адрес подтверждён.',
+      backToLogin: 'Назад ко входу',
     }
   };
 
   const l = labels[language];
+
+  // Linkul de verificare: se consumă o dată, la intrare, și spune ce s-a
+  // întâmplat. Nu deschide un ecran -- confirmarea nu cere nimic de la om.
+  useEffect(() => {
+    if (!tokens.verify) return;
+    let alive = true;
+    api
+      .verifyEmail(tokens.verify)
+      .then(() => { if (alive) setNotice(l.verified); })
+      .catch(() => { if (alive) setNotice(l.resetBad); })
+      .finally(() => { if (alive) navigate('/auth', { replace: true }); });
+    return () => { alive = false; };
+  }, [tokens.verify]);
+
+  // Linkul de resetare deschide ecranul de parolă nouă.
+  useEffect(() => {
+    if (tokens.reset) setMode('reset');
+  }, [tokens.reset]);
+
+  const askForLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    try {
+      await api.forgotPassword(formData.email, language);
+    } catch {
+      // Serverul întoarce mereu succes; dacă rețeaua cade, omul vede tot
+      // mesajul neutru. A spune „adresa asta n-are cont” ar fi chiar scurgerea
+      // pe care ruta o evită.
+    }
+    setBusy(false);
+    setNotice(l.forgotSent);
+  };
+
+  const chooseNewPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const check = loginSchema.shape.password.safeParse(formData.password);
+    if (!check.success) {
+      setErrors({ password: check.error.issues[0].message });
+      return;
+    }
+    setBusy(true);
+    try {
+      await api.resetPassword(tokens.reset ?? '', formData.password);
+      setMode('auth');
+      setNotice(l.resetDone);
+      navigate('/auth', { replace: true });
+    } catch (err) {
+      const reason = err instanceof Error ? err.message : '';
+      setNotice(reason.includes('used') ? l.resetUsed : reason.includes('expired') ? l.resetExpired : l.resetBad);
+    }
+    setBusy(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -163,6 +276,85 @@ const Auth = () => {
     }
   };
 
+
+  /**
+   * Coaja comună a paginii. Cele două ecrane noi ies devreme, cu ea, ca să nu
+   * fie nevoie să înfășor formularul existent în condiții -- o restructurare de
+   * JSX pentru două ecrane care nu-l ating.
+   */
+  const Shell = ({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) => (
+    <PageLayout className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12">
+      <div className="relative z-10 w-full max-w-md">
+        <div className="card-mystic py-8">
+          <div className="mb-8">
+            <div className="flex items-center gap-3">
+              <span className="h-px w-10 shrink-0 bg-gilt" aria-hidden="true" />
+              <span className="num text-[0.63rem] uppercase tracking-[0.18em] text-gilt">{l.login}</span>
+            </div>
+            <h1 className="mt-4 font-heading text-2xl text-foreground">{title}</h1>
+            <p className="mt-2 max-w-[42ch] text-sm text-muted-foreground">{subtitle}</p>
+          </div>
+          {children}
+          {notice && (
+            <p className="mt-6 border-t border-gilt pt-4 text-sm text-foreground/90">{notice}</p>
+          )}
+          <div className="mt-6">
+            <button
+              type="button"
+              onClick={() => { setMode('auth'); setNotice(null); setErrors({}); navigate('/auth', { replace: true }); }}
+              className="num min-h-11 text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-gilt"
+            >
+              ← {l.backToLogin}
+            </button>
+          </div>
+        </div>
+      </div>
+    </PageLayout>
+  );
+
+  if (mode === 'forgot') {
+    return (
+      <Shell title={l.forgotTitle} subtitle={l.forgotSubtitle}>
+        <form onSubmit={askForLink} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="forgot-email" className="font-raleway text-sm text-foreground/90">{l.email}</Label>
+            <Input
+              id="forgot-email"
+              type="email"
+              autoComplete="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              required
+            />
+          </div>
+          <Button type="submit" disabled={busy} className="w-full sm:w-auto">{l.forgotButton}</Button>
+        </form>
+      </Shell>
+    );
+  }
+
+  if (mode === 'reset') {
+    return (
+      <Shell title={l.resetTitle} subtitle={l.resetSubtitle}>
+        <form onSubmit={chooseNewPassword} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="new-password" className="font-raleway text-sm text-foreground/90">{l.password}</Label>
+            <Input
+              id="new-password"
+              type="password"
+              autoComplete="new-password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              required
+            />
+            {errors.password && <p className="text-sm text-tension">{errors.password}</p>}
+          </div>
+          <Button type="submit" disabled={busy} className="w-full sm:w-auto">{l.resetButton}</Button>
+        </form>
+      </Shell>
+    );
+  }
+
   // Wrapped in PageLayout like every other route. It used to render its own
   // StarField and a floating language switcher instead of the header, so
   // signing in meant losing the way back and the theme switcher both.
@@ -172,9 +364,6 @@ const Auth = () => {
         <div className="card-mystic py-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-sunken border border-line mb-4">
-              <Sparkles className="h-8 w-8" />
-            </div>
             <h1 className="font-heading text-2xl text-foreground mb-2">
               {isLoginMode ? l.welcome : l.createAccount}
             </h1>
@@ -277,6 +466,25 @@ const Auth = () => {
               {isLoginMode ? l.loginButton : l.registerButton}
             </Button>
           </form>
+
+          {/* Drumul pentru cine a uitat parola. Doar la conectare: la
+              înregistrare n-are ce parolă să uite. */}
+          {isLoginMode && (
+            <div className="mt-5">
+              <button
+                type="button"
+                onClick={() => { setMode('forgot'); setNotice(null); setErrors({}); }}
+                className="num min-h-11 text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-gilt"
+              >
+                {l.forgotLink}
+              </button>
+            </div>
+          )}
+
+          {/* Mesajul rămas de la o verificare sau o resetare tocmai făcută. */}
+          {notice && (
+            <p className="mt-5 border-t border-gilt pt-4 text-sm text-foreground/90">{notice}</p>
+          )}
 
           {/* Switch mode -- hidden entirely while sign-up is closed */}
           {registrationOpen && (

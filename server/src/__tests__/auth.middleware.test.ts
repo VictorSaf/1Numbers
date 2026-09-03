@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { authenticateToken, requireAdmin, AuthRequest } from '../middleware/auth';
 import pool from '../db';
+import { passwordChangedAt } from '../lib/sessions';
 
 vi.mock('../db', () => ({ default: { query: vi.fn() } }));
 
@@ -44,7 +45,7 @@ describe('Auth Middleware', () => {
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('should call next and set user info if token is valid', () => {
+    it('should call next and set user info if token is valid', async () => {
       const payload = { userId: '123', email: 'test@test.com', role: 'user' };
       const token = jwt.sign(payload, JWT_SECRET);
 
@@ -57,12 +58,70 @@ describe('Auth Middleware', () => {
       } as unknown as Response;
       const next = vi.fn() as NextFunction;
 
-      authenticateToken(req, res, next);
+      // Middleware-ul e asincron de când întreabă dacă sesiunea mai e valabilă.
+      await authenticateToken(req, res, next);
 
       expect(next).toHaveBeenCalled();
       expect(req.userId).toBe('123');
       expect(req.userEmail).toBe('test@test.com');
       expect(req.userRole).toBe('user');
+    });
+
+    /**
+     * Ce promite emailul de resetare: „după ce îl folosești, te deconectăm de
+     * pe toate dispozitivele". JWT-ul e semnat pe șapte zile și nu există
+     * logout pe server, deci fără verificarea asta cine ți-a furat parola
+     * rămâne înăuntru o săptămână DUPĂ ce ți-o schimbi -- adică exact
+     * scenariul pentru care omul cere resetarea.
+     */
+    it('refuză un jeton emis înainte de ultima schimbare de parolă', async () => {
+      const acumUnCeas = Math.floor(Date.now() / 1000) - 3600;
+      const token = jwt.sign(
+        { userId: '123', email: 'test@test.com', role: 'user', iat: acumUnCeas },
+        JWT_SECRET,
+      );
+      vi.mocked(passwordChangedAt).mockResolvedValueOnce(new Date());
+
+      const req = { headers: { authorization: `Bearer ${token}` } } as AuthRequest;
+      const res = { status: vi.fn().mockReturnThis(), json: vi.fn() } as unknown as Response;
+      const next = vi.fn() as NextFunction;
+
+      await authenticateToken(req, res, next);
+
+      expect(next).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(403);
+    });
+
+    it('lasă înăuntru jetonul emis DUPĂ schimbare', async () => {
+      const acum = Math.floor(Date.now() / 1000);
+      const token = jwt.sign(
+        { userId: '123', email: 'test@test.com', role: 'user', iat: acum },
+        JWT_SECRET,
+      );
+      // Parola schimbată acum o oră; jetonul e mai nou.
+      vi.mocked(passwordChangedAt).mockResolvedValueOnce(new Date(Date.now() - 3600_000));
+
+      const req = { headers: { authorization: `Bearer ${token}` } } as AuthRequest;
+      const res = { status: vi.fn().mockReturnThis(), json: vi.fn() } as unknown as Response;
+      const next = vi.fn() as NextFunction;
+
+      await authenticateToken(req, res, next);
+
+      expect(next).toHaveBeenCalled();
+    });
+
+    it('refuză jetonul unui cont care nu mai există', async () => {
+      const token = jwt.sign({ userId: 'sters', email: 'x@y.ro', role: 'user' }, JWT_SECRET);
+      vi.mocked(passwordChangedAt).mockResolvedValueOnce(undefined);
+
+      const req = { headers: { authorization: `Bearer ${token}` } } as AuthRequest;
+      const res = { status: vi.fn().mockReturnThis(), json: vi.fn() } as unknown as Response;
+      const next = vi.fn() as NextFunction;
+
+      await authenticateToken(req, res, next);
+
+      expect(next).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(403);
     });
   });
 
