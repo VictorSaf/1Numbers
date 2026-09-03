@@ -37,7 +37,7 @@ interface ConversationMessage {
 }
 
 export const AIConsultant = () => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const { user } = useAuth();
   const { profile } = useProfile();
   const [question, setQuestion] = useState('');
@@ -294,6 +294,20 @@ export const AIConsultant = () => {
             )}
           </div>
           <CardDescription>{tr.description}</CardDescription>
+          {/* Obligatoriu de la 2 august 2026, Articolul 50 din AI Act: omul
+              trebuie să știe că vorbește cu un model. Ghidul Comisiei cere ca
+              informația să fie perceptibilă în practică -- deci stă permanent
+              lângă casetă, nu într-un pop-up pe care îl închizi o dată și nu-l
+              mai vezi niciodată, și nu în termeni.
+              Spune și CE pleacă spre model, fiindcă asta e întrebarea pe care
+              omul chiar și-o pune. Numele și data nașterii nu mai pleacă --
+              vezi `aiPrompts.ts`, unde promptul se construiește. */}
+          <p
+            data-ai-disclosure
+            className="mt-3 max-w-[62ch] border-t border-gilt pt-3 text-sm leading-relaxed text-muted-foreground"
+          >
+            {t.aiConsultantNote}
+          </p>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>

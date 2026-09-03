@@ -132,6 +132,33 @@ describe("Today, cartea zilei", () => {
   });
 });
 
+describe("Today, cine scrie textul", () => {
+  it("nu trimite nimic nicăieri dacă omul a ales textul local", async () => {
+    // Nu „trimite și ignoră răspunsul”: cererea nu se face deloc. Altfel
+    // comutatorul ar schimba ce VEDE omul, nu ce PLEACĂ despre el.
+    localStorage.setItem("day-text-source", "local");
+    const { container } = show();
+
+    await waitFor(() => expect(container.querySelectorAll("[data-beat]").length).toBeGreaterThan(0));
+    expect(read).not.toHaveBeenCalled();
+    expect(says(container, reading.say)).toBe(true);
+  });
+
+  it("spune că textul e scris de un model, dar numai când chiar e", async () => {
+    // Articolul 50 din AI Act: un text generat trebuie să se vadă că e generat.
+    // Iar unul compus local nu trebuie să pretindă că a fost.
+    const cuModel = show();
+    await ready();
+    expect(cuModel.container.querySelector("[data-ai-generated]")).not.toBeNull();
+    cuModel.unmount();
+
+    localStorage.setItem("day-text-source", "local");
+    const local = show();
+    await waitFor(() => expect(local.container.querySelectorAll("[data-beat]").length).toBeGreaterThan(0));
+    expect(local.container.querySelector("[data-ai-generated]")).toBeNull();
+  });
+});
+
 describe("Today, ce trimite la server", () => {
   it("trimite exact atâtea relații câte are ziua, fără să repete", async () => {
     // Cerându-le mereu pe amândouă, `fric` și `aproape` cădeau pe aceeași

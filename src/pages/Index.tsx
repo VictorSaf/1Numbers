@@ -193,14 +193,6 @@ const Index = () => {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="relative z-10 py-6 border-t border-border mt-16">
-        <div className="page-measure text-center">
-          <p className="text-sm text-foreground/70 font-raleway">
-            {t.footer}
-          </p>
-        </div>
-      </footer>
     </PageLayout>
   );
 };

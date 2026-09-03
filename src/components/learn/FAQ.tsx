@@ -292,12 +292,6 @@ const FAQ = () => {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="relative z-10 py-6 border-t border-border/30">
-        <div className="px-4 text-center">
-          <p className="text-sm text-muted-foreground font-raleway">{t.footer}</p>
-        </div>
-      </footer>
     </>
   );
 };

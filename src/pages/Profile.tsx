@@ -31,6 +31,7 @@ import { ProfileSwitcher } from '@/components/ProfileSwitcher';
 import { ProfileComparison } from '@/components/ProfileComparison';
 import { AIConsultant } from '@/components/AIConsultant';
 import { NotificationSettings } from '@/components/NotificationSettings';
+import { DayTextChoice } from '@/components/DayTextChoice';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { SectionHead } from '@/components/layout/SectionHead';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -523,6 +524,8 @@ const Profile = () => {
           <AIConsultant />
           {/* Notification preferences. The component existed with no importer,
               so the whole permission-and-preferences flow was unreachable. */}
+          <DayTextChoice />
+
           <NotificationSettings />
         </div>
       </main>

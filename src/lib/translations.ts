@@ -217,6 +217,13 @@ export const translations = {
     
     // Footer
     footer: "Numerologia folosește sistemul Pitagoreic pentru calculele numerice",
+    disclaimer: "Interpretările sunt simbolice, pentru reflecție. Nu înlocuiesc decizii medicale, financiare, juridice sau de relație.",
+    aiWritten: "scris de un model",
+    dayTextTitle: "Textul zilei",
+    dayTextModel: "Scris de un model, în fiecare zi altfel",
+    dayTextLocal: "Compus de aplicație, mereu la fel",
+    dayTextNote: "Pe prima variantă, propozițiile compuse din harta ta pleacă spre furnizorul modelului. Pe a doua, nu pleacă nimic.",
+    aiConsultantNote: "Răspunsurile de aici sunt scrise de un model de limbaj. Ca să răspundă despre harta ta, îi trimitem cifrele ei — nu numele și nu data nașterii.",
     
     // Extended meanings
     extendedMeanings: {
@@ -627,6 +634,13 @@ export const translations = {
     
     // Footer
     footer: "Numerology uses the Pythagorean system for numeric calculations",
+    disclaimer: "These readings are symbolic, meant for reflection. They do not replace medical, financial, legal or relationship decisions.",
+    aiWritten: "written by a model",
+    dayTextTitle: "The day's text",
+    dayTextModel: "Written by a model, different every day",
+    dayTextLocal: "Composed by the app, always the same",
+    dayTextNote: "On the first, the sentences composed from your chart go to the model's provider. On the second, nothing leaves.",
+    aiConsultantNote: "The answers here are written by a language model. So it can speak about your chart, we send it the numbers — not your name and not your birth date.",
     
     // Extended meanings
     extendedMeanings: {
@@ -1107,6 +1121,13 @@ export const translations = {
     
     // Footer
     footer: "Нумерология использует систему Пифагора для числовых расчётов",
+    disclaimer: "Толкования символичны и предназначены для размышления. Они не заменяют медицинских, финансовых, юридических или личных решений.",
+    aiWritten: "написано моделью",
+    dayTextTitle: "Текст дня",
+    dayTextModel: "Пишет модель — каждый день иначе",
+    dayTextLocal: "Составляет приложение — всегда одинаково",
+    dayTextNote: "В первом случае предложения, составленные из вашей карты, уходят к поставщику модели. Во втором не уходит ничего.",
+    aiConsultantNote: "Ответы здесь пишет языковая модель. Чтобы она говорила о вашей карте, мы отправляем ей числа — не имя и не дату рождения.",
     
     // Extended meanings
     extendedMeanings: {

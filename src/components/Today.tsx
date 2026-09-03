@@ -4,6 +4,7 @@ import { buildToday, type TodayLang } from "@/lib/today";
 import { Words } from "@/components/Words";
 import { api } from "@/services/api";
 import { formatCalendarDate } from "@/lib/calendarDate";
+import { useDayTextSource } from "@/hooks/use-day-text-source";
 
 /**
  * Ziua ta, în trei-patru fraze.
@@ -24,6 +25,8 @@ interface Copy {
   shadow: string;
   /** Cât se scrie ziua. O dată pe zi, deci merită spus ce se întâmplă. */
   writing: string;
+  /** Cine a scris textul. Obligatoriu, nu politețe -- vezi mai jos. */
+  byModel: string;
 }
 
 const COPY: Record<TodayLang, Copy> = {
@@ -33,6 +36,7 @@ const COPY: Record<TodayLang, Copy> = {
     light: "când merge",
     shadow: "când se strică",
     writing: "se scrie ziua ta…",
+    byModel: "scris de un model",
   },
   en: {
     kicker: "your day",
@@ -40,6 +44,7 @@ const COPY: Record<TodayLang, Copy> = {
     light: "when it works",
     shadow: "when it breaks",
     writing: "writing your day…",
+    byModel: "written by a model",
   },
   ru: {
     kicker: "ваш день",
@@ -47,6 +52,7 @@ const COPY: Record<TodayLang, Copy> = {
     light: "когда работает",
     shadow: "когда ломается",
     writing: "пишем ваш день…",
+    byModel: "написано моделью",
   },
 };
 
@@ -60,6 +66,7 @@ export const Today = ({
   today?: Date;
 }) => {
   const { language } = useLanguage();
+  const [textSource] = useDayTextSource();
   const lang = (language in COPY ? language : "en") as TodayLang;
   const copy = COPY[lang];
 
@@ -97,6 +104,13 @@ export const Today = ({
       intrebare: reading.ask,
     };
 
+    // Cine a ales textul compus local nu trimite nimic nicăieri. Cererea nu se
+    // face deloc -- nu se face și se ignoră răspunsul.
+    if (textSource === "local") {
+      setWritten(composed);
+      return () => { alive = false; };
+    }
+
     api
       .getTodayReading({
         date: formatCalendarDate(reading.date),
@@ -110,7 +124,7 @@ export const Today = ({
       .catch(() => { if (alive) setWritten(composed); });
 
     return () => { alive = false; };
-  }, [reading, lang]);
+  }, [reading, lang, textSource]);
 
   // Fraza e unitatea, ca la fir: puse una sub alta, se anulează.
   const beats = useMemo(
@@ -178,7 +192,25 @@ export const Today = ({
                 </span>
               </div>
 
-              <div className="mt-7 space-y-6">
+              {/* Cine a scris textul de dedesubt.
+                  Articolul 50 din AI Act, în vigoare de la 2 august 2026: un
+                  text generat trebuie să se vadă că e generat. Stă exact
+                  deasupra frazelor, fiindcă ghidul Comisiei spune că o singură
+                  notă în capul paginii nu ajunge acolo unde omul poate să nu
+                  vadă începutul conținutului.
+                  `data-ai-generated` e pentru marcarea citibilă de mașină, cu
+                  termen separat -- 2 decembrie 2026. Atributul e primul pas;
+                  restul se decide când se așază standardul. */}
+              {textSource === "model" && (
+              <div className="mt-7 flex items-center gap-3" data-ai-generated>
+                <span className="h-px w-10 shrink-0 bg-plate-gilt-dim" aria-hidden="true" />
+                <span className="num text-[0.6rem] uppercase tracking-[0.18em] text-plate-muted">
+                  {copy.byModel}
+                </span>
+              </div>
+              )}
+
+              <div className="mt-5 space-y-6">
                 {beats.map((text, i) => {
                   /**
                    * Toate frazele sunt în pagină de la început; ce se eșalonează
