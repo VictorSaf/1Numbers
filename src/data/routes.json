@@ -185,6 +185,44 @@
     {
       "path": "/white-label",
       "kind": "internal"
+    },
+    {
+      "path": "/confidentialitate",
+      "kind": "public",
+      "priority": 0.3,
+      "meta": {
+        "ro": {
+          "title": "Confidențialitate — Ce date ținem și cum le poți lua înapoi",
+          "description": "Ce date ținem, de ce, cui ajung și cum le poți descărca sau șterge."
+        },
+        "en": {
+          "title": "Privacy — What we hold and how to take it back",
+          "description": "What we hold, why, who receives it, and how to download or delete it."
+        },
+        "ru": {
+          "title": "Конфиденциальность — что мы храним и как это забрать",
+          "description": "Что мы храним, зачем, кому это уходит и как скачать или удалить."
+        }
+      }
+    },
+    {
+      "path": "/termeni",
+      "kind": "public",
+      "priority": 0.3,
+      "meta": {
+        "ro": {
+          "title": "Termeni — Ce îți dăm și ce îți cerem",
+          "description": "Ce este serviciul, ce ține de contul tău și ce nu promitem."
+        },
+        "en": {
+          "title": "Terms — What we give and what we ask",
+          "description": "What the service is, what your account covers, and what we do not promise."
+        },
+        "ru": {
+          "title": "Условия — что мы даём и о чём просим",
+          "description": "Что это за сервис, что относится к аккаунту и чего мы не обещаем."
+        }
+      }
     }
   ],
   "redirects": [

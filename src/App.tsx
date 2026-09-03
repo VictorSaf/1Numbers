@@ -29,6 +29,8 @@ const Premium = lazy(() => import("./pages/Premium"));
 const Friends = lazy(() => import("./pages/Friends"));
 const ChaldeanAnalysis = lazy(() => import("./pages/ChaldeanAnalysis"));
 const Remedies = lazy(() => import("./pages/Remedies"));
+const Privacy = lazy(() => import("./pages/Legal").then((m) => ({ default: m.Privacy })));
+const Terms = lazy(() => import("./pages/Legal").then((m) => ({ default: m.Terms })));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Internal pages are constructed only when the build includes them. The ternary
@@ -53,6 +55,8 @@ const PAGES: Record<string, ComponentType | null> = {
   "/invata": Learn,
   "/chaldean": ChaldeanAnalysis,
   "/remedies": Remedies,
+  "/confidentialitate": Privacy,
+  "/termeni": Terms,
   "/auth": Auth,
   "/eu": Profile,
   "/jurnal": Journal,

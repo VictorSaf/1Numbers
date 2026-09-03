@@ -218,6 +218,8 @@ export const translations = {
     // Footer
     footer: "Numerologia folosește sistemul Pitagoreic pentru calculele numerice",
     disclaimer: "Interpretările sunt simbolice, pentru reflecție. Nu înlocuiesc decizii medicale, financiare, juridice sau de relație.",
+    privacyLink: "Confidențialitate",
+    termsLink: "Termeni",
     accountTitle: "Datele tale",
     exportLabel: "Descarcă tot ce ținem despre tine",
     exportNote: "Un fișier JSON cu profilurile, jurnalul, citirile și preferințele tale. Parola și cheile de notificare nu sunt incluse — sunt credențiale, nu date despre tine.",
@@ -645,6 +647,8 @@ export const translations = {
     // Footer
     footer: "Numerology uses the Pythagorean system for numeric calculations",
     disclaimer: "These readings are symbolic, meant for reflection. They do not replace medical, financial, legal or relationship decisions.",
+    privacyLink: "Privacy",
+    termsLink: "Terms",
     accountTitle: "Your data",
     exportLabel: "Download everything we hold about you",
     exportNote: "A JSON file with your profiles, journal, readings and preferences. Your password and notification keys are not included — those are credentials, not data about you.",
@@ -1142,6 +1146,8 @@ export const translations = {
     // Footer
     footer: "Нумерология использует систему Пифагора для числовых расчётов",
     disclaimer: "Толкования символичны и предназначены для размышления. Они не заменяют медицинских, финансовых, юридических или личных решений.",
+    privacyLink: "Конфиденциальность",
+    termsLink: "Условия",
     accountTitle: "Ваши данные",
     exportLabel: "Скачать всё, что мы о вас храним",
     exportNote: "Файл JSON с вашими профилями, дневником, чтениями и настройками. Пароль и ключи уведомлений не входят — это учётные данные, а не данные о вас.",
