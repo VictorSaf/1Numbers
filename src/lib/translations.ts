@@ -218,7 +218,6 @@ export const translations = {
     // Footer
     footer: "Numerologia folosește sistemul Pitagoreic pentru calculele numerice",
     disclaimer: "Interpretările sunt simbolice, pentru reflecție. Nu înlocuiesc decizii medicale, financiare, juridice sau de relație.",
-    aiWritten: "scris de un model",
     dayTextTitle: "Textul zilei",
     dayTextModel: "Scris de un model, în fiecare zi altfel",
     dayTextLocal: "Compus de aplicație, mereu la fel",
@@ -635,7 +634,6 @@ export const translations = {
     // Footer
     footer: "Numerology uses the Pythagorean system for numeric calculations",
     disclaimer: "These readings are symbolic, meant for reflection. They do not replace medical, financial, legal or relationship decisions.",
-    aiWritten: "written by a model",
     dayTextTitle: "The day's text",
     dayTextModel: "Written by a model, different every day",
     dayTextLocal: "Composed by the app, always the same",
@@ -1122,7 +1120,6 @@ export const translations = {
     // Footer
     footer: "Нумерология использует систему Пифагора для числовых расчётов",
     disclaimer: "Толкования символичны и предназначены для размышления. Они не заменяют медицинских, финансовых, юридических или личных решений.",
-    aiWritten: "написано моделью",
     dayTextTitle: "Текст дня",
     dayTextModel: "Пишет модель — каждый день иначе",
     dayTextLocal: "Составляет приложение — всегда одинаково",

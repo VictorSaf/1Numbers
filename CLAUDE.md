@@ -15,6 +15,9 @@ npm run build         # Build without the internal routes
 npm run build:internal # Build WITH /admin, /design-system, /white-label — use
                       # this one to deploy the machine that serves. See Routing.
 npm run lint          # Run ESLint
+npm run typecheck     # tsc -b --noEmit. USE THIS ONE. `npx tsc --noEmit` from the
+                      # repo root checks ZERO files: tsconfig.json has "files": []
+                      # and only project references, so it exits 0 on anything.
 npm run test          # Run tests in watch mode
 npm run test:run      # Run tests once
 npm run test:coverage # Coverage report (targets src/lib/)
@@ -101,15 +104,36 @@ recorded in `schema_migrations`; `npm run migrate` is a no-op once they are all
 in. A failing migration rolls back alone and stops the run.
 
 They are not replayable: `CREATE TRIGGER` in 004, 006 and 007 has no
-`IF NOT EXISTS`, and 005 and 009 seed `subscription_plans` without
-`ON CONFLICT`. Against a database that already carries the schema but has no
+`IF NOT EXISTS`, and 009 seeds `subscription_plans` without `ON CONFLICT`.
+(005 seeds the same table but *does* carry `ON CONFLICT (name) DO NOTHING`;
+this file used to name it alongside 009, wrongly. The inserts in 006 and 007
+sit inside function bodies, not seeds.)
+
+Numbering has a gap: 011 does not exist, and never did. Next free is 017. Against a database that already carries the schema but has no
 `schema_migrations` — which is what the live one was until 2026-08-30 — run
 `npm run migrate -- --baseline` once, then migrate normally from there.
 
 ### Auth
 
 JWT issued by the Express API in `server/`, held in `localStorage`, attached by
-`src/services/api.ts` and surfaced through `AuthContext`. There is no Supabase —
+`src/services/api.ts` and surfaced through `AuthContext`.
+
+Seven routes: `login`, `register`, `me`, `forgot`, `reset`, `verify-email`,
+`resend-verification`. `/forgot` returns the same answer whether or not the
+address has an account — otherwise it tells you who is signed up. Tokens for the
+email flows live in `auth_tokens` (migration 015) as **hashes**, one row per
+action, single use, 30 minutes; `server/src/lib/authTokens.ts` is the only place
+they are minted or consumed.
+
+`authenticateToken` asks `lib/sessions.ts` whether the password changed after the
+JWT was issued, and refuses stale ones — that is what makes "signed out on every
+device" true after a reset. It costs one primary-key read per authenticated
+request. It lives in its own module rather than inline because the test doubles
+prime `pool.query` positionally: inline, a new read on the hot path broke 84
+tests across 12 files. `src/__tests__/setup.ts` primes it once, for all of them.
+
+Email leaves through `server/src/lib/email.ts` — one POST, no SDK, no dependency.
+Without `RESEND_API_KEY` nothing is sent *and* nothing pretends it was. There is no Supabase —
 the dead client, its folder și cheile sale were removed on 2026-08-30. Likewise
 there is no Python backend, Docker stack or Kubernetes deployment; the versions
 of those that used to sit in this repo never ran.
@@ -155,11 +179,36 @@ Three faces, each with a job: **Literata** for headings and interpretation prose
 an unbalanced plane. They are deliberately not `--crit`/`--ok`: a bridge of 6 is
 a distance, not an error.
 
-Custom utilities: `.text-gradient-gold`, `.glow-gold`, `.card-mystic`, `.number-display`, `.btn-mystic`
+Nimic nu e închis într-o cutie. Un bloc se anunță cu o LINIE și un titlu, iar
+textul stă direct pe pagină; `.card-mystic` și `Card` păstrează doar filetul de
+sus, iar câmpurile sunt rânduri cu filet dedesubt, nu casete. Culoarea semantică
+stă pe linie, nu pe umplutură.
+
+Singura suprafață plină e **placa** — `bg-plate` plus `.plate-sky` — folosită de
+frontispiciu (`PagePlate`) și de capul de secțiune numerotat (`SectionHead`), și
+nicăieri altundeva. Nu urmează tema: e un obiect. Ce intră în ea primește
+`.on-plate`, care rescrie tokenii de culoare pentru suprafața închisă — altfel un
+câmp desenat cu `--line` ar fi invizibil pe tema deschisă.
+
+Utilitare: `.page-measure` (66rem, cu padding-ul o singură dată, aici),
+`.page-rhythm` (56px între blocuri), `.section-rhythm` (32px), `.card-mystic`,
+`.number-display`, `.btn-primary`, `.plate-sky`, `.on-plate`.
+
+`.text-gradient-gold`, `.glow-gold` și `.btn-mystic` erau citate aici, dar nu
+existau în CSS: 24 de fișiere le foloseau fără să emită nimic.
 
 ### Routes
 
-`/` (calculator), `/guide`, `/compatibility`, `/predictions`, `/tools`, `/tutorials`, `/faq`, `/auth`, `/profile`, `/journal`, `/courses`, `/articles`, `/premium`
+`/` (harta), `/doi`, `/azi`, `/unelte`, `/invata`, `/chaldean`, `/remedies`,
+`/raport` — publice. `/auth`, `/eu`, `/jurnal`, `/cercul-meu`, `/invite/:code` —
+au nevoie de cont. `/admin`, `/design-system`, `/white-label` — interne.
+
+Adresele englezești (`/guide`, `/compatibility`, `/predictions`, `/tools`,
+`/profile`, `/journal`, `/premium`…) sunt REDIRECTURI către cele de mai sus, nu
+rute. Lista lor stă tot în `routes.json`.
+
+`/unelte` e un lansator: fără parametru arată cele opt unelte ca destinații,
+`?s=<unealtă>` deschide una. Redirecturile intră direct pe unealta lor.
 
 ## Key Files
 

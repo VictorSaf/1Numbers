@@ -181,7 +181,9 @@ const Auth = () => {
       .catch(() => { if (alive) setNotice(l.resetBad); })
       .finally(() => { if (alive) navigate('/auth', { replace: true }); });
     return () => { alive = false; };
-  }, [tokens.verify]);
+    // Efectul se autolimitează: `navigate` golește adresa, deci `tokens.verify`
+    // devine null și a doua rulare iese imediat.
+  }, [tokens.verify, l.verified, l.resetBad, navigate]);
 
   // Linkul de resetare deschide ecranul de parolă nouă.
   useEffect(() => {
