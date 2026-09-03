@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
+import accountRoutes from './routes/account';
 import profileRoutes from './routes/profiles';
 import journalRoutes from './routes/journal';
 import subscriptionRoutes from './routes/subscriptions';
@@ -83,6 +84,7 @@ app.use((req, res, next) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/account', accountRoutes);
 app.use('/api/profiles', profileRoutes);
 app.use('/api/journal', journalRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);

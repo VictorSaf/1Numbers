@@ -32,6 +32,7 @@ import { ProfileComparison } from '@/components/ProfileComparison';
 import { AIConsultant } from '@/components/AIConsultant';
 import { NotificationSettings } from '@/components/NotificationSettings';
 import { DayTextChoice } from '@/components/DayTextChoice';
+import { AccountControls } from '@/components/AccountControls';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { SectionHead } from '@/components/layout/SectionHead';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -376,6 +377,17 @@ const Profile = () => {
                 <p className="text-xs text-muted-foreground">
                   {t.fullNameHint}
                 </p>
+                {/* Harta altcuiva înseamnă numele și data nașterii unui om care
+                    n-a fost întrebat. Se spune la locul unde se introduc, nu
+                    doar în politica de confidențialitate: cine completează
+                    formularul e cel care trebuie s-o citească.
+                    Apare doar când NU e propria hartă -- pe a ta, nota ar fi
+                    zgomot. */}
+                {formData.category !== 'eu' && (
+                  <p className="max-w-[62ch] border-t border-line pt-3 text-xs leading-relaxed text-muted-foreground">
+                    {t.othersNote}
+                  </p>
+                )}
               </div>
 
               {/* Category */}
@@ -527,6 +539,8 @@ const Profile = () => {
           <DayTextChoice />
 
           <NotificationSettings />
+
+          <AccountControls />
         </div>
       </main>
 

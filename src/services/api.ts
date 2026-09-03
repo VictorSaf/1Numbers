@@ -128,6 +128,37 @@ class ApiService {
     });
   }
 
+  /** Cere ștergerea contului. Nu șterge -- trimite confirmarea pe email. */
+  async requestAccountDeletion(language: string) {
+    return this.request<{ success: boolean }>('/account/deletion-request', {
+      method: 'POST',
+      body: { language },
+    });
+  }
+
+  /** Șterge, pe baza jetonului din email. */
+  async confirmAccountDeletion(token: string) {
+    return this.request<{ success: boolean }>('/account/delete', {
+      method: 'POST',
+      body: { token },
+    });
+  }
+
+  /**
+   * Descarcă tot ce ținem despre om.
+   *
+   * Nu trece prin `request`: acela citește JSON și îl întoarce ca obiect, iar
+   * aici vrem FIȘIERUL. Portabilitatea înseamnă ceva ce poți lua cu tine, nu
+   * ceva ce se afișează.
+   */
+  async exportMyData(): Promise<Blob> {
+    const res = await fetch(`${this.baseUrl}/account/export`, {
+      headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+    });
+    if (!res.ok) throw new Error(String(res.status));
+    return res.blob();
+  }
+
   async logout() {
     // Clear token locally, backend doesn't need to do anything for JWT
     this.setToken(null);
