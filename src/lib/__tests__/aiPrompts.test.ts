@@ -32,9 +32,31 @@ describe('buildAIPrompt separă profilul de întrebare', () => {
   it('pune numerele calculate în profileContext', () => {
     const result = buildAIPrompt('Ce înseamnă 7?', context());
 
-    expect(result.profileContext).toContain('Ana Popescu');
     expect(result.profileContext).toContain('Drumul Vieții');
     expect(result.profileContext).toContain('GRILA LO SHU');
+  });
+
+  it('NU trimite numele și nu trimite data nașterii', () => {
+    // Șirul ăsta e chiar ce pleacă peste rețea către model. Aici scriau numele
+    // complet și data nașterii în clar -- iar testul de dinainte cerea să fie
+    // acolo, deci păzea scurgerea în loc s-o oprească.
+    //
+    // Modelul n-are nevoie de niciunul: toate numerele din prompt sunt deja
+    // calculate din ele, în browser. Numele plus data nașterii identifică un
+    // om; „Drumul Vieții: 3” nu identifică pe nimeni.
+    const result = buildAIPrompt('Ce înseamnă 7?', context());
+
+    expect(result.profileContext).not.toContain('Ana');
+    expect(result.profileContext).not.toContain('Popescu');
+    expect(result.profileContext).not.toMatch(/1990-05-15|15\.05\.1990|15\/05\/1990/);
+  });
+
+  it('păstrează vârsta, fiindcă schimbă răspunsul', () => {
+    // Un vârf la 28 de ani și unul la 58 se citesc altfel. Vârsta e un număr,
+    // nu o dată de naștere.
+    const result = buildAIPrompt('Ce înseamnă 7?', context());
+
+    expect(result.profileContext).toMatch(/Vârsta: 36/);
   });
 
   it('nu mai împachetează istoricul în niciunul dintre câmpuri', () => {

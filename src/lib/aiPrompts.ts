@@ -76,8 +76,7 @@ export function buildUserContext(context: AIContext): string {
   const contextLabels: Record<Language, Record<string, string>> = {
     ro: {
       userProfile: 'PROFILUL NUMEROLOGIC AL UTILIZATORULUI',
-      name: 'Nume',
-      birthDate: 'Data nașterii',
+      age: 'Vârsta',
       coreNumbers: 'NUMERELE DE BAZĂ',
       lifePath: 'Drumul Vieții',
       destiny: 'Destinul',
@@ -104,8 +103,7 @@ export function buildUserContext(context: AIContext): string {
     },
     en: {
       userProfile: 'USER NUMEROLOGY PROFILE',
-      name: 'Name',
-      birthDate: 'Birth Date',
+      age: 'Age',
       coreNumbers: 'CORE NUMBERS',
       lifePath: 'Life Path',
       destiny: 'Destiny',
@@ -132,8 +130,7 @@ export function buildUserContext(context: AIContext): string {
     },
     ru: {
       userProfile: 'НУМЕРОЛОГИЧЕСКИЙ ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ',
-      name: 'Имя',
-      birthDate: 'Дата рождения',
+      age: 'Возраст',
       coreNumbers: 'ОСНОВНЫЕ ЧИСЛА',
       lifePath: 'Жизненный Путь',
       destiny: 'Судьба',
@@ -167,10 +164,21 @@ export function buildUserContext(context: AIContext): string {
   const currentPinnacle = pinnacles.find(p => age >= p.startAge && age <= p.endAge);
   const currentChallenge = challenges[0]; // First challenge is typically current
 
+  /**
+   * Ce pleacă spre model: CIFRELE, nu identitatea.
+   *
+   * Aici scriau numele complet și data nașterii în clar, iar șirul ăsta e chiar
+   * ce se trimite peste rețea. Modelul n-are nevoie de niciunul ca să răspundă
+   * despre numerologie -- toate numerele de mai jos sunt deja calculate din ele,
+   * în browser. Numele plus data nașterii identifică un om; „Drumul Vieții: 7”
+   * nu identifică pe nimeni.
+   *
+   * Vârsta rămâne, fiindcă chiar schimbă răspunsul: un vârf la 28 de ani și
+   * unul la 58 se citesc altfel. E un număr, nu o dată.
+   */
   let contextString = `
 === ${l.userProfile} ===
-${l.name}: ${fullName}
-${l.birthDate}: ${birthDate.toISOString().split('T')[0]}
+${l.age}: ${age}
 
 === ${l.coreNumbers} ===
 ${l.lifePath}: ${lifePath}
