@@ -55,6 +55,26 @@ describe("colours live in tokens", () => {
     }
   });
 
+  it("defines every token tailwind.config asks for", () => {
+    // Cea mai tăcută categorie de defect din tot fișierul ăsta.
+    //
+    // `tailwind.config.ts` trimitea `destructive` către `--error-foreground`,
+    // pe care index.css nu-l definea. Clasa se emitea -- `color:
+    // hsl(var(--error-foreground))` -- dar variabila nu exista, deci
+    // declarația era invalidă, deci proprietatea nu se aplica deloc și textul
+    // moștenea culoarea părintelui. Pe temă întunecată: aproape alb pe roșu
+    // deschis, raport 2,37, într-un toast de eroare.
+    //
+    // Zece tokeni erau în starea asta. Nimic nu se plângea: nici build, nici
+    // typecheck, nici lint. Se vedea doar uitându-te la ecran, sau măsurând.
+    const config = readFileSync(join(ROOT, "tailwind.config.ts"), "utf8");
+    const cerute = new Set([...config.matchAll(/hsl\(var\((--[\w-]+)\)/g)].map((m) => m[1]));
+    const definiti = new Set([...CSS.matchAll(/^\s*(--[\w-]+):/gm)].map((m) => m[1]));
+    const lipsa = [...cerute].filter((t) => !definiti.has(t));
+
+    expect(lipsa, "tokens tailwind.config uses that index.css never defines").toEqual([]);
+  });
+
   it("keeps the plate scope a remapping, never a fifth palette", () => {
     // Every value in it must point at another token. The moment one carries a
     // raw triple, the plate has its own colours and the four palettes are five.

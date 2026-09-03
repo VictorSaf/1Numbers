@@ -350,6 +350,31 @@
     --warning: var(--warn);
     --error: var(--crit);
 
+    /* Zece tokeni pe care tailwind.config îi cerea fără să existe aici.
+       O clasă ca `text-destructive-foreground` producea
+       `color: hsl(var(--error-foreground))` -- variabilă nedefinită, deci
+       declarație invalidă, deci proprietatea nu se aplica DELOC și textul
+       moștenea culoarea părintelui. Pe temă închisă asta însemna text
+       aproape alb pe roșu deschis: raport 2,37, adică ilizibil exact în
+       clipa în care omul trebuie să citească o eroare.
+       Nu dădea nicio eroare nicăieri: nici build, nici typecheck, nici lint.
+       Un test le păzește acum.
+
+       Perechile `*-foreground` iau `--surface`, care se inversează singur:
+       alb pe roșu închis la temă deschisă, închis pe roșu deschis la temă
+       întunecată -- exact ce cere fiecare. */
+    --error-foreground: var(--surface);
+    --success-foreground: var(--surface);
+    --warning-foreground: var(--surface);
+    --info: var(--accent);
+    --info-foreground: var(--surface);
+    --secondary-hover: var(--sunken);
+    --secondary-light: var(--surface-2);
+    --card-hover: var(--surface-2);
+    --border-hover: var(--line-2);
+    --muted-border: var(--line);
+    --popover-border: var(--line);
+
     /* Brand and decoration, derived from the palette rather than restated.
        --primary is what Tailwind resolves for bg-primary and text-primary, so it
        has to exist: without it every accented control in the app loses its

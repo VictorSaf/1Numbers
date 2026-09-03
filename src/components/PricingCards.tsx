@@ -258,13 +258,13 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
             >
               {/* Badge */}
               {isHighlighted && (
-                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">
+                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-background px-2">
                   <Sparkles className="h-3 w-3 mr-1" />
                   {t.mostPopular}
                 </Badge>
               )}
               {tier.id === 'pro' && (
-                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">
+                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-background px-2">
                   <Crown className="h-3 w-3 mr-1" />
                   {t.bestValue}
                 </Badge>
@@ -318,9 +318,12 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
                       {feature.included ? (
                         <Check className="h-5 w-5 text-ok shrink-0 mt-0.5" />
                       ) : (
-                        <X className="h-5 w-5 text-muted-foreground/50 shrink-0 mt-0.5" />
+                        <X className="h-5 w-5 text-tension shrink-0 mt-0.5" />
                       )}
-                      <div className={!feature.included ? 'text-muted-foreground/50' : ''}>
+                      {/* Jumătatea de opacitate scotea textul la 2,49 -- de
+                          necitit, nu doar estompat. Ce nu e inclus se vede din
+                          iconiță; textul rămâne lizibil. */}
+                      <div className={!feature.included ? 'text-muted-foreground' : ''}>
                         <span className="text-sm font-medium">
                           {feature.name[language] || feature.name.en}
                         </span>
