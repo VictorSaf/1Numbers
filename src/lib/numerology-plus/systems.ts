@@ -105,6 +105,8 @@ export function kuaNumber(year: number, gender: 'male' | 'female', era: KuaEra =
   if (gender === 'male') {
     kua = (post2000 ? 9 : 10) - d;
     if (kua <= 0) kua += 9;
+    // Anii cu ultimele două cifre de sumă 0 (1900, 2000) dau 10: se reduce, ca la femei.
+    if (kua > 9) kua = reduce(kua, false);
     if (kua === 5) kua = 2;
   } else {
     kua = d + (post2000 ? 6 : 5);

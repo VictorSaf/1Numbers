@@ -82,7 +82,7 @@ export async function renderShareCard(list: Comparison[], text: CardText): Promi
     for (const l of wrap(ctx, c.question, W - 2 * P)) { ctx.fillText(l, P, y); y += 44; }
     ctx.font = "44px 'IBM Plex Mono', ui-monospace, monospace";
     ctx.fillStyle = c.verdict === "apart" ? tension : gilt;
-    ctx.fillText(c.groups.map((g) => g.display).join("  ·  "), P, y + 12);
+    ctx.fillText(c.groups.map((g) => g.display).join("  /  "), P, y + 12);
     y += 76;
     if (y > H - 200) break;
   }

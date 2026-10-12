@@ -166,11 +166,12 @@ const Row = ({ c, t }: { c: Comparison; t: (typeof COPY)[Lang] }) => (
         <span className="block font-heading text-base text-foreground sm:text-lg">{c.question}</span>
         <span className="mt-1 block text-xs text-muted-foreground">
           {t.verdict[c.verdict]}
-          {c.verdict !== "agree" && c.verdict !== "octave" && ` · ${t.spread} ${c.spread}`}
+          {c.verdict !== "agree" && c.verdict !== "octave" && c.scale !== "category" && ` · ${t.spread} ${c.spread}`}
         </span>
       </span>
       <span className="num shrink-0 text-right text-lg text-primary sm:text-xl">
-        {c.groups.map((g) => g.display).join("  ·  ")}
+        {/* Un grup e un răspuns; „/” le desparte, „·” stă în interiorul unei mulțimi. */}
+        {c.groups.map((g) => g.display).join("  /  ")}
       </span>
       <span className="num shrink-0 text-xs text-muted-foreground transition-transform group-open:rotate-90" aria-hidden="true">›</span>
     </summary>
