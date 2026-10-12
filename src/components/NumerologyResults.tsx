@@ -251,9 +251,9 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
   // One line per section, shown under its title whether it is open or closed.
   const teasers = {
     twoAnswers: {
-      ro: "Fiecare școală, cu calculul ei, și distanța dintre răspunsuri — cincisprezece întrebări.",
-      en: "Every school, with its arithmetic, and the distance between the answers — fifteen questions.",
-      ru: "Каждая школа со своим расчётом и расстояние между ответами — пятнадцать вопросов.",
+      ro: "Fiecare școală, cu calculul ei, și distanța dintre răspunsuri, la fiecare întrebare a hărții.",
+      en: "Every school, with its arithmetic, and the distance between the answers, for every question of the map.",
+      ru: "Каждая школа со своим расчётом и расстояние между ответами — по каждому вопросу карты.",
     },
     pinnacles: { ro: "Cele patru etape majore ale vieții tale și provocările fiecăreia.", en: "The four major stages of your life and the challenge of each.", ru: "Четыре главных этапа вашей жизни и вызов каждого." },
     lifeCycles: { ro: "Trei etape lungi, din luna, ziua și anul nașterii.", en: "Three long stages, from the month, day and year of your birth.", ru: "Три долгих этапа — из месяца, дня и года рождения." },

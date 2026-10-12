@@ -128,6 +128,8 @@ const Q: Record<string, T3> = {
   luckyNumbers: { ro: "Ce numere îți sunt prielnice?", en: "Which numbers favour you?", ru: "Какие числа вам благоприятны?" },
   luckyDays: { ro: "În ce zile ai vânt din spate?", en: "On which days is the wind at your back?", ru: "В какие дни вам сопутствует удача?" },
   kua: { ro: "Ce număr Kua ai?", en: "What is your Kua number?", ru: "Какое у вас число Гуа?" },
+  key: { ro: "Unde crești?", en: "Where do you grow?", ru: "Где вы растёте?" },
+  intensity: { ro: "Ce trăsături ai peste medie?", en: "Which traits are above average?", ru: "Какие черты выше среднего?" },
 };
 
 const S = (ro: string, en: string, ru: string): T3 => ({ ro, en, ru });
@@ -760,6 +762,68 @@ function kuaDefs(b: BirthDate, gender: "male" | "female"): Def[] {
   ];
 }
 
+function keyDefs(name: string): Def[] {
+  const first = nameParts(name)[0] ?? "";
+  const p = sumLetters(first, PYTHAGOREAN);
+  const c = sumLetters(first, CHALDEAN);
+  return [
+    {
+      id: "pyth",
+      school: S("Key / Growth Number (Goodwin)", "Key / Growth Number (Goodwin)", "Ключевое число (Гудвин)"),
+      method: S("prenumele, pitagoreic", "the first name, Pythagorean", "имя, пифагорейская"),
+      value: reduce(p, true),
+      steps: [...letterSteps(first, PYTHAGOREAN), chain(p)],
+    },
+    {
+      id: "chaldean",
+      school: S("Prenumele, caldeean", "The first name, Chaldean", "Имя, халдейская"),
+      method: S("prenumele, prin alfabetul caldeean", "the first name, through the Chaldean alphabet", "имя по халдейскому алфавиту"),
+      value: reduce(c, false),
+      steps: [...letterSteps(first, CHALDEAN), chain(c, false)],
+    },
+  ];
+}
+
+/**
+ * Media așteptată a tabelului de incluziune. Două convenții:
+ * - tabelul fix al lui Goodwin pentru un nume de ~18 litere [K — de verificat în
+ *   carte], scalat la lungimea numelui;
+ * - proporția literelor din alfabet care cad pe fiecare cifră, × lungimea numelui.
+ * O cifră e „peste medie" când apare de cel puțin două ori mai des decât media.
+ */
+const GOODWIN_AVG: Record<number, number> = { 1: 3.5, 2: 1.5, 3: 1.5, 4: 1, 5: 3.5, 6: 1.5, 7: 0.5, 8: 1, 9: 3 };
+
+function intensityDefs(name: string): Def[] {
+  const ls = letters(name);
+  const n = ls.length || 1;
+  const count: Record<number, number> = {};
+  for (const ch of ls) { const v = PYTHAGOREAN[ch]; if (v) count[v] = (count[v] ?? 0) + 1; }
+  const alpha: Record<number, number> = {};
+  for (const ch of "ABCDEFGHIJKLMNOPQRSTUVWXYZ") alpha[PYTHAGOREAN[ch]] = (alpha[PYTHAGOREAN[ch]] ?? 0) + 1;
+  const goodwinTotal = Object.values(GOODWIN_AVG).reduce((a, x) => a + x, 0);
+  const digits = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  const over = (exp: (d: number) => number) => digits.filter((d) => (count[d] ?? 0) >= Math.max(2, 2 * exp(d)));
+  const g = (d: number) => (GOODWIN_AVG[d] * n) / goodwinTotal;
+  const a = (d: number) => (alpha[d] * n) / 26;
+  const fmt = (exp: (d: number) => number) => digits.map((d) => `${d}: ${count[d] ?? 0}/${exp(d).toFixed(1)}`).join("  ");
+  return [
+    {
+      id: "goodwin",
+      school: S("Media lui Goodwin", "Goodwin's average", "Среднее по Гудвину"),
+      method: S("tabelul fix al unui nume obișnuit, scalat la numele tău", "the fixed table of an ordinary name, scaled to yours", "фиксированная таблица обычного имени, масштаб под ваше"),
+      value: over(g),
+      steps: [fmt(g)],
+    },
+    {
+      id: "alphabet",
+      school: S("Proporția alfabetului", "The alphabet's proportion", "Пропорция алфавита"),
+      method: S("câte litere din alfabet cad pe fiecare cifră", "how many letters of the alphabet land on each digit", "сколько букв алфавита приходится на каждую цифру"),
+      value: over(a),
+      steps: [fmt(a)],
+    },
+  ];
+}
+
 // ─────────────────────────────────────────────────────────────
 // Punctul de intrare
 // ─────────────────────────────────────────────────────────────
@@ -804,6 +868,8 @@ export function compareAll(fullName: string, birthDate: Date, opts: CompareOptio
     build("gift", "digit", giftDefs(fullName, b), lang, num),
     build("missing", "set", missingDefs(fullName, birthDate, b), lang, sf),
     build("balance", "digit", balanceDefs(fullName), lang, num),
+    build("key", "digit", keyDefs(fullName), lang, num),
+    build("intensity", "set", intensityDefs(fullName), lang, sf),
     build("passion", "set", passionDefs(fullName, b), lang, sf),
     build("debts", "set", debtDefs(fullName, b), lang, sf),
     build("birthArchetype", "arcana", birthArchetypeDefs(b), lang, num),

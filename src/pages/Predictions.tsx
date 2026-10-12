@@ -26,6 +26,7 @@ import { DailyPredictionCard } from '@/components/DailyPredictionCard';
 import { WeeklyMonthlyPredictionCard } from '@/components/WeeklyMonthlyPredictionCard';
 import { BirthDateSelect } from "@/components/BirthDateSelect";
 import { DayNavigator } from '@/components/predictions/DayNavigator';
+import { CalendarAndHours } from '@/components/predictions/CalendarAndHours';
 import { useSelectedDay } from '@/hooks/use-selected-day';
 import { getDayContent } from '@/lib/dayContent';
 
@@ -415,6 +416,8 @@ const Predictions = () => {
               </TabsContent>
             </Tabs>
           )}
+
+          {birthDate && <CalendarAndHours birthDate={birthDate} />}
 
           {/* Change birth date button */}
           {birthDate && (
