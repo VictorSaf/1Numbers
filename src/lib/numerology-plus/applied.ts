@@ -79,28 +79,6 @@ export function homophoneScore(numberString: string) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// C2 / C3 — Telefon și număr de înmatriculare (ambele motoare)
-// ═══════════════════════════════════════════════════════════
-
-export function phoneNumerology(phone: string) {
-  const digits = phone.replace(/\D/g, '');
-  const western = result(digits.split('').reduce((a, d) => a + Number(d), 0), false);
-  return { digits, western, eastern: homophoneScore(digits) };
-}
-
-export function vehicleNumerology(plate: string) {
-  const digits = plate.replace(/\D/g, '');
-  const letterSum = sumLetters(plate, PYTHAGOREAN);
-  const digitSumTotal = digits.split('').reduce((a, d) => a + Number(d), 0);
-  return {
-    plate: plate.toUpperCase(),
-    western: result(digitSumTotal + letterSum, false),
-    digitsOnly: result(digitSumTotal, false),
-    eastern: homophoneScore(digits),
-  };
-}
-
-// ═══════════════════════════════════════════════════════════
 // C4 — Numerologia numelui de bebeluș
 // ═══════════════════════════════════════════════════════════
 

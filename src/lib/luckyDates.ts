@@ -168,29 +168,6 @@ export const findLuckyDates = (
   return { dates, bestDates, personalNumbers };
 };
 
-// Get lucky dates for specific purposes
-export const getLuckyDatesForPurpose = (
-  birthDate: Date,
-  fullName: string,
-  purpose: 'business' | 'romance' | 'travel' | 'health' | 'general',
-  month: number,
-  year: number
-): LuckyDatesResult => {
-  const startDate = new Date(year, month - 1, 1);
-  const endDate = new Date(year, month, 0);
-  
-  // Adjust min score based on purpose
-  const purposeMinScore: Record<string, number> = {
-    business: 40,
-    romance: 35,
-    travel: 30,
-    health: 35,
-    general: 25,
-  };
-  
-  return findLuckyDates(birthDate, fullName, startDate, endDate, purposeMinScore[purpose]);
-};
-
 // Get next lucky date from today
 export const getNextLuckyDate = (
   birthDate: Date,

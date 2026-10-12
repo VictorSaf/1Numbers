@@ -1,7 +1,6 @@
 import { compatibility, type RelationshipType } from "@/lib/numerology-plus/applied";
 import { toBirthDate } from "@/lib/numerology-plus/core";
 import { mulank, VEDIC_RELATIONS } from "@/lib/numerology-plus/systems";
-import { ARCHETYPES } from "@/lib/numerology-plus/content/archetypes";
 
 /**
  * Unde cele două hărți se judecă de două ori.
@@ -55,8 +54,6 @@ export interface CoupleDisagreements {
   spread: Spread;
   traditions: TraditionVerdict;
 }
-
-const archetype = (n: number) => ARCHETYPES.find((a) => a.n === n) ?? ARCHETYPES[0];
 
 const COPY: Record<CoupleLang, {
   parts: Record<string, string>;
@@ -209,6 +206,3 @@ export function findCoupleDisagreements(
 
   return { spread, traditions };
 }
-
-/** Esența unei cifre, pentru interfață — ca să nu importe arhetipurile direct. */
-export const essenceOf = (n: number, lang: CoupleLang) => archetype(n).essence[lang];

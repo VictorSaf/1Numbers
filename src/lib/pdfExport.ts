@@ -18,6 +18,7 @@ import type { PinnacleData, ChallengeData } from './pinnacles';
 import { calculatePinnacles, calculateChallenges } from './pinnacles';
 import { getRemedyForNumber } from './remedies';
 import { generateLoShuGrid } from './loShuGrid';
+import { formatCalendarDate, parseCalendarDate } from './calendarDate';
 
 export interface ReportData {
   fullName: string;
@@ -88,7 +89,7 @@ export function generateReportData(data: ReportData): NumerologyReport {
     generatedAt: new Date(),
     person: {
       name: fullName,
-      birthDate: birthDate.toISOString().split('T')[0],
+      birthDate: formatCalendarDate(birthDate),
     },
     coreNumbers: {
       lifePath,
@@ -246,8 +247,8 @@ export function generateReportHTML(
   const t = reportTranslations[language] || reportTranslations.en;
   const primaryColor = whiteLabel?.primaryColor || '#6366f1';
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
+  const formatDate = (date: Date | null) => {
+    if (!date) return '';
     return date.toLocaleDateString(language === 'ro' ? 'ro-RO' : language === 'ru' ? 'ru-RU' : 'en-US', {
       year: 'numeric',
       month: 'long',
@@ -504,7 +505,7 @@ export function generateReportHTML(
     <header class="header">
       ${whiteLabel?.logo ? `<img src="${whiteLabel.logo}" alt="${whiteLabel.companyName}" class="white-label-logo">` : ''}
       <h1>${whiteLabel?.companyName || t.title}</h1>
-      <p class="subtitle">${t.generatedOn}: ${formatDate(report.generatedAt.toISOString())}</p>
+      <p class="subtitle">${t.generatedOn}: ${formatDate(report.generatedAt)}</p>
     </header>
 
     <section class="section">
@@ -516,7 +517,7 @@ export function generateReportHTML(
         </div>
         <div class="profile-item">
           <label>${t.birthDate}</label>
-          <value>${formatDate(report.person.birthDate)}</value>
+          <value>${formatDate(parseCalendarDate(report.person.birthDate))}</value>
         </div>
       </div>
     </section>
@@ -713,40 +714,4 @@ export function generateReportHTML(
 </body>
 </html>
 `;
-}
-
-// Export to PDF using browser print
-export function exportToPDF(
-  report: NumerologyReport,
-  language: string,
-  whiteLabel?: WhiteLabelConfig
-): void {
-  const html = generateReportHTML(report, language, whiteLabel);
-  const printWindow = window.open('', '_blank');
-
-  if (printWindow) {
-    printWindow.document.write(html);
-    printWindow.document.close();
-    printWindow.onload = () => {
-      printWindow.print();
-    };
-  }
-}
-
-// Download as HTML file
-export function downloadReport(
-  report: NumerologyReport,
-  language: string,
-  whiteLabel?: WhiteLabelConfig
-): void {
-  const html = generateReportHTML(report, language, whiteLabel);
-  const blob = new Blob([html], { type: 'text/html' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `numerology-report-${report.person.name.replace(/\s+/g, '-').toLowerCase()}.html`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
 }

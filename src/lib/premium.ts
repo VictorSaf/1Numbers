@@ -452,35 +452,6 @@ export function getTierById(tierId: PremiumTier): TierDefinition | undefined {
   return TIERS.find(t => t.id === tierId);
 }
 
-export function hasFeature(userTier: PremiumTier, featureId: string): boolean {
-  const tier = getTierById(userTier);
-  if (!tier) return false;
-
-  // Pro includes all Premium features
-  if (userTier === 'pro') {
-    const premiumTier = getTierById('premium');
-    const premiumHas = premiumTier?.features.some(f => f.id === featureId && f.included);
-    if (premiumHas) return true;
-  }
-
-  return tier.features.some(f => f.id === featureId && f.included);
-}
-
-export function getFeatureLimit(userTier: PremiumTier, featureId: string): number | 'unlimited' | null {
-  const tier = getTierById(userTier);
-  if (!tier) return null;
-
-  // Pro overrides for unlimited
-  if (userTier === 'pro') {
-    if (featureId === FEATURES.AI_CONSULTANT || featureId === FEATURES.COMPATIBILITY) {
-      return 'unlimited';
-    }
-  }
-
-  const feature = tier.features.find(f => f.id === featureId);
-  return feature?.limit ?? null;
-}
-
 export function formatPrice(price: number, currency: string): string {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -490,18 +461,4 @@ export function formatPrice(price: number, currency: string): string {
 
 export function calculateYearlySavings(monthly: number, yearly: number): number {
   return monthly * 12 - yearly;
-}
-
-// Feature comparison for upgrade prompts
-export function getUpgradeFeatures(currentTier: PremiumTier, targetTier: PremiumTier): TierFeature[] {
-  const current = getTierById(currentTier);
-  const target = getTierById(targetTier);
-
-  if (!current || !target) return [];
-
-  const currentFeatureIds = new Set(
-    current.features.filter(f => f.included).map(f => f.id)
-  );
-
-  return target.features.filter(f => f.included && !currentFeatureIds.has(f.id));
 }

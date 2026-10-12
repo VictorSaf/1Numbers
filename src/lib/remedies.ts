@@ -1029,28 +1029,6 @@ export function getAllRemedies(language: string = 'en'): NumberRemedy[] {
 }
 
 /**
- * Get color recommendation based on number
- */
-export function getColorRecommendation(number: number, language: string = 'en'): { wear: string[]; avoid: string[]; hex: string } | null {
-  const remedy = getRemedyForNumber(number, language);
-  if (!remedy) return null;
-  return {
-    wear: [remedy.colors.primary, ...remedy.colors.secondary],
-    avoid: remedy.colors.avoid,
-    hex: remedy.colors.hex,
-  };
-}
-
-/**
- * Get gemstone recommendation
- */
-export function getGemstoneRecommendation(number: number, language: string = 'en'): { primary: string; alternatives: string[]; metal: string } | null {
-  const remedy = getRemedyForNumber(number, language);
-  if (!remedy) return null;
-  return remedy.gemstones;
-}
-
-/**
  * Get daily remedy based on day of week
  */
 export function getDailyRemedy(date: Date, language: string = 'en'): { dayNumber: number; remedy: NumberRemedy } | null {
@@ -1072,4 +1050,3 @@ export function getDailyRemedy(date: Date, language: string = 'en'): { dayNumber
   if (!remedy) return null;
   return { dayNumber: number, remedy };
 }
-
