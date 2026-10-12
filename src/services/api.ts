@@ -121,13 +121,6 @@ class ApiService {
     });
   }
 
-  async resendVerification(language: string) {
-    return this.request<{ success: boolean; alreadyVerified?: boolean }>('/auth/resend-verification', {
-      method: 'POST',
-      body: { language },
-    });
-  }
-
   /** Cere ștergerea contului. Nu șterge -- trimite confirmarea pe email. */
   async requestAccountDeletion(language: string) {
     return this.request<{ success: boolean }>('/account/deletion-request', {
@@ -341,24 +334,10 @@ class ApiService {
   }
 
   // Subscription endpoints
-  async getSubscriptionPlans() {
-    return this.request<{ success: boolean; plans: unknown[] }>('/subscriptions/plans');
-  }
-
-  async getSubscriptionStatus() {
-    return this.request<{ success: boolean; subscription: unknown | null; plan: unknown; isPremium: boolean }>('/subscriptions/status');
-  }
-
   async createSubscription(data: { planId: number; billingPeriod?: 'monthly' | 'yearly' }) {
     return this.request<{ success: boolean; subscription: unknown }>('/subscriptions/create', {
       method: 'POST',
       body: data,
-    });
-  }
-
-  async cancelSubscription() {
-    return this.request<{ success: boolean; message: string; subscription: unknown }>('/subscriptions/cancel', {
-      method: 'POST',
     });
   }
 
@@ -369,43 +348,6 @@ class ApiService {
   // Tier and feature usage endpoints
   async getTierInfo() {
     return this.request<{ success: boolean; tierId: string; planName: string; isPremium: boolean; features: string[] }>('/subscriptions/tier');
-  }
-
-  async checkFeatureLimit(featureId: string, limit: number) {
-    return this.request<{ success: boolean; allowed: boolean; currentUsage: number; limit: number | 'unlimited' }>(
-      `/subscriptions/feature/${featureId}/check?limit=${limit}`
-    );
-  }
-
-  async useFeature(featureId: string) {
-    return this.request<{ success: boolean; newCount: number }>(`/subscriptions/feature/${featureId}/use`, {
-      method: 'POST',
-    });
-  }
-
-  async getFeatureUsage() {
-    return this.request<{ success: boolean; usage: Array<{ featureId: string; usageCount: number; periodStart: string; periodEnd: string }> }>('/subscriptions/usage');
-  }
-
-  // One-time purchases
-  async getPurchases() {
-    return this.request<{ success: boolean; purchases: Array<{
-      id: number;
-      productId: string;
-      productName: string;
-      price: number;
-      currency: string;
-      status: string;
-      purchasedAt: string;
-      expiresAt?: string;
-    }> }>('/subscriptions/purchases');
-  }
-
-  async createPurchase(data: { productId: string; productName: string; price: number; currency?: string; metadata?: Record<string, unknown> }) {
-    return this.request<{ success: boolean; purchase: unknown }>('/subscriptions/purchase', {
-      method: 'POST',
-      body: data,
-    });
   }
 
   // White label configuration (Pro users only)
@@ -447,121 +389,7 @@ class ApiService {
     });
   }
 
-  // Upgrade subscription
-  async upgradeSubscription(data: { targetTierId: string; billingPeriod?: 'monthly' | 'yearly' }) {
-    return this.request<{
-      success: boolean;
-      message: string;
-      subscription: unknown;
-      proratedCredit: string;
-    }>('/subscriptions/upgrade', {
-      method: 'POST',
-      body: data,
-    });
-  }
-
-  // Gamification endpoints
-  async getGamificationStats() {
-    return this.request<{ success: boolean; stats: unknown }>('/gamification/stats');
-  }
-
-  async getStreak() {
-    try {
-      const response = await this.getGamificationStats();
-      const stats = response.stats as { currentStreak?: number } | null;
-      return { success: true, streak: stats?.currentStreak || 0 };
-    } catch {
-      return { success: false, streak: 0 };
-    }
-  }
-
-  async getAchievements() {
-    return this.request<{ success: boolean; achievements: unknown[] }>('/gamification/achievements');
-  }
-
-  async getLeaderboard(period?: 'daily' | 'weekly' | 'monthly' | 'all_time') {
-    const query = period ? `?period=${period}` : '';
-    return this.request<{ success: boolean; leaderboard: unknown[] }>(`/gamification/leaderboard${query}`);
-  }
-
-  // Notifications endpoints
-  async registerPushSubscription(subscription: PushSubscription) {
-    return this.request<{ success: boolean }>('/notifications/subscribe', {
-      method: 'POST',
-      body: { subscription },
-    });
-  }
-
-  async getNotificationPreferences() {
-    return this.request<{ success: boolean; preferences: Record<string, boolean> }>('/notifications/preferences');
-  }
-
-  async updateNotificationPreferences(preferences: Record<string, boolean>) {
-    return this.request<{ success: boolean }>('/notifications/preferences', {
-      method: 'PUT',
-      body: { preferences },
-    });
-  }
-
-  // Friends endpoints
-  async getFriends() {
-    return this.request<{ success: boolean; friends: unknown[] }>('/friends');
-  }
-
-  async getFriendRequests() {
-    return this.request<{ success: boolean; received: unknown[]; sent: unknown[] }>('/friends/requests');
-  }
-
-  async sendFriendRequest(email: string) {
-    return this.request<{ success: boolean; request: unknown }>('/friends/request', {
-      method: 'POST',
-      body: { email },
-    });
-  }
-
-  async acceptFriendRequest(requestId: number) {
-    return this.request<{ success: boolean }>(`/friends/request/${requestId}/accept`, {
-      method: 'POST',
-    });
-  }
-
-  async removeFriend(friendId: number) {
-    return this.request<{ success: boolean }>(`/friends/${friendId}`, {
-      method: 'DELETE',
-    });
-  }
-
   // Admin endpoints
-  async getAdminDashboard() {
-    return this.request<{ totalUsers: number; activeUsers: number; premiumUsers: number; newUsersThisWeek: number }>('/admin/dashboard');
-  }
-
-  async getAdminUsers() {
-    return this.request<{ users: Array<{ id: number; email: string; name: string; role: string; createdAt: string }> }>('/admin/users');
-  }
-
-  async updateAdminUser(userId: number, data: { role?: string }) {
-    return this.request<{ user: unknown }>(`/admin/users/${userId}`, {
-      method: 'PATCH',
-      body: data,
-    });
-  }
-
-  async getAdminSettings() {
-    return this.request<{ settings: unknown }>('/admin/settings');
-  }
-
-  async updateAdminSettings(settings: Record<string, unknown>) {
-    return this.request<{ success: boolean; message: string }>('/admin/settings', {
-      method: 'PUT',
-      body: settings,
-    });
-  }
-
-  async getAdminAnalytics() {
-    return this.request<{ analytics: unknown }>('/admin/analytics');
-  }
-
   async getAdminAgents() {
     return this.request<{ agents: Array<{ name: string; filename: string; description: string; content: string }>; count: number }>('/admin/agents');
   }
