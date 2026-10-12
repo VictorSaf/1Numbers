@@ -120,42 +120,6 @@ const Forecast = () => (
   </svg>
 );
 
-/** Variante de nume, sortate după cifră. */
-const Optimizer = () => (
-  <svg viewBox="0 0 168 92" className={FIG} fill="none" aria-hidden="true">
-    <circle cx="40" cy="44" r="36" className="stroke-current" strokeWidth="1.25" opacity="0.7" />
-    {Array.from({ length: 9 }, (_, i) => {
-      const a = (i / 9) * Math.PI * 2 - Math.PI / 2;
-      const x = 40 + Math.cos(a) * 36;
-      const y = 44 + Math.sin(a) * 36;
-      const ales = i === 2;
-      return (
-        <g key={i}>
-          {ales && <path d={`M40 44L${x} ${y}`} className="stroke-gilt" strokeWidth="1.25" />}
-          <circle cx={x} cy={y} r={ales ? 5 : 3} className={ales ? "fill-gilt" : "fill-current"} opacity={ales ? 1 : 0.7} />
-        </g>
-      );
-    })}
-    <circle cx="40" cy="44" r="2.5" className="fill-current" />
-  </svg>
-);
-
-/** Toate perechile dintr-un grup, deodată. */
-const Matrix = () => (
-  <svg viewBox="0 0 168 92" className={FIG} fill="none" aria-hidden="true">
-    {Array.from({ length: 81 }, (_, i) => {
-      const c = i % 9;
-      const r = Math.floor(i / 9);
-      const x = c * 10;
-      const y = 4 + r * 10;
-      if (c === r) return <rect key={i} x={x} y={y} width="7" height="7" className="fill-gilt" />;
-      // Intensitatea ține locul scorului: o matrice ARATĂ unde e apropierea.
-      const forta = ((c * 3 + r * 5) % 7) / 7;
-      return <rect key={i} x={x} y={y} width="7" height="7" className="fill-current" opacity={0.2 + forta * 0.6} />;
-    })}
-  </svg>
-);
-
 export interface Tool {
   value: string;
   label: string;
@@ -169,8 +133,6 @@ const FIGURI: Record<string, () => ReactNode> = {
   "name-change": NameChange,
   business: Business,
   forecast: Forecast,
-  optimizer: Optimizer,
-  matrix: Matrix,
 };
 
 export const ToolTiles = ({

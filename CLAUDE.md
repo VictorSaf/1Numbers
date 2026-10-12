@@ -114,7 +114,7 @@ server/src/
 
 All numerology calculations are pure TypeScript functions:
 - `numerology.ts` - Life Path, Destiny, Soul Urge, Personality, Personal Year
-- `compatibility.ts` + `compatibilityMatrix.ts` - Compatibility scoring (Life Path 50%, Destiny 30%, Soul Urge 20%)
+- `compatibility.ts` - Compatibility scoring (Life Path 50%, Destiny 30%, Soul Urge 20%)
 - `karmic.ts` - Karmic debt (13, 14, 16, 19) and lessons
 - `personalCycles.ts` - Day/Month/Year cycles
 - `pinnacles.ts` - Life pinnacles and challenges

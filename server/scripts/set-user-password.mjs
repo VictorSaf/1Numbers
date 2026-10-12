@@ -100,15 +100,28 @@ if (password !== again) {
 // middleware-ul să refuze orice JWT emis înainte, deci sesiunile deschise cu
 // parola veche se închid. Fără el, cine avea contul îl păstra încă o săptămână
 // după ce i-ai schimbat parola de aici.
-await db.query(
-  'UPDATE users SET password_hash = $1, password_changed_at = now(), updated_at = now() WHERE id = $2',
-  [await bcrypt.hash(password, 10), found.rows[0].id],
-);
-// Linkurile de resetare încă nefolosite nu mai au ce debloca.
-await db.query(
-  "UPDATE auth_tokens SET used_at = now() WHERE user_id = $1 AND kind = 'reset_password' AND used_at IS NULL",
-  [found.rows[0].id],
-);
+// Într-o tranzacție: dacă a doua scriere cade, nu rămâne o parolă nouă cu
+// linkurile vechi de resetare încă valabile.
+const hash = await bcrypt.hash(password, 10);
+const tx = await db.connect();
+try {
+  await tx.query('BEGIN');
+  await tx.query(
+    'UPDATE users SET password_hash = $1, password_changed_at = now(), updated_at = now() WHERE id = $2',
+    [hash, found.rows[0].id],
+  );
+  // Linkurile de resetare încă nefolosite nu mai au ce debloca.
+  await tx.query(
+    "UPDATE auth_tokens SET used_at = now() WHERE user_id = $1 AND kind = 'reset_password' AND used_at IS NULL",
+    [found.rows[0].id],
+  );
+  await tx.query('COMMIT');
+} catch (error) {
+  await tx.query('ROLLBACK');
+  throw error;
+} finally {
+  tx.release();
+}
 
 console.log(`\nParola pentru ${found.rows[0].email} (${found.rows[0].role}) a fost schimbată.`);
 console.log('Sesiunile deschise cu parola veche au fost închise.');

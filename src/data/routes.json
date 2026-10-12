@@ -231,6 +231,10 @@
       "to": "/unelte?s=angel"
     },
     {
+      "from": "/articles",
+      "to": "/invata"
+    },
+    {
       "from": "/compatibility",
       "to": "/doi"
     },

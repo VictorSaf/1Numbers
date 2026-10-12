@@ -168,8 +168,8 @@ docker-compose restart
 
 ## Documentation
 
-- [ ] Updated BACKEND_SETUP.md
-- [ ] Updated ARCHITECTURE.md
+- [ ] Updated DEPLOY.md
+- [ ] Updated CLAUDE.md
 - [ ] Updated API documentation
 - [ ] Added/updated code comments
 - [ ] Updated README
@@ -207,10 +207,9 @@ docker-compose restart
 
 ## Related Documentation
 
-- [Architecture Guide](../ARCHITECTURE.md)
-- [Backend Setup](../BACKEND_SETUP.md)
-- [Phase Completion](../PHASE_1_COMPLETION.md)
-- [Contributing Guidelines](../CONTRIBUTING.md) (coming soon)
+- [Project guide](../CLAUDE.md)
+- [Deployment](../DEPLOY.md)
+- [Product doctrine](../docs/produs/02-doctrina.md)
 
 ## Checklist
 

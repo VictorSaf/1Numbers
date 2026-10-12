@@ -128,7 +128,7 @@ special.
 | `JWT_SECRET` | procesul refuză să pornească — fără fallback, intenționat |
 | `FRONTEND_URL` | CORS cade pe `localhost:8082` |
 | `ALLOW_REGISTRATION` | înregistrarea publică e închisă (403) |
-| `ALLOW_BILLING` | `/subscriptions/create`, `/upgrade`, `/purchase` întorc 403 |
+| `ALLOW_BILLING` | `/subscriptions/create` întoarce 403 |
 | `ANTHROPIC_API_KEY` | consultantul AI e indisponibil — `/api/ai/consult` întoarce 503 și interfața spune că nu e disponibil |
 | `VAPID_PUBLIC_KEY` | notificările push nu pleacă; dispecerul refuză să pornească și spune de ce |
 | `VAPID_PRIVATE_KEY` | idem — perechea se generează cu `npx web-push generate-vapid-keys --json` |
