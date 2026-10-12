@@ -46,15 +46,14 @@ export default defineConfig({
             "@radix-ui/react-accordion",
           ],
           "vendor-charts": ["recharts"],
-          "vendor-forms": ["react-hook-form", "@hookform/resolvers", "zod"],
           "vendor-query": ["@tanstack/react-query"],
           "vendor-utils": ["date-fns", "clsx", "tailwind-merge", "class-variance-authority"],
-          // App-specific chunks
+          // App-specific chunks. compatibility.ts și predictions.ts nu stau aici:
+          // le folosesc doar pagini lazy, iar în acest chunk erau preîncărcate
+          // (~60KB) pe pagina de start.
           "numerology-core": [
             "./src/lib/numerology.ts",
-            "./src/lib/compatibility.ts",
             "./src/lib/karmic.ts",
-            "./src/lib/predictions.ts",
           ],
         },
       },
