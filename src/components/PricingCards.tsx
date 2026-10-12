@@ -29,6 +29,9 @@ interface PricingCardsProps {
   currentTier?: PremiumTier;
 }
 
+/** Plățile se deschid odată cu ALLOW_BILLING pe server; până atunci butoanele nu pornesc. */
+const BILLING_OPEN = import.meta.env.VITE_ALLOW_BILLING === 'true';
+
 export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCardsProps) => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -209,6 +212,7 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
 
   const getButtonText = (tier: TierDefinition) => {
     if (tier.id === currentTier) return t.currentPlan;
+    if (!BILLING_OPEN && tier.id !== 'free') return t.billingClosed;
     if (tier.id === 'free') return t.getStarted;
     if (currentTier !== 'free') return t.upgrade;
     return t.subscribe;
@@ -216,6 +220,13 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
 
   return (
     <div className="space-y-8">
+      {/* Un buton care dă 403 nu se arată activ (R6): spunem dinainte. */}
+      {!BILLING_OPEN && (
+        <p data-billing-closed className="border-l-2 border-tension py-1 pl-4 text-sm text-foreground/85">
+          {t.billingClosed}.
+        </p>
+      )}
+
       {/* Billing Toggle */}
       <div className="flex items-center justify-center gap-4">
         <Label
@@ -348,7 +359,7 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
                   className="w-full"
                   variant={isHighlighted ? 'default' : tier.id === 'pro' ? 'default' : 'outline'}
                   size="lg"
-                  disabled={isCurrentTier || loadingTier === tier.id}
+                  disabled={isCurrentTier || loadingTier === tier.id || (!BILLING_OPEN && tier.id !== 'free')}
                   onClick={() => handleSubscribe(tier)}
                 >
                   {loadingTier === tier.id ? (
@@ -451,7 +462,7 @@ export const OneTimePurchases = () => {
                   <Button
                     size="sm"
                     variant="outline"
-                    disabled={purchasing === product.id}
+                    disabled={purchasing === product.id || !BILLING_OPEN}
                     onClick={() => handlePurchase(product.id)}
                   >
                     {purchasing === product.id

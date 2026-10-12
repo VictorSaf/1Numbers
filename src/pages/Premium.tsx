@@ -174,6 +174,7 @@ const Premium = () => {
 
   return (
     <PageLayout>
+      <main>
       <div className="page-measure py-4 page-rhythm">
         <PagePlate eyebrow="abonament" title={t.title} subtitle={t.subtitle} />
 
@@ -331,6 +332,7 @@ const Premium = () => {
           </TabsContent>
         </Tabs>
       </div>
+      </main>
     </PageLayout>
   );
 };

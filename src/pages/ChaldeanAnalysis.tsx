@@ -40,6 +40,13 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 
+// getFavorableDays întoarce zilele în engleză („MONDAY” apărea în pagina română).
+const WEEKDAY: Record<string, Record<string, string>> = {
+  ro: { Sunday: "duminică", Monday: "luni", Tuesday: "marți", Wednesday: "miercuri", Thursday: "joi", Friday: "vineri", Saturday: "sâmbătă" },
+  en: {},
+  ru: { Sunday: "воскресенье", Monday: "понедельник", Tuesday: "вторник", Wednesday: "среда", Thursday: "четверг", Friday: "пятница", Saturday: "суббота" },
+};
+
 const ChaldeanAnalysis = () => {
   const { profileData } = useProfile();
   const { language } = useLanguage();
@@ -93,8 +100,8 @@ const ChaldeanAnalysis = () => {
       planet: 'Planetă',
       favorableDays: 'Zile Favorabile',
       compatibleNumbers: 'Numere Compatibile',
-      positive: 'Pozitiv',
-      negative: 'Negativ',
+      positive: 'Favorabil la Cheiro',
+      negative: 'Dificil la Cheiro',
       neutral: 'Neutru',
       businessAnalysis: 'Analiză Nume Business',
       isLucky: 'Este Norocos',
@@ -125,8 +132,8 @@ const ChaldeanAnalysis = () => {
       planet: 'Planet',
       favorableDays: 'Favorable Days',
       compatibleNumbers: 'Compatible Numbers',
-      positive: 'Positive',
-      negative: 'Negative',
+      positive: 'Favourable for Cheiro',
+      negative: 'Difficult for Cheiro',
       neutral: 'Neutral',
       businessAnalysis: 'Business Name Analysis',
       isLucky: 'Is Lucky',
@@ -157,8 +164,8 @@ const ChaldeanAnalysis = () => {
       planet: 'Планета',
       favorableDays: 'Благоприятные Дни',
       compatibleNumbers: 'Совместимые Числа',
-      positive: 'Положительный',
-      negative: 'Отрицательный',
+      positive: 'Благоприятное у Хейро',
+      negative: 'Трудное у Хейро',
       neutral: 'Нейтральный',
       businessAnalysis: 'Анализ Названия Бизнеса',
       isLucky: 'Удачное',
@@ -203,9 +210,10 @@ const ChaldeanAnalysis = () => {
   const getNatureBadge = (nature: 'positive' | 'negative' | 'neutral') => {
     switch (nature) {
       case 'positive':
-        return <Badge className="bg-ok">{t.positive}</Badge>;
+        return <Badge variant="outline" className="border-harmony text-harmony">{t.positive}</Badge>;
       case 'negative':
-        return <Badge variant="destructive">{t.negative}</Badge>;
+        // Lectura lui Cheiro, nu un verdict al aplicației: tensiune, nu eroare (R3).
+        return <Badge variant="outline" className="border-tension text-tension">{t.negative}</Badge>;
       default:
         return <Badge variant="secondary">{t.neutral}</Badge>;
     }
@@ -282,6 +290,7 @@ const ChaldeanAnalysis = () => {
   // the language a reader had chosen was simply not changeable from here.
   return (
     <PageLayout>
+      <main>
       <div className="page-measure py-4 page-rhythm">
       {/* Placa de deschidere, ca la hartă. Figura ei e chiar alfabetul: opt
           valori în loc de nouă, adică toată deosebirea sistemului. */}
@@ -340,7 +349,7 @@ const ChaldeanAnalysis = () => {
                       setFullName(e.target.value);
                       setShowResults(false);
                     }}
-                    placeholder="John Doe"
+                    placeholder={language === "ru" ? "Иван Петрович Иванов" : language === "en" ? "John William Smith" : "Ion Popescu"}
                   />
                 </div>
                 <div className="space-y-2">
@@ -426,7 +435,7 @@ const ChaldeanAnalysis = () => {
                     <div className="flex flex-wrap gap-2">
                       {getFavorableDays(analysis.nameNumber.single).map((day) => (
                         <Badge key={day} variant="secondary">
-                          {day}
+                          {WEEKDAY[language]?.[day] ?? day}
                         </Badge>
                       ))}
                     </div>
@@ -588,6 +597,7 @@ const ChaldeanAnalysis = () => {
         </TabsContent>
         </Tabs>
       </div>
+      </main>
     </PageLayout>
   );
 };

@@ -389,7 +389,7 @@ const Auth = () => {
                     value={formData.name}
                     onChange={handleChange('name')}
                     className="input-mystic h-12 pl-10"
-                    placeholder="John Doe"
+                    placeholder={language === "ru" ? "Иван Петрович Иванов" : language === "en" ? "John William Smith" : "Ion Popescu"}
                   />
                 </div>
                 {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}

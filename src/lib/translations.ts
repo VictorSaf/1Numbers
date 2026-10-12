@@ -169,7 +169,7 @@ export const translations = {
     allNumbersTitle: "Toate Numerele",
     
     // Footer
-    footer: "Numerologia folosește sistemul Pitagoreic pentru calculele numerice",
+    footer: "Calcule pe toate școlile găsite — pitagoreic, caldeean, vedic, Lo Shu, Alexandrov, Matricea; unde se despart, le vezi pe toate",
     disclaimer: "Interpretările sunt simbolice, pentru reflecție. Nu înlocuiesc decizii medicale, financiare, juridice sau de relație.",
     privacyLink: "Confidențialitate",
     termsLink: "Termeni",
@@ -539,7 +539,7 @@ export const translations = {
     allNumbersTitle: "All Numbers",
     
     // Footer
-    footer: "Numerology uses the Pythagorean system for numeric calculations",
+    footer: "Calculated on every school we found — Pythagorean, Chaldean, Vedic, Lo Shu, Alexandrov, the Matrix; where they part, you see all of them",
     disclaimer: "These readings are symbolic, meant for reflection. They do not replace medical, financial, legal or relationship decisions.",
     privacyLink: "Privacy",
     termsLink: "Terms",
@@ -950,7 +950,7 @@ export const translations = {
     allNumbersTitle: "Все Числа",
     
     // Footer
-    footer: "Нумерология использует систему Пифагора для числовых расчётов",
+    footer: "Расчёты по всем найденным школам — пифагорейской, халдейской, ведической, Ло Шу, Александрова, Матрице; где они расходятся, вы видите все",
     disclaimer: "Толкования символичны и предназначены для размышления. Они не заменяют медицинских, финансовых, юридических или личных решений.",
     privacyLink: "Конфиденциальность",
     termsLink: "Условия",

@@ -14,6 +14,8 @@ import { Badge } from '@/components/ui/badge';
 import { RemedyCard } from '@/components/RemedyCard';
 import { getRemedyForNumber, getAllRemedies, getDailyRemedy, NumberRemedy } from '@/lib/remedies';
 import { calculateLifePathNumber, calculateDestinyNumber } from '@/lib/numerology';
+import { mulank } from '@/lib/numerology-plus/systems';
+import { toBirthDate } from '@/lib/numerology-plus/core';
 import { useProfile } from '@/hooks/use-profile';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { PagePlate } from '@/components/layout/PagePlate';
@@ -72,6 +74,8 @@ const Remedies = () => {
       birthDate: 'Data Nașterii',
       lifePath: 'Drumul Vieții',
       destiny: 'Destin',
+      mulank: 'Mulank (vedic)',
+      schools: 'Școlile nu pun remediile pe același număr: tradiția vedică le citește din Mulank — ziua nașterii —, aplicațiile occidentale din Drumul Vieții. Unde cele două dau planete diferite, le vezi pe amândouă.',
       enterDetails: 'Introdu datele pentru remedii personalizate',
       calculate: 'Calculează Remedii',
       selectNumber: 'Selectează un număr pentru detalii',
@@ -90,6 +94,8 @@ const Remedies = () => {
       birthDate: 'Birth Date',
       lifePath: 'Life Path',
       destiny: 'Destiny',
+      mulank: 'Mulank (Vedic)',
+      schools: 'The schools do not hang remedies on the same number: the Vedic tradition reads them from Mulank — your day of birth —, Western apps from the Life Path. Where the two give different planets, you see both.',
       enterDetails: 'Enter your details for personalized remedies',
       calculate: 'Calculate Remedies',
       selectNumber: 'Select a number for details',
@@ -108,6 +114,8 @@ const Remedies = () => {
       birthDate: 'Дата рождения',
       lifePath: 'Путь Жизни',
       destiny: 'Судьба',
+      mulank: 'Мулянк (ведич.)',
+      schools: 'Школы привязывают средства к разным числам: ведическая традиция читает их из Мулянка — дня рождения, — западные приложения из Пути жизни. Где планеты расходятся, вы видите обе.',
       enterDetails: 'Введите данные для персональных средств',
       calculate: 'Рассчитать Средства',
       selectNumber: 'Выберите число для подробностей',
@@ -126,6 +134,9 @@ const Remedies = () => {
     return {
       lifePath: calculateLifePathNumber(date),
       destiny: calculateDestinyNumber(fullName),
+      // Remediile vedice (Navagraha) se citesc din Mulank, ziua nașterii;
+      // aplicațiile occidentale le pun pe Drumul Vieții. Arătăm ambele (R9).
+      mulank: mulank(toBirthDate(date)),
     };
   }, [birthDate, fullName]);
 
@@ -137,6 +148,11 @@ const Remedies = () => {
   const destinyRemedy = useMemo(() => {
     if (!userNumbers) return null;
     return getRemedyForNumber(userNumbers.destiny, language);
+  }, [userNumbers, language]);
+
+  const mulankRemedy = useMemo(() => {
+    if (!userNumbers) return null;
+    return getRemedyForNumber(userNumbers.mulank, language);
   }, [userNumbers, language]);
 
   const todayRemedy = useMemo(() => {
@@ -172,6 +188,7 @@ const Remedies = () => {
   // the language a reader had chosen was simply not changeable from here.
   return (
     <PageLayout>
+      <main>
       <div className="page-measure py-4 page-rhythm">
       <PagePlate eyebrow="remedii numerologice" title={t.title} subtitle={t.description} />
 
@@ -206,7 +223,7 @@ const Remedies = () => {
                       id="fullName"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      placeholder="John Doe"
+                      placeholder={language === "ru" ? "Иван Петрович Иванов" : language === "en" ? "John William Smith" : "Ion Popescu"}
                     />
                   </div>
                   <div className="space-y-2">
@@ -261,6 +278,19 @@ const Remedies = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              <p className="max-w-prose text-sm leading-relaxed text-muted-foreground">{t.schools}</p>
+
+              {/* Mulank Remedy — school vedică, dacă dă altă planetă */}
+              {mulankRemedy && userNumbers.mulank !== userNumbers.lifePath && (
+                <div>
+                  <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                    <Star className="h-5 w-5 text-tension" />
+                    {t.mulank} {userNumbers.mulank} - {mulankRemedy.planet.name}
+                  </h2>
+                  <RemedyCard remedy={mulankRemedy} showAll />
+                </div>
+              )}
 
               {/* Life Path Remedy */}
               {lifePathRemedy && (
@@ -435,6 +465,7 @@ const Remedies = () => {
         </TabsContent>
         </Tabs>
       </div>
+      </main>
     </PageLayout>
   );
 };
