@@ -9,7 +9,8 @@ import { PersonalCycleCard } from "./PersonalCycleCard";
 import { LuckyDatesCard } from "./LuckyDatesCard";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
-import { lifePath as lifePathPlus } from "@/lib/numerology-plus/pythagorean";
+import { lifePath as lifePathPlus, fullPythagoreanProfile } from "@/lib/numerology-plus/pythagorean";
+import { toBirthDate } from "@/lib/numerology-plus/core";
 import {
   calculateLifePathNumber,
   calculateDestinyNumber,
@@ -109,6 +110,21 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     [birthDate],
   );
 
+  // Profilul pitagoreic, o dată pentru toată pagina. NewNumbers (de patru ori),
+  // LetterStones și Contradictions îl calculau fiecare prin `fullProfile()`, care
+  // mai face caldean, vedic, kabbalah, matricea și treizeci de zile de bioritm --
+  // nimic din ele folosit acolo. Importul e același cu al lui `lifePathPlus`, deci
+  // stratul de conținut al motorului rămâne în afara pachetului principal.
+  //
+  // Cheia e ziua, nu obiectul Date: Index face un Date nou la fiecare randare a
+  // hărții proprii. `language` rămâne în chei ca înainte, în blocuri: o schimbare
+  // de limbă după miezul nopții ia și ziua nouă pentru capitolul „acum".
+  const birthTime = birthDate.getTime();
+  const pythagorean = useMemo(
+    () => fullPythagoreanProfile(fullName, toBirthDate(new Date(birthTime))),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- language: vezi mai sus
+    [fullName, birthTime, language],
+  );
   const pinnacles = useMemo(() => calculatePinnacles(birthDate), [birthDate]);
   const challenges = useMemo(() => calculateChallenges(birthDate), [birthDate]);
   const lifeCycles = useMemo(() => calculateLifeCycles(birthDate), [birthDate]);
@@ -359,7 +375,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
 
           <Block title={sectionLabels.newNumbers[language]}>
             <Suspense fallback={chartSkeleton}>
-              <NewNumbers fullName={fullName} birthDate={birthDate} keys={CHAPTER_SELF} />
+              <NewNumbers profile={pythagorean} keys={CHAPTER_SELF} />
             </Suspense>
           </Block>
 
@@ -374,7 +390,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
           <Deeper label={sectionLabels.deeperSelf[language]}>
           <Block title={sectionLabels.stones[language]} note={teasers.stones[language]}>
             <Suspense fallback={chartSkeleton}>
-              <LetterStones fullName={fullName} birthDate={birthDate} />
+              <LetterStones profile={pythagorean} />
             </Suspense>
           </Block>
           {/* The one diagram of this chapter: the five core numbers on one
@@ -418,13 +434,13 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
           {/* The chapter's answer, before its parts. */}
           <Block title={sectionLabels.contradiction[language]} note={teasers.contradiction[language]}>
             <Suspense fallback={chartSkeleton}>
-              <Contradictions fullName={fullName} birthDate={birthDate} />
+              <Contradictions profile={pythagorean} />
             </Suspense>
           </Block>
 
           <Block title={sectionLabels.tension[language]} note={teasers.tension[language]}>
             <Suspense fallback={chartSkeleton}>
-              <NewNumbers fullName={fullName} birthDate={birthDate} keys={CHAPTER_TENSION} />
+              <NewNumbers profile={pythagorean} keys={CHAPTER_TENSION} />
             </Suspense>
           </Block>
 
@@ -495,7 +511,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
           <Deeper label={sectionLabels.deeperLessons[language]}>
           <Block title={sectionLabels.depth[language]} note={teasers.depth[language]}>
             <Suspense fallback={chartSkeleton}>
-              <NewNumbers fullName={fullName} birthDate={birthDate} keys={CHAPTER_LESSONS} />
+              <NewNumbers profile={pythagorean} keys={CHAPTER_LESSONS} />
             </Suspense>
           </Block>
 
@@ -529,7 +545,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
 
           <Block title={sectionLabels.transits[language]} note={teasers.transits[language]}>
             <Suspense fallback={chartSkeleton}>
-              <NewNumbers fullName={fullName} birthDate={birthDate} keys={CHAPTER_NOW} />
+              <NewNumbers profile={pythagorean} keys={CHAPTER_NOW} />
             </Suspense>
           </Block>
 

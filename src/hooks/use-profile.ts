@@ -6,12 +6,12 @@ import { parseCalendarDate } from '@/lib/calendarDate';
  * Now uses useProfiles hook internally to get active profile
  */
 export const useProfile = () => {
-  const { activeProfile, loading } = useProfiles();
+  const { activeProfile, loading, refetch } = useProfiles();
 
   return {
     profile: activeProfile,
     loading,
-    refetch: () => {}, // Use useProfiles().refetch() instead
+    refetch,
     hasProfile: !!activeProfile,
     profileData: activeProfile ? {
       fullName: activeProfile.fullName,

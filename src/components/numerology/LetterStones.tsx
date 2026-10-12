@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { fullProfile } from "@/lib/numerology-plus";
+import type { fullPythagoreanProfile } from "@/lib/numerology-plus/pythagorean";
 import { interpretLetters } from "@/lib/numerology-plus/content/interpret";
 import { NumberCard } from "./NumberCard";
 
@@ -19,23 +19,20 @@ import { NumberCard } from "./NumberCard";
  * în motor apare aici singură.
  */
 
+type PythagoreanProfile = ReturnType<typeof fullPythagoreanProfile>;
+
 interface LetterStonesProps {
-  fullName: string;
-  birthDate: Date;
+  /** Profilul pitagoreic, calculat o dată de pagina de rezultate. */
+  profile: PythagoreanProfile;
 }
 
-const LetterStones = ({ fullName, birthDate }: LetterStonesProps) => {
+const LetterStones = ({ profile }: LetterStonesProps) => {
   const { language } = useLanguage();
 
   const stones = useMemo(() => {
-    const profile = fullProfile(fullName, {
-      day: birthDate.getDate(),
-      month: birthDate.getMonth() + 1,
-      year: birthDate.getFullYear(),
-    });
     // filter(Boolean) nu îngustează tipul, flatMap da.
-    return interpretLetters(profile.pythagorean, language).flatMap((s) => (s ? [s] : []));
-  }, [fullName, birthDate, language]);
+    return interpretLetters(profile, language).flatMap((s) => (s ? [s] : []));
+  }, [profile, language]);
 
   return (
     <div className="grid gap-3">

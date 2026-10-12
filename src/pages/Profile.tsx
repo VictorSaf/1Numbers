@@ -72,7 +72,7 @@ const Profile = () => {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { profiles, activeProfile, createProfile, updateProfile, deleteProfile, refetch } = useProfiles();
+  const { profiles, activeProfile, createProfile, updateProfile, deleteProfile } = useProfiles();
 
   const [editingProfileId, setEditingProfileId] = useState<string | null>(null);
 
@@ -212,7 +212,7 @@ const Profile = () => {
             title: t.profileSaved,
           });
           setEditingProfileId(null);
-          await refetch();
+          // Lista e deja reîncărcată: mutația o invalidează și o așteaptă.
         } else {
           toast({
             title: t.error,
@@ -230,7 +230,6 @@ const Profile = () => {
           toast({
             title: t.profileSaved,
           });
-          await refetch();
         } else {
           // Refuzurile cunoscute sunt reguli, nu avarii: vezi profileErrors.ts.
           const human = humanProfileError(result.error, language as 'ro' | 'en' | 'ru');
@@ -269,7 +268,6 @@ const Profile = () => {
           setEditingProfileId(null);
           startCreating();
         }
-        await refetch();
       } else {
         toast({
           title: t.error,

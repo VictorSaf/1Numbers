@@ -2,6 +2,7 @@ import { describe, it, expect, afterEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { fullProfile } from "@/lib/numerology-plus";
+import { fullPythagoreanProfile } from "@/lib/numerology-plus/pythagorean";
 import { interpretLetters } from "@/lib/numerology-plus/content/interpret";
 import { analyzeIndividualLetters } from "@/lib/nameAnalysis";
 import LetterStones from "../LetterStones";
@@ -16,7 +17,7 @@ import LetterStones from "../LetterStones";
  */
 
 const NAME = "Victor Ion Safta";
-const BIRTH = new Date(1990, 7, 25);
+const BIRTH = { day: 25, month: 8, year: 1990 };
 type Lang = "ro" | "en" | "ru";
 
 const fromEngine = (lang: Lang) =>
@@ -29,7 +30,7 @@ const renderStones = (lang: Lang) => {
   localStorage.setItem("language", lang);
   return render(
     <LanguageProvider>
-      <LetterStones fullName={NAME} birthDate={BIRTH} />
+      <LetterStones profile={fullPythagoreanProfile(NAME, BIRTH)} />
     </LanguageProvider>,
   );
 };

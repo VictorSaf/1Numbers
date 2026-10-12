@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { fullProfile } from "@/lib/numerology-plus";
+import type { fullPythagoreanProfile } from "@/lib/numerology-plus/pythagorean";
 import { contradictions } from "@/lib/numerology-plus/content/contradiction";
 
 /**
@@ -15,22 +15,17 @@ import { contradictions } from "@/lib/numerology-plus/content/contradiction";
  * over a thousand lines of copy in three languages.
  */
 
+type PythagoreanProfile = ReturnType<typeof fullPythagoreanProfile>;
+
 interface ContradictionsProps {
-  fullName: string;
-  birthDate: Date;
+  /** Profilul pitagoreic, calculat o dată de pagina de rezultate. */
+  profile: PythagoreanProfile;
 }
 
-const Contradictions = ({ fullName, birthDate }: ContradictionsProps) => {
+const Contradictions = ({ profile }: ContradictionsProps) => {
   const { language } = useLanguage();
 
-  const found = useMemo(() => {
-    const profile = fullProfile(fullName, {
-      day: birthDate.getDate(),
-      month: birthDate.getMonth() + 1,
-      year: birthDate.getFullYear(),
-    });
-    return contradictions(profile.pythagorean, language);
-  }, [fullName, birthDate, language]);
+  const found = useMemo(() => contradictions(profile, language), [profile, language]);
 
   return (
     <div>

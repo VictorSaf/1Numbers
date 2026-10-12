@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Sparkles, Moon, Sun, Stars } from "lucide-react";
 import { NumerologyForm } from "@/components/NumerologyForm";
 import { FirstVisitPromise, EXAMPLE_NAME, EXAMPLE_BIRTH_DATE } from "@/components/FirstVisitPromise";
@@ -8,7 +8,7 @@ import { PageLayout } from "@/components/layout/PageLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { api } from "@/services/api";
+import { useProfiles } from "@/hooks/use-profiles";
 import { parseCalendarDate } from '@/lib/calendarDate';
 
 interface UserData {
@@ -16,49 +16,23 @@ interface UserData {
   birthDate: Date;
 }
 
-interface UserProfile {
-  id: string;
-  userId: string;
-  fullName: string;
-  birthDate: string;
-  birthTime?: string;
-  birthPlace?: string;
-}
-
 const Index = () => {
   const { t } = useLanguage();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
+  const { profiles, loading: loadingProfile } = useProfiles();
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loadingProfile, setLoadingProfile] = useState(false);
   const [showDashboard, setShowDashboard] = useState(true);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      loadProfile();
-    } else {
-      setProfile(null);
-    }
-  }, [isAuthenticated]);
-
-  const loadProfile = async () => {
-    try {
-      setLoadingProfile(true);
-      const response = await api.getProfile();
-      if (response.success && response.profile) {
-        const profileData = response.profile as UserProfile;
-        setProfile(profileData);
-        setShowDashboard(true);
-      } else {
-        setProfile(null);
-      }
-    } catch (error) {
-      console.error('Error loading profile:', error);
-      setProfile(null);
-    } finally {
-      setLoadingProfile(false);
-    }
-  };
+  /**
+   * Harta proprie e rândul activ din lista comună de profiluri.
+   *
+   * Pagina cerea separat `/profiles/me`, iar butonul de salvare de sub hartă
+   * cerea `/profiles/all` -- două drumuri spre același rând. `/me` întoarce
+   * rândul cu `is_active`, iar indexul unic din migrația 003 ține cel mult unul
+   * pe utilizator, deci e exact `find(isActive)`. Nu `activeProfile`: acela cade
+   * pe primul profil când niciunul nu e activ, adică pe harta unui copil.
+   */
+  const profile = profiles.find((p) => p.isActive) ?? null;
 
   const handleCalculate = (data: UserData) => {
     setUserData(data);
