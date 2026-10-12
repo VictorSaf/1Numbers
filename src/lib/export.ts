@@ -1,6 +1,5 @@
 // PDF Export and Report Generation
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import { 
   calculateLifePathNumber,
   calculateDestinyNumber,
@@ -332,35 +331,3 @@ export const generateCustomReportPDF = async (
 ): Promise<void> => {
   return generateFullReportPDF(data, options);
 };
-
-/**
- * Generate PDF from HTML element (for charts and visualizations).
- * @param elementId - ID of HTML element to capture
- * @param fileName - Output file name
- * @returns Promise that resolves when PDF is generated
- */
-export const generatePDFFromElement = async (
-  elementId: string,
-  fileName: string = 'numerology-chart.pdf'
-): Promise<void> => {
-  const element = document.getElementById(elementId);
-  if (!element) {
-    throw new Error(`Element with id "${elementId}" not found`);
-  }
-  
-  const canvas = await html2canvas(element, {
-    scale: 2,
-    useCORS: true,
-    logging: false
-  });
-  
-  const imgData = canvas.toDataURL('image/png');
-  const pdf = new jsPDF('landscape', 'mm', 'a4');
-  const imgWidth = pdf.internal.pageSize.getWidth();
-  const imgHeight = (canvas.height * imgWidth) / canvas.width;
-  
-  pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-  applyPDFBranding(pdf);
-  pdf.save(fileName);
-};
-

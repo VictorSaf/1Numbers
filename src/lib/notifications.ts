@@ -299,69 +299,6 @@ export const generateAchievementNotification = (
   };
 };
 
-export const generateSpecialDateNotification = (
-  eventType: 'personal-year' | 'birthday' | 'pinnacle',
-  language: Language
-): NotificationPayload => {
-  const content: Record<string, Record<Language, { title: string; body: string }>> = {
-    'personal-year': {
-      ro: {
-        title: 'Începe un Nou An Personal!',
-        body: 'Astăzi începe un nou ciclu în viața ta. Descoperă ce îți rezervă noul an personal!',
-      },
-      en: {
-        title: 'A New Personal Year Begins!',
-        body: 'Today marks the start of a new cycle in your life. Discover what your new personal year holds!',
-      },
-      ru: {
-        title: 'Начинается Новый Личный Год!',
-        body: 'Сегодня начинается новый цикл в вашей жизни. Узнайте, что приготовил новый личный год!',
-      },
-    },
-    birthday: {
-      ro: {
-        title: 'La Mulți Ani!',
-        body: 'Astăzi este ziua ta specială! Descoperă ce energie numerologică te așteaptă în noul an.',
-      },
-      en: {
-        title: 'Happy Birthday!',
-        body: 'Today is your special day! Discover what numerological energy awaits you in the new year.',
-      },
-      ru: {
-        title: 'С Днём Рождения!',
-        body: 'Сегодня ваш особенный день! Узнайте, какая нумерологическая энергия ждёт вас в новом году.',
-      },
-    },
-    pinnacle: {
-      ro: {
-        title: 'Intri într-un Nou Vârf de Viață!',
-        body: 'O nouă perioadă importantă începe în viața ta. Vezi ce provocări și oportunități te așteaptă!',
-      },
-      en: {
-        title: 'Entering a New Life Pinnacle!',
-        body: 'A new important period begins in your life. See what challenges and opportunities await!',
-      },
-      ru: {
-        title: 'Начинается Новая Вершина Жизни!',
-        body: 'Новый важный период начинается в вашей жизни. Узнайте, какие вызовы и возможности ждут!',
-      },
-    },
-  };
-
-  const { title, body } = content[eventType][language];
-
-  return {
-    title,
-    body,
-    tag: `special-date-${eventType}`,
-    data: {
-      type: 'special-date',
-      eventType,
-      url: '/azi',
-    },
-  };
-};
-
 // Save notification preferences to localStorage
 export const saveNotificationPreferences = (preferences: NotificationPreferences): void => {
   localStorage.setItem('notification_preferences', JSON.stringify(preferences));
@@ -378,21 +315,4 @@ export const loadNotificationPreferences = (): NotificationPreferences => {
     }
   }
   return DEFAULT_PREFERENCES;
-};
-
-// Schedule a local notification (for demo/testing)
-export const scheduleNotification = (
-  payload: NotificationPayload,
-  delayMs: number
-): number => {
-  const timeoutId = window.setTimeout(() => {
-    showLocalNotification(payload).catch(console.error);
-  }, delayMs);
-
-  return timeoutId;
-};
-
-// Cancel a scheduled notification
-export const cancelScheduledNotification = (timeoutId: number): void => {
-  window.clearTimeout(timeoutId);
 };

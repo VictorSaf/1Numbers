@@ -579,18 +579,6 @@ export const FREQUENT_QUESTIONS: Record<Language, Array<{ question: string; cate
   ],
 };
 
-// Format conversation history for AI context
-export function formatConversationHistory(
-  history: Array<{ role: 'user' | 'assistant'; content: string }>,
-  maxMessages: number = 10
-): string {
-  const recentHistory = history.slice(-maxMessages);
-
-  return recentHistory
-    .map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`)
-    .join('\n\n');
-}
-
 // Build complete prompt for AI request
 //
 // The system prompt is no longer built here: the server owns it, so that the

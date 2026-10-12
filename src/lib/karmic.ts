@@ -18,17 +18,6 @@ export interface KarmicLessonInfo {
   description: { ro: string; en: string; ru: string };
 }
 
-// Karmic Debt Numbers and their meanings
-export const KARMIC_DEBT_NUMBERS = [13, 14, 16, 19];
-
-// Check if a number contains karmic debt (before reduction)
-export const hasKarmicDebt = (originalSum: number): number | null => {
-  if (KARMIC_DEBT_NUMBERS.includes(originalSum)) {
-    return originalSum;
-  }
-  return null;
-};
-
 // Calculate all potential karmic debts from birth date and name
 //
 // This used to redo the sums itself and then ask whether the total was one of

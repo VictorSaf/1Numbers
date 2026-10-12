@@ -129,35 +129,6 @@ export const calculateHiddenPassions = (fullName: string): number[] => {
 };
 
 /**
- * Calculate Maturity Number (Life Path + Destiny).
- * This number reveals the person you will become as you mature and develop.
- * @param birthDate - Birth date
- * @param fullName - Full name at birth
- * @returns Maturity number (1-9, or master numbers 11, 22, 33)
- */
-export const calculateMaturityNumber = (birthDate: Date, fullName: string): number => {
-  const lifePath = calculateLifePathNumber(birthDate);
-  const destiny = calculateDestinyNumber(fullName);
-  
-  const total = lifePath + destiny;
-  return reduceToSingleDigit(total, true);
-};
-
-/**
- * Calculate Balance Number (difference between vowels and consonants).
- * This reveals how balanced you are between inner desires and outer expression.
- * @param fullName - Full name at birth
- * @returns Balance number (0-8), where 0 = perfect balance
- */
-export const calculateBalanceNumber = (fullName: string): number => {
-  const soulUrge = calculateSoulUrgeNumber(fullName);
-  const personality = calculatePersonalityNumber(fullName);
-  
-  const difference = Math.abs(soulUrge - personality);
-  return reduceToSingleDigit(difference, false);
-};
-
-/**
  * Analyze letter distribution in the name.
  * Returns detailed statistics about which numbers appear and their frequencies.
  * @param fullName - Full name at birth

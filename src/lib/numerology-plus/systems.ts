@@ -75,35 +75,6 @@ export function vedicProfile(name: string, b: BirthDate) {
   };
 }
 
-/**
- * Name correction: propune variante de ortografie care mută Naamank
- * într-un număr prieten cu Mulank și Bhagyank.
- * Strategie: dublare de consoană, adăugare de vocală finală, eliminare de literă.
- */
-export function suggestNameCorrections(name: string, b: BirthDate, maxSuggestions = 8) {
-  const m = mulank(b), bh = bhagyank(b);
-  const targets = (VEDIC_RELATIONS[m]?.friends ?? []).filter((t) => VEDIC_RELATIONS[bh]?.friends.includes(t));
-  const base = name.trim();
-  const candidates = new Set<string>();
-
-  for (let i = 0; i < base.length; i++) {
-    const ch = base[i];
-    if (!/[a-z]/i.test(ch)) continue;
-    candidates.add(base.slice(0, i + 1) + ch + base.slice(i + 1)); // dublare
-    candidates.add(base.slice(0, i) + base.slice(i + 1));          // eliminare
-  }
-  for (const v of ['a', 'e', 'i', 'h']) {
-    candidates.add(base + v);
-    const parts = base.split(' ');
-    if (parts.length > 1) candidates.add([parts[0] + v, ...parts.slice(1)].join(' '));
-  }
-
-  return [...candidates]
-    .map((c) => ({ name: c, naamank: naamank(c) }))
-    .filter((c) => targets.includes(c.naamank.root))
-    .slice(0, maxSuggestions);
-}
-
 // ═══════════════════════════════════════════════════════════
 // B2 — Numărul Kua (Feng Shui)
 // ═══════════════════════════════════════════════════════════
