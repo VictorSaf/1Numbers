@@ -49,7 +49,7 @@ export const NUMBER_MEANINGS: Record<number, { title: string; traits: string[]; 
     description: "Ești un pionier natural, cu o dorință puternică de a conduce și de a inova. Energia ta este cea a începuturilor și a independenței."
   },
   2: {
-    title: "Diplomatull",
+    title: "Diplomatul",
     traits: ["Diplomatic", "Sensibil", "Cooperant", "Intuitiv"],
     description: "Ești un pacificator natural, cu abilități excepționale de a crea armonie. Energia ta este cea a parteneriatului și echilibrului."
   },

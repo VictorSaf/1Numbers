@@ -30,7 +30,7 @@ const FAQ = () => {
         {
           category: 'basics',
           question: 'Ce sistem folosiți pentru calcule?',
-          answer: 'Folosim sistemul Pitagoreic, cel mai popular și utilizat sistem în numerologia occidentală. Acest sistem atribuie valori numerice de la 1 la 9 literelor alfabetului.'
+          answer: 'Pe toate pe care le-am găsit în piață și în literatură: pitagoreic, caldeean (Cheiro), vedic, Lo Shu, psihomatricea lui Alexandrov, Matricea destinului, kabbalah, tarot. Harta pornește de la cel pitagoreic, iar unde școlile dau răspunsuri diferite la aceeași întrebare le vezi pe toate, cu calculul fiecăreia și distanța dintre ele — în capitolul „Aceeași întrebare, toate școlile”.'
         },
         {
           category: 'basics',
@@ -104,7 +104,7 @@ const FAQ = () => {
         {
           category: 'basics',
           question: 'What system do you use for calculations?',
-          answer: 'We use the Pythagorean system, the most popular and widely used system in Western numerology. This system assigns numerical values from 1 to 9 to the letters of the alphabet.'
+          answer: 'All of the ones we found in the market and the literature: Pythagorean, Chaldean (Cheiro), Vedic, Lo Shu, Alexandrov\'s psychomatrix, the Destiny Matrix, Kabbalah, tarot. The map starts from the Pythagorean one, and where the schools give different answers to the same question you see all of them, each with its arithmetic and the distance between them — in the chapter “The same question, every school”.'
         },
         {
           category: 'basics',
@@ -178,7 +178,7 @@ const FAQ = () => {
         {
           category: 'basics',
           question: 'Какую систему вы используете для расчётов?',
-          answer: 'Мы используем пифагорейскую систему — самую популярную в западной нумерологии. Эта система присваивает числовые значения от 1 до 9 буквам алфавита.'
+          answer: 'Все, что мы нашли на рынке и в литературе: пифагорейскую, халдейскую (Хейро), ведическую, Ло Шу, психоматрицу Александрова, Матрицу судьбы, каббалу, таро. Карта начинается с пифагорейской, а где школы отвечают на один вопрос по-разному, вы видите все ответы, расчёт каждого и расстояние между ними — в главе «Один вопрос, все школы».'
         },
         {
           category: 'basics',

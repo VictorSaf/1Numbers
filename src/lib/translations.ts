@@ -232,7 +232,7 @@ export const translations = {
         advice: ["Cultivă răbdarea și ascultă ideile altora", "Echilibrează ambiția cu empatia", "Nu te teme să delegi responsabilități", "Practică colaborarea fără a-ți pierde viziunea"]
       },
       2: {
-        title: "Diplomatull",
+        title: "Diplomatul",
         traits: ["Diplomatic", "Sensibil", "Cooperant", "Intuitiv"],
         description: "Ești un pacificator natural, cu abilități excepționale de a crea armonie. Energia ta este cea a parteneriatului și echilibrului.",
         strengths: ["Intuiție puternică", "Empatie", "Abilități de mediere", "Sensibilitate"],

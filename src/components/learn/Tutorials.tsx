@@ -32,6 +32,7 @@ const Tutorials = () => {
       backToCalculator: 'Înapoi la Calculator',
       lesson: 'Lecția',
       step: 'Pas',
+      steps: (n: number) => (n === 1 ? '1 pas' : `${n} pași`),
       of: 'din',
       next: 'Următorul',
       previous: 'Anterior',
@@ -47,7 +48,7 @@ const Tutorials = () => {
           steps: [
             {
               title: 'Ce este Numerologia?',
-              content: 'Numerologia este studiul semnificației ascunse a numerelor și a modului în care acestea influențează viața noastră. Fiecare număr poartă o vibrație unică ce ne poate ajuta să ne înțelegem mai bine pe noi și lumea din jur.',
+              content: 'Numerologia e un sistem simbolic: dă fiecărui număr o semnificație și citește numele și data nașterii prin ele. Nu e o știință și nu prezice nimic; e o oglindă — un fel de a-ți pune întrebări despre tine, cu un vocabular vechi de câteva mii de ani.',
               example: 'De exemplu, dacă te-ai născut pe 15, reduci: 1 + 5 = 6. Numărul 6 reprezintă armonia și responsabilitatea familială.'
             },
             {
@@ -122,6 +123,7 @@ const Tutorials = () => {
       backToCalculator: 'Back to Calculator',
       lesson: 'Lesson',
       step: 'Step',
+      steps: (n: number) => (n === 1 ? '1 step' : `${n} steps`),
       of: 'of',
       next: 'Next',
       previous: 'Previous',
@@ -137,7 +139,7 @@ const Tutorials = () => {
           steps: [
             {
               title: 'What is Numerology?',
-              content: 'Numerology is the study of the hidden meaning of numbers and how they influence our lives. Each number carries a unique vibration that can help us better understand ourselves and the world around us.',
+              content: 'Numerology is a symbolic system: it gives each number a meaning and reads your name and birth date through them. It is not a science and predicts nothing; it is a mirror — a way of asking yourself questions, with a vocabulary a few thousand years old.',
               example: 'For example, if you were born on the 15th, you reduce: 1 + 5 = 6. The number 6 represents harmony and family responsibility.'
             },
             {
@@ -212,6 +214,7 @@ const Tutorials = () => {
       backToCalculator: 'Назад к Калькулятору',
       lesson: 'Урок',
       step: 'Шаг',
+      steps: (n: number) => `${n} ${n % 10 === 1 && n % 100 !== 11 ? 'шаг' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'шага' : 'шагов'}`,
       of: 'из',
       next: 'Далее',
       previous: 'Назад',
@@ -227,7 +230,7 @@ const Tutorials = () => {
           steps: [
             {
               title: 'Что такое Нумерология?',
-              content: 'Нумерология — это изучение скрытого значения чисел и того, как они влияют на нашу жизнь. Каждое число несёт уникальную вибрацию, которая помогает лучше понять себя и мир вокруг.',
+              content: 'Нумерология — символическая система: она даёт каждому числу значение и читает через них имя и дату рождения. Это не наука и она ничего не предсказывает; это зеркало — способ задавать себе вопросы на языке, которому несколько тысяч лет.',
               example: 'Например, если вы родились 15-го, сократите: 1 + 5 = 6. Число 6 представляет гармонию и семейную ответственность.'
             },
             {
@@ -358,7 +361,7 @@ const Tutorials = () => {
                 </div>
                 <h3 className="font-heading text-foreground mb-2">{les.title}</h3>
                 <p className="text-xs text-muted-foreground">
-                  {les.steps.length} {l.step.toLowerCase()}s
+                  {l.steps(les.steps.length)}
                 </p>
               </button>
             ))}
