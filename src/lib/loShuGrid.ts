@@ -218,11 +218,14 @@ const calculatePlaneStrength = (
   const total = numbers.reduce((sum, num) => sum + digitCounts[num], 0);
   const presentCount = numbers.filter(num => digitCounts[num] > 0).length;
 
+  // Tăria unui plan e câte dintre cele trei cifre are, nu câte apariții adună:
+  // un 1 repetat de cinci ori într-un plan fără 8 și 6 tot un plan cu o
+  // singură cifră e. Regula veche (`total <= 3` → echilibrat) făcea dintr-un
+  // plan aproape gol unul echilibrat sau chiar dominant (03-filtru.md).
   if (presentCount === 0) return 'empty';
-  if (presentCount === 1 && total === 1) return 'weak';
-  if (presentCount === 2 || total <= 3) return 'balanced';
-  if (total <= 5) return 'strong';
-  return 'dominant';
+  if (presentCount === 1) return 'weak';
+  if (presentCount === 2) return 'balanced';
+  return total >= 5 ? 'dominant' : 'strong';
 };
 
 /**
