@@ -27,7 +27,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
       subtitle: "Găsește datele favorabile bazate pe numerele tale",
       nextLucky: "Următoarea dată norocoasă",
       bestDates: "Cele mai bune date",
-      score: "Scor",
+      score: "din 7 criterii",
       reasons: {
         lifePathMatch: "Potrivire Drum al Vieții",
         lifePathCompatible: "Compatibil Drum al Vieții",
@@ -40,7 +40,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
         repeatingDigits: "Cifre repetate"
       },
       noLuckyDates: "Nu există date norocoase în această lună",
-      dayNumber: "Numărul zilei",
+      dayNumber: "Ziua lunii",
       universalNumber: "Nr. universal",
       allDates: "Toate datele norocoase"
     },
@@ -49,7 +49,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
       subtitle: "Find favorable dates based on your numbers",
       nextLucky: "Next lucky date",
       bestDates: "Best dates",
-      score: "Score",
+      score: "of 7 criteria",
       reasons: {
         lifePathMatch: "Life Path Match",
         lifePathCompatible: "Life Path Compatible",
@@ -62,7 +62,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
         repeatingDigits: "Repeating Digits"
       },
       noLuckyDates: "No lucky dates this month",
-      dayNumber: "Day number",
+      dayNumber: "Day of the month",
       universalNumber: "Universal no.",
       allDates: "All lucky dates"
     },
@@ -71,7 +71,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
       subtitle: "Найдите благоприятные даты на основе ваших чисел",
       nextLucky: "Следующая удачная дата",
       bestDates: "Лучшие даты",
-      score: "Оценка",
+      score: "из 7 критериев",
       reasons: {
         lifePathMatch: "Совпадение с Жизненным Путём",
         lifePathCompatible: "Совместимость с Жизненным Путём",
@@ -84,7 +84,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
         repeatingDigits: "Повторяющиеся цифры"
       },
       noLuckyDates: "Нет удачных дат в этом месяце",
-      dayNumber: "Число дня",
+      dayNumber: "Число месяца",
       universalNumber: "Универс. число",
       allDates: "Все удачные даты"
     }
@@ -143,7 +143,9 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
         </div>
         <div className={cn("px-3 py-2 rounded-lg border text-center", getScoreBg(luckyDate.score))}>
           <div className={cn("num text-lg", getScoreColor(luckyDate.score))}>
-            {luckyDate.score}
+            {/* Punctele erau o sumă fără scară (maximul teoretic e 135, nu 100);
+                numărul de criterii îndeplinite se poate citi. */}
+            {luckyDate.reasons.length}
           </div>
           <div className="text-xs text-muted-foreground">{t.score}</div>
         </div>

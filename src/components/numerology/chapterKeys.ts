@@ -24,7 +24,7 @@ export const CHAPTER_TENSION = [
 ] as const;
 
 /** 3 — what is missing, and what that asks of you. */
-export const CHAPTER_LESSONS = ['hiddenPassion', 'inclusionTable'] as const;
+export const CHAPTER_LESSONS = ['hiddenPassion'] as const;
 
 /** 4 — this year, this month, today. */
 export const CHAPTER_NOW = ['essence', 'universalYear'] as const;

@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { toBirthDate } from "@/lib/numerology-plus/core";
 import {
-  psychomatrix, lineStrength, GRID_LAYOUT, LINES, type LineKey, type Psychomatrix as PM,
+  psychomatrix, lineStrength, cellStrength, GRID_LAYOUT, LINES, type LineKey, type Psychomatrix as PM,
 } from "@/lib/numerology-plus/psychomatrix";
 
 /**
@@ -32,39 +32,43 @@ const LINE: Record<Lang, Record<LineKey, string>> = {
 const COPY: Record<Lang, {
   working: string; loShu: string; added: string; strength: Record<string, string>;
   rules: string; absolute: string; plus19: string; rulesNote: string; empty: string;
+  cell: Record<"absent" | "normal" | "strong" | "excess", string>;
 }> = {
   ro: {
     working: "numerele de lucru",
     loShu: "în Lo Shu",
-    added: "Numerele de lucru adaugă",
+    added: "Numerele de lucru mai pun în grilă, față de Lo Shu",
     strength: { weak: "slabă", medium: "medie", strong: "puternică" },
     rules: "Două reguli pentru născuții după 2000",
     absolute: "|N1 − 2 × prima cifră a zilei|",
     plus19: "N1 + 19",
     rulesNote: "Celulele în care regulile dau altceva sunt marcate.",
     empty: "gol",
+    cell: { absent: "lipsește", normal: "normal", strong: "accentuat", excess: "în exces" },
   },
   en: {
     working: "working numbers",
     loShu: "in Lo Shu",
-    added: "The working numbers add",
+    added: "Compared with Lo Shu, the working numbers add",
     strength: { weak: "weak", medium: "medium", strong: "strong" },
     rules: "Two rules for births from 2000",
     absolute: "|N1 − 2 × first digit of the day|",
     plus19: "N1 + 19",
     rulesNote: "Cells where the rules disagree are marked.",
     empty: "empty",
+    cell: { absent: "missing", normal: "normal", strong: "strong", excess: "in excess" },
   },
   ru: {
     working: "рабочие числа",
     loShu: "в Ло Шу",
-    added: "Рабочие числа добавляют",
+    added: "По сравнению с Ло Шу рабочие числа добавляют",
     strength: { weak: "слабая", medium: "средняя", strong: "сильная" },
     rules: "Два правила для рождённых после 2000",
     absolute: "|N1 − 2 × первая цифра дня|",
     plus19: "N1 + 19",
     rulesNote: "Клетки, где правила расходятся, отмечены.",
     empty: "пусто",
+    cell: { absent: "нет", normal: "норма", strong: "усилено", excess: "избыток" },
   },
 };
 
@@ -78,7 +82,9 @@ const Grid = ({ pm, compare, lang, loShu }: { pm: PM; compare?: PM; lang: Lang; 
           <p className={`num min-h-[1.75rem] text-lg leading-tight break-all ${n ? "text-primary" : "text-muted-foreground/50"}`}>
             {n ? String(d).repeat(n) : COPY[lang].empty}
           </p>
-          <p className="mt-1 text-[0.7rem] text-muted-foreground">{CELL[lang][d]}</p>
+          <p className="mt-1 text-[0.7rem] text-muted-foreground">
+            {CELL[lang][d]} · <span className={n === 0 ? "text-tension" : n >= 3 ? "text-gilt" : ""}>{COPY[lang].cell[cellStrength(n)]}</span>
+          </p>
           {loShu && (
             <p className="num mt-0.5 text-[0.63rem] text-muted-foreground/80">
               {COPY[lang].loShu}: {loShu[d] ?? 0}
@@ -110,7 +116,7 @@ export const Psychomatrix = ({ birthDate }: { birthDate: Date }) => {
 
   const added = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     .filter((d) => abs.counts[d] > loShu[d])
-    .map((d) => `${d}×${abs.counts[d] - loShu[d]}`);
+    .map((d) => `${d} (+${abs.counts[d] - loShu[d]})`);
 
   return (
     <div data-psychomatrix className="space-y-5">

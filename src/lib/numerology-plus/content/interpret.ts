@@ -83,9 +83,9 @@ export function interpretProfile(profile: PythagoreanProfile, lang: Lang = 'ro')
   out.push(interpret('universalYear', c.universalYear.value, lang));
   out.push(interpret('essence', t.essence.value, lang));
 
-  const dominant = Object.entries(e.inclusionTable as Record<string, number>)
-    .sort((a, b) => b[1] - a[1])[0];
-  if (dominant) out.push(interpret('inclusionTable', Number(dominant[0]), lang));
+  // „Tabelul de incluziune” redus la cifra dominantă era Pasiunea Ascunsă a doua
+  // oară. Tabelul întreg se vede în distribuția cifrelor, iar comparația lui cu
+  // media, în „toate școlile”.
 
   return out.filter(Boolean) as Interpretation[];
 }
