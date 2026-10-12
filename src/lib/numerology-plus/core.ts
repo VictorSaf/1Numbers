@@ -137,13 +137,13 @@ export function nameParts(name: string): string[] {
  * Euristica pentru Y: e vocală dacă în cuvânt nu există altă vocală tare,
  * SAU dacă e precedată de consoană și nu urmată de vocală (Mary, Lynn, Bryn).
  */
-export function classifyLetters(word: string): Array<{ ch: string; vowel: boolean }> {
+export function classifyLetters(word: string, yMode: YMode = Y_VOWEL_MODE): Array<{ ch: string; vowel: boolean }> {
   const w = word.toUpperCase().replace(/[^A-Z]/g, '');
   return w.split('').map((ch, i) => {
     if (HARD_VOWELS.has(ch)) return { ch, vowel: true };
     if (ch !== 'Y') return { ch, vowel: false };
-    if (Y_VOWEL_MODE === 'always') return { ch, vowel: true };
-    if (Y_VOWEL_MODE === 'never') return { ch, vowel: false };
+    if (yMode === 'always') return { ch, vowel: true };
+    if (yMode === 'never') return { ch, vowel: false };
 
     // One rule: Y is a consonant when it opens a syllable, which in writing is
     // when a hard vowel follows it directly. Otherwise it is carrying the vowel
@@ -158,8 +158,8 @@ export function classifyLetters(word: string): Array<{ ch: string; vowel: boolea
   });
 }
 
-export function classifyFullName(name: string): Array<{ ch: string; vowel: boolean }> {
-  return nameParts(name).flatMap(classifyLetters);
+export function classifyFullName(name: string, yMode: YMode = Y_VOWEL_MODE): Array<{ ch: string; vowel: boolean }> {
+  return nameParts(name).flatMap((w) => classifyLetters(w, yMode));
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -235,8 +235,9 @@ export function sumLetters(
   name: string,
   table: LetterTable = PYTHAGOREAN,
   filter?: (l: { ch: string; vowel: boolean }) => boolean,
+  yMode: YMode = Y_VOWEL_MODE,
 ): number {
-  return classifyFullName(name)
+  return classifyFullName(name, yMode)
     .filter((l) => (filter ? filter(l) : true))
     .reduce((a, l) => a + (table[l.ch] ?? 0), 0);
 }
