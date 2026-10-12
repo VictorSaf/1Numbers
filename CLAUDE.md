@@ -163,7 +163,7 @@ They are not replayable: `CREATE TRIGGER` in 004, 006 and 007 has no
 this file used to name it alongside 009, wrongly. The inserts in 006 and 007
 sit inside function bodies, not seeds.)
 
-Numbering has a gap: 011 does not exist, and never did. Next free is 017. Against a database that already carries the schema but has no
+Numbering has a gap: 011 does not exist, and never did. Next free is 019. Against a database that already carries the schema but has no
 `schema_migrations` — which is what the live one was until 2026-08-30 — run
 `npm run migrate -- --baseline` once, then migrate normally from there.
 
