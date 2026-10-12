@@ -2,33 +2,6 @@ export type Language = "ro" | "en" | "ru";
 
 export const translations = {
   ro: {
-    export: {
-      export: "Exportă",
-      fullReport: "Raport complet PDF",
-      customReport: "Raport personalizat",
-      exportChart: "Exportă graficul",
-      options: "Opțiuni",
-      includeCharts: "Include graficele",
-      includeKarmic: "Include analiza karmică",
-      includePinnacles: "Include pinaclele",
-      includeCycles: "Include ciclurile",
-      includePredictions: "Include previziunile",
-      exporting: "Se exportă...",
-      success: "Export reușit!",
-      error: "Eroare la export"
-    },
-    sharing: {
-      share: "Distribuie",
-      shareTo: "Distribuie pe",
-      facebook: "Facebook",
-      twitter: "Twitter",
-      whatsapp: "WhatsApp",
-      instagram: "Instagram",
-      email: "Trimite pe e-mail",
-      copyLink: "Copiază linkul",
-      linkCopied: "Link copiat!",
-      nativeShare: "Distribuie"
-    },
     people: {
       title: "Oamenii mei",
       subtitle: "Hărțile pe care le ții: ale tale, ale celor apropiați, ale copiilor, ale firmelor.",
@@ -88,8 +61,6 @@ export const translations = {
     calculateButton: "Descoperă Numerele Tale",
     
     // Results
-    profileTitle: "Profilul Tău Numerologic",
-    profileSubtitle: "Descoperă semnificația ascunsă a numerelor tale personale",
     calculateAgain: "Calculează din nou",
     
     // Number titles
@@ -105,20 +76,12 @@ export const translations = {
     infoPersonalYear: "Energia anului curent",
     
     // Navigation
-    viewGuide: "Ghid",
-    viewCompatibility: "Compatibilitate",
     backToCalculator: "Înapoi la Calculator",
     profile: "Profil",
     myProfile: "Profilul Meu",
     login: "Autentificare",
     predictions: "Previziuni",
-    tools: "Instrumente",
-    tutorials: "Tutoriale",
-    courses: "Cursuri",
-    articles: "Articole",
-    faq: "Întrebări Frecvente",
     angelNumbers: "Numere Îngeri",
-    back: "Înapoi",
     
     // NotFound page
     notFound: {
@@ -132,7 +95,6 @@ export const translations = {
     profilePageSubtitle: "Completează datele tale personale pentru a accesa rapid calculele numerologice",
     profileSaved: "Profil salvat cu succes!",
     profileDeleted: "Profil șters cu succes!",
-    saveProfile: "Salvează Profilul",
     deleteProfile: "Șterge Profilul",
     editProfile: "Editează Profilul",
     createProfile: "Creează Profilul",
@@ -143,22 +105,16 @@ export const translations = {
     birthPlaceLabel: "Locul nașterii (opțional)",
     birthPlacePlaceholder: "Ex: București, România",
     birthPlaceHint: "Locul nașterii poate influența calculele numerologice",
-    useProfileData: "Folosește datele din profil",
-    profileRequired: "Te rugăm să creezi un profil pentru a folosi această funcție",
     cancel: "Anulează",
     save: "Salvează",
     error: "Eroare",
     // Multiple profiles
-    switchProfile: "Schimbă Profilul",
-    activeProfile: "Profil Activ",
-    allProfiles: "Toate Profilele",
     createNewProfile: "Creează Profil Nou",
     selectProfile: "Selectează Profil",
     profileSwitched: "Profil schimbat cu succes!",
     switchProfileError: "Eroare la schimbarea profilului",
     noProfiles: "Nu ai încă niciun profil",
     profileComparison: "Comparare Profile",
-    compareProfiles: "Compară Profilele",
     selectProfilesToCompare: "Selectează profilele pentru comparare",
     
     // Compatibility page
@@ -203,9 +159,6 @@ export const translations = {
     },
     
     // Guide page
-    guideLabel: "Ghid Complet",
-    guideTitle: "Semnificația Numerelor",
-    guideSubtitle: "Explorează în profunzime semnificația fiecărui număr în numerologie și descoperă cum influențează viața ta",
     coreNumbersTitle: "Numerele Fundamentale (1-9)",
     coreNumbersDesc: "Aceste nouă numere formează baza întregii numerologii. Fiecare poartă o vibrație unică și caracteristici distincte.",
     masterNumbersTitle: "Numerele Master (11, 22, 33)",
@@ -462,45 +415,6 @@ export const translations = {
       dayNumber: "Numărul zilei",
       universalNumber: "Numărul universal"
     },
-    
-    // Premium
-    premium: {
-      title: "Premium",
-      subtitle: "Deblochează funcționalități avansate",
-      plans: "Planuri de Abonare",
-      aiConsultant: "Consultant AI",
-      features: "Caracteristici Premium",
-      currentPlan: "Planul tău actual",
-      upgrade: "Upgrade",
-      premiumFeatures: "Funcționalități Premium",
-      advancedReports: "Rapoarte Avansate",
-      aiConsultantDesc: "Consultant AI pentru întrebări numerologice",
-      unlimitedAccess: "Acces Nelimitat",
-      prioritySupport: "Suport Priorititar",
-      exportPDF: "Export PDF",
-      customReports: "Rapoarte Personalizate",
-      monthly: "Lunar",
-      yearly: "Anual",
-      subscribe: "Abonează-te",
-      mostPopular: "Cel mai popular",
-      save: "Economisește",
-      perMonth: "/lună",
-      perYear: "/an",
-      featureTitle: "Funcționalitate Premium",
-      featureDescription: "Această funcționalitate necesită un abonament Premium.",
-      upgradeToPremium: "Upgrade la Premium",
-      unlockAdvanced: "Deblochează funcționalități avansate",
-      getStarted: "Începe acum",
-      consultantTitle: "Consultant AI Numerologic",
-      consultantDescription: "Pune întrebări despre numerologie și primește răspunsuri personalizate",
-      consultantPlaceholder: "Ex: Ce înseamnă Numărul Drumului Vieții pentru mine?",
-      ask: "Întreabă",
-      quickQuestions: "Întrebări rapide",
-      relatedNumbers: "Numere conexe",
-      suggestions: "Sugestii",
-      followUp: "Întrebări de urmărire",
-      noResponse: "Pune o întrebare pentru a începe conversația"
-    }
   },
   en: {
     loading: "Loading...",
@@ -519,8 +433,6 @@ export const translations = {
     calculateButton: "Discover Your Numbers",
     
     // Results
-    profileTitle: "Your Numerological Profile",
-    profileSubtitle: "Discover the hidden meaning of your personal numbers",
     calculateAgain: "Calculate again",
     
     // Number titles
@@ -536,27 +448,18 @@ export const translations = {
     infoPersonalYear: "This year's energy",
     
     // Navigation
-    viewGuide: "Guide",
-    viewCompatibility: "Compatibility",
     backToCalculator: "Back to Calculator",
     profile: "Profile",
     myProfile: "My Profile",
     login: "Login",
-    courses: "Courses",
-    articles: "Articles",
     predictions: "Predictions",
-    tools: "Tools",
-    tutorials: "Tutorials",
-    faq: "FAQ",
     angelNumbers: "Angel Numbers",
-    back: "Back",
 
     // Profile page
     profilePageTitle: "My Numerological Profile",
     profilePageSubtitle: "Complete your personal data to quickly access numerological calculations",
     profileSaved: "Profile saved successfully!",
     profileDeleted: "Profile deleted successfully!",
-    saveProfile: "Save Profile",
     deleteProfile: "Delete Profile",
     editProfile: "Edit Profile",
     createProfile: "Create Profile",
@@ -567,19 +470,13 @@ export const translations = {
     birthPlaceLabel: "Birth Place (optional)",
     birthPlacePlaceholder: "Ex: New York, USA",
     birthPlaceHint: "Birth place can influence numerological calculations",
-    useProfileData: "Use profile data",
-    profileRequired: "Please create a profile to use this feature",
     // Multiple profiles
-    switchProfile: "Switch Profile",
-    activeProfile: "Active Profile",
-    allProfiles: "All Profiles",
     createNewProfile: "Create New Profile",
     selectProfile: "Select Profile",
     profileSwitched: "Profile switched successfully!",
     switchProfileError: "Error switching profile",
     noProfiles: "You don't have any profiles yet",
     profileComparison: "Profile Comparison",
-    compareProfiles: "Compare Profiles",
     selectProfilesToCompare: "Select profiles to compare",
     cancel: "Cancel",
     save: "Save",
@@ -632,9 +529,6 @@ export const translations = {
     },
     
     // Guide page
-    guideLabel: "Complete Guide",
-    guideTitle: "Number Meanings",
-    guideSubtitle: "Explore in depth the meaning of each number in numerology and discover how they influence your life",
     coreNumbersTitle: "Core Numbers (1-9)",
     coreNumbersDesc: "These nine numbers form the foundation of all numerology. Each carries a unique vibration and distinct characteristics.",
     masterNumbersTitle: "Master Numbers (11, 22, 33)",
@@ -863,35 +757,6 @@ export const translations = {
       tryExample: "See an example map first",
       exampleNote: "The map of a made-up person, so you can see what this is before you type your own name."
     },
-    
-    // Export & Sharing
-    export: {
-      export: "Export",
-      fullReport: "Full Report PDF",
-      customReport: "Custom Report",
-      exportChart: "Export Chart",
-      options: "Options",
-      includeCharts: "Include Charts",
-      includeKarmic: "Include Karmic Analysis",
-      includePinnacles: "Include Pinnacles",
-      includeCycles: "Include Cycles",
-      includePredictions: "Include Predictions",
-      exporting: "Exporting...",
-      success: "Export successful!",
-      error: "Export error"
-    },
-    sharing: {
-      share: "Share",
-      shareTo: "Share to",
-      facebook: "Facebook",
-      twitter: "Twitter",
-      whatsapp: "WhatsApp",
-      instagram: "Instagram",
-      email: "Send by Email",
-      copyLink: "Copy Link",
-      linkCopied: "Link copied!",
-      nativeShare: "Share"
-    },
     people: {
       title: "My people",
       subtitle: "The maps you keep: your own, the people close to you, children, businesses.",
@@ -959,45 +824,6 @@ export const translations = {
       dayNumber: "Day number",
       universalNumber: "Universal number"
     },
-    
-    // Premium
-    premium: {
-      title: "Premium",
-      subtitle: "Unlock advanced features",
-      plans: "Subscription Plans",
-      aiConsultant: "AI Consultant",
-      features: "Premium Features",
-      currentPlan: "Your current plan",
-      upgrade: "Upgrade",
-      premiumFeatures: "Premium Features",
-      advancedReports: "Advanced Reports",
-      aiConsultantDesc: "AI consultant for numerology questions",
-      unlimitedAccess: "Unlimited Access",
-      prioritySupport: "Priority Support",
-      exportPDF: "PDF Export",
-      customReports: "Custom Reports",
-      monthly: "Monthly",
-      yearly: "Yearly",
-      subscribe: "Subscribe",
-      mostPopular: "Most popular",
-      save: "Save",
-      perMonth: "/month",
-      perYear: "/year",
-      featureTitle: "Premium Feature",
-      featureDescription: "This feature requires a Premium subscription.",
-      upgradeToPremium: "Upgrade to Premium",
-      unlockAdvanced: "Unlock advanced features",
-      getStarted: "Get Started",
-      consultantTitle: "AI Numerology Consultant",
-      consultantDescription: "Ask questions about numerology and get personalized answers",
-      consultantPlaceholder: "E.g.: What does my Life Path Number mean for me?",
-      ask: "Ask",
-      quickQuestions: "Quick Questions",
-      relatedNumbers: "Related Numbers",
-      suggestions: "Suggestions",
-      followUp: "Follow-up Questions",
-      noResponse: "Ask a question to start the conversation"
-    }
   },
   ru: {
     loading: "Загрузка...",
@@ -1016,8 +842,6 @@ export const translations = {
     calculateButton: "Узнать Ваши Числа",
     
     // Results
-    profileTitle: "Ваш Нумерологический Профиль",
-    profileSubtitle: "Откройте скрытое значение ваших личных чисел",
     calculateAgain: "Рассчитать снова",
     
     // Number titles
@@ -1033,20 +857,12 @@ export const translations = {
     infoPersonalYear: "Энергия текущего года",
     
     // Navigation
-    viewGuide: "Руководство",
-    viewCompatibility: "Совместимость",
     backToCalculator: "Назад к Калькулятору",
     profile: "Профиль",
     myProfile: "Мой Профиль",
     login: "Вход",
-    courses: "Курсы",
-    articles: "Статьи",
     predictions: "Прогнозы",
-    tools: "Инструменты",
-    tutorials: "Учебники",
-    faq: "Часто Задаваемые Вопросы",
     angelNumbers: "Ангельские Числа",
-    back: "Назад",
     
     // NotFound page
     notFound: {
@@ -1060,7 +876,6 @@ export const translations = {
     profilePageSubtitle: "Заполните ваши личные данные для быстрого доступа к нумерологическим расчётам",
     profileSaved: "Профиль успешно сохранён!",
     profileDeleted: "Профиль успешно удалён!",
-    saveProfile: "Сохранить Профиль",
     deleteProfile: "Удалить Профиль",
     editProfile: "Редактировать Профиль",
     createProfile: "Создать Профиль",
@@ -1071,19 +886,13 @@ export const translations = {
     birthPlaceLabel: "Место Рождения (необязательно)",
     birthPlacePlaceholder: "Например: Москва, Россия",
     birthPlaceHint: "Место рождения может влиять на нумерологические расчёты",
-    useProfileData: "Использовать данные профиля",
-    profileRequired: "Пожалуйста, создайте профиль для использования этой функции",
     // Multiple profiles
-    switchProfile: "Переключить Профиль",
-    activeProfile: "Активный Профиль",
-    allProfiles: "Все Профили",
     createNewProfile: "Создать Новый Профиль",
     selectProfile: "Выбрать Профиль",
     profileSwitched: "Профиль успешно переключён!",
     switchProfileError: "Ошибка переключения профиля",
     noProfiles: "У вас ещё нет профилей",
     profileComparison: "Сравнение Профилей",
-    compareProfiles: "Сравнить Профили",
     selectProfilesToCompare: "Выберите профили для сравнения",
     cancel: "Отмена",
     save: "Сохранить",
@@ -1131,9 +940,6 @@ export const translations = {
     },
     
     // Guide page
-    guideLabel: "Полное Руководство",
-    guideTitle: "Значение Чисел",
-    guideSubtitle: "Исследуйте глубоко значение каждого числа в нумерологии и откройте, как они влияют на вашу жизнь",
     coreNumbersTitle: "Основные Числа (1-9)",
     coreNumbersDesc: "Эти девять чисел составляют основу всей нумерологии. Каждое несёт уникальную вибрацию и отличительные характеристики.",
     masterNumbersTitle: "Мастер-Числа (11, 22, 33)",
@@ -1362,35 +1168,6 @@ export const translations = {
       tryExample: "Сначала посмотрите пример карты",
       exampleNote: "Карта вымышленного человека, чтобы понять, о чём речь, прежде чем вводить своё имя."
     },
-    
-    // Export & Sharing
-    export: {
-      export: "Экспорт",
-      fullReport: "Полный Отчёт PDF",
-      customReport: "Настраиваемый Отчёт",
-      exportChart: "Экспорт Графика",
-      options: "Опции",
-      includeCharts: "Включить Графики",
-      includeKarmic: "Включить Кармический Анализ",
-      includePinnacles: "Включить Пики",
-      includeCycles: "Включить Циклы",
-      includePredictions: "Включить Прогнозы",
-      exporting: "Экспорт...",
-      success: "Экспорт успешен!",
-      error: "Ошибка экспорта"
-    },
-    sharing: {
-      share: "Поделиться",
-      shareTo: "Поделиться в",
-      facebook: "Facebook",
-      twitter: "Twitter",
-      whatsapp: "WhatsApp",
-      instagram: "Instagram",
-      email: "Отправить по Email",
-      copyLink: "Копировать Ссылку",
-      linkCopied: "Ссылка скопирована!",
-      nativeShare: "Поделиться"
-    },
     people: {
       title: "Мои люди",
       subtitle: "Карты, которые вы храните: свои, близких, детей, компаний.",
@@ -1458,45 +1235,6 @@ export const translations = {
       dayNumber: "Число дня",
       universalNumber: "Универсальное число"
     },
-    
-    // Premium
-    premium: {
-      title: "Премиум",
-      subtitle: "Разблокировать расширенные функции",
-      plans: "Планы подписки",
-      aiConsultant: "ИИ Консультант",
-      features: "Премиум функции",
-      currentPlan: "Ваш текущий план",
-      upgrade: "Обновить",
-      premiumFeatures: "Премиум функции",
-      advancedReports: "Расширенные отчеты",
-      aiConsultantDesc: "ИИ консультант для нумерологических вопросов",
-      unlimitedAccess: "Неограниченный доступ",
-      prioritySupport: "Приоритетная поддержка",
-      exportPDF: "Экспорт PDF",
-      customReports: "Пользовательские отчеты",
-      monthly: "Ежемесячно",
-      yearly: "Ежегодно",
-      subscribe: "Подписаться",
-      mostPopular: "Самый популярный",
-      save: "Сэкономить",
-      perMonth: "/месяц",
-      perYear: "/год",
-      featureTitle: "Премиум функция",
-      featureDescription: "Эта функция требует премиум подписки.",
-      upgradeToPremium: "Обновить до Премиум",
-      unlockAdvanced: "Разблокировать расширенные функции",
-      getStarted: "Начать",
-      consultantTitle: "ИИ Нумерологический консультант",
-      consultantDescription: "Задавайте вопросы о нумерологии и получайте персонализированные ответы",
-      consultantPlaceholder: "Например: Что означает мое Число Жизненного Пути для меня?",
-      ask: "Спросить",
-      quickQuestions: "Быстрые вопросы",
-      relatedNumbers: "Связанные числа",
-      suggestions: "Предложения",
-      followUp: "Вопросы для продолжения",
-      noResponse: "Задайте вопрос, чтобы начать разговор"
-    }
   }
 };
 
