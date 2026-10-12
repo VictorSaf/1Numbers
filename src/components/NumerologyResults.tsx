@@ -224,6 +224,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     deeperNow: { ro: "Zilele favorabile și bioritmurile", en: "Lucky dates and biorhythms", ru: "Благоприятные дни и биоритмы" },
     openChaldean: { ro: "Deschide analiza caldeeană", en: "Open the Chaldean analysis", ru: "Открыть халдейский анализ" },
     transits: { ro: "Tranzite și Esență", en: "Transits and Essence", ru: "Транзиты и Сущность" },
+    transitsYears: { ro: "Tranzitele, an cu an", en: "The transits, year by year", ru: "Транзиты, год за годом" },
     biorhythms: { ro: "Biorritmuri", en: "Biorhythms", ru: "Биоритмы" },
     core: { ro: "Numerele de bază", en: "The core numbers", ru: "Основные числа" },
     profile: { ro: "Profilul numerologic", en: "Numerology profile", ru: "Нумерологический профиль" },
@@ -610,7 +611,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
             </div>
           </Block>
 
-          <Block title={sectionLabels.transits[language]} note={teasers.transits[language]}>
+          <Block title={sectionLabels.transitsYears[language]} note={teasers.transits[language]}>
             <Suspense fallback={chartSkeleton}>
               <TransitsTimeline fullName={fullName} birthDate={birthDate} />
             </Suspense>

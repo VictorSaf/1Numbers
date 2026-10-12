@@ -138,8 +138,10 @@ const zoneTitle = (t: MatrixCopy, row: { family: string; id: string; model: stri
 };
 
 /** „A + E = 7 + 8 = 15 → 15". */
-const stepText = (s: CalcStep, value: number) => {
-  const codes = s.terms.map((x) => (x.unreduced ? `(${x.code})*` : x.code)).join(" + ");
+const stepText = (s: CalcStep, value: number, t?: MatrixCopy) => {
+  // Totalurile adună celule („anahata.physics”): le scriem cu numele lor, nu cu cheia.
+  const name = (code: string) => (t && code.includes(".") ? cellLabel(t, code) : code);
+  const codes = s.terms.map((x) => (x.unreduced ? `(${name(x.code)})*` : name(x.code))).join(" + ");
   if (s.terms.length === 1) return `${codes} = ${value}`;
   const vals = s.terms.map((x) => x.value).join(" + ");
   return `${codes} = ${vals} = ${s.raw}${s.raw !== value ? ` → ${value}` : ""}`;
@@ -153,7 +155,12 @@ const DIST_TONE: Record<Verdict, string> = {
 };
 
 /** Zonele, fiecare cu ambele reduceri, distanța și pașii. Folosită și de cuplu. */
-export const MatrixZoneList = ({ rows, t }: { rows: ReductionRow[]; t: MatrixCopy }) => (
+export const MatrixZoneList = ({ rows, t }: { rows: ReductionRow[]; t: MatrixCopy }) => {
+  const { language } = useLanguage();
+  const lang = (["ro", "en", "ru"].includes(language) ? language : "en") as "ro" | "en" | "ru";
+  // Un număr de arcan fără nume nu spune nimic omului; numele e arhetipul.
+  const name = (n: number) => ARCANA_BY_N[n]?.title[lang] ?? "";
+  return (
   <div className="space-y-6">
     {rows.map((row) => (
       <div key={row.id} data-zone={row.id} className="border-t border-line pt-3">
@@ -166,7 +173,10 @@ export const MatrixZoneList = ({ rows, t }: { rows: ReductionRow[]; t: MatrixCop
           {row.cells.map((c) => (
             <div key={c.key} data-cell={c.key} className="flex items-baseline justify-between gap-3 border-b border-line py-1 text-sm">
               <dt className="text-muted-foreground">{cellLabel(t, c.key)}</dt>
-              <dd className="m-0 flex items-baseline gap-2">
+              <dd className="m-0 flex flex-wrap items-baseline justify-end gap-x-2 text-right">
+                <span className="text-[11px] text-muted-foreground">
+                  {name(c.digitsum)}{c.mod22 !== c.digitsum && ` / ${name(c.mod22)}`}
+                </span>
                 <span data-reduction="digitsum" title={t.digitsum} className="num text-foreground">{c.digitsum}</span>
                 <span aria-hidden className="text-faint">/</span>
                 <span data-reduction="mod22" title={t.mod22} className="num text-muted-foreground">{c.mod22}</span>
@@ -184,9 +194,9 @@ export const MatrixZoneList = ({ rows, t }: { rows: ReductionRow[]; t: MatrixCop
           <ul className="mt-1 space-y-0.5">
             {row.cells.map((c) => (
               <li key={c.key} className="num">
-                {cellLabel(t, c.key)}: {stepText(c.steps.digitsum, c.digitsum)}
+                {cellLabel(t, c.key)}: {stepText(c.steps.digitsum, c.digitsum, t)}
                 {(c.steps.mod22.raw !== c.steps.digitsum.raw || c.mod22 !== c.digitsum) &&
-                  ` · ${t.mod22}: ${stepText(c.steps.mod22, c.mod22)}`}
+                  ` · ${t.mod22}: ${stepText(c.steps.mod22, c.mod22, t)}`}
               </li>
             ))}
           </ul>
@@ -197,7 +207,8 @@ export const MatrixZoneList = ({ rows, t }: { rows: ReductionRow[]; t: MatrixCop
       </div>
     ))}
   </div>
-);
+  );
+};
 
 /** Modelele aceleiași zone, unul lângă altul, cu distanța dintre ele. */
 export const ModelComparisons = ({ comparisons, t }: { comparisons: ModelComparison[]; t: MatrixCopy }) => (
