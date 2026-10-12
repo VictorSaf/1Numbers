@@ -54,7 +54,7 @@ export const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarPro
               className={cn(
                 "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all",
                 isActive
-                  ? "bg-primary/20 text-primary border border-primary/30"
+                  ? "bg-sunken text-primary border border-line"
                   : "text-foreground/70 hover:bg-muted/50 hover:text-foreground"
               )}
             >
@@ -84,7 +84,7 @@ export const AdminMobileNav = ({ activeSection, onSectionChange }: AdminSidebarP
               className={cn(
                 "flex items-center gap-2 px-4 py-2 rounded-lg transition-all whitespace-nowrap",
                 isActive
-                  ? "bg-primary/20 text-primary border border-primary/30"
+                  ? "bg-sunken text-primary border border-line"
                   : "text-foreground/70 hover:bg-muted/50"
               )}
             >

@@ -9,18 +9,37 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        /* Alama plină, ca peste tot în aplicație.
+           `text-background` se inversează singur: pe temă deschisă alama e
+           închisă și textul iese deschis, pe temă închisă invers. Un
+           `text-white` fix ar fi fost ilizibil pe una dintre ele. */
+        default: "bg-gilt text-background hover:bg-gilt/90",
+        destructive: "border border-crit bg-transparent text-crit hover:bg-crit/10",
+        outline: "border border-gilt bg-transparent text-gilt hover:bg-gilt-soft",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
       },
+      /**
+       * 44px (h-11) e pragul de jos, pentru toate mărimile.
+       *
+       * Măsurat pe 390×844: butoanele `sm` ieșeau 36px, `default` 40, iar
+       * ghidul iOS cere 44 și Material 48. Nu era o scăpare punctuală -- era
+       * valoarea implicită a variantei, deci apărea în toate cele 44 de locuri
+       * unde cineva scrisese size="sm".
+       *
+       * Ridicat doar `sm`, ar fi ieșit mai înalt decât `default`: „mic” mai
+       * mare decât „normal” e incoerent și derutează orice folosire viitoare.
+       * Deci pragul se aplică la toate, iar ce distinge mărimile rămâne
+       * spațierea orizontală și raza -- nu înălțimea la care intră degetul.
+       *
+       * Consecință acceptată: butoanele sunt cu 4-8px mai înalte și cu mouse-ul.
+       */
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
-        icon: "h-10 w-10",
+        default: "h-11 px-4 py-2",
+        sm: "h-11 rounded-md px-3",
+        lg: "h-12 rounded-md px-8",
+        icon: "h-11 w-11",
       },
     },
     defaultVariants: {

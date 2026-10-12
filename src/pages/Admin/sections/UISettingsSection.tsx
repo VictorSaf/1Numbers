@@ -5,43 +5,36 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { API_BASE } from '@/lib/apiBase';
 
 interface UISettings {
   defaultTheme: string;
   availableThemes: string[];
 }
 
+// Two themes, and the swatches are the tokens they actually set. The four this
+// replaced were labelled from memory rather than from the stylesheet: celestial
+// was described as "light ethereal" and is dark, dawn as "warm sunrise" and is
+// the only light one. Three of the four were the same palette.
 const themes = [
   {
-    id: 'twilight',
-    name: 'Twilight',
-    description: 'Deep purple mystical theme',
-    colors: ['#1a0f2e', '#7c3aed', '#fbbf24'],
+    id: 'light',
+    name: 'Light',
+    description: 'Ink blue on paper',
+    colors: ['#f2f3f7', '#22406b', '#8c3b6b'],
   },
   {
-    id: 'dawn',
-    name: 'Dawn',
-    description: 'Warm sunrise colors',
-    colors: ['#1f1a24', '#f97316', '#fcd34d'],
-  },
-  {
-    id: 'midnight',
-    name: 'Midnight',
-    description: 'Dark blue cosmic theme',
-    colors: ['#0a0f1a', '#3b82f6', '#60a5fa'],
-  },
-  {
-    id: 'celestial',
-    name: 'Celestial',
-    description: 'Light ethereal theme',
-    colors: ['#f5f5f5', '#8b5cf6', '#c084fc'],
+    id: 'dark',
+    name: 'Dark',
+    description: 'Ink blue on slate',
+    colors: ['#0e1017', '#8fb4e0', '#dd90bf'],
   },
 ];
 
 export const UISettingsSection = () => {
   const [settings, setSettings] = useState<UISettings>({
-    defaultTheme: 'twilight',
-    availableThemes: ['twilight', 'dawn', 'midnight', 'celestial'],
+    defaultTheme: 'system',
+    availableThemes: ['light', 'dark', 'system'],
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -51,7 +44,7 @@ export const UISettingsSection = () => {
     const fetchSettings = async () => {
       try {
         const token = localStorage.getItem('auth_token');
-        const response = await fetch('http://localhost:3001/api/admin/settings', {
+        const response = await fetch(`${API_BASE}/admin/settings`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -77,7 +70,7 @@ export const UISettingsSection = () => {
     setSaving(true);
     try {
       const token = localStorage.getItem('auth_token');
-      const response = await fetch('http://localhost:3001/api/admin/settings', {
+      const response = await fetch(`${API_BASE}/admin/settings`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -131,7 +124,7 @@ export const UISettingsSection = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-cinzel font-bold mb-2">UI Settings</h2>
+        <h2 className="text-2xl font-heading font-bold mb-2">UI Settings</h2>
         <p className="text-muted-foreground">Customize the visual appearance</p>
       </div>
 
@@ -150,8 +143,8 @@ export const UISettingsSection = () => {
                 className={cn(
                   "p-4 rounded-lg border-2 transition-all text-left",
                   settings.defaultTheme === theme.id
-                    ? "border-primary bg-primary/10"
-                    : "border-border hover:border-primary/50"
+                    ? "border-primary bg-sunken"
+                    : "border-border hover:border-line"
                 )}
               >
                 <div className="flex gap-1 mb-2">
@@ -219,7 +212,7 @@ export const UISettingsSection = () => {
 
       {/* Save Button */}
       <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={saving} className="btn-mystic">
+        <Button onClick={handleSave} disabled={saving}>
           <Save className="h-4 w-4 mr-2" />
           {saving ? 'Saving...' : 'Save Settings'}
         </Button>

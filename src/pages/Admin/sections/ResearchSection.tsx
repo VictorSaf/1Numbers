@@ -56,7 +56,7 @@ export const ResearchSection = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-cinzel font-bold mb-2">Research Documents</h2>
+        <h2 className="text-2xl font-heading font-bold mb-2">Research Documents</h2>
         <p className="text-muted-foreground">
           Project research and documentation from docs/research/
         </p>
@@ -66,8 +66,8 @@ export const ResearchSection = () => {
       <Card className="card-mystic">
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
-            <div className="p-3 rounded-lg bg-primary/10">
-              <FileSearch className="h-6 w-6 text-primary" />
+            <div className="p-3 rounded-lg bg-sunken">
+              <FileSearch className="h-6 w-6" />
             </div>
             <div>
               <div className="text-2xl font-bold">{documents.length} Documents</div>
@@ -99,8 +99,8 @@ export const ResearchSection = () => {
                 className="flex items-center justify-between p-4 rounded-lg bg-muted/30 border border-border/30"
               >
                 <div className="flex items-center gap-4">
-                  <div className="p-2 rounded-lg bg-blue-500/10">
-                    <FileText className="h-5 w-5 text-blue-500" />
+                  <div className="p-2 rounded-lg">
+                    <FileText className="h-5 w-5 text-info" />
                   </div>
                   <div className="flex-1">
                     <div className="font-medium flex items-center gap-2">
@@ -134,11 +134,11 @@ export const ResearchSection = () => {
       </Card>
 
       {/* Info Card */}
-      <Card className="card-mystic border-primary/30">
+      <Card className="card-mystic border-line">
         <CardContent className="p-6">
           <div className="flex items-start gap-4">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <FileSearch className="h-5 w-5 text-primary" />
+            <div className="p-2 rounded-lg bg-sunken">
+              <FileSearch className="h-5 w-5" />
             </div>
             <div>
               <div className="font-medium mb-1">Research Documentation</div>

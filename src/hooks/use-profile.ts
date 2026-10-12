@@ -1,20 +1,21 @@
 import { useProfiles, Profile } from './use-profiles';
+import { parseCalendarDate } from '@/lib/calendarDate';
 
 /**
  * Legacy hook for backward compatibility
  * Now uses useProfiles hook internally to get active profile
  */
 export const useProfile = () => {
-  const { activeProfile, loading } = useProfiles();
+  const { activeProfile, loading, refetch } = useProfiles();
 
   return {
     profile: activeProfile,
     loading,
-    refetch: () => {}, // Use useProfiles().refetch() instead
+    refetch,
     hasProfile: !!activeProfile,
     profileData: activeProfile ? {
       fullName: activeProfile.fullName,
-      birthDate: new Date(activeProfile.birthDate),
+      birthDate: parseCalendarDate(activeProfile.birthDate),
       birthTime: activeProfile.birthTime,
       birthPlace: activeProfile.birthPlace,
     } : null,

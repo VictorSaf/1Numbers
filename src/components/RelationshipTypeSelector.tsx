@@ -1,5 +1,4 @@
 import { Heart, Users, Briefcase, Home } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { RelationshipType } from "@/lib/compatibility";
 import { cn } from "@/lib/utils";
@@ -49,20 +48,22 @@ export const RelationshipTypeSelector = ({
       </label>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
         {relationshipTypes.map(({ type, icon, label }) => (
-          <Button
+          <button
             key={type}
-            variant={selectedType === type ? "default" : "outline"}
+            type="button"
             onClick={() => onTypeChange(type)}
+            aria-pressed={selectedType === type}
             className={cn(
-              "flex flex-col items-center gap-2 h-auto py-3",
+              "num flex min-h-11 flex-col items-center justify-center gap-1.5 border-b-2 pb-2",
+              "text-[0.63rem] uppercase tracking-[0.14em] transition-colors",
               selectedType === type
-                ? "bg-primary text-primary-foreground border-primary"
-                : "hover:bg-primary/10"
+                ? "border-gilt text-gilt"
+                : "border-transparent text-muted-foreground hover:border-line hover:text-foreground",
             )}
           >
             {icon}
-            <span className="text-xs font-medium">{label[language]}</span>
-          </Button>
+            <span>{label[language]}</span>
+          </button>
         ))}
       </div>
     </div>

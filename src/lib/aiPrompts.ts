@@ -16,6 +16,7 @@ import {
 import { calculateKarmicDebts, calculateKarmicLessons } from './karmic';
 import { calculatePinnacles, calculateChallenges } from './pinnacles';
 import { generateLoShuGrid, LoShuGridResult } from './loShuGrid';
+import { compareAll } from './models/elements';
 
 // Types
 export interface UserNumerologyProfile {
@@ -46,70 +47,6 @@ export interface DailySuggestion {
 }
 
 // System prompts for different AI contexts
-export const SYSTEM_PROMPTS: Record<Language, string> = {
-  ro: `Ești un consultant numerologic expert cu cunoștințe profunde în sistemul Pythagorean, numerologia chineză (Lo Shu Grid), și interpretarea karmică a numerelor.
-
-ROLUL TĂU:
-- Oferă interpretări personalizate bazate pe profilul numerologic complet al utilizatorului
-- Explică conceptele numerologice într-un mod accesibil și practic
-- Conectează numerologia cu viața de zi cu zi a utilizatorului
-- Fii empatic, înțelegător și pozitiv în răspunsuri
-- Folosește limba română corectă și elegantă
-
-STILUL RĂSPUNSURILOR:
-- Răspunsuri clare, structurate și relevante
-- Include întotdeauna aspecte practice și aplicabile
-- Menționează numerele relevante și semnificația lor
-- Oferă sugestii concrete pentru îmbunătățire
-- Evită răspunsurile prea lungi sau vagi
-
-LIMITĂRI:
-- Nu face predicții definitive despre viitor
-- Nu oferi sfaturi medicale sau financiare specifice
-- Subliniază că numerologia este un instrument de auto-cunoaștere`,
-
-  en: `You are an expert numerology consultant with deep knowledge in the Pythagorean system, Chinese numerology (Lo Shu Grid), and karmic number interpretation.
-
-YOUR ROLE:
-- Provide personalized interpretations based on the user's complete numerological profile
-- Explain numerological concepts in an accessible and practical way
-- Connect numerology with the user's daily life
-- Be empathetic, understanding, and positive in your responses
-- Use clear and elegant English
-
-RESPONSE STYLE:
-- Clear, structured, and relevant answers
-- Always include practical and applicable aspects
-- Mention relevant numbers and their significance
-- Offer concrete suggestions for improvement
-- Avoid responses that are too long or vague
-
-LIMITATIONS:
-- Do not make definitive predictions about the future
-- Do not offer specific medical or financial advice
-- Emphasize that numerology is a tool for self-knowledge`,
-
-  ru: `Вы эксперт-консультант по нумерологии с глубокими знаниями системы Пифагора, китайской нумерологии (сетка Ло Шу) и кармической интерпретации чисел.
-
-ВАША РОЛЬ:
-- Предоставлять персонализированные интерпретации на основе полного нумерологического профиля пользователя
-- Объяснять нумерологические концепции доступным и практичным способом
-- Связывать нумерологию с повседневной жизнью пользователя
-- Быть эмпатичным, понимающим и позитивным в ответах
-- Использовать правильный и элегантный русский язык
-
-СТИЛЬ ОТВЕТОВ:
-- Четкие, структурированные и релевантные ответы
-- Всегда включайте практические и применимые аспекты
-- Упоминайте релевантные числа и их значение
-- Предлагайте конкретные предложения по улучшению
-- Избегайте слишком длинных или расплывчатых ответов
-
-ОГРАНИЧЕНИЯ:
-- Не делайте определенных прогнозов о будущем
-- Не давайте конкретных медицинских или финансовых советов
-- Подчеркивайте, что нумерология - инструмент самопознания`
-};
 
 // Build comprehensive user context for AI
 export function buildUserContext(context: AIContext): string {
@@ -140,8 +77,7 @@ export function buildUserContext(context: AIContext): string {
   const contextLabels: Record<Language, Record<string, string>> = {
     ro: {
       userProfile: 'PROFILUL NUMEROLOGIC AL UTILIZATORULUI',
-      name: 'Nume',
-      birthDate: 'Data nașterii',
+      age: 'Vârsta',
       coreNumbers: 'NUMERELE DE BAZĂ',
       lifePath: 'Drumul Vieții',
       destiny: 'Destinul',
@@ -168,8 +104,7 @@ export function buildUserContext(context: AIContext): string {
     },
     en: {
       userProfile: 'USER NUMEROLOGY PROFILE',
-      name: 'Name',
-      birthDate: 'Birth Date',
+      age: 'Age',
       coreNumbers: 'CORE NUMBERS',
       lifePath: 'Life Path',
       destiny: 'Destiny',
@@ -196,8 +131,7 @@ export function buildUserContext(context: AIContext): string {
     },
     ru: {
       userProfile: 'НУМЕРОЛОГИЧЕСКИЙ ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ',
-      name: 'Имя',
-      birthDate: 'Дата рождения',
+      age: 'Возраст',
       coreNumbers: 'ОСНОВНЫЕ ЧИСЛА',
       lifePath: 'Жизненный Путь',
       destiny: 'Судьба',
@@ -231,10 +165,21 @@ export function buildUserContext(context: AIContext): string {
   const currentPinnacle = pinnacles.find(p => age >= p.startAge && age <= p.endAge);
   const currentChallenge = challenges[0]; // First challenge is typically current
 
+  /**
+   * Ce pleacă spre model: CIFRELE, nu identitatea.
+   *
+   * Aici scriau numele complet și data nașterii în clar, iar șirul ăsta e chiar
+   * ce se trimite peste rețea. Modelul n-are nevoie de niciunul ca să răspundă
+   * despre numerologie -- toate numerele de mai jos sunt deja calculate din ele,
+   * în browser. Numele plus data nașterii identifică un om; „Drumul Vieții: 7”
+   * nu identifică pe nimeni.
+   *
+   * Vârsta rămâne, fiindcă chiar schimbă răspunsul: un vârf la 28 de ani și
+   * unul la 58 se citesc altfel. E un număr, nu o dată.
+   */
   let contextString = `
 === ${l.userProfile} ===
-${l.name}: ${fullName}
-${l.birthDate}: ${birthDate.toISOString().split('T')[0]}
+${l.age}: ${age}
 
 === ${l.coreNumbers} ===
 ${l.lifePath}: ${lifePath}
@@ -260,6 +205,24 @@ ${l.dominantElement}: ${loShuGrid.dominantElement}
 ${l.currentPinnacle}: ${currentPinnacle?.number || 'N/A'}
 ${l.currentChallenge}: ${currentChallenge?.number || 'N/A'}`;
 
+  // R4 și R9: modelul primește și unde școlile se despart, ca să nu aleagă una
+  // în tăcere. Doar întrebarea, școala și cifra -- fără pașii de calcul, care
+  // conțin literele numelui.
+  const SCHOOLS: Record<Language, { title: string; rule: string }> = {
+    ro: { title: 'UNDE ȘCOLILE SE DESPART', rule: 'Când răspunzi despre una dintre aceste întrebări, numește diferența dintre școli. Nu face medii și nu alege o școală în tăcere.' },
+    en: { title: 'WHERE THE SCHOOLS PART', rule: 'When you answer about one of these questions, name the difference between the schools. Do not average and do not silently pick one.' },
+    ru: { title: 'ГДЕ ШКОЛЫ РАСХОДЯТСЯ', rule: 'Отвечая на один из этих вопросов, назовите расхождение между школами. Не усредняйте и не выбирайте одну молча.' },
+  };
+  const splits = compareAll(fullName, birthDate, { lang: language, today: currentDate })
+    .filter((c) => c.verdict !== 'agree');
+  if (splits.length) {
+    contextString += `
+
+=== ${SCHOOLS[language].title} ===
+${SCHOOLS[language].rule}
+${splits.map((c) => `${c.question} ${c.models.map((m) => `${m.school}: ${m.display}`).join('; ')} [${c.verdict}, ${c.spread}]`).join('\n')}`;
+  }
+
   // Add gamification stats if available
   if (profile.gamificationStats) {
     const { level, streak, achievements } = profile.gamificationStats;
@@ -280,7 +243,7 @@ export function generateDailySuggestion(context: AIContext): DailySuggestion {
   const { birthDate } = profile;
 
   const personalDay = calculatePersonalDayNumber(birthDate, currentDate);
-  const personalMonth = calculatePersonalMonthNumber(birthDate, currentDate);
+  const personalMonth = calculatePersonalMonthNumber(birthDate, currentDate.getFullYear(), currentDate.getMonth() + 1);
   const lifePath = calculateLifePathNumber(birthDate);
 
   const suggestions: Record<Language, Record<number, DailySuggestion>> = {
@@ -635,36 +598,26 @@ export const FREQUENT_QUESTIONS: Record<Language, Array<{ question: string; cate
   ],
 };
 
-// Format conversation history for AI context
-export function formatConversationHistory(
-  history: Array<{ role: 'user' | 'assistant'; content: string }>,
-  maxMessages: number = 10
-): string {
-  const recentHistory = history.slice(-maxMessages);
-
-  return recentHistory
-    .map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`)
-    .join('\n\n');
-}
-
 // Build complete prompt for AI request
+//
+// The system prompt is no longer built here: the server owns it, so that the
+// provider key cannot be pointed at a task the client chose.
+//
+// Nor is the conversation history: it used to be folded into the question text
+// here *and* posted separately by AIConsultant, so the server received it twice
+// and paid for the same tokens twice. It travels once now, in its own field.
+//
+// The profile is returned separately from the question because the server puts
+// it before the cache breakpoint -- it is the only part that does not change
+// during a conversation.
 export function buildAIPrompt(
   userMessage: string,
   context: AIContext
-): { systemPrompt: string; userPrompt: string } {
-  const systemPrompt = SYSTEM_PROMPTS[context.language];
-  const userContext = buildUserContext(context);
-
-  let userPrompt = `${userContext}\n\n`;
-
-  if (context.conversationHistory && context.conversationHistory.length > 0) {
-    userPrompt += `CONVERSATION HISTORY:\n${formatConversationHistory(context.conversationHistory)}\n\n`;
-  }
-
-  userPrompt += `USER QUESTION: ${userMessage}`;
-
-  return { systemPrompt, userPrompt };
+): { profileContext: string; question: string } {
+  return {
+    profileContext: buildUserContext(context).trim(),
+    question: userMessage,
+  };
 }
 
 // Export types for use in components
-export type { AIContext, UserNumerologyProfile, DailySuggestion };

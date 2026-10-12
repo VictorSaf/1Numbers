@@ -6,7 +6,6 @@ import {
   buildAIPrompt,
   generateDailySuggestion,
   FREQUENT_QUESTIONS,
-  SYSTEM_PROMPTS,
   type AIContext,
   type DailySuggestion,
 } from '@/lib/aiPrompts';
@@ -27,6 +26,9 @@ import {
   ChevronRight,
   RefreshCw,
 } from 'lucide-react';
+import { AssistantText } from '@/components/AssistantText';
+import { API_BASE } from '@/lib/apiBase';
+import { parseCalendarDate } from '@/lib/calendarDate';
 
 interface ConversationMessage {
   role: 'user' | 'assistant';
@@ -34,15 +36,8 @@ interface ConversationMessage {
   timestamp: Date;
 }
 
-interface AIResponse {
-  answer: string;
-  relatedNumbers?: number[];
-  suggestions?: string[];
-  followUpQuestions?: string[];
-}
-
 export const AIConsultant = () => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const { user } = useAuth();
   const { profile } = useProfile();
   const [question, setQuestion] = useState('');
@@ -50,12 +45,16 @@ export const AIConsultant = () => {
   const [conversation, setConversation] = useState<ConversationMessage[]>([]);
   const [dailySuggestion, setDailySuggestion] = useState<DailySuggestion | null>(null);
   const [activeTab, setActiveTab] = useState('chat');
+  // What actually happened to the last question. Not an assistant message:
+  // an answer that didn't come from the model has no business in the
+  // conversation next to ones that did.
+  const [problem, setProblem] = useState<'unavailable' | 'busy' | 'failed' | null>(null);
 
   // Build AI context from user profile
   const aiContext: AIContext | null = useMemo(() => {
     if (!profile) return null;
 
-    const birthDate = new Date(profile.birthDate);
+    const birthDate = parseCalendarDate(profile.birthDate);
     const loShuGrid = generateLoShuGrid(birthDate);
 
     return {
@@ -84,6 +83,7 @@ export const AIConsultant = () => {
     if (!question.trim() || !aiContext) return;
 
     setLoading(true);
+    setProblem(null);
     const currentQuestion = question;
     setQuestion('');
 
@@ -95,60 +95,56 @@ export const AIConsultant = () => {
     };
     setConversation((prev) => [...prev, userMessage]);
 
+    // The server accepts at most eight history messages, each up to 1500
+    // characters. Trim to that here instead of letting the request come
+    // back 400 once the conversation runs long.
+    const history = conversation.slice(-8).map((msg) => ({
+      role: msg.role,
+      content: msg.content.slice(0, 1500),
+    }));
+
     try {
-      // Build prompt with full context
-      const { systemPrompt, userPrompt } = buildAIPrompt(currentQuestion, aiContext);
+      const { profileContext, question: askedQuestion } = buildAIPrompt(currentQuestion, aiContext);
 
       // Try to call backend API
-      const response = await fetch('/api/ai/consult', {
+      const response = await fetch(`${API_BASE}/ai/consult`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
         },
         body: JSON.stringify({
-          systemPrompt,
-          userPrompt,
-          conversationHistory: conversation.map((msg) => ({
-            role: msg.role,
-            content: msg.content,
-          })),
+          profileContext,
+          question: askedQuestion,
+          conversationHistory: history,
           language,
         }),
       });
 
-      let aiResponse: AIResponse;
-
+      // Nothing is appended to the conversation when the request fails. The
+      // consultant either shows an answer a model wrote about this person, or
+      // it says it has none -- there is no third thing it may display. What
+      // used to sit here invented a paragraph about the reader's "remarkable
+      // potential" and pushed it into the same bubble as a real answer.
       if (response.ok) {
-        const data = await response.json();
-        aiResponse = {
-          answer: data.answer,
-          relatedNumbers: data.relatedNumbers,
-          suggestions: data.suggestions,
-          followUpQuestions: data.followUpQuestions,
+        const data = (await response.json()) as { answer: string };
+        const assistantMessage: ConversationMessage = {
+          role: 'assistant',
+          content: data.answer,
+          timestamp: new Date(),
         };
+        setConversation((prev) => [...prev, assistantMessage]);
+      } else if (response.status === 503) {
+        // No model key configured server-side. Said, not papered over.
+        setProblem('unavailable');
+      } else if (response.status === 429) {
+        setProblem('busy');
       } else {
-        // Fallback to local generation
-        aiResponse = generateLocalResponse(currentQuestion, aiContext);
+        setProblem('failed');
       }
-
-      // Add assistant message to conversation
-      const assistantMessage: ConversationMessage = {
-        role: 'assistant',
-        content: aiResponse.answer,
-        timestamp: new Date(),
-      };
-      setConversation((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error asking question:', error);
-      // Fallback to local generation on error
-      const fallbackResponse = generateLocalResponse(currentQuestion, aiContext);
-      const assistantMessage: ConversationMessage = {
-        role: 'assistant',
-        content: fallbackResponse.answer,
-        timestamp: new Date(),
-      };
-      setConversation((prev) => [...prev, assistantMessage]);
+      setProblem('failed');
     } finally {
       setLoading(false);
     }
@@ -161,6 +157,7 @@ export const AIConsultant = () => {
 
   const clearConversation = () => {
     setConversation([]);
+    setProblem(null);
   };
 
   const translations: Record<string, Record<string, string>> = {
@@ -174,6 +171,9 @@ export const AIConsultant = () => {
       suggestions: 'Sugestii',
       clearChat: 'Șterge conversația',
       noProfile: 'Creează un profil pentru a primi răspunsuri personalizate',
+      unavailable: 'Consultantul nu este disponibil acum. Nu s-a inventat nimic în locul lui — încearcă din nou peste puțin.',
+      rateLimited: 'Ai pus prea multe întrebări într-un timp scurt. Încearcă din nou mai târziu.',
+      error: 'Nu am putut obține un răspuns. Încearcă din nou.',
       focus: 'Focus',
       luckyNumbers: 'Numere norocoase',
       advice: 'Sfaturi',
@@ -191,6 +191,9 @@ export const AIConsultant = () => {
       suggestions: 'Suggestions',
       clearChat: 'Clear chat',
       noProfile: 'Create a profile to receive personalized answers',
+      unavailable: 'The consultant is not available right now. Nothing was invented in its place — try again in a moment.',
+      rateLimited: 'Too many questions in a short time. Please try again later.',
+      error: 'We could not get an answer. Please try again.',
       focus: 'Focus',
       luckyNumbers: 'Lucky Numbers',
       advice: 'Advice',
@@ -208,6 +211,9 @@ export const AIConsultant = () => {
       suggestions: 'Предложения',
       clearChat: 'Очистить чат',
       noProfile: 'Создайте профиль для получения персонализированных ответов',
+      unavailable: 'Консультант сейчас недоступен. Ничего не было выдумано вместо него — попробуйте ещё раз чуть позже.',
+      rateLimited: 'Слишком много вопросов за короткое время. Попробуйте позже.',
+      error: 'Не удалось получить ответ. Попробуйте ещё раз.',
       focus: 'Фокус',
       luckyNumbers: 'Счастливые числа',
       advice: 'Совет',
@@ -224,10 +230,9 @@ export const AIConsultant = () => {
     <div className="space-y-6">
       {/* Daily Energy Card */}
       {dailySuggestion && (
-        <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-purple-500/5">
+        <Card>
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
-              <Sun className="h-5 w-5 text-amber-500" />
               <CardTitle className="text-lg">{tr.dailyEnergy}</CardTitle>
             </div>
           </CardHeader>
@@ -257,7 +262,7 @@ export const AIConsultant = () => {
                 <ul className="space-y-1">
                   {dailySuggestion.advice.slice(0, 3).map((tip, idx) => (
                     <li key={idx} className="text-sm flex items-start gap-2">
-                      <Lightbulb className="h-3 w-3 text-amber-500 mt-1 shrink-0" />
+                      <Lightbulb className="h-3 w-3 text-warn mt-1 shrink-0" />
                       <span>{tip}</span>
                     </li>
                   ))}
@@ -278,7 +283,7 @@ export const AIConsultant = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Bot className="h-5 w-5 text-primary" />
+              <Bot className="h-5 w-5" />
               <CardTitle>{tr.title}</CardTitle>
             </div>
             {conversation.length > 0 && (
@@ -289,10 +294,24 @@ export const AIConsultant = () => {
             )}
           </div>
           <CardDescription>{tr.description}</CardDescription>
+          {/* Obligatoriu de la 2 august 2026, Articolul 50 din AI Act: omul
+              trebuie să știe că vorbește cu un model. Ghidul Comisiei cere ca
+              informația să fie perceptibilă în practică -- deci stă permanent
+              lângă casetă, nu într-un pop-up pe care îl închizi o dată și nu-l
+              mai vezi niciodată, și nu în termeni.
+              Spune și CE pleacă spre model, fiindcă asta e întrebarea pe care
+              omul chiar și-o pune. Numele și data nașterii nu mai pleacă --
+              vezi `aiPrompts.ts`, unde promptul se construiește. */}
+          <p
+            data-ai-disclosure
+            className="mt-3 max-w-[62ch] border-t border-gilt pt-3 text-sm leading-relaxed text-muted-foreground"
+          >
+            {t.aiConsultantNote}
+          </p>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList>
               <TabsTrigger value="chat" className="gap-2">
                 <MessageSquare className="h-4 w-4" />
                 {tr.chat}
@@ -306,8 +325,17 @@ export const AIConsultant = () => {
             <TabsContent value="chat" className="space-y-4 mt-4">
               {/* No profile warning */}
               {!profile && (
-                <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/30 text-sm text-amber-600 dark:text-amber-400">
+                <div className="p-4 rounded-lg border border-warn text-sm text-warn">
                   {tr.noProfile}
+                </div>
+              )}
+
+              {/* Said instead of an answer, never alongside one. */}
+              {problem && (
+                <div className="p-4 rounded-lg border border-warn text-sm text-warn">
+                  {problem === 'unavailable' && tr.unavailable}
+                  {problem === 'busy' && tr.rateLimited}
+                  {problem === 'failed' && tr.error}
                 </div>
               )}
 
@@ -320,13 +348,18 @@ export const AIConsultant = () => {
                       className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
                       <div
-                        className={`max-w-[85%] p-3 rounded-lg ${
-                          msg.role === 'user'
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-muted'
-                        }`}
+                        data-role={msg.role}
+                        className={`max-w-[85%] p-3 rounded-lg ${ msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted' }`}
                       >
-                        <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                        {/* Întrebarea omului e text simplu, cum a scris-o.
+                            Răspunsul modelului vine în markdown -- titluri,
+                            îngroșări, liste -- și până acum se afișa cu tot cu
+                            semne, ca un bloc pe care nu-l parcurgea nimeni. */}
+                        {msg.role === 'user' ? (
+                          <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                        ) : (
+                          <AssistantText text={msg.content} />
+                        )}
                         <p className="text-[10px] opacity-70 mt-1">
                           {msg.timestamp.toLocaleTimeString()}
                         </p>
@@ -361,11 +394,11 @@ export const AIConsultant = () => {
                     }
                   }}
                   className="min-h-[80px] resize-none"
-                  disabled={!profile}
+                  disabled={!profile || problem === 'unavailable'}
                 />
                 <Button
                   onClick={handleAsk}
-                  disabled={loading || !question.trim() || !profile}
+                  disabled={loading || !question.trim() || !profile || problem === 'unavailable'}
                   className="self-end"
                 >
                   {loading ? (
@@ -386,7 +419,7 @@ export const AIConsultant = () => {
                     className="w-full p-3 rounded-lg text-left hover:bg-muted transition-colors flex items-center justify-between group"
                   >
                     <span className="text-sm">{item.question}</span>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground transition-colors" />
                   </button>
                 ))}
               </div>
@@ -397,23 +430,5 @@ export const AIConsultant = () => {
     </div>
   );
 };
-
-// Local fallback response generation
-function generateLocalResponse(question: string, context: AIContext): AIResponse {
-  const { language, profile } = context;
-
-  const responses: Record<string, string> = {
-    ro: `Bazat pe profilul tău numerologic (${profile.fullName}), pot observa că ai un potențial remarcabil. Numerele tale indică o combinație unică de energie și direcție în viață. Te încurajez să explorezi mai profund semnificația numerelor tale personale pentru a descoperi cum poți folosi cel mai bine aceste energii în viața de zi cu zi.`,
-    en: `Based on your numerological profile (${profile.fullName}), I can see that you have remarkable potential. Your numbers indicate a unique combination of energy and life direction. I encourage you to explore more deeply the meaning of your personal numbers to discover how you can best use these energies in your daily life.`,
-    ru: `Основываясь на вашем нумерологическом профиле (${profile.fullName}), я вижу, что у вас замечательный потенциал. Ваши числа указывают на уникальное сочетание энергии и направления в жизни. Рекомендую глубже изучить значение ваших личных чисел, чтобы понять, как лучше использовать эти энергии в повседневной жизни.`,
-  };
-
-  return {
-    answer: responses[language] || responses.en,
-    relatedNumbers: [1, 5, 7],
-    suggestions: [],
-    followUpQuestions: [],
-  };
-}
 
 export default AIConsultant;

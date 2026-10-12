@@ -27,7 +27,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
       subtitle: "Găsește datele favorabile bazate pe numerele tale",
       nextLucky: "Următoarea dată norocoasă",
       bestDates: "Cele mai bune date",
-      score: "Scor",
+      score: "din 7 criterii",
       reasons: {
         lifePathMatch: "Potrivire Drum al Vieții",
         lifePathCompatible: "Compatibil Drum al Vieții",
@@ -40,7 +40,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
         repeatingDigits: "Cifre repetate"
       },
       noLuckyDates: "Nu există date norocoase în această lună",
-      dayNumber: "Numărul zilei",
+      dayNumber: "Ziua lunii",
       universalNumber: "Nr. universal",
       allDates: "Toate datele norocoase"
     },
@@ -49,7 +49,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
       subtitle: "Find favorable dates based on your numbers",
       nextLucky: "Next lucky date",
       bestDates: "Best dates",
-      score: "Score",
+      score: "of 7 criteria",
       reasons: {
         lifePathMatch: "Life Path Match",
         lifePathCompatible: "Life Path Compatible",
@@ -62,7 +62,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
         repeatingDigits: "Repeating Digits"
       },
       noLuckyDates: "No lucky dates this month",
-      dayNumber: "Day number",
+      dayNumber: "Day of the month",
       universalNumber: "Universal no.",
       allDates: "All lucky dates"
     },
@@ -71,7 +71,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
       subtitle: "Найдите благоприятные даты на основе ваших чисел",
       nextLucky: "Следующая удачная дата",
       bestDates: "Лучшие даты",
-      score: "Оценка",
+      score: "из 7 критериев",
       reasons: {
         lifePathMatch: "Совпадение с Жизненным Путём",
         lifePathCompatible: "Совместимость с Жизненным Путём",
@@ -84,7 +84,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
         repeatingDigits: "Повторяющиеся цифры"
       },
       noLuckyDates: "Нет удачных дат в этом месяце",
-      dayNumber: "Число дня",
+      dayNumber: "Число месяца",
       universalNumber: "Универс. число",
       allDates: "Все удачные даты"
     }
@@ -99,30 +99,30 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
   }, [birthDate, fullName, selectedMonth]);
 
   const getScoreColor = (score: number) => {
-    if (score >= 70) return "text-green-400";
-    if (score >= 50) return "text-amber-400";
+    if (score >= 70) return "text-ok";
+    if (score >= 50) return "text-warn";
     return "text-primary";
   };
 
   const getScoreBg = (score: number) => {
-    if (score >= 70) return "bg-green-500/20 border-green-500/30";
-    if (score >= 50) return "bg-amber-500/20 border-amber-500/30";
-    return "bg-primary/20 border-primary/30";
+    if (score >= 70) return "border-ok";
+    if (score >= 50) return "border-warn";
+    return "bg-sunken border-line";
   };
 
   const renderDateCard = (luckyDate: LuckyDate, isNext: boolean = false) => (
     <div
       key={luckyDate.date.toISOString()}
       className={cn(
-        "p-4 rounded-xl border backdrop-blur-sm transition-all hover:scale-[1.02]",
-        isNext ? "bg-primary/10 border-primary/30" : "bg-card/30 border-border/50"
+        "border-t py-4 transition-colors",
+        isNext ? "bg-sunken border-line" : "bg-card/30 border-border/50"
       )}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
-            <Calendar className="h-4 w-4 text-primary" />
-            <span className="font-cinzel text-foreground">
+            <Calendar className="h-4 w-4" />
+            <span className="font-heading text-foreground">
               {format(luckyDate.date, "EEEE, d MMMM", { locale })}
             </span>
           </div>
@@ -130,7 +130,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
             {luckyDate.reasons.map((reason) => (
               <span
                 key={reason}
-                className="text-xs px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground"
+                className="num text-[0.6rem] uppercase tracking-[0.14em] text-muted-foreground"
               >
                 {t.reasons[reason as keyof typeof t.reasons] || reason}
               </span>
@@ -142,8 +142,10 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
           </div>
         </div>
         <div className={cn("px-3 py-2 rounded-lg border text-center", getScoreBg(luckyDate.score))}>
-          <div className={cn("font-cinzel text-lg", getScoreColor(luckyDate.score))}>
-            {luckyDate.score}
+          <div className={cn("num text-lg", getScoreColor(luckyDate.score))}>
+            {/* Punctele erau o sumă fără scară (maximul teoretic e 135, nu 100);
+                numărul de criterii îndeplinite se poate citi. */}
+            {luckyDate.reasons.length}
           </div>
           <div className="text-xs text-muted-foreground">{t.score}</div>
         </div>
@@ -154,13 +156,13 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
   return (
     <div
       className={cn(
-        "p-6 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm opacity-0 animate-fade-in",
+        "border-t border-line pt-6 opacity-0 animate-fade-in",
         getDelayClass(delay)
       )}
     >
       <div className="flex items-center gap-2 mb-2">
-        <Sparkles className="h-5 w-5 text-primary" />
-        <h3 className="font-cinzel text-lg text-foreground">{t.title}</h3>
+        <Sparkles className="h-5 w-5" />
+        <h3 className="font-heading text-lg text-foreground">{t.title}</h3>
       </div>
       <p className="text-sm text-muted-foreground mb-6">{t.subtitle}</p>
 
@@ -168,7 +170,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
       {nextLucky && (
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-3">
-            <Star className="h-4 w-4 text-amber-400" />
+            <Star className="h-4 w-4 text-warn" />
             <span className="text-sm font-medium text-foreground">{t.nextLucky}</span>
           </div>
           {renderDateCard(nextLucky, true)}
@@ -201,7 +203,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
       {/* Best Dates */}
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-3">
-          <TrendingUp className="h-4 w-4 text-primary" />
+          <TrendingUp className="h-4 w-4" />
           <span className="text-sm font-medium text-foreground">{t.bestDates}</span>
           <span className="text-xs text-muted-foreground">({monthDates.bestDates.length})</span>
         </div>
@@ -210,7 +212,7 @@ export const LuckyDatesCard = ({ birthDate, fullName, delay = 0 }: LuckyDatesCar
             {monthDates.bestDates.map((date) => renderDateCard(date))}
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground p-4 rounded-xl bg-muted/20 border border-border/30">
+          <p className="text-sm text-muted-foreground pt-4 border-t border-line">
             {t.noLuckyDates}
           </p>
         )}

@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { ro, enUS, ru } from 'date-fns/locale';
-import { CalendarIcon, Save, Trash2, User } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { CalendarIcon, Save, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -30,8 +29,30 @@ import { useToast } from '@/hooks/use-toast';
 import { useProfiles } from '@/hooks/use-profiles';
 import { ProfileSwitcher } from '@/components/ProfileSwitcher';
 import { ProfileComparison } from '@/components/ProfileComparison';
+import { AIConsultant } from '@/components/AIConsultant';
+import { NotificationSettings } from '@/components/NotificationSettings';
+import { DayTextChoice } from '@/components/DayTextChoice';
+import { AccountControls } from '@/components/AccountControls';
 import { PageLayout } from '@/components/layout/PageLayout';
+import { SectionHead } from '@/components/layout/SectionHead';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { parseCalendarDate } from '@/lib/calendarDate';
+import { PeopleFilter } from '@/components/people/PeopleFilter';
+import { PeopleGroup } from '@/components/people/PeopleGroup';
+import {
+  PROFILE_CATEGORIES,
+  groupProfilesByCategory,
+  normalizeCategory,
+  type ProfileCategory,
+} from '@/lib/profileCategories';
+import { humanProfileError } from '@/lib/profileErrors';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const locales = { ro, en: enUS, ru };
 
@@ -51,22 +72,49 @@ const Profile = () => {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { profiles, activeProfile, createProfile, updateProfile, deleteProfile, refetch } = useProfiles();
+  const { profiles, activeProfile, createProfile, updateProfile, deleteProfile } = useProfiles();
 
   const [editingProfileId, setEditingProfileId] = useState<string | null>(null);
+
+  /**
+   * Numele și data nașterii de pe harta proprie nu se mai schimbă odată puse.
+   *
+   * Toată aplicația e construită pe ele -- ziua personală, ecoul din jurnal
+   * legat de cifra zilei, citirea întreagă indexată pe amprenta hărții. Aici
+   * doar se arată ce refuză serverul oricum: un câmp care se lasă tastat și
+   * apoi întoarce 409 e mai rău decât unul care spune de la început că nu.
+   *
+   * Doar harta proprie. Un copil sau un apropiat rămân de corectat.
+   */
+  const identityIsFixed =
+    editingProfileId !== null &&
+    profiles.some((p) => p.id === editingProfileId && normalizeCategory(p.category) === 'eu');
   const [saving, setSaving] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deletingProfileId, setDeletingProfileId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<ProfileCategory | null>(null);
 
   const [formData, setFormData] = useState({
     fullName: '',
     birthDate: undefined as Date | undefined,
     birthTime: '',
     birthPlace: '',
+    category: 'eu' as ProfileCategory,
   });
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const dateLocale = locales[language];
+
+  const counts = Object.fromEntries(
+    PROFILE_CATEGORIES.map((category) => [
+      category,
+      profiles.filter((p) => normalizeCategory(p.category) === category).length,
+    ]),
+  ) as Record<ProfileCategory, number>;
+
+  const groups = groupProfilesByCategory(profiles).filter(
+    (group) => filter === null || group.category === filter,
+  );
 
   useEffect(() => {
     if (!authLoading) {
@@ -83,9 +131,10 @@ const Profile = () => {
       if (editingProfileId === activeProfile.id || !editingProfileId) {
         setFormData({
           fullName: activeProfile.fullName,
-          birthDate: new Date(activeProfile.birthDate),
+          birthDate: parseCalendarDate(activeProfile.birthDate),
           birthTime: activeProfile.birthTime || '',
           birthPlace: activeProfile.birthPlace || '',
+          category: normalizeCategory(activeProfile.category),
         });
         // Set editingProfileId to active profile if not already set
         if (!editingProfileId) {
@@ -99,6 +148,7 @@ const Profile = () => {
         birthDate: undefined,
         birthTime: '',
         birthPlace: '',
+        category: 'eu',
       });
     }
   }, [activeProfile, editingProfileId]);
@@ -109,9 +159,10 @@ const Profile = () => {
       setEditingProfileId(profileId);
       setFormData({
         fullName: profile.fullName,
-        birthDate: new Date(profile.birthDate),
+        birthDate: parseCalendarDate(profile.birthDate),
         birthTime: profile.birthTime || '',
         birthPlace: profile.birthPlace || '',
+        category: normalizeCategory(profile.category),
       });
     }
   };
@@ -123,6 +174,7 @@ const Profile = () => {
       birthDate: undefined,
       birthTime: '',
       birthPlace: '',
+      category: 'eu',
     });
   };
 
@@ -149,6 +201,7 @@ const Profile = () => {
         birthDate: formattedDate,
         birthTime: formData.birthTime || undefined,
         birthPlace: formData.birthPlace || undefined,
+        category: formData.category,
       };
 
       if (editingProfileId) {
@@ -159,7 +212,7 @@ const Profile = () => {
             title: t.profileSaved,
           });
           setEditingProfileId(null);
-          await refetch();
+          // Lista e deja reîncărcată: mutația o invalidează și o așteaptă.
         } else {
           toast({
             title: t.error,
@@ -171,19 +224,20 @@ const Profile = () => {
         // Create new profile (set as active if it's the first one)
         const result = await createProfile({
           ...data,
-          setAsActive: profiles.length === 0,
+          setAsActive: formData.category === 'eu' && profiles.length === 0,
         });
         if (result.success) {
           toast({
             title: t.profileSaved,
           });
-          await refetch();
         } else {
-          toast({
-            title: t.error,
-            description: result.error || 'Failed to create profile',
-            variant: 'destructive',
-          });
+          // Refuzurile cunoscute sunt reguli, nu avarii: vezi profileErrors.ts.
+          const human = humanProfileError(result.error, language as 'ro' | 'en' | 'ru');
+          toast(
+            human
+              ? { title: human.title, description: human.body }
+              : { title: t.error, variant: 'destructive' },
+          );
         }
       }
     } catch (error: unknown) {
@@ -214,7 +268,6 @@ const Profile = () => {
           setEditingProfileId(null);
           startCreating();
         }
-        await refetch();
       } else {
         toast({
           title: t.error,
@@ -236,8 +289,8 @@ const Profile = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-pulse flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-primary/20 border-2 border-primary/40" />
-          <div className="h-4 w-32 bg-primary/20 rounded" />
+          <div className="w-16 h-16 rounded-full bg-sunken border-2 border-line" />
+          <div className="h-4 w-32 bg-sunken rounded" />
         </div>
       </div>
     );
@@ -249,79 +302,53 @@ const Profile = () => {
         title={t.profilePageTitle}
         subtitle={t.profilePageSubtitle}
         badge={{
-          icon: <User className="h-4 w-4 text-primary" />,
+          icon: <User className="h-4 w-4" />,
           label: t.myProfile
         }}
       />
 
       {/* Main Content */}
-      <main className="relative z-10 px-4 pb-16">
-        <div className="max-w-4xl mx-auto pt-4 space-y-6">
+      <main className="relative z-10 pb-16">
+        <div className="page-measure pt-4 page-rhythm">
           {/* Profile Switcher */}
           {profiles.length > 0 && (
-            <div className="card-mystic rounded-2xl p-6 glow-gold-subtle">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold">{t.allProfiles}</h3>
+            <div className="space-y-4">
+              <SectionHead index={1} title={t.people.title} question={t.people.subtitle} />
+              <div className="flex flex-wrap items-center justify-between gap-4">
                 <ProfileSwitcher onProfileSwitch={(id) => startEditing(id)} />
               </div>
-              <div className="space-y-2">
-                {profiles.map((profile) => (
-                  <div
-                    key={profile.id}
-                    className={cn(
-                      "flex items-center justify-between p-3 rounded-lg border",
-                      profile.isActive
-                        ? "bg-primary/10 border-primary/30"
-                        : "bg-muted/30 border-border/30"
-                    )}
-                  >
-                    <div className="flex-1">
-                      <div className="font-medium">{profile.fullName}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {new Date(profile.birthDate).toLocaleDateString()}
-                        {profile.isActive && (
-                          <Badge variant="secondary" className="ml-2">
-                            {t.activeProfile}
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => startEditing(profile.id)}
-                      >
-                        {t.editProfile}
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => {
-                          setDeletingProfileId(profile.id);
-                          setShowDeleteDialog(true);
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <Button
-                variant="outline"
-                className="w-full mt-4"
-                onClick={startCreating}
-              >
+
+              <PeopleFilter selected={filter} counts={counts} onSelect={setFilter} />
+
+              {groups.length === 0 ? (
+                <p className="text-sm text-muted-foreground font-raleway">{t.people.empty}</p>
+              ) : (
+                groups.map((group) => (
+                  <PeopleGroup
+                    key={group.category}
+                    category={group.category}
+                    profiles={group.profiles}
+                    onEdit={startEditing}
+                    onDelete={(id) => {
+                      setDeletingProfileId(id);
+                      setShowDeleteDialog(true);
+                    }}
+                  />
+                ))
+              )}
+
+              <Button variant="outline" className="w-full sm:w-auto" onClick={startCreating}>
                 {t.createNewProfile}
               </Button>
             </div>
           )}
 
           {/* Profile Form */}
-          <div className="card-mystic rounded-2xl p-8 glow-gold-subtle">
+          <SectionHead index={2} title={t.profilePageTitle} question={t.profilePageSubtitle} />
+
+          <div className="card-mystic py-8">
             {profiles.length === 0 && (
-              <div className="mb-6 p-4 rounded-lg bg-muted/30 border border-border/30">
+              <div className="mb-6 pt-4 border-t border-line">
                 <p className="text-sm text-muted-foreground text-center">
                   {t.profileNotCreated}
                 </p>
@@ -341,28 +368,69 @@ const Profile = () => {
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   placeholder={t.fullNamePlaceholder}
                   className="input-mystic h-12 text-base"
+                  disabled={identityIsFixed}
+                  readOnly={identityIsFixed}
                   required
                 />
                 <p className="text-xs text-muted-foreground">
                   {t.fullNameHint}
+                </p>
+                {/* Harta altcuiva înseamnă numele și data nașterii unui om care
+                    n-a fost întrebat. Se spune la locul unde se introduc, nu
+                    doar în politica de confidențialitate: cine completează
+                    formularul e cel care trebuie s-o citească.
+                    Apare doar când NU e propria hartă -- pe a ta, nota ar fi
+                    zgomot. */}
+                {formData.category !== 'eu' && (
+                  <p className="max-w-[62ch] border-t border-line pt-3 text-xs leading-relaxed text-muted-foreground">
+                    {t.othersNote}
+                  </p>
+                )}
+              </div>
+
+              {/* Category */}
+              <div className="space-y-2">
+                <Label className="text-foreground/90 font-raleway text-sm tracking-wide">
+                  {t.people.categoryLabel}
+                </Label>
+                <Select
+                  value={formData.category}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, category: value as ProfileCategory })
+                  }
+                >
+                  <SelectTrigger className="input-mystic h-12">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PROFILE_CATEGORIES.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {t.people.categories[category]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  {t.people.categoryHints[formData.category]}
                 </p>
               </div>
 
               {/* Birth Date */}
               <div className="space-y-2">
                 <Label className="text-foreground/90 font-raleway text-sm tracking-wide">
-                  {t.birthDateLabel}
+                  {formData.category === 'afacere' ? t.people.foundedLabel : t.birthDateLabel}
                 </Label>
                 <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                   <PopoverTrigger asChild>
                     <Button
-                      variant="outline"
+                      variant="ghost"
+                      disabled={identityIsFixed}
                       className={cn(
-                        "w-full justify-start text-left font-normal h-12 input-mystic",
+                        "h-11 w-full justify-start rounded-none border-b border-line px-0 text-left font-normal hover:bg-transparent hover:border-gilt",
                         !formData.birthDate && "text-muted-foreground"
                       )}
                     >
-                      <CalendarIcon className="mr-2 h-4 w-4 text-primary" />
+                      <CalendarIcon className="mr-2 h-4 w-4" />
                       {formData.birthDate ? (
                         format(formData.birthDate, "d MMMM yyyy", { locale: dateLocale })
                       ) : (
@@ -392,47 +460,14 @@ const Profile = () => {
                 </Popover>
               </div>
 
-              {/* Birth Time */}
-              <div className="space-y-2">
-                <Label htmlFor="birthTime" className="text-foreground/90 font-raleway text-sm tracking-wide">
-                  {t.birthTimeLabel}
-                </Label>
-                <Input
-                  id="birthTime"
-                  type="time"
-                  value={formData.birthTime}
-                  onChange={(e) => setFormData({ ...formData, birthTime: e.target.value })}
-                  placeholder={t.birthTimePlaceholder}
-                  className="input-mystic h-12 text-base"
-                />
-                <p className="text-xs text-muted-foreground">
-                  {t.birthTimeHint}
-                </p>
-              </div>
-
-              {/* Birth Place */}
-              <div className="space-y-2">
-                <Label htmlFor="birthPlace" className="text-foreground/90 font-raleway text-sm tracking-wide">
-                  {t.birthPlaceLabel}
-                </Label>
-                <Input
-                  id="birthPlace"
-                  type="text"
-                  value={formData.birthPlace}
-                  onChange={(e) => setFormData({ ...formData, birthPlace: e.target.value })}
-                  placeholder={t.birthPlacePlaceholder}
-                  className="input-mystic h-12 text-base"
-                />
-                <p className="text-xs text-muted-foreground">
-                  {t.birthPlaceHint}
-                </p>
-              </div>
+              {/* Ora și locul nașterii nu le folosește niciun calcul; R6: nu cerem ce
+                  nu folosim. Valorile deja salvate trec neatinse prin formData. */}
 
               {/* Actions */}
               <div className="flex gap-4 pt-4">
                 <Button
                   type="submit"
-                  className="btn-mystic flex-1 h-12"
+                  className="flex-1 h-12"
                   disabled={saving || !formData.fullName.trim() || !formData.birthDate}
                 >
                   <Save className="mr-2 h-4 w-4" />
@@ -456,6 +491,21 @@ const Profile = () => {
           {profiles.length >= 2 && (
             <ProfileComparison />
           )}
+
+
+          {/* Consultantul stă aici, nu pe pagina de prețuri.
+              Întrebarea „și ce înseamnă asta pentru mine?" se naște în fața
+              propriilor numere, nu în fața unui tabel de tarife. Componenta
+              citește profilul activ, deci ce vede omul pe ecran și ce vede
+              modelul în prompt sunt același lucru. */}
+          <AIConsultant />
+          {/* Notification preferences. The component existed with no importer,
+              so the whole permission-and-preferences flow was unreachable. */}
+          <DayTextChoice />
+
+          <NotificationSettings />
+
+          <AccountControls />
         </div>
       </main>
 
@@ -465,7 +515,7 @@ const Profile = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>{t.deleteProfile}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete your profile? This action cannot be undone.
+              {t.people.deleteConfirm}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

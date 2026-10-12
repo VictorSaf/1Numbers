@@ -11,7 +11,7 @@ import {
   DropdownMenuCheckboxItem,
 } from '@/components/ui/dropdown-menu';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { generateFullReportPDF, generateCustomReportPDF, ReportData, CustomReportOptions } from '@/lib/export';
+import type { ReportData, CustomReportOptions } from '@/lib/export';
 import { useToast } from '@/hooks/use-toast';
 
 interface ExportMenuProps {
@@ -82,6 +82,7 @@ export const ExportMenu = ({ reportData, elementId }: ExportMenuProps) => {
   const handleFullReport = async () => {
     setIsExporting(true);
     try {
+      const { generateFullReportPDF } = await import('@/lib/export');
       await generateFullReportPDF(reportData);
       toast({
         title: labels.success,
@@ -102,6 +103,7 @@ export const ExportMenu = ({ reportData, elementId }: ExportMenuProps) => {
   const handleCustomReport = async () => {
     setIsExporting(true);
     try {
+      const { generateCustomReportPDF } = await import('@/lib/export');
       await generateCustomReportPDF(reportData, options);
       toast({
         title: labels.success,
@@ -124,7 +126,7 @@ export const ExportMenu = ({ reportData, elementId }: ExportMenuProps) => {
       <DropdownMenuTrigger asChild>
         <Button 
           variant="outline" 
-          className="border-primary/30 text-primary hover:bg-primary/10"
+          className="border-line text-primary hover:bg-sunken"
           disabled={isExporting}
         >
           {isExporting ? (

@@ -1,8 +1,8 @@
 // API Service Configuration
-// Configure this file to point to your backend server
+import { API_BASE } from '@/lib/apiBase';
+import type { ProfileCategory } from '@/lib/profileCategories';
 
-// Default API URL - change this to your backend server URL
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = API_BASE;
 
 interface RequestConfig {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -52,6 +52,22 @@ class ApiService {
     });
 
     if (!response.ok) {
+      // A 401 means the token this client is holding is no longer accepted --
+      // it expired mid-session, or it was signed with a secret that has since
+      // been rotated. Nothing in the app inspected the status, so the UI stayed
+      // logged in with every request failing behind it. Signing out here is the
+      // only honest reading of the answer.
+      //
+      // /auth/* is excluded: a wrong password is also a 401, and bouncing the
+      // sign-in page to itself would hide the message that says so.
+      if (response.status === 401 && !endpoint.startsWith('/auth/')) {
+        this.setToken(null);
+        if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/auth')) {
+          const back = window.location.pathname + window.location.search;
+          window.location.assign(`/auth?redirect=${encodeURIComponent(back)}`);
+        }
+      }
+
       const error = await response.json().catch(() => ({ error: 'Request failed' }));
       const errorMessage = error.error || error.message || error.details || 'Request failed';
       const apiError = new Error(errorMessage) as Error & { status?: number };
@@ -77,6 +93,77 @@ class ApiService {
     });
   }
 
+  /**
+   * Am uitat parola.
+   *
+   * Serverul întoarce mereu succes, chiar dacă adresa n-are cont -- altfel ruta
+   * ar spune cine e înscris. Interfața trebuie să arate același lucru, deci nu
+   * are ce eroare să trateze.
+   */
+  async forgotPassword(email: string, language: string) {
+    return this.request<{ success: boolean }>('/auth/forgot', {
+      method: 'POST',
+      body: { email, language },
+    });
+  }
+
+  async resetPassword(token: string, password: string) {
+    return this.request<{ success: boolean }>('/auth/reset', {
+      method: 'POST',
+      body: { token, password },
+    });
+  }
+
+  async verifyEmail(token: string) {
+    return this.request<{ success: boolean }>('/auth/verify-email', {
+      method: 'POST',
+      body: { token },
+    });
+  }
+
+  /** Cere ștergerea contului. Nu șterge -- trimite confirmarea pe email. */
+  async requestAccountDeletion(language: string) {
+    return this.request<{ success: boolean }>('/account/deletion-request', {
+      method: 'POST',
+      body: { language },
+    });
+  }
+
+  /** Șterge, pe baza jetonului din email. */
+  async confirmAccountDeletion(token: string) {
+    return this.request<{ success: boolean }>('/account/delete', {
+      method: 'POST',
+      body: { token },
+    });
+  }
+
+  /**
+   * Descarcă tot ce ținem despre om.
+   *
+   * Nu trece prin `request`: acela citește JSON și îl întoarce ca obiect, iar
+   * aici vrem FIȘIERUL. Portabilitatea înseamnă ceva ce poți lua cu tine, nu
+   * ceva ce se afișează.
+   */
+  async exportMyData(): Promise<Blob> {
+    const res = await fetch(`${this.baseUrl}/account/export`, {
+      headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+    });
+    if (!res.ok) throw new Error(String(res.status));
+    return res.blob();
+  }
+
+  /** Ce a acordat omul. Un fel lipsă înseamnă „nu l-am întrebat niciodată”. */
+  async getConsents() {
+    return this.request<{ consents: Record<string, boolean>; policyVersion: string }>('/account/consents');
+  }
+
+  async setConsent(kind: 'model' | 'notifications', granted: boolean) {
+    return this.request<{ success: boolean; consents: Record<string, boolean> }>('/account/consents', {
+      method: 'POST',
+      body: { kind, granted },
+    });
+  }
+
   async logout() {
     // Clear token locally, backend doesn't need to do anything for JWT
     this.setToken(null);
@@ -96,14 +183,30 @@ class ApiService {
     return this.request<{ success: boolean; profiles: unknown[] }>('/profiles/all');
   }
 
-  async createProfile(data: { fullName: string; birthDate: string; birthTime?: string; birthPlace?: string; setAsActive?: boolean }) {
+  async createProfile(data: {
+    fullName: string;
+    birthDate: string;
+    birthTime?: string;
+    birthPlace?: string;
+    category?: ProfileCategory;
+    setAsActive?: boolean;
+  }) {
     return this.request<{ success: boolean; profile: unknown }>('/profiles/me', {
       method: 'POST',
       body: data,
     });
   }
 
-  async updateProfile(profileId: string, data: { fullName: string; birthDate: string; birthTime?: string; birthPlace?: string }) {
+  async updateProfile(
+    profileId: string,
+    data: {
+      fullName: string;
+      birthDate: string;
+      birthTime?: string;
+      birthPlace?: string;
+      category?: ProfileCategory;
+    },
+  ) {
     return this.request<{ success: boolean; profile: unknown }>(`/profiles/${profileId}`, {
       method: 'PUT',
       body: data,
@@ -121,13 +224,46 @@ class ApiService {
     });
   }
 
-  // Predictions endpoints
-  async getDailyPrediction(birthDate: string) {
-    return this.request<{ prediction: unknown }>(`/predictions/daily?birthDate=${birthDate}`);
+  /**
+   * Ziua, scrisă de model o dată pe zi.
+   *
+   * Propozițiile adevărate pleacă de aici -- motorul de arhetipuri stă în
+   * frontend -- iar serverul le dă modelului doar ca să le reformuleze.
+   * Serverul verifică singur ziua personală din data nașterii pe care o are.
+   */
+  async getTodayReading(data: {
+    date: string;
+    language: 'ro' | 'en' | 'ru';
+    personalDay: number;
+    composed: { ziua: string; fric?: string; aproape?: string; intrebare: string };
+  }) {
+    return this.request<{
+      body: { ziua: string; fric?: string; aproape?: string; intrebare: string };
+      source: 'model' | 'composed';
+      model?: string;
+      /** Ce a scris omul ultima dată la aceeași cifră, citat întocmai. */
+      echo?: string;
+      cached: boolean;
+    }>('/today/reading', { method: 'POST', body: data });
   }
 
-  async getMonthlyPrediction(birthDate: string, month: number, year: number) {
-    return this.request<{ prediction: unknown }>(`/predictions/monthly?birthDate=${birthDate}&month=${month}&year=${year}`);
+  /**
+   * Citirea întreagă a hărții: legată, nu enumerată.
+   *
+   * Propozițiile adevărate pleacă de aici, din `buildThread` -- aceleași care
+   * compun firul. Serverul le dă modelului doar ca să le lege, și verifică la
+   * întoarcere că n-a apărut nicio cifră străină de hartă.
+   */
+  async getDeepReading(data: {
+    language: 'ro' | 'en' | 'ru';
+    steps: Array<{ name: string; figures: string; say: string }>;
+  }) {
+    return this.request<{
+      body: { opening: string; chapters: Array<{ title: string; text: string }>; closing: string };
+      source: 'model' | 'composed';
+      model?: string;
+      cached: boolean;
+    }>('/chart/reading', { method: 'POST', body: data });
   }
 
   // Journal endpoints
@@ -198,24 +334,10 @@ class ApiService {
   }
 
   // Subscription endpoints
-  async getSubscriptionPlans() {
-    return this.request<{ success: boolean; plans: unknown[] }>('/subscriptions/plans');
-  }
-
-  async getSubscriptionStatus() {
-    return this.request<{ success: boolean; subscription: unknown | null; plan: unknown; isPremium: boolean }>('/subscriptions/status');
-  }
-
   async createSubscription(data: { planId: number; billingPeriod?: 'monthly' | 'yearly' }) {
     return this.request<{ success: boolean; subscription: unknown }>('/subscriptions/create', {
       method: 'POST',
       body: data,
-    });
-  }
-
-  async cancelSubscription() {
-    return this.request<{ success: boolean; message: string; subscription: unknown }>('/subscriptions/cancel', {
-      method: 'POST',
     });
   }
 
@@ -226,43 +348,6 @@ class ApiService {
   // Tier and feature usage endpoints
   async getTierInfo() {
     return this.request<{ success: boolean; tierId: string; planName: string; isPremium: boolean; features: string[] }>('/subscriptions/tier');
-  }
-
-  async checkFeatureLimit(featureId: string, limit: number) {
-    return this.request<{ success: boolean; allowed: boolean; currentUsage: number; limit: number | 'unlimited' }>(
-      `/subscriptions/feature/${featureId}/check?limit=${limit}`
-    );
-  }
-
-  async useFeature(featureId: string) {
-    return this.request<{ success: boolean; newCount: number }>(`/subscriptions/feature/${featureId}/use`, {
-      method: 'POST',
-    });
-  }
-
-  async getFeatureUsage() {
-    return this.request<{ success: boolean; usage: Array<{ featureId: string; usageCount: number; periodStart: string; periodEnd: string }> }>('/subscriptions/usage');
-  }
-
-  // One-time purchases
-  async getPurchases() {
-    return this.request<{ success: boolean; purchases: Array<{
-      id: number;
-      productId: string;
-      productName: string;
-      price: number;
-      currency: string;
-      status: string;
-      purchasedAt: string;
-      expiresAt?: string;
-    }> }>('/subscriptions/purchases');
-  }
-
-  async createPurchase(data: { productId: string; productName: string; price: number; currency?: string; metadata?: Record<string, unknown> }) {
-    return this.request<{ success: boolean; purchase: unknown }>('/subscriptions/purchase', {
-      method: 'POST',
-      body: data,
-    });
   }
 
   // White label configuration (Pro users only)
@@ -304,140 +389,7 @@ class ApiService {
     });
   }
 
-  // Upgrade subscription
-  async upgradeSubscription(data: { targetTierId: string; billingPeriod?: 'monthly' | 'yearly' }) {
-    return this.request<{
-      success: boolean;
-      message: string;
-      subscription: unknown;
-      proratedCredit: string;
-    }>('/subscriptions/upgrade', {
-      method: 'POST',
-      body: data,
-    });
-  }
-
-  // Gamification endpoints
-  async getGamificationStats() {
-    return this.request<{ success: boolean; stats: unknown }>('/gamification/stats');
-  }
-
-  async getStreak() {
-    try {
-      const response = await this.getGamificationStats();
-      const stats = response.stats as { currentStreak?: number } | null;
-      return { success: true, streak: stats?.currentStreak || 0 };
-    } catch {
-      return { success: false, streak: 0 };
-    }
-  }
-
-  async getAchievements() {
-    return this.request<{ success: boolean; achievements: unknown[] }>('/gamification/achievements');
-  }
-
-  async getLeaderboard(period?: 'daily' | 'weekly' | 'monthly' | 'all_time') {
-    const query = period ? `?period=${period}` : '';
-    return this.request<{ success: boolean; leaderboard: unknown[] }>(`/gamification/leaderboard${query}`);
-  }
-
-  // AI Consultant endpoints
-  async sendAIMessage(message: string, context?: Record<string, unknown>) {
-    return this.request<{ success: boolean; response: string; usage?: { promptTokens: number; completionTokens: number } }>('/ai/chat', {
-      method: 'POST',
-      body: { message, context },
-    });
-  }
-
-  async getAIHistory(limit?: number) {
-    const query = limit ? `?limit=${limit}` : '';
-    return this.request<{ success: boolean; history: Array<{ role: string; content: string; timestamp: string }> }>(`/ai/history${query}`);
-  }
-
-  // Notifications endpoints
-  async registerPushSubscription(subscription: PushSubscription) {
-    return this.request<{ success: boolean }>('/notifications/subscribe', {
-      method: 'POST',
-      body: { subscription },
-    });
-  }
-
-  async getNotificationPreferences() {
-    return this.request<{ success: boolean; preferences: Record<string, boolean> }>('/notifications/preferences');
-  }
-
-  async updateNotificationPreferences(preferences: Record<string, boolean>) {
-    return this.request<{ success: boolean }>('/notifications/preferences', {
-      method: 'PUT',
-      body: { preferences },
-    });
-  }
-
-  // Friends endpoints
-  async getFriends() {
-    return this.request<{ success: boolean; friends: unknown[] }>('/friends');
-  }
-
-  async getFriendRequests() {
-    return this.request<{ success: boolean; received: unknown[]; sent: unknown[] }>('/friends/requests');
-  }
-
-  async sendFriendRequest(email: string) {
-    return this.request<{ success: boolean; request: unknown }>('/friends/request', {
-      method: 'POST',
-      body: { email },
-    });
-  }
-
-  async acceptFriendRequest(requestId: number) {
-    return this.request<{ success: boolean }>(`/friends/request/${requestId}/accept`, {
-      method: 'POST',
-    });
-  }
-
-  async removeFriend(friendId: number) {
-    return this.request<{ success: boolean }>(`/friends/${friendId}`, {
-      method: 'DELETE',
-    });
-  }
-
-  async createInviteLink() {
-    return this.request<{ success: boolean; inviteLink: unknown }>('/friends/invite-link', {
-      method: 'POST',
-    });
-  }
-
   // Admin endpoints
-  async getAdminDashboard() {
-    return this.request<{ totalUsers: number; activeUsers: number; premiumUsers: number; newUsersThisWeek: number }>('/admin/dashboard');
-  }
-
-  async getAdminUsers() {
-    return this.request<{ users: Array<{ id: number; email: string; name: string; role: string; createdAt: string }> }>('/admin/users');
-  }
-
-  async updateAdminUser(userId: number, data: { role?: string; status?: string }) {
-    return this.request<{ user: unknown }>(`/admin/users/${userId}`, {
-      method: 'PATCH',
-      body: data,
-    });
-  }
-
-  async getAdminSettings() {
-    return this.request<{ settings: unknown }>('/admin/settings');
-  }
-
-  async updateAdminSettings(settings: Record<string, unknown>) {
-    return this.request<{ success: boolean; message: string }>('/admin/settings', {
-      method: 'PUT',
-      body: settings,
-    });
-  }
-
-  async getAdminAnalytics() {
-    return this.request<{ analytics: unknown }>('/admin/analytics');
-  }
-
   async getAdminAgents() {
     return this.request<{ agents: Array<{ name: string; filename: string; description: string; content: string }>; count: number }>('/admin/agents');
   }

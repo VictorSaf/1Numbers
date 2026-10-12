@@ -4,6 +4,9 @@ import {
   calculatePersonalityNumber,
   getNumberMeaning 
 } from './numerology';
+// From the module rather than the barrel, so the content layer stays out of
+// whichever chunk this file lands in.
+import { classifyFullName, PYTHAGOREAN } from './numerology-plus/core';
 
 export interface NameAnalysis {
   destinyNumber: number;
@@ -356,83 +359,6 @@ export const analyzeBusinessName = (name: string, language: 'ro' | 'en' | 'ru'):
   };
 };
 
-// Name Optimizer - suggest variations
-export interface NameSuggestion {
-  name: string;
-  destinyNumber: number;
-  improvement: number;
-  reason: string;
-}
-
-const VOWELS = ['a', 'e', 'i', 'o', 'u', 'y'];
-const COMMON_ADDITIONS = ['a', 'e', 'i', 'o', 'n', 's', 'h', 'y'];
-
-export const generateNameSuggestions = (
-  originalName: string, 
-  targetNumbers: number[],
-  language: 'ro' | 'en' | 'ru'
-): NameSuggestion[] => {
-  const suggestions: NameSuggestion[] = [];
-  const originalDestiny = calculateDestinyNumber(originalName);
-  
-  const reasons = {
-    ro: {
-      masterNumber: 'Număr Master - energie spirituală intensificată',
-      targetMatch: 'Potrivire cu numărul țintă dorit',
-      balancedEnergy: 'Energie mai echilibrată'
-    },
-    en: {
-      masterNumber: 'Master Number - intensified spiritual energy',
-      targetMatch: 'Match with desired target number',
-      balancedEnergy: 'More balanced energy'
-    },
-    ru: {
-      masterNumber: 'Мастер-число - усиленная духовная энергия',
-      targetMatch: 'Совпадение с желаемым целевым числом',
-      balancedEnergy: 'Более сбалансированная энергия'
-    }
-  };
-  
-  // Try adding single letters
-  for (const letter of COMMON_ADDITIONS) {
-    const newName = originalName + letter;
-    const newDestiny = calculateDestinyNumber(newName);
-    
-    if (targetNumbers.includes(newDestiny) || [11, 22, 33].includes(newDestiny)) {
-      suggestions.push({
-        name: newName,
-        destinyNumber: newDestiny,
-        improvement: [11, 22, 33].includes(newDestiny) ? 3 : 1,
-        reason: [11, 22, 33].includes(newDestiny) 
-          ? reasons[language].masterNumber 
-          : reasons[language].targetMatch
-      });
-    }
-  }
-  
-  // Try double letters at end
-  const lastChar = originalName.slice(-1).toLowerCase();
-  if (!VOWELS.includes(lastChar)) {
-    const doubledName = originalName + lastChar;
-    const doubledDestiny = calculateDestinyNumber(doubledName);
-    if (targetNumbers.includes(doubledDestiny) || doubledDestiny !== originalDestiny) {
-      suggestions.push({
-        name: doubledName,
-        destinyNumber: doubledDestiny,
-        improvement: 1,
-        reason: reasons[language].balancedEnergy
-      });
-    }
-  }
-  
-  // Sort by improvement and remove duplicates
-  const unique = suggestions.filter((s, i, arr) => 
-    arr.findIndex(x => x.name.toLowerCase() === s.name.toLowerCase()) === i
-  );
-  
-  return unique.sort((a, b) => b.improvement - a.improvement).slice(0, 5);
-};
-
 // Extended Name Analysis Functions
 
 /**
@@ -450,25 +376,19 @@ export interface LetterAnalysis {
 }
 
 export const analyzeIndividualLetters = (fullName: string): LetterAnalysis[] => {
-  const PYTHAGOREAN_VALUES: Record<string, number> = {
-    A: 1, B: 2, C: 3, D: 4, E: 5, F: 6, G: 7, H: 8, I: 9,
-    J: 1, K: 2, L: 3, M: 4, N: 5, O: 6, P: 7, Q: 8, R: 9,
-    S: 1, T: 2, U: 3, V: 4, W: 5, X: 6, Y: 7, Z: 8
-  };
-  
-  const VOWELS = ['A', 'E', 'I', 'O', 'U'];
-  const cleanName = fullName.toUpperCase().replace(/[^A-Z]/g, '');
+  // Classification comes from the shared engine. The local table dropped
+  // diacritics and treated Y as always a consonant, so this per-letter view
+  // contradicted the numbers shown directly above it on the results page.
   const analysis: LetterAnalysis[] = [];
-  
-  let position = 1;
-  for (const letter of cleanName) {
-    const value = PYTHAGOREAN_VALUES[letter] || 0;
-    const isVowel = VOWELS.includes(letter);
+
+  for (const [index, { ch: letter, vowel: isVowel }] of classifyFullName(fullName).entries()) {
+    const value = PYTHAGOREAN[letter] ?? 0;
+    const position = index + 1;
     const isConsonant = !isVowel && value > 0;
     
     analysis.push({
       letter,
-      position: position++,
+      position,
       value,
       isVowel,
       isConsonant,
@@ -484,213 +404,9 @@ export const analyzeIndividualLetters = (fullName: string): LetterAnalysis[] => 
  * @param fullName - Full name at birth
  * @returns Vowel analysis with detailed information
  */
-export interface VowelAnalysis {
-  vowels: LetterAnalysis[];
-  totalValue: number;
-  reducedValue: number;
-  soulUrgeNumber: number;
-  interpretation: { ro: string; en: string; ru: string };
-  strengths: { ro: string[]; en: string[]; ru: string[] };
-}
 
-export const analyzeVowelsSeparately = (fullName: string): VowelAnalysis => {
-  const allLetters = analyzeIndividualLetters(fullName);
-  const vowels = allLetters.filter(l => l.isVowel);
-  
-  const totalValue = vowels.reduce((sum, v) => sum + v.value, 0);
-  const reducedValue = calculateDestinyNumber(fullName); // This uses vowels internally
-  const soulUrgeNumber = calculateSoulUrgeNumber(fullName);
-  
-  return {
-    vowels,
-    totalValue,
-    reducedValue,
-    soulUrgeNumber,
-    interpretation: getVowelInterpretation(soulUrgeNumber, vowels.length),
-    strengths: getVowelStrengths(soulUrgeNumber)
-  };
-};
-
-/**
- * Analyze consonants separately from the name.
- * @param fullName - Full name at birth
- * @returns Consonant analysis with detailed information
- */
-export interface ConsonantAnalysis {
-  consonants: LetterAnalysis[];
-  totalValue: number;
-  reducedValue: number;
-  personalityNumber: number;
-  interpretation: { ro: string; en: string; ru: string };
-  characteristics: { ro: string[]; en: string[]; ru: string[] };
-}
-
-export const analyzeConsonantsSeparately = (fullName: string): ConsonantAnalysis => {
-  const allLetters = analyzeIndividualLetters(fullName);
-  const consonants = allLetters.filter(l => l.isConsonant);
-  
-  const totalValue = consonants.reduce((sum, c) => sum + c.value, 0);
-  const reducedValue = calculateDestinyNumber(fullName); // This uses all letters
-  const personalityNumber = calculatePersonalityNumber(fullName);
-  
-  return {
-    consonants,
-    totalValue,
-    reducedValue,
-    personalityNumber,
-    interpretation: getConsonantInterpretation(personalityNumber, consonants.length),
-    characteristics: getConsonantCharacteristics(personalityNumber)
-  };
-};
-
-/**
- * Find hidden numbers in the name (numbers that appear but aren't the main numbers).
- * @param fullName - Full name at birth
- * @returns Array of hidden numbers with their significance
- */
-export interface HiddenNumber {
-  number: number;
-  frequency: number;
-  significance: { ro: string; en: string; ru: string };
-  influence: 'strong' | 'moderate' | 'weak';
-}
-
-export const findHiddenNumbers = (fullName: string): HiddenNumber[] => {
-  const allLetters = analyzeIndividualLetters(fullName);
-  const frequencyMap = new Map<number, number>();
-  
-  // Count frequency of each number
-  for (const letter of allLetters) {
-    if (letter.value > 0) {
-      frequencyMap.set(letter.value, (frequencyMap.get(letter.value) || 0) + 1);
-    }
-  }
-  
-  // Get main numbers to exclude
-  const destinyNumber = calculateDestinyNumber(fullName);
-  const soulUrgeNumber = calculateSoulUrgeNumber(fullName);
-  const personalityNumber = calculatePersonalityNumber(fullName);
-  const mainNumbers = new Set([destinyNumber, soulUrgeNumber, personalityNumber]);
-  
-  // Find hidden numbers (appear but aren't main numbers)
-  const hiddenNumbers: HiddenNumber[] = [];
-  for (const [number, frequency] of frequencyMap.entries()) {
-    if (!mainNumbers.has(number)) {
-      hiddenNumbers.push({
-        number,
-        frequency,
-        significance: getHiddenNumberSignificance(number, frequency),
-        influence: getInfluenceLevel(frequency)
-      });
-    }
-  }
-  
-  // Sort by frequency (highest first)
-  return hiddenNumbers.sort((a, b) => b.frequency - a.frequency);
-};
-
-/**
- * Get name optimization suggestions based on desired numbers.
- * @param fullName - Current full name
- * @param targetNumbers - Desired numerological numbers (e.g., [1, 8] for leadership and success)
- * @param language - Language for suggestions
- * @returns Detailed optimization suggestions
- */
-export interface NameOptimizationSuggestion {
-  currentAnalysis: NameAnalysis;
-  targetNumbers: number[];
-  suggestions: {
-    name: string;
-    newAnalysis: NameAnalysis;
-    improvements: {
-      destiny: { changed: boolean; improvement: number };
-      soulUrge: { changed: boolean; improvement: number };
-      personality: { changed: boolean; improvement: number };
-    };
-    overallScore: number;
-    reason: { ro: string; en: string; ru: string };
-  }[];
-  recommendations: { ro: string; en: string; ru: string };
-}
-
-export const getNameOptimizationSuggestions = (
-  fullName: string,
-  targetNumbers: number[],
-  language: 'ro' | 'en' | 'ru' = 'ro'
-): NameOptimizationSuggestion => {
-  const currentAnalysis = analyzeNameNumbers(fullName);
-  const baseSuggestions = generateNameSuggestions(fullName, targetNumbers, language);
-  
-  // Convert to detailed suggestions
-  const detailedSuggestions = baseSuggestions.map(suggestion => {
-    const newAnalysis = analyzeNameNumbers(suggestion.name);
-    
-    const improvements = {
-      destiny: {
-        changed: currentAnalysis.destinyNumber !== newAnalysis.destinyNumber,
-        improvement: calculateNumberImprovement(
-          currentAnalysis.destinyNumber,
-          newAnalysis.destinyNumber,
-          targetNumbers
-        )
-      },
-      soulUrge: {
-        changed: currentAnalysis.soulUrgeNumber !== newAnalysis.soulUrgeNumber,
-        improvement: calculateNumberImprovement(
-          currentAnalysis.soulUrgeNumber,
-          newAnalysis.soulUrgeNumber,
-          targetNumbers
-        )
-      },
-      personality: {
-        changed: currentAnalysis.personalityNumber !== newAnalysis.personalityNumber,
-        improvement: calculateNumberImprovement(
-          currentAnalysis.personalityNumber,
-          newAnalysis.personalityNumber,
-          targetNumbers
-        )
-      }
-    };
-    
-    const overallScore = 
-      improvements.destiny.improvement +
-      improvements.soulUrge.improvement +
-      improvements.personality.improvement;
-    
-    return {
-      name: suggestion.name,
-      newAnalysis,
-      improvements,
-      overallScore,
-      reason: {
-        ro: suggestion.reason,
-        en: suggestion.reason.replace('Număr Master', 'Master Number'),
-        ru: suggestion.reason.replace('Număr Master', 'Мастер-число')
-      }
-    };
-  });
-  
-  // Sort by overall score
-  const sortedSuggestions = detailedSuggestions.sort((a, b) => b.overallScore - a.overallScore);
-  
-  return {
-    currentAnalysis,
-    targetNumbers,
-    suggestions: sortedSuggestions,
-    recommendations: getOptimizationRecommendations(
-      currentAnalysis,
-      targetNumbers,
-      sortedSuggestions.length > 0 ? sortedSuggestions[0].overallScore : 0,
-      language
-    )
-  };
-};
-
-// Helper functions
-
-/**
- * Get letter meaning based on its value.
- */
+// The per-letter caption analyzeIndividualLetters attaches. It lived below
+// the block that was removed, and is the only part of it still reachable.
 const getLetterMeaning = (
   value: number,
   isVowel: boolean
@@ -750,186 +466,14 @@ const getLetterMeaning = (
   };
 };
 
-/**
- * Get vowel interpretation.
- */
-const getVowelInterpretation = (
-  soulUrgeNumber: number,
-  vowelCount: number
-): { ro: string; en: string; ru: string } => {
-  const base = {
-    ro: `Numărul Sufletului ${soulUrgeNumber} derivat din ${vowelCount} vocale`,
-    en: `Soul Urge Number ${soulUrgeNumber} derived from ${vowelCount} vowels`,
-    ru: `Число Души ${soulUrgeNumber}, полученное из ${vowelCount} гласных`
-  };
-  
-  if (vowelCount === 0) {
-    return {
-      ro: "Nume fără vocale - dorințe interioare ascunse",
-      en: "Name without vowels - hidden inner desires",
-      ru: "Имя без гласных — скрытые внутренние желания"
-    };
-  }
-  
-  return base;
-};
-
-/**
- * Get vowel strengths.
- */
-const getVowelStrengths = (soulUrgeNumber: number): { ro: string[]; en: string[]; ru: string[] } => {
-  const strengths: Record<number, { ro: string[]; en: string[]; ru: string[] }> = {
-    1: {
-      ro: ["Independență", "Leadership", "Inițiativă"],
-      en: ["Independence", "Leadership", "Initiative"],
-      ru: ["Независимость", "Лидерство", "Инициатива"]
-    },
-    2: {
-      ro: ["Cooperare", "Diplomație", "Sensibilitate"],
-      en: ["Cooperation", "Diplomacy", "Sensitivity"],
-      ru: ["Сотрудничество", "Дипломатия", "Чувствительность"]
-    },
-    3: {
-      ro: ["Creativitate", "Expresie", "Bucurie"],
-      en: ["Creativity", "Expression", "Joy"],
-      ru: ["Творчество", "Выражение", "Радость"]
-    }
-  };
-  
-  return strengths[soulUrgeNumber] || {
-    ro: ["Energie spirituală"],
-    en: ["Spiritual energy"],
-    ru: ["Духовная энергия"]
-  };
-};
-
-/**
- * Get consonant interpretation.
- */
-const getConsonantInterpretation = (
-  personalityNumber: number,
-  consonantCount: number
-): { ro: string; en: string; ru: string } => {
-  return {
-    ro: `Numărul Personalității ${personalityNumber} derivat din ${consonantCount} consoane`,
-    en: `Personality Number ${personalityNumber} derived from ${consonantCount} consonants`,
-    ru: `Число Личности ${personalityNumber}, полученное из ${consonantCount} согласных`
-  };
-};
-
-/**
- * Get consonant characteristics.
- */
-const getConsonantCharacteristics = (personalityNumber: number): { ro: string[]; en: string[]; ru: string[] } => {
-  const characteristics: Record<number, { ro: string[]; en: string[]; ru: string[] }> = {
-    1: {
-      ro: ["Assertiv", "Direct", "Convingător"],
-      en: ["Assertive", "Direct", "Persuasive"],
-      ru: ["Напористый", "Прямой", "Убедительный"]
-    },
-    2: {
-      ro: ["Diplomatic", "Sensibil", "Cooperant"],
-      en: ["Diplomatic", "Sensitive", "Cooperative"],
-      ru: ["Дипломатичный", "Чувствительный", "Сотрудничающий"]
-    },
-    3: {
-      ro: ["Expresiv", "Creativ", "Sociabil"],
-      en: ["Expressive", "Creative", "Sociable"],
-      ru: ["Выразительный", "Творческий", "Общительный"]
-    }
-  };
-  
-  return characteristics[personalityNumber] || {
-    ro: ["Caracteristici unice"],
-    en: ["Unique characteristics"],
-    ru: ["Уникальные характеристики"]
-  };
-};
-
-/**
- * Get hidden number significance.
- */
-const getHiddenNumberSignificance = (
-  number: number,
-  frequency: number
-): { ro: string; en: string; ru: string } => {
-  return {
-    ro: `Numărul ${number} apare ${frequency} ${frequency === 1 ? 'dată' : 'ori'} în nume - energie ascunsă`,
-    en: `Number ${number} appears ${frequency} ${frequency === 1 ? 'time' : 'times'} in name - hidden energy`,
-    ru: `Число ${number} встречается ${frequency} ${frequency === 1 ? 'раз' : 'раза'} в имени — скрытая энергия`
-  };
-};
-
-/**
- * Get influence level based on frequency.
- */
-const getInfluenceLevel = (frequency: number): 'strong' | 'moderate' | 'weak' => {
-  if (frequency >= 3) return 'strong';
-  if (frequency === 2) return 'moderate';
-  return 'weak';
-};
-
-/**
- * Calculate number improvement score.
- */
-const calculateNumberImprovement = (
-  current: number,
-  newNum: number,
-  targetNumbers: number[]
-): number => {
-  // Perfect match with target
-  if (targetNumbers.includes(newNum)) return 10;
-  
-  // Master number bonus
-  if ([11, 22, 33].includes(newNum)) return 8;
-  
-  // Same as current (no change)
-  if (current === newNum) return 0;
-  
-  // Check if closer to target
-  const currentDistance = Math.min(...targetNumbers.map(t => Math.abs(current - t)));
-  const newDistance = Math.min(...targetNumbers.map(t => Math.abs(newNum - t)));
-  
-  if (newDistance < currentDistance) return 5;
-  if (newDistance > currentDistance) return -2;
-  
-  return 1; // Neutral change
-};
-
-/**
- * Get optimization recommendations.
- */
-const getOptimizationRecommendations = (
-  currentAnalysis: NameAnalysis,
-  targetNumbers: number[],
-  bestScore: number,
-  language: 'ro' | 'en' | 'ru'
-): { ro: string; en: string; ru: string } => {
-  const currentMatches = [
-    currentAnalysis.destinyNumber,
-    currentAnalysis.soulUrgeNumber,
-    currentAnalysis.personalityNumber
-  ].filter(n => targetNumbers.includes(n)).length;
-  
-  if (currentMatches === 3) {
-    return {
-      ro: "Numele tău este deja optimizat! Toate numerele principale corespund țintelor.",
-      en: "Your name is already optimized! All main numbers match targets.",
-      ru: "Ваше имя уже оптимизировано! Все основные числа соответствуют целям."
-    };
-  }
-  
-  if (bestScore > 15) {
-    return {
-      ro: "Există sugestii excelente pentru optimizare. Consideră variantele propuse.",
-      en: "There are excellent suggestions for optimization. Consider the proposed variants.",
-      ru: "Есть отличные предложения по оптимизации. Рассмотрите предложенные варианты."
-    };
-  }
-  
-  return {
-    ro: "Optimizarea numelui poate aduce beneficii moderate. Analizează fiecare sugestie.",
-    en: "Name optimization can bring moderate benefits. Analyze each suggestion.",
-    ru: "Оптимизация имени может принести умеренные преимущества. Проанализируйте каждое предложение."
-  };
-};
+// What used to follow -- analyzeVowelsSeparately, analyzeConsonantsSeparately,
+// findHiddenNumbers and getNameOptimizationSuggestions, some 450 lines with
+// their types -- was removed on 2026-08-30 along with NameAnalysisCard, their
+// only caller.
+//
+// Each was a second answer to a question already answered elsewhere on the same
+// page: the first two re-interpreted Soul Urge and Personality, which chapter 1
+// gives from the engine; findHiddenNumbers counted the Hidden Passion a second
+// way; and getNameOptimizationSuggestions wrapped generateNameSuggestions, which
+// went too, with the name optimiser on /unelte (docs/produs/03-filtru.md). `git show 12a48ea~1` has them if a paid report ever
+// wants the longer form.

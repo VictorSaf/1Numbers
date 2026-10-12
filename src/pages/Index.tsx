@@ -1,147 +1,120 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Sparkles, Moon, Sun, Stars } from "lucide-react";
 import { NumerologyForm } from "@/components/NumerologyForm";
+import { FirstVisitPromise, EXAMPLE_NAME, EXAMPLE_BIRTH_DATE } from "@/components/FirstVisitPromise";
 import { NumerologyResults } from "@/components/NumerologyResults";
-import { BentoDashboard } from "@/components/dashboard/BentoDashboard";
 import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { api } from "@/services/api";
+import { useProfiles } from "@/hooks/use-profiles";
+import { parseCalendarDate } from '@/lib/calendarDate';
 
 interface UserData {
   fullName: string;
   birthDate: Date;
 }
 
-interface UserProfile {
-  id: string;
-  userId: string;
-  fullName: string;
-  birthDate: string;
-  birthTime?: string;
-  birthPlace?: string;
-}
-
 const Index = () => {
   const { t } = useLanguage();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
+  const { profiles, loading: loadingProfile } = useProfiles();
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loadingProfile, setLoadingProfile] = useState(false);
   const [showDashboard, setShowDashboard] = useState(true);
-  const [streak, setStreak] = useState(0);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      loadProfile();
-      loadStreak();
-    } else {
-      setProfile(null);
-      setStreak(0);
-    }
-  }, [isAuthenticated]);
-
-  const loadProfile = async () => {
-    try {
-      setLoadingProfile(true);
-      const response = await api.getProfile();
-      if (response.success && response.profile) {
-        const profileData = response.profile as UserProfile;
-        setProfile(profileData);
-        setShowDashboard(true);
-      } else {
-        setProfile(null);
-      }
-    } catch (error) {
-      console.error('Error loading profile:', error);
-      setProfile(null);
-    } finally {
-      setLoadingProfile(false);
-    }
-  };
-
-  const loadStreak = async () => {
-    try {
-      const response = await api.getStreak();
-      if (response.success && response.streak !== undefined) {
-        setStreak(response.streak);
-      }
-    } catch (error) {
-      console.error('Error loading streak:', error);
-    }
-  };
+  /**
+   * Harta proprie e rândul activ din lista comună de profiluri.
+   *
+   * Pagina cerea separat `/profiles/me`, iar butonul de salvare de sub hartă
+   * cerea `/profiles/all` -- două drumuri spre același rând. `/me` întoarce
+   * rândul cu `is_active`, iar indexul unic din migrația 003 ține cel mult unul
+   * pe utilizator, deci e exact `find(isActive)`. Nu `activeProfile`: acela cade
+   * pe primul profil când niciunul nu e activ, adică pe harta unui copil.
+   */
+  const profile = profiles.find((p) => p.isActive) ?? null;
 
   const handleCalculate = (data: UserData) => {
     setUserData(data);
     setShowDashboard(false);
   };
 
+  // Un clic până la o hartă adevărată. Nu o descriere a produsului, ci
+  // produsul: aceleași cinci capitole, aceleași calcule, pe o persoană
+  // inventată. Trece prin `handleCalculate`, deci nu ocolește nimic.
+  const handleTryExample = () => {
+    handleCalculate({ fullName: EXAMPLE_NAME, birthDate: EXAMPLE_BIRTH_DATE });
+  };
+
+  // „Calculate again” duce la formular, nu înapoi la aceeași hartă. Pentru cine
+  // are cont, formularul vine precompletat -- e drumul spre altcineva sau altă
+  // dată, nu spre ce tocmai a citit.
   const handleReset = () => {
     setUserData(null);
-    if (profile) {
-      setShowDashboard(true);
-    }
-  };
-
-  const handleNewCalculation = () => {
     setShowDashboard(false);
-    setUserData(null);
   };
 
-  // Determine what to show
-  const shouldShowDashboard = isAuthenticated && profile && showDashboard && !userData;
-  const shouldShowResults = userData !== null;
-  const shouldShowForm = !shouldShowDashboard && !shouldShowResults;
+  /**
+   * Cine are cont primește harta direct. Nu formularul, nu un panou: harta.
+   *
+   * Numele și data lui sunt deja în baza noastră -- de-aia și-a făcut cont.
+   * Să i le arătăm într-un formular precompletat, ca să apese un buton care
+   * ne spune ce știm deja, e o vamă pusă exact în calea celui care ne-a dat
+   * datele. Vizitatorul o trece fiindcă n-avem de unde ști cine e; el nu.
+   *
+   * Formularul rămâne la un clic distanță, din „Calculate again” de pe hartă,
+   * pentru cine vrea altcineva sau altă dată.
+   */
+  const mine =
+    isAuthenticated && profile && showDashboard
+      ? { fullName: profile.fullName, birthDate: parseCalendarDate(profile.birthDate) }
+      : null;
+  const reading =
+    userData ?? (mine && mine.birthDate ? { fullName: mine.fullName, birthDate: mine.birthDate } : null);
+
+  const shouldShowResults = reading !== null;
+  const shouldShowForm = !shouldShowResults;
 
   return (
     <PageLayout>
-      {/* Header */}
-      <PageHeader
+      {/* Antetul de marketing dispare pentru cine e deja înăuntru: „Discover
+          the hidden secrets in your personal numbers" e o promisiune făcută
+          cuiva care încă n-a intrat, iar deasupra firului concurează cu chiar
+          lucrul pe care omul a venit să-l citească. */}
+      {!shouldShowResults && <PageHeader
         title={t.title}
         subtitle={t.subtitle}
         badge={{
           icon: (
             <>
-              <Moon className="h-4 w-4 text-primary animate-pulse-glow" />
-              <Stars className="h-5 w-5 text-primary" />
-              <Sun className="h-4 w-4 text-primary animate-pulse-glow" />
+              <Moon className="h-4 w-4 animate-pulse-glow" />
+              <Stars className="h-5 w-5" />
+              <Sun className="h-4 w-4 animate-pulse-glow" />
             </>
           ),
           label: t.title
         }}
-      />
+      />}
 
       {/* Main Content */}
-      <main className="relative z-10 px-4 pb-16">
+      <main className="relative z-10 pb-16">
         {/* Dashboard Loading State */}
         {loadingProfile && isAuthenticated && (
-          <div className="max-w-7xl mx-auto pt-4">
+          <div className="page-measure pt-4">
             <DashboardSkeleton />
           </div>
         )}
 
-        {/* Bento Dashboard for authenticated users with profile */}
-        {shouldShowDashboard && !loadingProfile && (
-          <BentoDashboard
-            fullName={profile.fullName}
-            birthDate={new Date(profile.birthDate)}
-            userName={user?.email?.split('@')[0] || profile.fullName}
-            streak={streak}
-          />
-        )}
-
         {/* Form for new calculations */}
         {shouldShowForm && !loadingProfile && (
-          <div className="max-w-4xl mx-auto pt-4">
+          <div className="page-measure pt-4">
             <div className="max-w-md mx-auto">
-              <div className="card-mystic rounded-2xl p-8 glow-gold-subtle">
+              <div className="card-mystic py-8">
                 <div className="text-center mb-8">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 border border-primary/20 mb-4">
-                    <Sparkles className="h-8 w-8 text-primary" />
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-sunken border border-line mb-4">
+                    <Sparkles className="h-8 w-8" />
                   </div>
-                  <h2 className="font-cinzel text-2xl text-foreground mb-2">
+                  <h2 className="font-heading text-2xl text-foreground mb-2">
                     {t.formTitle}
                   </h2>
                   <p className="text-sm text-muted-foreground">
@@ -149,11 +122,13 @@ const Index = () => {
                   </p>
                 </div>
 
+                <FirstVisitPromise onTryExample={handleTryExample} />
+
                 <NumerologyForm
                   onCalculate={handleCalculate}
                   profileData={profile ? {
                     fullName: profile.fullName,
-                    birthDate: new Date(profile.birthDate)
+                    birthDate: parseCalendarDate(profile.birthDate)
                   } : null}
                 />
               </div>
@@ -167,9 +142,9 @@ const Index = () => {
                 ].map((item, i) => (
                   <div
                     key={i}
-                    className="text-center p-4 rounded-xl bg-card/30 border border-border/30"
+                    className="text-center pt-4 border-t border-line"
                   >
-                    <h3 className="font-cinzel text-sm text-primary mb-1">{item.title}</h3>
+                    <h3 className="font-heading text-sm text-foreground mb-1">{item.title}</h3>
                     <p className="text-xs text-muted-foreground">{item.desc}</p>
                   </div>
                 ))}
@@ -180,24 +155,18 @@ const Index = () => {
 
         {/* Results view */}
         {shouldShowResults && (
-          <div className="max-w-4xl mx-auto pt-4">
+          // Wider than the rest of the page: the reading carries a sticky
+          // chapter column beside it on desktop.
+          <div className="page-measure pt-4">
             <NumerologyResults
-              fullName={userData.fullName}
-              birthDate={userData.birthDate}
+              fullName={reading.fullName}
+              birthDate={reading.birthDate}
               onReset={handleReset}
             />
           </div>
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="relative z-10 py-6 border-t border-border mt-16">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <p className="text-sm text-foreground/70 font-raleway">
-            {t.footer}
-          </p>
-        </div>
-      </footer>
     </PageLayout>
   );
 };

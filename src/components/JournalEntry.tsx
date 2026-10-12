@@ -6,6 +6,16 @@ import { Badge } from '@/components/ui/badge';
 import { JournalEntry as JournalEntryType } from '@/lib/journal';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { useLanguage } from '@/contexts/LanguageContext';
+
+// Ce scrie „Ziua ta” în jurnal: întrebarea zilei, ziua personală și relațiile
+// dintre numere. Relațiile sunt obiecte; afișate cu String() ieșeau „[object
+// Object]”. Arătăm doar ce se poate citi, cu etichetă în limba paginii.
+const DATA_LABELS: Record<string, Record<string, string>> = {
+  ro: { title: 'Date numerologice', personalDay: 'Ziua personală', personalYear: 'Anul personal', personalMonth: 'Luna personală', accuracy: 'Cât s-a potrivit' },
+  en: { title: 'Numerology data', personalDay: 'Personal day', personalYear: 'Personal year', personalMonth: 'Personal month', accuracy: 'How well it fitted' },
+  ru: { title: 'Нумерологические данные', personalDay: 'Личный день', personalYear: 'Личный год', personalMonth: 'Личный месяц', accuracy: 'Насколько совпало' },
+};
 
 interface JournalEntryProps {
   entry: JournalEntryType;
@@ -15,6 +25,7 @@ interface JournalEntryProps {
 }
 
 export const JournalEntry = ({ entry, onEdit, onDelete, className }: JournalEntryProps) => {
+  const { language } = useLanguage();
   const [showFullContent, setShowFullContent] = useState(false);
   const isLongContent = entry.content && entry.content.length > 200;
 
@@ -23,7 +34,7 @@ export const JournalEntry = ({ entry, onEdit, onDelete, className }: JournalEntr
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <CardTitle className="font-cinzel text-lg text-foreground mb-2">
+            <CardTitle className="font-heading text-lg text-foreground mb-2">
               {entry.title}
             </CardTitle>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -94,18 +105,28 @@ export const JournalEntry = ({ entry, onEdit, onDelete, className }: JournalEntr
           </div>
         )}
 
-        {entry.numerologyData && (
-          <div className="p-3 rounded-lg bg-muted/30 border border-border/30">
-            <p className="text-xs text-muted-foreground mb-1">Date numerologice:</p>
-            <div className="flex flex-wrap gap-2">
-              {Object.entries(entry.numerologyData).map(([key, value]) => (
-                <Badge key={key} variant="secondary" className="text-xs">
-                  {key}: {String(value)}
-                </Badge>
-              ))}
+        {entry.numerologyData && (() => {
+          const L = DATA_LABELS[language] ?? DATA_LABELS.en;
+          const data = entry.numerologyData as Record<string, unknown>;
+          const question = typeof data.question === 'string' ? data.question : null;
+          const scalars = Object.entries(data).filter(
+            ([k, v]) => k !== 'question' && (typeof v === 'number' || typeof v === 'string'),
+          );
+          if (!question && scalars.length === 0) return null;
+          return (
+            <div className="pt-3 border-t border-line">
+              <p className="text-xs text-muted-foreground mb-1">{L.title}</p>
+              {question && <p className="mb-2 font-heading text-sm italic text-foreground/85">„{question}”</p>}
+              <div className="flex flex-wrap gap-2">
+                {scalars.map(([key, value]) => (
+                  <Badge key={key} variant="secondary" className="text-xs">
+                    {L[key] ?? key}: {String(value)}
+                  </Badge>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
       </CardContent>
     </Card>
   );

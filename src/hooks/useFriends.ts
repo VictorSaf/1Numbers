@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { API_BASE } from '@/lib/apiBase';
 
 export interface Friend {
   id: string;
@@ -62,8 +63,6 @@ interface FriendProfile {
   memberSince: string;
 }
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-
 export function useFriends() {
   const { token, user } = useAuth();
   const [friends, setFriends] = useState<Friend[]>([]);
@@ -81,7 +80,7 @@ export function useFriends() {
     if (!token) return null;
 
     try {
-      const response = await fetch(`${API_BASE}/api/friends${endpoint}`, {
+      const response = await fetch(`${API_BASE}/friends${endpoint}`, {
         ...options,
         headers: {
           'Content-Type': 'application/json',
@@ -258,8 +257,12 @@ export function useFriends() {
     }
   }, [fetchWithAuth, fetchInviteLinks]);
 
-  // Use invite link
-  const useInviteLink = useCallback(async (code: string) => {
+  // Redeem an invite link.
+  //
+  // Named `useInviteLink` until 2026-08-30, which made every linter treat it as
+  // a React hook and refuse to see it called from inside a callback -- where an
+  // action like this is only ever called.
+  const redeemInviteLink = useCallback(async (code: string) => {
     try {
       const data = await fetchWithAuth<ApiResponse<void>>(`/invite/${code}`, {
         method: 'POST',
@@ -344,7 +347,7 @@ export function useFriends() {
     rejectRequest,
     removeFriend,
     generateInviteLink,
-    useInviteLink,
+    redeemInviteLink,
     deactivateInviteLink,
     getFriendProfile,
     refreshAll,

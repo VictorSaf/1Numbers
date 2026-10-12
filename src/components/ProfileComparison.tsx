@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { parseCalendarDate } from '@/lib/calendarDate';
 
 interface ProfileComparisonProps {
   className?: string;
@@ -37,7 +38,7 @@ export const ProfileComparison = ({ className }: ProfileComparisonProps) => {
   };
 
   const calculateProfileNumbers = (profile: Profile) => {
-    const birthDate = new Date(profile.birthDate);
+    const birthDate = parseCalendarDate(profile.birthDate);
 
     const lifePath = calculateLifePathNumber(birthDate);
     const destiny = calculateDestinyNumber(profile.fullName);
@@ -54,7 +55,7 @@ export const ProfileComparison = ({ className }: ProfileComparisonProps) => {
       <Card className={cn("card-mystic", className)}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-primary" />
+            <Users className="h-5 w-5" />
             {t.profileComparison}
           </CardTitle>
         </CardHeader>
@@ -71,7 +72,7 @@ export const ProfileComparison = ({ className }: ProfileComparisonProps) => {
     <Card className={cn("card-mystic", className)}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Users className="h-5 w-5 text-primary" />
+          <Users className="h-5 w-5" />
           {t.profileComparison}
         </CardTitle>
       </CardHeader>
@@ -139,28 +140,28 @@ export const ProfileComparison = ({ className }: ProfileComparisonProps) => {
                       <td className="p-2">
                         <div className="font-medium">{profile.fullName}</div>
                         <div className="text-xs text-muted-foreground">
-                          {new Date(profile.birthDate).toLocaleDateString()}
+                          {parseCalendarDate(profile.birthDate)?.toLocaleDateString()}
                         </div>
                       </td>
                       <td className="text-center p-2">
-                        <Badge variant="outline" className="number-display">
+                        <span className="number-display">
                           {numbers.lifePath}
-                        </Badge>
+                        </span>
                       </td>
                       <td className="text-center p-2">
-                        <Badge variant="outline" className="number-display">
+                        <span className="number-display">
                           {numbers.destiny}
-                        </Badge>
+                        </span>
                       </td>
                       <td className="text-center p-2">
-                        <Badge variant="outline" className="number-display">
+                        <span className="number-display">
                           {numbers.soulUrge}
-                        </Badge>
+                        </span>
                       </td>
                       <td className="text-center p-2">
-                        <Badge variant="outline" className="number-display">
+                        <span className="number-display">
                           {numbers.personality}
-                        </Badge>
+                        </span>
                       </td>
                     </tr>
                   );

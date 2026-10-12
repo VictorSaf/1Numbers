@@ -1,0 +1,282 @@
+{
+  "$comment": "Single source of truth for every route the app serves. Generated lists (sitemap.xml, the prerendered per-route index.html files, and the static server's 404 allowlist) are all derived from this file at build time by scripts/emit-routes.mjs -- do not hand-edit any of them. kind: 'public' is indexable and needs meta; 'app' is a real route that is private or carries params, so it is served but never indexed; 'internal' is development-only and is dropped from the production build entirely.",
+  "origin": "https://compass.oneaigency.com",
+  "routes": [
+    {
+      "path": "/",
+      "kind": "public",
+      "priority": 1.0,
+      "meta": {
+        "ro": {
+          "title": "Numerologia — Calculator Numerologic Gratuit",
+          "description": "Calculează-ți Numărul Drumului Vieții, Destinului, Sufletului și Personalității cu sistemul pitagoreic. Gratuit, în română."
+        },
+        "en": {
+          "title": "Numerology Compass — Free Numerology Calculator",
+          "description": "Calculate your Life Path, Destiny, Soul Urge and Personality numbers using the Pythagorean system. Free."
+        },
+        "ru": {
+          "title": "Нумерология — Бесплатный нумерологический калькулятор",
+          "description": "Рассчитайте числа жизненного пути, судьбы, души и личности по пифагорейской системе. Бесплатно."
+        }
+      }
+    },
+    {
+      "path": "/doi",
+      "kind": "public",
+      "priority": 0.9,
+      "meta": {
+        "ro": {
+          "title": "Compatibilitate Numerologică în Cuplu",
+          "description": "Verifică armonia numerologică dintre două persoane: Drumul Vieții, Destinul și Numărul Sufletului."
+        },
+        "en": {
+          "title": "Numerology Compatibility for Couples",
+          "description": "Check the numerological harmony between two people across Life Path, Destiny and Soul Urge numbers."
+        },
+        "ru": {
+          "title": "Нумерологическая совместимость пары",
+          "description": "Проверьте нумерологическую совместимость двух людей по числам пути, судьбы и души."
+        }
+      }
+    },
+    {
+      "path": "/azi",
+      "kind": "public",
+      "priority": 0.8,
+      "meta": {
+        "ro": {
+          "title": "Previziuni Numerologice — Zi, Lună și An Personal",
+          "description": "Descoperă energia zilei, lunii și anului tău personal, calculate din data nașterii."
+        },
+        "en": {
+          "title": "Numerology Predictions — Personal Day, Month and Year",
+          "description": "Discover your personal day, month and year energy, calculated from your date of birth."
+        },
+        "ru": {
+          "title": "Нумерологические прогнозы — день, месяц и год",
+          "description": "Узнайте энергию личного дня, месяца и года, рассчитанную по дате рождения."
+        }
+      }
+    },
+    {
+      "path": "/unelte",
+      "kind": "public",
+      "priority": 0.8,
+      "meta": {
+        "ro": {
+          "title": "Instrumente Numerologice — Calendar, Lo Shu, Prognoză Anuală",
+          "description": "Calendar numerologic, grila Lo Shu, schimbarea numelui, nume de firmă, prognoză pe an, numere înger."
+        },
+        "en": {
+          "title": "Numerology Tools — Calendar, Lo Shu, Year Forecast",
+          "description": "Numerology calendar, Lo Shu grid, name change, business name, year forecast, angel numbers."
+        },
+        "ru": {
+          "title": "Нумерологические инструменты — календарь, Ло Шу, прогноз на год",
+          "description": "Нумерологический календарь, сетка Ло Шу, смена имени, название компании, годовой прогноз, ангельские числа."
+        }
+      }
+    },
+    {
+      "path": "/invata",
+      "kind": "public",
+      "priority": 0.9,
+      "meta": {
+        "ro": {
+          "title": "Învață Numerologie — Ghid, Tutoriale, Întrebări",
+          "description": "Semnificația numerelor 1-9 și a masterilor 11, 22, 33, tutoriale pas cu pas și întrebări frecvente."
+        },
+        "en": {
+          "title": "Learn Numerology — Guide, Tutorials, Questions",
+          "description": "What the numbers 1-9 and the master numbers 11, 22 and 33 mean, step-by-step tutorials and frequent questions."
+        },
+        "ru": {
+          "title": "Изучайте нумерологию — руководство, уроки, вопросы",
+          "description": "Значения чисел 1-9 и мастер-чисел 11, 22, 33, пошаговые уроки и частые вопросы."
+        }
+      }
+    },
+    {
+      "path": "/chaldean",
+      "kind": "public",
+      "priority": 0.7,
+      "meta": {
+        "ro": {
+          "title": "Numerologie Caldeeană — Analiză după Sistemul Caldeean",
+          "description": "Analiză numerologică după sistemul caldeean, mai vechi decât cel pitagoreic."
+        },
+        "en": {
+          "title": "Chaldean Numerology — Analysis by the Chaldean System",
+          "description": "A numerology reading using the Chaldean system, older than the Pythagorean one."
+        },
+        "ru": {
+          "title": "Халдейская нумерология — анализ по халдейской системе",
+          "description": "Нумерологический анализ по халдейской системе, более древней, чем пифагорейская."
+        }
+      }
+    },
+    {
+      "path": "/remedies",
+      "kind": "public",
+      "priority": 0.7,
+      "meta": {
+        "ro": {
+          "title": "Remedii Numerologice — Culori, Pietre și Mantre",
+          "description": "Descoperă culorile, pietrele și mantrele favorabile numerelor tale personale."
+        },
+        "en": {
+          "title": "Numerology Remedies — Colours, Stones and Mantras",
+          "description": "Find the colours, stones and mantras that favour your personal numbers."
+        },
+        "ru": {
+          "title": "Нумерологические средства — цвета, камни и мантры",
+          "description": "Цвета, камни и мантры, благоприятные для ваших личных чисел."
+        }
+      }
+    },
+    {
+      "path": "/auth",
+      "kind": "app"
+    },
+    {
+      "path": "/eu",
+      "kind": "app"
+    },
+    {
+      "path": "/jurnal",
+      "kind": "app"
+    },
+    {
+      "path": "/cercul-meu",
+      "kind": "app"
+    },
+    {
+      "path": "/raport",
+      "kind": "public",
+      "priority": 0.5,
+      "meta": {
+        "ro": {
+          "title": "Premium — Planuri și Funcții Avansate",
+          "description": "Compară planurile și funcțiile avansate: rapoarte detaliate, consultant AI și export PDF."
+        },
+        "en": {
+          "title": "Premium — Plans and Advanced Features",
+          "description": "Compare plans and advanced features: detailed reports, AI consultant and PDF export."
+        },
+        "ru": {
+          "title": "Премиум — тарифы и расширенные возможности",
+          "description": "Сравните тарифы и возможности: подробные отчёты, ИИ-консультант и экспорт в PDF."
+        }
+      }
+    },
+    {
+      "path": "/invite/:code",
+      "kind": "app"
+    },
+    {
+      "path": "/admin",
+      "kind": "internal"
+    },
+    {
+      "path": "/design-system",
+      "kind": "internal"
+    },
+    {
+      "path": "/white-label",
+      "kind": "internal"
+    },
+    {
+      "path": "/confidentialitate",
+      "kind": "public",
+      "priority": 0.3,
+      "meta": {
+        "ro": {
+          "title": "Confidențialitate — Ce date ținem și cum le poți lua înapoi",
+          "description": "Ce date ținem, de ce, cui ajung și cum le poți descărca sau șterge."
+        },
+        "en": {
+          "title": "Privacy — What we hold and how to take it back",
+          "description": "What we hold, why, who receives it, and how to download or delete it."
+        },
+        "ru": {
+          "title": "Конфиденциальность — что мы храним и как это забрать",
+          "description": "Что мы храним, зачем, кому это уходит и как скачать или удалить."
+        }
+      }
+    },
+    {
+      "path": "/termeni",
+      "kind": "public",
+      "priority": 0.3,
+      "meta": {
+        "ro": {
+          "title": "Termeni — Ce îți dăm și ce îți cerem",
+          "description": "Ce este serviciul, ce ține de contul tău și ce nu promitem."
+        },
+        "en": {
+          "title": "Terms — What we give and what we ask",
+          "description": "What the service is, what your account covers, and what we do not promise."
+        },
+        "ru": {
+          "title": "Условия — что мы даём и о чём просим",
+          "description": "Что это за сервис, что относится к аккаунту и чего мы не обещаем."
+        }
+      }
+    }
+  ],
+  "redirects": [
+    {
+      "from": "/angel-numbers",
+      "to": "/unelte?s=angel"
+    },
+    {
+      "from": "/articles",
+      "to": "/invata"
+    },
+    {
+      "from": "/compatibility",
+      "to": "/doi"
+    },
+    {
+      "from": "/courses",
+      "to": "/"
+    },
+    {
+      "from": "/faq",
+      "to": "/invata?s=intrebari"
+    },
+    {
+      "from": "/friends",
+      "to": "/cercul-meu"
+    },
+    {
+      "from": "/guide",
+      "to": "/invata"
+    },
+    {
+      "from": "/journal",
+      "to": "/jurnal"
+    },
+    {
+      "from": "/predictions",
+      "to": "/azi"
+    },
+    {
+      "from": "/premium",
+      "to": "/raport"
+    },
+    {
+      "from": "/profile",
+      "to": "/eu"
+    },
+    {
+      "from": "/tools",
+      "to": "/unelte"
+    },
+    {
+      "from": "/tutorials",
+      "to": "/invata?s=tutoriale"
+    }
+  ]
+}

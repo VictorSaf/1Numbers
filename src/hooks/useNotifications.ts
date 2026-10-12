@@ -1,12 +1,12 @@
 // useNotifications Hook
 // Manages push notification permissions, subscriptions, and preferences
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   isNotificationSupported,
   getNotificationPermission,
   requestNotificationPermission,
-  registerServiceWorker,
+  getServiceWorkerRegistration,
   subscribeToPush,
   unsubscribeFromPush,
   showLocalNotification,
@@ -20,6 +20,33 @@ import {
   DEFAULT_PREFERENCES,
 } from '@/lib/notifications';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { API_BASE } from '@/lib/apiBase';
+
+/**
+ * Preferințele trăiau numai în localStorage. Serverul nu afla niciodată nimic,
+ * deci rândul din notification_preferences nu se crea, deci
+ * preferences->>'enabled' rămânea false și dispecerul zilnic nu găsea pe nimeni.
+ *
+ * PUT-ul cere obiectul întreg: schema din server/src/routes/notifications.ts e
+ * un zod .strict() cu toate cele șapte câmpuri.
+ */
+const pushPreferencesToServer = async (preferences: NotificationPreferences): Promise<void> => {
+  const token = localStorage.getItem('auth_token');
+  if (!token) return;
+
+  try {
+    await fetch(`${API_BASE}/notifications/preferences`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ preferences }),
+    });
+  } catch {
+    console.warn('Failed to save notification preferences to server');
+  }
+};
 
 interface UseNotificationsReturn {
   // Status
@@ -58,11 +85,46 @@ export const useNotifications = (): UseNotificationsReturn => {
     loadNotificationPreferences()
   );
   const [swRegistration, setSwRegistration] = useState<ServiceWorkerRegistration | null>(null);
+  const skipPushOnceRef = useRef(false);
+
+  // Load preferences from server at mount (if authenticated)
+  useEffect(() => {
+    skipPushOnceRef.current = true; // Anticipate loading from server, skip PUT once
+
+    const loadPreferencesFromServer = async () => {
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        skipPushOnceRef.current = false; // No auth, allow PUT immediately
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/notifications/preferences`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setPreferences(data.preferences);
+          // skipPushOnceRef.current stays true, PUT will skip once
+        } else {
+          // Server doesn't have a row yet, push defaults at mount
+          skipPushOnceRef.current = false; // Allow PUT for user changes
+          await pushPreferencesToServer(DEFAULT_PREFERENCES);
+        }
+      } catch {
+        // Error loading, push defaults at mount
+        skipPushOnceRef.current = false;
+        await pushPreferencesToServer(DEFAULT_PREFERENCES);
+      }
+    };
+
+    void loadPreferencesFromServer();
+  }, []);
 
   // Initialize service worker on mount
   useEffect(() => {
     if (isSupported && permission === 'granted') {
-      registerServiceWorker().then((registration) => {
+      getServiceWorkerRegistration().then((registration) => {
         setSwRegistration(registration);
         if (registration) {
           // Check if already subscribed
@@ -90,7 +152,7 @@ export const useNotifications = (): UseNotificationsReturn => {
 
       if (result === 'granted') {
         // Register service worker after permission granted
-        const registration = await registerServiceWorker();
+        const registration = await getServiceWorkerRegistration();
         setSwRegistration(registration);
         return true;
       } else if (result === 'denied') {
@@ -134,13 +196,13 @@ export const useNotifications = (): UseNotificationsReturn => {
       if (subscription) {
         // Send subscription to server
         try {
-          await fetch('/api/notifications/subscribe', {
+          await fetch(`${API_BASE}/notifications/subscribe`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
             },
-            body: JSON.stringify({ subscription: subscription.toJSON() }),
+            body: JSON.stringify({ subscription: subscription.toJSON(), language }),
           });
         } catch {
           console.warn('Failed to send subscription to server');
@@ -158,7 +220,7 @@ export const useNotifications = (): UseNotificationsReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, [swRegistration]);
+  }, [swRegistration, language]);
 
   // Unsubscribe from push notifications
   const unsubscribe = useCallback(async (): Promise<boolean> => {
@@ -177,7 +239,7 @@ export const useNotifications = (): UseNotificationsReturn => {
       if (success) {
         // Notify server
         try {
-          await fetch('/api/notifications/unsubscribe', {
+          await fetch(`${API_BASE}/notifications/unsubscribe`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -208,6 +270,16 @@ export const useNotifications = (): UseNotificationsReturn => {
       return newPrefs;
     });
   }, []);
+
+  // Sync preference changes to server, but skip once if loaded from server at mount.
+  // This prevents overwriting server data with local defaults on a fresh device.
+  useEffect(() => {
+    if (skipPushOnceRef.current) {
+      skipPushOnceRef.current = false;
+      return;
+    }
+    void pushPreferencesToServer(preferences);
+  }, [preferences]);
 
   // Send test notification
   const sendTestNotification = useCallback(async (): Promise<void> => {

@@ -62,22 +62,23 @@ export const requestNotificationPermission = async (): Promise<NotificationPermi
   return permission;
 };
 
-// Register service worker for push notifications
-export const registerServiceWorker = async (): Promise<ServiceWorkerRegistration | null> => {
+// The registration push notifications attach to.
+//
+// This used to call register() itself, which was the only register() in the
+// codebase and was reached only through a component with no importer -- so the
+// PWA never installed. Registration now happens once, at startup, in
+// lib/serviceWorker.ts; this waits for that one rather than racing it with a
+// second call for the same scope.
+export const getServiceWorkerRegistration = async (): Promise<ServiceWorkerRegistration | null> => {
   if (!('serviceWorker' in navigator)) {
     console.warn('Service workers not supported');
     return null;
   }
 
   try {
-    const registration = await navigator.serviceWorker.register('/sw.js', {
-      scope: '/',
-    });
-
-    console.log('Service Worker registered:', registration.scope);
-    return registration;
+    return await navigator.serviceWorker.ready;
   } catch (error) {
-    console.error('Service Worker registration failed:', error);
+    console.error('Service Worker not available:', error);
     return null;
   }
 };
@@ -131,7 +132,7 @@ export const showLocalNotification = async (
 
   const registration = await navigator.serviceWorker.ready;
 
-  await registration.showNotification(payload.title, {
+  const options: NotificationOptions & { actions?: unknown; vibrate?: number[] } = {
     body: payload.body,
     icon: payload.icon || '/icons/icon-192x192.png',
     badge: payload.badge || '/icons/badge-72x72.png',
@@ -140,18 +141,19 @@ export const showLocalNotification = async (
     actions: payload.actions,
     vibrate: [200, 100, 200],
     requireInteraction: false,
-  });
+  };
+  await registration.showNotification(payload.title, options);
 };
 
 // Helper function to convert VAPID key
-function urlBase64ToUint8Array(base64String: string): Uint8Array {
+function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding)
     .replace(/-/g, '+')
     .replace(/_/g, '/');
 
   const rawData = window.atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
+  const outputArray = new Uint8Array(new ArrayBuffer(rawData.length));
 
   for (let i = 0; i < rawData.length; ++i) {
     outputArray[i] = rawData.charCodeAt(i);
@@ -173,37 +175,37 @@ export const generateDailyPredictionNotification = (
 
   const bodies: Record<Language, Record<number, string>> = {
     ro: {
-      1: 'Astăzi este o zi perfectă pentru noi începuturi! Energia numărului 1 te susține.',
-      2: 'Ziua favorizează cooperarea și relațiile armonioase. Fii diplomat!',
-      3: 'Creativitatea ta este la maxim astăzi! Exprimă-te liber.',
-      4: 'O zi excelentă pentru organizare și muncă practică.',
-      5: 'Schimbarea și aventura sunt în aer! Fii deschis la nou.',
-      6: 'Energia zilei se concentrează pe familie și iubire.',
-      7: 'Zi ideală pentru introspecție și studiu profund.',
-      8: 'Energia abundenței și succesului este puternică astăzi!',
-      9: 'O zi pentru compasiune și încheierea ciclurilor.',
+      1: 'Zi de început. Pornește ce amâni, și cere ajutorul înainte să ai nevoie de el.',
+      2: 'Simți azi tensiunea din cameră înainte să fie spusă. Dezamorseaz-o fără să te ștergi pe tine.',
+      3: 'Ce simți vrea azi să iasă în afară. Spune-o într-un singur loc, nu în zece.',
+      4: 'Zi bună pentru ce se construiește încet. Ai grijă să nu folosești munca drept adăpost.',
+      5: 'Stagnarea te costă azi mai mult decât riscul. Alege o direcție și du-o până la capăt.',
+      6: 'Azi alții se sprijină pe tine. Ai grijă de ei fără să decizi în locul lor.',
+      7: 'Zi de întrebări, nu de răspunsuri comode. Ai grijă să nu folosești analiza ca să nu simți.',
+      8: 'Azi se măsoară. Uită-te la cifre, și ține minte că nu ele spun cât valorezi.',
+      9: 'Vezi azi imaginea largă. Închide ce trebuie închis, chiar dacă nu iese perfect.',
     },
     en: {
-      1: 'Today is perfect for new beginnings! Number 1 energy supports you.',
-      2: 'The day favors cooperation and harmonious relationships. Be diplomatic!',
-      3: 'Your creativity is at its peak today! Express yourself freely.',
-      4: 'An excellent day for organization and practical work.',
-      5: 'Change and adventure are in the air! Be open to the new.',
-      6: 'Today\'s energy focuses on family and love.',
-      7: 'An ideal day for introspection and deep study.',
-      8: 'The energy of abundance and success is strong today!',
-      9: 'A day for compassion and completing cycles.',
+      1: 'A day for beginnings. Start what you postpone, and ask for help before you need it.',
+      2: 'Today you feel the tension before anyone names it. Defuse it without erasing yourself.',
+      3: 'What you feel wants out today. Say it in one place, not in ten.',
+      4: 'A good day for what is built slowly. Watch that work does not become a place to hide.',
+      5: 'Standing still costs you more than the risk today. Pick one direction and finish it.',
+      6: 'People lean on you today. Care for them without deciding for them.',
+      7: 'A day for questions, not for comfortable answers. Watch that analysis is not a way to not feel.',
+      8: 'Today things get measured. Look at the numbers, and remember they do not say what you are worth.',
+      9: 'You see the whole picture today. Close what needs closing, even if it is not perfect.',
     },
     ru: {
-      1: 'Сегодня идеальный день для новых начинаний! Энергия числа 1 поддерживает вас.',
-      2: 'День благоприятствует сотрудничеству и гармоничным отношениям. Будьте дипломатичны!',
-      3: 'Ваша креативность на пике сегодня! Выражайте себя свободно.',
-      4: 'Отличный день для организации и практической работы.',
-      5: 'Перемены и приключения в воздухе! Будьте открыты новому.',
-      6: 'Энергия дня сосредоточена на семье и любви.',
-      7: 'Идеальный день для самоанализа и глубокого изучения.',
-      8: 'Энергия изобилия и успеха сильна сегодня!',
-      9: 'День для сострадания и завершения циклов.',
+      1: 'День начала. Начните то, что откладываете, и попросите помощь до того, как она понадобится.',
+      2: 'Сегодня вы чувствуете напряжение раньше слов. Снимите его, не стирая себя.',
+      3: 'То, что вы чувствуете, просится наружу. Скажите это в одном месте, а не в десяти.',
+      4: 'Хороший день для того, что строится медленно. Следите, чтобы работа не стала укрытием.',
+      5: 'Сегодня застой обходится дороже риска. Выберите одно направление и доведите его до конца.',
+      6: 'Сегодня на вас опираются. Позаботьтесь о других, не решая за них.',
+      7: 'День вопросов, а не удобных ответов. Следите, чтобы анализ не заменял чувство.',
+      8: 'Сегодня всё измеряется. Смотрите на цифры и помните: они не говорят, чего вы стоите.',
+      9: 'Сегодня вы видите картину целиком. Закройте то, что пора закрыть, даже если оно не идеально.',
     },
   };
 
@@ -216,7 +218,7 @@ export const generateDailyPredictionNotification = (
     data: {
       type: 'daily-prediction',
       personalDay,
-      url: '/predictions',
+      url: '/azi',
     },
     actions: [
       {
@@ -292,70 +294,7 @@ export const generateAchievementNotification = (
       type: 'achievement',
       achievementName,
       xpAwarded,
-      url: '/profile',
-    },
-  };
-};
-
-export const generateSpecialDateNotification = (
-  eventType: 'personal-year' | 'birthday' | 'pinnacle',
-  language: Language
-): NotificationPayload => {
-  const content: Record<string, Record<Language, { title: string; body: string }>> = {
-    'personal-year': {
-      ro: {
-        title: 'Începe un Nou An Personal!',
-        body: 'Astăzi începe un nou ciclu în viața ta. Descoperă ce îți rezervă noul an personal!',
-      },
-      en: {
-        title: 'A New Personal Year Begins!',
-        body: 'Today marks the start of a new cycle in your life. Discover what your new personal year holds!',
-      },
-      ru: {
-        title: 'Начинается Новый Личный Год!',
-        body: 'Сегодня начинается новый цикл в вашей жизни. Узнайте, что приготовил новый личный год!',
-      },
-    },
-    birthday: {
-      ro: {
-        title: 'La Mulți Ani!',
-        body: 'Astăzi este ziua ta specială! Descoperă ce energie numerologică te așteaptă în noul an.',
-      },
-      en: {
-        title: 'Happy Birthday!',
-        body: 'Today is your special day! Discover what numerological energy awaits you in the new year.',
-      },
-      ru: {
-        title: 'С Днём Рождения!',
-        body: 'Сегодня ваш особенный день! Узнайте, какая нумерологическая энергия ждёт вас в новом году.',
-      },
-    },
-    pinnacle: {
-      ro: {
-        title: 'Intri într-un Nou Vârf de Viață!',
-        body: 'O nouă perioadă importantă începe în viața ta. Vezi ce provocări și oportunități te așteaptă!',
-      },
-      en: {
-        title: 'Entering a New Life Pinnacle!',
-        body: 'A new important period begins in your life. See what challenges and opportunities await!',
-      },
-      ru: {
-        title: 'Начинается Новая Вершина Жизни!',
-        body: 'Новый важный период начинается в вашей жизни. Узнайте, какие вызовы и возможности ждут!',
-      },
-    },
-  };
-
-  const { title, body } = content[eventType][language];
-
-  return {
-    title,
-    body,
-    tag: `special-date-${eventType}`,
-    data: {
-      type: 'special-date',
-      eventType,
-      url: '/predictions',
+      url: '/eu',
     },
   };
 };
@@ -376,21 +315,4 @@ export const loadNotificationPreferences = (): NotificationPreferences => {
     }
   }
   return DEFAULT_PREFERENCES;
-};
-
-// Schedule a local notification (for demo/testing)
-export const scheduleNotification = (
-  payload: NotificationPayload,
-  delayMs: number
-): number => {
-  const timeoutId = window.setTimeout(() => {
-    showLocalNotification(payload).catch(console.error);
-  }, delayMs);
-
-  return timeoutId;
-};
-
-// Cancel a scheduled notification
-export const cancelScheduledNotification = (timeoutId: number): void => {
-  window.clearTimeout(timeoutId);
 };

@@ -20,7 +20,10 @@ export default {
     },
     extend: {
       fontFamily: {
-        cinzel: ["var(--font-heading)", "serif"],
+        // Any column of numbers uses this; tabular-nums is applied by the
+        // .num utility so figures line up down the column.
+        mono: ["var(--font-mono)"],
+        heading: ["var(--font-heading)", "Georgia", "serif"],
         raleway: ["var(--font-body)", "sans-serif"],
       },
       colors: {
@@ -28,6 +31,53 @@ export default {
         "border-hover": "hsl(var(--border-hover))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
+        // Palette tokens exposed as utilities, so a component can write
+        // text-ok or bg-crit-soft instead of text-green-500 or bg-red-100.
+        // Without these the semantic colours exist in CSS but no class reaches them.
+        surface: { DEFAULT: "hsl(var(--surface))", 2: "hsl(var(--surface-2))" },
+        sunken: "hsl(var(--sunken))",
+        ink: { DEFAULT: "hsl(var(--ink))", 2: "hsl(var(--ink-2))" },
+        faint: "hsl(var(--faint))",
+        line: { DEFAULT: "hsl(var(--line))", 2: "hsl(var(--line-2))" },
+        // The relations between numbers: a bridge that is wide, a plane that is
+        // unbalanced, a year of duality. They used to be drawn in the accent like
+        // everything else, so nothing on the page could tell agreement from strain.
+        tension: {
+          DEFAULT: "hsl(var(--tension))",
+          soft: "hsl(var(--tension-soft))",
+        },
+        gilt: {
+          DEFAULT: "hsl(var(--gilt))",
+          soft: "hsl(var(--gilt-soft))",
+        },
+        // Placa nu urmează tema -- vezi comentariul din index.css.
+        plate: {
+          DEFAULT: "hsl(var(--plate))",
+          2: "hsl(var(--plate-2))",
+          gilt: "hsl(var(--plate-gilt))",
+          "gilt-hi": "hsl(var(--plate-gilt-hi))",
+          "gilt-dim": "hsl(var(--plate-gilt-dim))",
+          ink: "hsl(var(--plate-ink))",
+          muted: "hsl(var(--plate-muted))",
+          tension: "hsl(var(--plate-tension))",
+          warn: "hsl(var(--plate-warn))",
+          harmony: "hsl(var(--plate-harmony))",
+        },
+        harmony: {
+          DEFAULT: "hsl(var(--harmony))",
+          soft: "hsl(var(--harmony-soft))",
+        },
+        ok: { DEFAULT: "hsl(var(--ok))", soft: "hsl(var(--ok-soft))", ink: "hsl(var(--ok-ink))" },
+        warn: { DEFAULT: "hsl(var(--warn))", soft: "hsl(var(--warn-soft))", ink: "hsl(var(--warn-ink))" },
+        crit: { DEFAULT: "hsl(var(--crit))", soft: "hsl(var(--crit-soft))", ink: "hsl(var(--crit-ink))" },
+        chart: {
+          1: "hsl(var(--chart-1))", 2: "hsl(var(--chart-2))", 3: "hsl(var(--chart-3))",
+          4: "hsl(var(--chart-4))", 5: "hsl(var(--chart-5))", 6: "hsl(var(--chart-6))",
+        },
+        ramp: {
+          1: "hsl(var(--ramp-1))", 2: "hsl(var(--ramp-2))", 3: "hsl(var(--ramp-3))",
+          4: "hsl(var(--ramp-4))", 5: "hsl(var(--ramp-5))", 6: "hsl(var(--ramp-6))",
+        },
         background: {
           DEFAULT: "hsl(var(--background))",
           elevated: "hsl(var(--background-elevated))",
@@ -50,8 +100,18 @@ export default {
           hover: "hsl(var(--secondary-hover))",
           light: "hsl(var(--secondary-light))",
         },
+        // Blue had no token, so every informational note was a raw blue-500.
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          soft: "hsl(var(--info-soft))",
+          ink: "hsl(var(--info-ink))",
+        },
         accent: {
           DEFAULT: "hsl(var(--accent))",
+          // The palette defines a soft tint and a darker ink for the accent;
+          // without exposing them here, bg-accent-soft silently produces nothing.
+          soft: "hsl(var(--accent-soft))",
+          ink: "hsl(var(--accent-ink))",
           foreground: "hsl(var(--accent-foreground))",
           hover: "hsl(var(--accent-hover))",
         },

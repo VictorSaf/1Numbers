@@ -68,7 +68,7 @@ export const ProfileSwitcher = ({ className, onProfileSwitch }: ProfileSwitcherP
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <User className="h-4 w-4 text-primary" />
+      <User className="h-4 w-4" />
       <Select
         value={activeProfile?.id || ''}
         onValueChange={handleSwitch}
@@ -80,7 +80,7 @@ export const ProfileSwitcher = ({ className, onProfileSwitch }: ProfileSwitcherP
               <div className="flex items-center gap-2">
                 <span className="truncate">{activeProfile.fullName}</span>
                 {activeProfile.isActive && (
-                  <Check className="h-3 w-3 text-primary" />
+                  <Check className="h-3 w-3" />
                 )}
               </div>
             ) : (
@@ -95,13 +95,13 @@ export const ProfileSwitcher = ({ className, onProfileSwitch }: ProfileSwitcherP
               value={profile.id}
               className={cn(
                 "cursor-pointer",
-                profile.isActive && "bg-primary/10"
+                profile.isActive && "bg-sunken"
               )}
             >
               <div className="flex items-center justify-between w-full">
                 <span className="truncate">{profile.fullName}</span>
                 {profile.isActive && (
-                  <Check className="h-4 w-4 text-primary ml-2" />
+                  <Check className="h-4 w-4 ml-2" />
                 )}
               </div>
             </SelectItem>
@@ -109,7 +109,7 @@ export const ProfileSwitcher = ({ className, onProfileSwitch }: ProfileSwitcherP
         </SelectContent>
       </Select>
       {switching && (
-        <Loader2 className="h-4 w-4 animate-spin text-primary" />
+        <Loader2 className="h-4 w-4 animate-spin" />
       )}
     </div>
   );

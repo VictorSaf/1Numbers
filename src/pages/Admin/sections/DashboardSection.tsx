@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Users, UserCheck, Crown, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { API_BASE } from '@/lib/apiBase';
 
 interface DashboardStats {
   totalUsers: number;
@@ -22,7 +23,7 @@ export const DashboardSection = () => {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem('auth_token');
-        const response = await fetch('http://localhost:3001/api/admin/dashboard', {
+        const response = await fetch(`${API_BASE}/admin/dashboard`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -47,30 +48,30 @@ export const DashboardSection = () => {
       title: 'Total Users',
       value: stats.totalUsers,
       icon: Users,
-      color: 'text-blue-500',
-      bgColor: 'bg-blue-500/10',
+      color: 'text-info',
+      bgColor: '',
     },
     {
       title: 'Active Users',
       value: stats.activeUsers,
       icon: UserCheck,
-      color: 'text-green-500',
-      bgColor: 'bg-green-500/10',
+      color: 'text-ok',
+      bgColor: '',
       subtitle: 'Last 7 days',
     },
     {
       title: 'Premium Users',
       value: stats.premiumUsers,
       icon: Crown,
-      color: 'text-amber-500',
-      bgColor: 'bg-amber-500/10',
+      color: 'text-warn',
+      bgColor: '',
     },
     {
       title: 'New This Week',
       value: stats.newUsersThisWeek,
       icon: TrendingUp,
-      color: 'text-purple-500',
-      bgColor: 'bg-purple-500/10',
+      color: 'text-primary',
+      bgColor: 'bg-sunken',
     },
   ];
 
@@ -94,7 +95,7 @@ export const DashboardSection = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-cinzel font-bold mb-2">Dashboard</h2>
+        <h2 className="text-2xl font-heading font-bold mb-2">Dashboard</h2>
         <p className="text-muted-foreground">Overview of your platform metrics</p>
       </div>
 

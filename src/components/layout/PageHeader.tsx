@@ -3,11 +3,30 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { PagePlate } from '@/components/layout/PagePlate';
+
+/**
+ * Capul unei pagini. E o placă, ca frontispiciul hărții.
+ *
+ * Componenta a rămas fiindcă șapte pagini o cheamă cu aceleași trei lucruri --
+ * titlu, subtitlu, etichetă. Ce s-a schimbat e ce desenează: o placă, nu un
+ * titlu pe suprafața paginii. Așa se deschid toate la fel, fără ca fiecare
+ * pagină să fie editată separat.
+ *
+ * `badge.icon` rămâne în semnătură fiindcă cele șapte îl trimit, dar nu se mai
+ * desenează: iconițele colorate erau semnătura stilului vechi, iar eticheta
+ * singură spune același lucru.
+ *
+ * `figure` e ce ține de pagina anume. Cine n-are un desen propriu primește o
+ * placă goală -- un desen pus ca să umple spațiul ar fi chiar decorul pe care
+ * l-am scos de peste tot.
+ */
 
 interface PageHeaderProps {
   title: string;
   subtitle?: string;
   badge?: { icon: ReactNode; label: string };
+  figure?: ReactNode;
   showBack?: boolean;
   backTo?: string;
   backLabel?: string;
@@ -18,6 +37,7 @@ export const PageHeader = ({
   title,
   subtitle,
   badge,
+  figure,
   showBack = false,
   backTo = '/',
   backLabel,
@@ -26,42 +46,24 @@ export const PageHeader = ({
   const { t } = useLanguage();
 
   return (
-    <header className={`relative z-10 py-8 px-4 ${className}`}>
-      <div className="max-w-4xl mx-auto">
+    <header className={`relative z-10 pt-4 ${className}`}>
+      <div className="page-measure">
         {showBack && (
-          <Link to={backTo} className="inline-block mb-6">
-            <Button
-              variant="ghost"
-              className="text-foreground/90 hover:text-primary hover:bg-primary/10 gap-2"
-            >
+          <Link to={backTo} className="mb-4 inline-block">
+            <Button variant="ghost" className="gap-2 text-muted-foreground hover:text-foreground">
               <ArrowLeft className="h-4 w-4" />
               <span>{backLabel || t.backToCalculator}</span>
             </Button>
           </Link>
         )}
 
-        <div className="text-center">
-          {badge && (
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30 mb-4">
-              {badge.icon}
-              <span className="text-sm font-raleway text-primary font-medium">
-                {badge.label}
-              </span>
-            </div>
-          )}
-
-          <h1 className="font-cinzel text-3xl md:text-4xl lg:text-5xl text-gradient-gold mb-3 font-bold">
-            {title}
-          </h1>
-
-          {subtitle && (
-            <p className="font-raleway text-lg text-foreground/90 max-w-2xl mx-auto">
-              {subtitle}
-            </p>
-          )}
-        </div>
+        <PagePlate
+          eyebrow={badge?.label ?? title}
+          title={title}
+          subtitle={subtitle}
+          figure={figure}
+        />
       </div>
     </header>
   );
 };
-

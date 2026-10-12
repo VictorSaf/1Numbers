@@ -4,6 +4,15 @@ import { authenticateToken, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
+// Aceeași adresă ca în auth.ts și account.ts. 8080 era alt serviciu de pe
+// mașină; aplicația e pe 8082.
+const appUrl = (): string => (process.env.FRONTEND_URL || 'http://localhost:8082').replace(/\/+$/, '');
+
+// Listele cercului se încarcă întregi în interfață, fără paginare. Plafonul e
+// larg -- nimeni nu are 200 de cereri în așteptare -- dar există: un cont nu
+// poate cere serverului o listă fără capăt.
+const LIST_CAP = 200;
+
 // Get friends list
 router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
@@ -16,13 +25,16 @@ router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
       `SELECT
         f.friend_id,
         u.email,
-        u.birth_date,
-        u.full_name,
+        p.birth_date,
+        p.full_name,
         f.created_at as friendship_date
+      -- birth_date and full_name live on user_profiles, not users
       FROM friendships f
       JOIN users u ON u.id = f.friend_id
+      LEFT JOIN user_profiles p ON p.user_id = u.id AND p.is_active = true
       WHERE f.user_id = $1
-      ORDER BY f.created_at DESC`,
+      ORDER BY f.created_at DESC
+      LIMIT ${LIST_CAP}`,
       [userId]
     );
 
@@ -59,13 +71,15 @@ router.get('/requests', authenticateToken, async (req: AuthRequest, res: Respons
         fr.id,
         fr.from_user_id,
         u.email,
-        u.full_name,
+        p.full_name,
         fr.message,
         fr.created_at
       FROM friend_requests fr
       JOIN users u ON u.id = fr.from_user_id
+      LEFT JOIN user_profiles p ON p.user_id = u.id AND p.is_active = true
       WHERE fr.to_user_id = $1 AND fr.status = 'pending'
-      ORDER BY fr.created_at DESC`,
+      ORDER BY fr.created_at DESC
+      LIMIT ${LIST_CAP}`,
       [userId]
     );
 
@@ -103,13 +117,15 @@ router.get('/requests/sent', authenticateToken, async (req: AuthRequest, res: Re
         fr.id,
         fr.to_user_id,
         u.email,
-        u.full_name,
+        p.full_name,
         fr.status,
         fr.created_at
       FROM friend_requests fr
       JOIN users u ON u.id = fr.to_user_id
+      LEFT JOIN user_profiles p ON p.user_id = u.id AND p.is_active = true
       WHERE fr.from_user_id = $1
-      ORDER BY fr.created_at DESC`,
+      ORDER BY fr.created_at DESC
+      LIMIT ${LIST_CAP}`,
       [userId]
     );
 
@@ -222,33 +238,42 @@ router.post('/request/:requestId/accept', authenticateToken, async (req: AuthReq
       return res.status(401).json({ error: 'User ID not found' });
     }
 
-    // Get request and verify it's for this user
-    const requestResult = await pool.query(
-      `SELECT from_user_id, to_user_id FROM friend_requests
-       WHERE id = $1 AND to_user_id = $2 AND status = 'pending'`,
-      [requestId, userId]
-    );
+    // Starea cererii și prietenia se scriu împreună sau deloc. UPDATE-ul cu
+    // `status = 'pending'` în WHERE e și verificarea: două acceptări simultane
+    // nu trec amândouă.
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
 
-    if (requestResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Friend request not found' });
+      const requestResult = await client.query(
+        `UPDATE friend_requests SET status = 'accepted', responded_at = NOW()
+         WHERE id = $1 AND to_user_id = $2 AND status = 'pending'
+         RETURNING from_user_id`,
+        [requestId, userId]
+      );
+
+      if (requestResult.rows.length === 0) {
+        await client.query('ROLLBACK');
+        return res.status(404).json({ error: 'Friend request not found' });
+      }
+
+      const fromUserId = requestResult.rows[0].from_user_id;
+
+      // Create bidirectional friendship
+      await client.query(
+        `INSERT INTO friendships (user_id, friend_id)
+         VALUES ($1, $2), ($2, $1)
+         ON CONFLICT DO NOTHING`,
+        [userId, fromUserId]
+      );
+
+      await client.query('COMMIT');
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
     }
-
-    const fromUserId = requestResult.rows[0].from_user_id;
-
-    // Update request status
-    await pool.query(
-      `UPDATE friend_requests SET status = 'accepted', responded_at = NOW()
-       WHERE id = $1`,
-      [requestId]
-    );
-
-    // Create bidirectional friendship
-    await pool.query(
-      `INSERT INTO friendships (user_id, friend_id)
-       VALUES ($1, $2), ($2, $1)
-       ON CONFLICT DO NOTHING`,
-      [userId, fromUserId]
-    );
 
     res.json({
       success: true,
@@ -361,7 +386,7 @@ router.post('/invite-link', authenticateToken, async (req: AuthRequest, res: Res
     res.json({
       success: true,
       code,
-      inviteUrl: `${process.env.FRONTEND_URL || 'http://localhost:8080'}/invite/${code}`,
+      inviteUrl: `${appUrl()}/invite/${code}`,
     });
   } catch (error: unknown) {
     console.error('Generate invite link error:', error);
@@ -383,54 +408,86 @@ router.post('/invite/:code', authenticateToken, async (req: AuthRequest, res: Re
       return res.status(401).json({ error: 'User ID not found' });
     }
 
-    // Find valid invite link
-    const linkResult = await pool.query(
-      `SELECT id, user_id FROM friend_invite_links
-       WHERE code = $1
-         AND is_active = true
-         AND (expires_at IS NULL OR expires_at > NOW())
-         AND (max_uses IS NULL OR uses_count < max_uses)`,
-      [code.toUpperCase()]
-    );
+    // Linkul se consumă și prietenia se creează împreună sau deloc.
+    const client = await pool.connect();
+    let inviterId: string;
+    try {
+      await client.query('BEGIN');
 
-    if (linkResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Invalid or expired invite link' });
+      // Find valid invite link
+      const linkResult = await client.query(
+        `SELECT id, user_id FROM friend_invite_links
+         WHERE code = $1
+           AND is_active = true
+           AND (expires_at IS NULL OR expires_at > NOW())
+           AND (max_uses IS NULL OR uses_count < max_uses)`,
+        [code.toUpperCase()]
+      );
+
+      if (linkResult.rows.length === 0) {
+        await client.query('ROLLBACK');
+        return res.status(404).json({ error: 'Invalid or expired invite link' });
+      }
+
+      inviterId = linkResult.rows[0].user_id;
+      const linkId = linkResult.rows[0].id;
+
+      if (inviterId === userId) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({ error: 'Cannot use your own invite link' });
+      }
+
+      // Check if already friends
+      const friendshipResult = await client.query(
+        'SELECT id FROM friendships WHERE user_id = $1 AND friend_id = $2',
+        [userId, inviterId]
+      );
+
+      if (friendshipResult.rows.length > 0) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({ error: 'Already friends with this user' });
+      }
+
+      // Consumă o folosire numai dacă mai e una. Verificarea stă în UPDATE, nu
+      // înaintea lui: între SELECT și un UPDATE necondiționat, doi oameni pe
+      // un link de o singură folosire treceau amândoi.
+      const usedResult = await client.query(
+        `UPDATE friend_invite_links SET uses_count = uses_count + 1
+         WHERE id = $1
+           AND is_active = true
+           AND (expires_at IS NULL OR expires_at > NOW())
+           AND (max_uses IS NULL OR uses_count < max_uses)
+         RETURNING id`,
+        [linkId]
+      );
+
+      if (usedResult.rows.length === 0) {
+        await client.query('ROLLBACK');
+        return res.status(404).json({ error: 'Invalid or expired invite link' });
+      }
+
+      // Create bidirectional friendship
+      await client.query(
+        `INSERT INTO friendships (user_id, friend_id)
+         VALUES ($1, $2), ($2, $1)
+         ON CONFLICT DO NOTHING`,
+        [userId, inviterId]
+      );
+
+      await client.query('COMMIT');
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
     }
-
-    const inviterId = linkResult.rows[0].user_id;
-    const linkId = linkResult.rows[0].id;
-
-    if (inviterId === userId) {
-      return res.status(400).json({ error: 'Cannot use your own invite link' });
-    }
-
-    // Check if already friends
-    const friendshipResult = await pool.query(
-      'SELECT id FROM friendships WHERE user_id = $1 AND friend_id = $2',
-      [userId, inviterId]
-    );
-
-    if (friendshipResult.rows.length > 0) {
-      return res.status(400).json({ error: 'Already friends with this user' });
-    }
-
-    // Update usage count
-    await pool.query(
-      'UPDATE friend_invite_links SET uses_count = uses_count + 1 WHERE id = $1',
-      [linkId]
-    );
-
-    // Create bidirectional friendship
-    await pool.query(
-      `INSERT INTO friendships (user_id, friend_id)
-       VALUES ($1, $2), ($2, $1)
-       ON CONFLICT DO NOTHING`,
-      [userId, inviterId]
-    );
 
     // Get inviter info
     const inviterResult = await pool.query(
-      'SELECT email, full_name FROM users WHERE id = $1',
+      `SELECT u.email, p.full_name
+       FROM users u
+       LEFT JOIN user_profiles p ON p.user_id = u.id AND p.is_active = true
+       WHERE u.id = $1`,
       [inviterId]
     );
 
@@ -465,7 +522,8 @@ router.get('/invite-links', authenticateToken, async (req: AuthRequest, res: Res
       `SELECT id, code, uses_count, max_uses, expires_at, created_at, is_active
        FROM friend_invite_links
        WHERE user_id = $1
-       ORDER BY created_at DESC`,
+       ORDER BY created_at DESC
+       LIMIT ${LIST_CAP}`,
       [userId]
     );
 
@@ -479,7 +537,7 @@ router.get('/invite-links', authenticateToken, async (req: AuthRequest, res: Res
         expiresAt: l.expires_at,
         createdAt: l.created_at,
         isActive: l.is_active,
-        inviteUrl: `${process.env.FRONTEND_URL || 'http://localhost:8080'}/invite/${l.code}`,
+        inviteUrl: `${appUrl()}/invite/${l.code}`,
       })),
     });
   } catch (error: unknown) {
@@ -543,8 +601,10 @@ router.get('/:friendId/profile', authenticateToken, async (req: AuthRequest, res
 
     // Get friend's profile
     const profileResult = await pool.query(
-      `SELECT id, email, birth_date, full_name, created_at
-       FROM users WHERE id = $1`,
+      `SELECT u.id, u.email, p.birth_date, p.full_name, u.created_at
+       FROM users u
+       LEFT JOIN user_profiles p ON p.user_id = u.id AND p.is_active = true
+       WHERE u.id = $1`,
       [friendId]
     );
 

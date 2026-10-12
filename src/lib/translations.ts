@@ -2,6 +2,50 @@ export type Language = "ro" | "en" | "ru";
 
 export const translations = {
   ro: {
+    people: {
+      title: "Oamenii mei",
+      subtitle: "Hărțile pe care le ții: ale tale, ale celor apropiați, ale copiilor, ale firmelor.",
+      all: "Toate",
+      empty: "Nicio hartă aici încă.",
+      aboutSomeoneElse: "Datele acestei persoane le vezi numai tu. Nu sunt trimise nicăieri și le poți șterge oricând.",
+      keepName: "Salvează numele în cont",
+      keepNameDone: "Numele e salvat",
+      dateLabel: "Data nașterii",
+      foundedLabel: "Data înființării",
+      categoryLabel: "Ce fel de hartă e",
+      categories: {
+        eu: "Eu",
+        apropiat: "Cineva apropiat",
+        copil: "Copil",
+        afacere: "Afacere",
+      },
+      categoryHints: {
+        eu: "Tu, inclusiv variantele numelui tău.",
+        apropiat: "Partener, familie, prieten.",
+        copil: "Un copil, sau un nume pe care îl alegi pentru unul.",
+        afacere: "O firmă sau un brand. Data e cea a înființării.",
+      },
+      deleteConfirm: "Sigur ștergi această hartă? Nu poți reveni asupra acestei acțiuni.",
+    },
+    timing: {
+      title: "Relația în timp",
+      subtitle: "Scorul spune cât de aproape sunteți. Anul și lunile spun unde vă prinde perioada asta.",
+      thisYear: "Anul ăsta",
+      monthByMonth: "Lună de lună",
+      yourYear: "Anul tău personal",
+      theirYear: "Anul lui personal",
+      bands: {
+        harmony: "Vă trageți în aceeași direcție",
+        mixed: "Mergeți în paralel",
+        tension: "Trageți în direcții diferite",
+      },
+      bandHints: {
+        harmony: "Ce vrea unul e și ce vrea celălalt. E perioada în care lucrurile mari se fac ușor.",
+        mixed: "Nici împreună, nici împotrivă. Merge orice, dacă vă spuneți unde sunteți.",
+        tension: "Unul strânge, celălalt desface. Nu e o problemă între voi — e o distanță de ținut minte.",
+      },
+    },
+    loading: "Se încarcă...",
     // Header
     title: "Numerologia",
     subtitle: "Descoperă secretele ascunse în numerele tale personale",
@@ -17,21 +61,14 @@ export const translations = {
     calculateButton: "Descoperă Numerele Tale",
     
     // Results
-    profileTitle: "Profilul Tău Numerologic",
-    profileSubtitle: "Descoperă semnificația ascunsă a numerelor tale personale",
     calculateAgain: "Calculează din nou",
     
     // Number titles
     lifePathTitle: "Numărul Drumului Vieții",
-    lifePathDesc: "Cel mai important număr în numerologie. Reprezintă calea ta de viață, lecțiile de învățat și scopul existenței tale.",
     destinyTitle: "Numărul Destinului",
-    destinyDesc: "Derivat din numele tău complet, arată talentele și abilitățile pe care le ai pentru a-ți îndeplini misiunea de viață.",
     soulUrgeTitle: "Numărul Sufletului",
-    soulUrgeDesc: "Calculat din vocalele numelui, relevă dorințele tale interioare și motivațiile cele mai profunde.",
     personalityTitle: "Numărul Personalității",
-    personalityDesc: "Derivat din consoanele numelui, arată cum te percep alții și prima impresie pe care o lași.",
     personalYearTitle: "Anul Personal",
-    personalYearDesc: "Energia care te ghidează în acest an. Fiecare an personal aduce oportunități și provocări unice.",
     
     // Info cards
     infoLifePath: "Misiunea ta în această viață",
@@ -39,20 +76,12 @@ export const translations = {
     infoPersonalYear: "Energia anului curent",
     
     // Navigation
-    viewGuide: "Ghid",
-    viewCompatibility: "Compatibilitate",
     backToCalculator: "Înapoi la Calculator",
     profile: "Profil",
     myProfile: "Profilul Meu",
     login: "Autentificare",
     predictions: "Previziuni",
-    tools: "Instrumente",
-    tutorials: "Tutoriale",
-    courses: "Cursuri",
-    articles: "Articole",
-    faq: "Întrebări Frecvente",
     angelNumbers: "Numere Îngeri",
-    back: "Înapoi",
     
     // NotFound page
     notFound: {
@@ -66,7 +95,6 @@ export const translations = {
     profilePageSubtitle: "Completează datele tale personale pentru a accesa rapid calculele numerologice",
     profileSaved: "Profil salvat cu succes!",
     profileDeleted: "Profil șters cu succes!",
-    saveProfile: "Salvează Profilul",
     deleteProfile: "Șterge Profilul",
     editProfile: "Editează Profilul",
     createProfile: "Creează Profilul",
@@ -77,27 +105,22 @@ export const translations = {
     birthPlaceLabel: "Locul nașterii (opțional)",
     birthPlacePlaceholder: "Ex: București, România",
     birthPlaceHint: "Locul nașterii poate influența calculele numerologice",
-    useProfileData: "Folosește datele din profil",
-    profileRequired: "Te rugăm să creezi un profil pentru a folosi această funcție",
     cancel: "Anulează",
+    save: "Salvează",
     error: "Eroare",
     // Multiple profiles
-    switchProfile: "Schimbă Profilul",
-    activeProfile: "Profil Activ",
-    allProfiles: "Toate Profilele",
     createNewProfile: "Creează Profil Nou",
     selectProfile: "Selectează Profil",
     profileSwitched: "Profil schimbat cu succes!",
     switchProfileError: "Eroare la schimbarea profilului",
     noProfiles: "Nu ai încă niciun profil",
     profileComparison: "Comparare Profile",
-    compareProfiles: "Compară Profilele",
     selectProfilesToCompare: "Selectează profilele pentru comparare",
     
     // Compatibility page
     compatibilityLabel: "Compatibilitate Numerologică",
     compatibilityTitle: "Compatibilitatea Perechii",
-    compatibilitySubtitle: "Descoperă armonia numerologică dintre două suflete și cum se completează energiile voastre",
+    compatibilitySubtitle: "Aceeași pereche, prin fiecare metodă de compatibilitate — unde se pun de acord și unde nu",
     person1: "Prima Persoană",
     person2: "A Doua Persoană",
     calculateCompatibility: "Calculează Compatibilitatea",
@@ -136,9 +159,6 @@ export const translations = {
     },
     
     // Guide page
-    guideLabel: "Ghid Complet",
-    guideTitle: "Semnificația Numerelor",
-    guideSubtitle: "Explorează în profunzime semnificația fiecărui număr în numerologie și descoperă cum influențează viața ta",
     coreNumbersTitle: "Numerele Fundamentale (1-9)",
     coreNumbersDesc: "Aceste nouă numere formează baza întregii numerologii. Fiecare poartă o vibrație unică și caracteristici distincte.",
     masterNumbersTitle: "Numerele Master (11, 22, 33)",
@@ -149,7 +169,26 @@ export const translations = {
     allNumbersTitle: "Toate Numerele",
     
     // Footer
-    footer: "Numerologia folosește sistemul Pitagoreic pentru calculele numerice",
+    footer: "Calcule pe toate școlile găsite — pitagoreic, caldeean, vedic, Lo Shu, Alexandrov, Matricea; unde se despart, le vezi pe toate",
+    disclaimer: "Interpretările sunt simbolice, pentru reflecție. Nu înlocuiesc decizii medicale, financiare, juridice sau de relație.",
+    privacyLink: "Confidențialitate",
+    termsLink: "Termeni",
+    accountTitle: "Datele tale",
+    exportLabel: "Descarcă tot ce ținem despre tine",
+    exportNote: "Un fișier JSON cu profilurile, jurnalul, citirile și preferințele tale. Parola și cheile de notificare nu sunt incluse — sunt credențiale, nu date despre tine.",
+    exportButton: "Descarcă",
+    deleteLabel: "Șterge contul",
+    deleteNote: "Îți trimitem un email de confirmare. După ce îl apeși, dispar contul, hărțile tale și cele salvate pentru alții, jurnalul, citirile și preferințele. Nu se poate anula. Dacă vrei datele, descarcă-le întâi.",
+    deleteButton: "Cere ștergerea",
+    deleteSent: "Ți-am trimis emailul de confirmare. Linkul e valabil 30 de minute.",
+    deleteNoEmail: "Nu putem trimite emailuri momentan, iar ștergerea trece prin confirmare pe email. Încearcă mai târziu.",
+    deleteDone: "Contul a fost șters.",
+    othersNote: "Datele pe care le introduci pentru altcineva rămân la tine și le poți șterge oricând. Tu răspunzi de ce introduci despre alți oameni.",
+    dayTextTitle: "Textul zilei",
+    dayTextModel: "Scris de un model, în fiecare zi altfel",
+    dayTextLocal: "Compus de aplicație, mereu la fel",
+    dayTextNote: "Pe prima variantă, propozițiile compuse din harta ta pleacă spre furnizorul modelului. Pe a doua, nu pleacă nimic.",
+    aiConsultantNote: "Răspunsurile de aici sunt scrise de un model de limbaj. Ca să răspundă despre harta ta, îi trimitem cifrele ei — nu numele și nu data nașterii.",
     
     // Extended meanings
     extendedMeanings: {
@@ -176,21 +215,8 @@ export const translations = {
     
     // Name Analysis
     nameAnalysis: {
-      title: "Analiză Completă a Numelui",
-      subtitle: "Analiză detaliată a fiecărei litere și a energiilor ascunse",
-      letterDistribution: "Distribuția Literelor",
-      individualLetters: "Analiza Fiecărei Litere",
       vowel: "Vocală",
-      consonant: "Consoană",
-      vowelsAnalysis: "Vocale",
-      consonantsAnalysis: "Consoane",
-      soulUrgeNumber: "Numărul Sufletului",
-      personalityNumber: "Numărul Personalității",
-      vowels: "vocale",
-      consonants: "consoane",
-      hiddenNumbers: "Numere Ascunse",
-      number: "Număr",
-      optimizationSuggestions: "Sugestii de Optimizare"
+      consonant: "Consoană"
     },
     
     // Number meanings
@@ -206,7 +232,7 @@ export const translations = {
         advice: ["Cultivă răbdarea și ascultă ideile altora", "Echilibrează ambiția cu empatia", "Nu te teme să delegi responsabilități", "Practică colaborarea fără a-ți pierde viziunea"]
       },
       2: {
-        title: "Diplomatull",
+        title: "Diplomatul",
         traits: ["Diplomatic", "Sensibil", "Cooperant", "Intuitiv"],
         description: "Ești un pacificator natural, cu abilități excepționale de a crea armonie. Energia ta este cea a parteneriatului și echilibrului.",
         strengths: ["Intuiție puternică", "Empatie", "Abilități de mediere", "Sensibilitate"],
@@ -345,6 +371,26 @@ export const translations = {
       neutral: "Neutră",
       challenging: "Provocatoare"
     },
+    // Navigarea pe zile de pe /azi. Etichete de interfață; ce înseamnă o zi
+    // anume stă în src/lib/dayContent.ts, lângă motor.
+    today: {
+      previousDay: "Ziua precedentă",
+      nextDay: "Ziua următoare",
+      backToToday: "Înapoi la azi",
+      horizonEdge: "Se pot citi 90 de zile în fiecare direcție.",
+      personalDay: "Ziua personală",
+      personalMonth: "Luna personală",
+      universalDay: "Ziua universală",
+      advice: "Ce ai de făcut"
+    },
+    // Ce află vizitatorul înainte să i se ceară ceva. Pagina cerea înainte să
+    // ofere: "Calculează Numerele Tale" e o comandă, nu o promisiune.
+    firstVisit: {
+      promise: "Scrii numele de la naștere și data nașterii. Primești o hartă în cinci capitole, de citit acum.",
+      noAccount: "Fără cont, fără plată, fără adresă de e-mail.",
+      tryExample: "Vezi întâi o hartă de exemplu",
+      exampleNote: "Harta unei persoane inventate, ca să vezi despre ce e vorba înainte să-ți scrii numele."
+    },
     
     // Lucky Dates
     luckyDates: {
@@ -369,47 +415,9 @@ export const translations = {
       dayNumber: "Numărul zilei",
       universalNumber: "Numărul universal"
     },
-    
-    // Premium
-    premium: {
-      title: "Premium",
-      subtitle: "Deblochează funcționalități avansate",
-      plans: "Planuri de Abonare",
-      aiConsultant: "Consultant AI",
-      features: "Caracteristici Premium",
-      currentPlan: "Planul tău actual",
-      upgrade: "Upgrade",
-      premiumFeatures: "Funcționalități Premium",
-      advancedReports: "Rapoarte Avansate",
-      aiConsultantDesc: "Consultant AI pentru întrebări numerologice",
-      unlimitedAccess: "Acces Nelimitat",
-      prioritySupport: "Suport Priorititar",
-      exportPDF: "Export PDF",
-      customReports: "Rapoarte Personalizate",
-      monthly: "Lunar",
-      yearly: "Anual",
-      subscribe: "Abonează-te",
-      mostPopular: "Cel mai popular",
-      save: "Economisește",
-      perMonth: "/lună",
-      perYear: "/an",
-      featureTitle: "Funcționalitate Premium",
-      featureDescription: "Această funcționalitate necesită un abonament Premium.",
-      upgradeToPremium: "Upgrade la Premium",
-      unlockAdvanced: "Deblochează funcționalități avansate",
-      getStarted: "Începe acum",
-      consultantTitle: "Consultant AI Numerologic",
-      consultantDescription: "Pune întrebări despre numerologie și primește răspunsuri personalizate",
-      consultantPlaceholder: "Ex: Ce înseamnă Numărul Drumului Vieții pentru mine?",
-      ask: "Întreabă",
-      quickQuestions: "Întrebări rapide",
-      relatedNumbers: "Numere conexe",
-      suggestions: "Sugestii",
-      followUp: "Întrebări de urmărire",
-      noResponse: "Pune o întrebare pentru a începe conversația"
-    }
   },
   en: {
+    loading: "Loading...",
     // Header
     title: "Numerology",
     subtitle: "Discover the hidden secrets in your personal numbers",
@@ -425,21 +433,14 @@ export const translations = {
     calculateButton: "Discover Your Numbers",
     
     // Results
-    profileTitle: "Your Numerological Profile",
-    profileSubtitle: "Discover the hidden meaning of your personal numbers",
     calculateAgain: "Calculate again",
     
     // Number titles
     lifePathTitle: "Life Path Number",
-    lifePathDesc: "The most important number in numerology. It represents your life path, lessons to learn, and your life purpose.",
     destinyTitle: "Destiny Number",
-    destinyDesc: "Derived from your full name, it shows the talents and abilities you have to fulfill your life mission.",
     soulUrgeTitle: "Soul Urge Number",
-    soulUrgeDesc: "Calculated from the vowels in your name, it reveals your innermost desires and deepest motivations.",
     personalityTitle: "Personality Number",
-    personalityDesc: "Derived from the consonants in your name, it shows how others perceive you and your first impression.",
     personalYearTitle: "Personal Year",
-    personalYearDesc: "The energy guiding you this year. Each personal year brings unique opportunities and challenges.",
     
     // Info cards
     infoLifePath: "Your mission in this life",
@@ -447,27 +448,18 @@ export const translations = {
     infoPersonalYear: "This year's energy",
     
     // Navigation
-    viewGuide: "Guide",
-    viewCompatibility: "Compatibility",
     backToCalculator: "Back to Calculator",
     profile: "Profile",
     myProfile: "My Profile",
     login: "Login",
-    courses: "Courses",
-    articles: "Articles",
     predictions: "Predictions",
-    tools: "Tools",
-    tutorials: "Tutorials",
-    faq: "FAQ",
     angelNumbers: "Angel Numbers",
-    back: "Back",
 
     // Profile page
     profilePageTitle: "My Numerological Profile",
     profilePageSubtitle: "Complete your personal data to quickly access numerological calculations",
     profileSaved: "Profile saved successfully!",
     profileDeleted: "Profile deleted successfully!",
-    saveProfile: "Save Profile",
     deleteProfile: "Delete Profile",
     editProfile: "Edit Profile",
     createProfile: "Create Profile",
@@ -478,33 +470,33 @@ export const translations = {
     birthPlaceLabel: "Birth Place (optional)",
     birthPlacePlaceholder: "Ex: New York, USA",
     birthPlaceHint: "Birth place can influence numerological calculations",
-    useProfileData: "Use profile data",
-    profileRequired: "Please create a profile to use this feature",
     // Multiple profiles
-    switchProfile: "Switch Profile",
-    activeProfile: "Active Profile",
-    allProfiles: "All Profiles",
     createNewProfile: "Create New Profile",
     selectProfile: "Select Profile",
     profileSwitched: "Profile switched successfully!",
     switchProfileError: "Error switching profile",
     noProfiles: "You don't have any profiles yet",
     profileComparison: "Profile Comparison",
-    compareProfiles: "Compare Profiles",
     selectProfilesToCompare: "Select profiles to compare",
     cancel: "Cancel",
+    save: "Save",
     error: "Error",
     
     // Compatibility page
     compatibilityLabel: "Numerological Compatibility",
     compatibilityTitle: "Couple Compatibility",
-    compatibilitySubtitle: "Discover the numerological harmony between two souls and how your energies complement each other",
+    compatibilitySubtitle: "The same pair, through every compatibility method — where they agree and where they do not",
     person1: "First Person",
     person2: "Second Person",
     calculateCompatibility: "Calculate Compatibility",
     overallCompatibility: "Overall Compatibility",
     weight: "Weight",
     tryAnotherPair: "Try another pair",
+    notFound: {
+      title: "Page not found",
+      description: "The page you are looking for does not exist or has been moved.",
+      backHome: "Back to Home"
+    },
     compatibilityLevels: {
       excellent: "Excellent",
       good: "Good",
@@ -537,9 +529,6 @@ export const translations = {
     },
     
     // Guide page
-    guideLabel: "Complete Guide",
-    guideTitle: "Number Meanings",
-    guideSubtitle: "Explore in depth the meaning of each number in numerology and discover how they influence your life",
     coreNumbersTitle: "Core Numbers (1-9)",
     coreNumbersDesc: "These nine numbers form the foundation of all numerology. Each carries a unique vibration and distinct characteristics.",
     masterNumbersTitle: "Master Numbers (11, 22, 33)",
@@ -550,7 +539,26 @@ export const translations = {
     allNumbersTitle: "All Numbers",
     
     // Footer
-    footer: "Numerology uses the Pythagorean system for numeric calculations",
+    footer: "Calculated on every school we found — Pythagorean, Chaldean, Vedic, Lo Shu, Alexandrov, the Matrix; where they part, you see all of them",
+    disclaimer: "These readings are symbolic, meant for reflection. They do not replace medical, financial, legal or relationship decisions.",
+    privacyLink: "Privacy",
+    termsLink: "Terms",
+    accountTitle: "Your data",
+    exportLabel: "Download everything we hold about you",
+    exportNote: "A JSON file with your profiles, journal, readings and preferences. Your password and notification keys are not included — those are credentials, not data about you.",
+    exportButton: "Download",
+    deleteLabel: "Delete your account",
+    deleteNote: "We will email you a confirmation. Once you use it, your account, your charts and the ones you saved for other people, your journal, your readings and your preferences are gone. This cannot be undone. If you want your data, download it first.",
+    deleteButton: "Request deletion",
+    deleteSent: "The confirmation email is on its way. The link is valid for 30 minutes.",
+    deleteNoEmail: "We cannot send email right now, and deletion goes through an email confirmation. Please try later.",
+    deleteDone: "Your account has been deleted.",
+    othersNote: "Data you enter for someone else stays with you and you can delete it at any time. You are responsible for what you enter about other people.",
+    dayTextTitle: "The day's text",
+    dayTextModel: "Written by a model, different every day",
+    dayTextLocal: "Composed by the app, always the same",
+    dayTextNote: "On the first, the sentences composed from your chart go to the model's provider. On the second, nothing leaves.",
+    aiConsultantNote: "The answers here are written by a language model. So it can speak about your chart, we send it the numbers — not your name and not your birth date.",
     
     // Extended meanings
     extendedMeanings: {
@@ -577,21 +585,8 @@ export const translations = {
     
     // Name Analysis
     nameAnalysis: {
-      title: "Complete Name Analysis",
-      subtitle: "Detailed analysis of each letter and hidden energies",
-      letterDistribution: "Letter Distribution",
-      individualLetters: "Individual Letter Analysis",
       vowel: "Vowel",
-      consonant: "Consonant",
-      vowelsAnalysis: "Vowels",
-      consonantsAnalysis: "Consonants",
-      soulUrgeNumber: "Soul Urge Number",
-      personalityNumber: "Personality Number",
-      vowels: "vowels",
-      consonants: "consonants",
-      hiddenNumbers: "Hidden Numbers",
-      number: "Number",
-      optimizationSuggestions: "Optimization Suggestions"
+      consonant: "Consonant"
     },
     
     // Number meanings
@@ -746,36 +741,66 @@ export const translations = {
       neutral: "Neutral",
       challenging: "Challenging"
     },
-    
-    // Export & Sharing
-    export: {
-      export: "Export",
-      fullReport: "Full Report PDF",
-      customReport: "Custom Report",
-      exportChart: "Export Chart",
-      options: "Options",
-      includeCharts: "Include Charts",
-      includeKarmic: "Include Karmic Analysis",
-      includePinnacles: "Include Pinnacles",
-      includeCycles: "Include Cycles",
-      includePredictions: "Include Predictions",
-      exporting: "Exporting...",
-      success: "Export successful!",
-      error: "Export error"
+    today: {
+      previousDay: "Previous day",
+      nextDay: "Next day",
+      backToToday: "Back to today",
+      horizonEdge: "You can read 90 days in each direction.",
+      personalDay: "Personal day",
+      personalMonth: "Personal month",
+      universalDay: "Universal day",
+      advice: "What to do"
     },
-    sharing: {
-      share: "Share",
-      shareTo: "Share to",
-      facebook: "Facebook",
-      twitter: "Twitter",
-      whatsapp: "WhatsApp",
-      instagram: "Instagram",
-      email: "Send by Email",
-      copyLink: "Copy Link",
-      linkCopied: "Link copied!",
-      nativeShare: "Share"
+    firstVisit: {
+      promise: "Write the name you were born with and your date of birth. You get a map in five chapters, to read now.",
+      noAccount: "No account, no payment, no email address.",
+      tryExample: "See an example map first",
+      exampleNote: "The map of a made-up person, so you can see what this is before you type your own name."
     },
-    
+    people: {
+      title: "My people",
+      subtitle: "The maps you keep: your own, the people close to you, children, businesses.",
+      all: "All",
+      empty: "No maps here yet.",
+      aboutSomeoneElse: "This person's details are visible to you alone. They are sent nowhere, and you can delete them at any time.",
+      keepName: "Save this name to your account",
+      keepNameDone: "Name saved",
+      dateLabel: "Date of birth",
+      foundedLabel: "Date founded",
+      categoryLabel: "What kind of map this is",
+      categories: {
+        eu: "Me",
+        apropiat: "Someone close",
+        copil: "Child",
+        afacere: "Business",
+      },
+      categoryHints: {
+        eu: "You, including variants of your own name.",
+        apropiat: "Partner, family, friend.",
+        copil: "A child, or a name you are choosing for one.",
+        afacere: "A company or a brand. The date is the founding date.",
+      },
+      deleteConfirm: "Are you sure you want to delete this map? This action cannot be undone.",
+    },
+    timing: {
+      title: "The relationship over time",
+      subtitle: "The score says how close you are. The year and the months say where this stretch of time finds you.",
+      thisYear: "This year",
+      monthByMonth: "Month by month",
+      yourYear: "Your personal year",
+      theirYear: "Their personal year",
+      bands: {
+        harmony: "You are pulling the same way",
+        mixed: "You are running in parallel",
+        tension: "You are pulling different ways",
+      },
+      bandHints: {
+        harmony: "What one of you wants is what the other wants too. This is when the big things get done easily.",
+        mixed: "Neither together nor against. Anything works, as long as you say where you are.",
+        tension: "One of you is gathering, the other is letting go. It is not a fault between you — it is a distance worth remembering.",
+      },
+    },
+
     // Lucky Dates
     luckyDates: {
       title: "Lucky Dates",
@@ -799,47 +824,9 @@ export const translations = {
       dayNumber: "Day number",
       universalNumber: "Universal number"
     },
-    
-    // Premium
-    premium: {
-      title: "Premium",
-      subtitle: "Unlock advanced features",
-      plans: "Subscription Plans",
-      aiConsultant: "AI Consultant",
-      features: "Premium Features",
-      currentPlan: "Your current plan",
-      upgrade: "Upgrade",
-      premiumFeatures: "Premium Features",
-      advancedReports: "Advanced Reports",
-      aiConsultantDesc: "AI consultant for numerology questions",
-      unlimitedAccess: "Unlimited Access",
-      prioritySupport: "Priority Support",
-      exportPDF: "PDF Export",
-      customReports: "Custom Reports",
-      monthly: "Monthly",
-      yearly: "Yearly",
-      subscribe: "Subscribe",
-      mostPopular: "Most popular",
-      save: "Save",
-      perMonth: "/month",
-      perYear: "/year",
-      featureTitle: "Premium Feature",
-      featureDescription: "This feature requires a Premium subscription.",
-      upgradeToPremium: "Upgrade to Premium",
-      unlockAdvanced: "Unlock advanced features",
-      getStarted: "Get Started",
-      consultantTitle: "AI Numerology Consultant",
-      consultantDescription: "Ask questions about numerology and get personalized answers",
-      consultantPlaceholder: "E.g.: What does my Life Path Number mean for me?",
-      ask: "Ask",
-      quickQuestions: "Quick Questions",
-      relatedNumbers: "Related Numbers",
-      suggestions: "Suggestions",
-      followUp: "Follow-up Questions",
-      noResponse: "Ask a question to start the conversation"
-    }
   },
   ru: {
+    loading: "Загрузка...",
     // Header
     title: "Нумерология",
     subtitle: "Откройте скрытые тайны в ваших личных числах",
@@ -855,21 +842,14 @@ export const translations = {
     calculateButton: "Узнать Ваши Числа",
     
     // Results
-    profileTitle: "Ваш Нумерологический Профиль",
-    profileSubtitle: "Откройте скрытое значение ваших личных чисел",
     calculateAgain: "Рассчитать снова",
     
     // Number titles
     lifePathTitle: "Число Жизненного Пути",
-    lifePathDesc: "Самое важное число в нумерологии. Оно представляет ваш жизненный путь, уроки и цель вашей жизни.",
     destinyTitle: "Число Судьбы",
-    destinyDesc: "Полученное из вашего полного имени, оно показывает таланты и способности для выполнения вашей жизненной миссии.",
     soulUrgeTitle: "Число Души",
-    soulUrgeDesc: "Рассчитанное из гласных в имени, оно раскрывает ваши внутренние желания и глубочайшие мотивации.",
     personalityTitle: "Число Личности",
-    personalityDesc: "Полученное из согласных в имени, показывает как другие воспринимают вас и первое впечатление.",
     personalYearTitle: "Личный Год",
-    personalYearDesc: "Энергия, направляющая вас в этом году. Каждый личный год приносит уникальные возможности и вызовы.",
     
     // Info cards
     infoLifePath: "Ваша миссия в этой жизни",
@@ -877,20 +857,12 @@ export const translations = {
     infoPersonalYear: "Энергия текущего года",
     
     // Navigation
-    viewGuide: "Руководство",
-    viewCompatibility: "Совместимость",
     backToCalculator: "Назад к Калькулятору",
     profile: "Профиль",
     myProfile: "Мой Профиль",
     login: "Вход",
-    courses: "Курсы",
-    articles: "Статьи",
     predictions: "Прогнозы",
-    tools: "Инструменты",
-    tutorials: "Учебники",
-    faq: "Часто Задаваемые Вопросы",
     angelNumbers: "Ангельские Числа",
-    back: "Назад",
     
     // NotFound page
     notFound: {
@@ -904,7 +876,6 @@ export const translations = {
     profilePageSubtitle: "Заполните ваши личные данные для быстрого доступа к нумерологическим расчётам",
     profileSaved: "Профиль успешно сохранён!",
     profileDeleted: "Профиль успешно удалён!",
-    saveProfile: "Сохранить Профиль",
     deleteProfile: "Удалить Профиль",
     editProfile: "Редактировать Профиль",
     createProfile: "Создать Профиль",
@@ -915,27 +886,22 @@ export const translations = {
     birthPlaceLabel: "Место Рождения (необязательно)",
     birthPlacePlaceholder: "Например: Москва, Россия",
     birthPlaceHint: "Место рождения может влиять на нумерологические расчёты",
-    useProfileData: "Использовать данные профиля",
-    profileRequired: "Пожалуйста, создайте профиль для использования этой функции",
     // Multiple profiles
-    switchProfile: "Переключить Профиль",
-    activeProfile: "Активный Профиль",
-    allProfiles: "Все Профили",
     createNewProfile: "Создать Новый Профиль",
     selectProfile: "Выбрать Профиль",
     profileSwitched: "Профиль успешно переключён!",
     switchProfileError: "Ошибка переключения профиля",
     noProfiles: "У вас ещё нет профилей",
     profileComparison: "Сравнение Профилей",
-    compareProfiles: "Сравнить Профили",
     selectProfilesToCompare: "Выберите профили для сравнения",
     cancel: "Отмена",
+    save: "Сохранить",
     error: "Ошибка",
     
     // Compatibility page
     compatibilityLabel: "Нумерологическая Совместимость",
     compatibilityTitle: "Совместимость Пары",
-    compatibilitySubtitle: "Откройте нумерологическую гармонию между двумя душами и как ваши энергии дополняют друг друга",
+    compatibilitySubtitle: "Одна пара через каждый метод совместимости — где они согласны и где нет",
     person1: "Первый Человек",
     person2: "Второй Человек",
     calculateCompatibility: "Рассчитать Совместимость",
@@ -974,9 +940,6 @@ export const translations = {
     },
     
     // Guide page
-    guideLabel: "Полное Руководство",
-    guideTitle: "Значение Чисел",
-    guideSubtitle: "Исследуйте глубоко значение каждого числа в нумерологии и откройте, как они влияют на вашу жизнь",
     coreNumbersTitle: "Основные Числа (1-9)",
     coreNumbersDesc: "Эти девять чисел составляют основу всей нумерологии. Каждое несёт уникальную вибрацию и отличительные характеристики.",
     masterNumbersTitle: "Мастер-Числа (11, 22, 33)",
@@ -987,7 +950,26 @@ export const translations = {
     allNumbersTitle: "Все Числа",
     
     // Footer
-    footer: "Нумерология использует систему Пифагора для числовых расчётов",
+    footer: "Расчёты по всем найденным школам — пифагорейской, халдейской, ведической, Ло Шу, Александрова, Матрице; где они расходятся, вы видите все",
+    disclaimer: "Толкования символичны и предназначены для размышления. Они не заменяют медицинских, финансовых, юридических или личных решений.",
+    privacyLink: "Конфиденциальность",
+    termsLink: "Условия",
+    accountTitle: "Ваши данные",
+    exportLabel: "Скачать всё, что мы о вас храним",
+    exportNote: "Файл JSON с вашими профилями, дневником, чтениями и настройками. Пароль и ключи уведомлений не входят — это учётные данные, а не данные о вас.",
+    exportButton: "Скачать",
+    deleteLabel: "Удалить аккаунт",
+    deleteNote: "Мы отправим письмо для подтверждения. После него исчезнут аккаунт, ваши карты и сохранённые для других, дневник, чтения и настройки. Отменить нельзя. Если нужны данные — сначала скачайте их.",
+    deleteButton: "Запросить удаление",
+    deleteSent: "Письмо с подтверждением отправлено. Ссылка действует 30 минут.",
+    deleteNoEmail: "Сейчас мы не можем отправлять письма, а удаление проходит через подтверждение по почте. Попробуйте позже.",
+    deleteDone: "Аккаунт удалён.",
+    othersNote: "Данные, которые вы вводите за другого человека, остаются у вас, и вы можете удалить их в любой момент. Вы отвечаете за то, что вводите о других.",
+    dayTextTitle: "Текст дня",
+    dayTextModel: "Пишет модель — каждый день иначе",
+    dayTextLocal: "Составляет приложение — всегда одинаково",
+    dayTextNote: "В первом случае предложения, составленные из вашей карты, уходят к поставщику модели. Во втором не уходит ничего.",
+    aiConsultantNote: "Ответы здесь пишет языковая модель. Чтобы она говорила о вашей карте, мы отправляем ей числа — не имя и не дату рождения.",
     
     // Extended meanings
     extendedMeanings: {
@@ -1014,21 +996,8 @@ export const translations = {
     
     // Name Analysis
     nameAnalysis: {
-      title: "Полный Анализ Имени",
-      subtitle: "Детальный анализ каждой буквы и скрытых энергий",
-      letterDistribution: "Распределение Букв",
-      individualLetters: "Анализ Каждой Буквы",
       vowel: "Гласная",
-      consonant: "Согласная",
-      vowelsAnalysis: "Гласные",
-      consonantsAnalysis: "Согласные",
-      soulUrgeNumber: "Число Души",
-      personalityNumber: "Число Личности",
-      vowels: "гласных",
-      consonants: "согласных",
-      hiddenNumbers: "Скрытые Числа",
-      number: "Число",
-      optimizationSuggestions: "Предложения по Оптимизации"
+      consonant: "Согласная"
     },
     
     // Number meanings
@@ -1183,36 +1152,66 @@ export const translations = {
       neutral: "Нейтральная",
       challenging: "Сложная"
     },
-    
-    // Export & Sharing
-    export: {
-      export: "Экспорт",
-      fullReport: "Полный Отчёт PDF",
-      customReport: "Настраиваемый Отчёт",
-      exportChart: "Экспорт Графика",
-      options: "Опции",
-      includeCharts: "Включить Графики",
-      includeKarmic: "Включить Кармический Анализ",
-      includePinnacles: "Включить Пики",
-      includeCycles: "Включить Циклы",
-      includePredictions: "Включить Прогнозы",
-      exporting: "Экспорт...",
-      success: "Экспорт успешен!",
-      error: "Ошибка экспорта"
+    today: {
+      previousDay: "Предыдущий день",
+      nextDay: "Следующий день",
+      backToToday: "Вернуться к сегодня",
+      horizonEdge: "Можно читать 90 дней в каждую сторону.",
+      personalDay: "Личный день",
+      personalMonth: "Личный месяц",
+      universalDay: "Универсальный день",
+      advice: "Что делать"
     },
-    sharing: {
-      share: "Поделиться",
-      shareTo: "Поделиться в",
-      facebook: "Facebook",
-      twitter: "Twitter",
-      whatsapp: "WhatsApp",
-      instagram: "Instagram",
-      email: "Отправить по Email",
-      copyLink: "Копировать Ссылку",
-      linkCopied: "Ссылка скопирована!",
-      nativeShare: "Поделиться"
+    firstVisit: {
+      promise: "Напишите имя, данное при рождении, и дату рождения. Получите карту из пяти глав — читать прямо сейчас.",
+      noAccount: "Без аккаунта, без оплаты, без адреса почты.",
+      tryExample: "Сначала посмотрите пример карты",
+      exampleNote: "Карта вымышленного человека, чтобы понять, о чём речь, прежде чем вводить своё имя."
     },
-    
+    people: {
+      title: "Мои люди",
+      subtitle: "Карты, которые вы храните: свои, близких, детей, компаний.",
+      all: "Все",
+      empty: "Здесь пока нет карт.",
+      aboutSomeoneElse: "Данные этого человека видите только вы. Они никуда не отправляются, и вы можете удалить их в любой момент.",
+      keepName: "Сохранить это имя",
+      keepNameDone: "Имя сохранено",
+      dateLabel: "Дата рождения",
+      foundedLabel: "Дата основания",
+      categoryLabel: "Какая это карта",
+      categories: {
+        eu: "Я",
+        apropiat: "Близкий человек",
+        copil: "Ребёнок",
+        afacere: "Бизнес",
+      },
+      categoryHints: {
+        eu: "Вы, включая варианты вашего имени.",
+        apropiat: "Партнёр, семья, друг.",
+        copil: "Ребёнок или имя, которое вы для него выбираете.",
+        afacere: "Компания или бренд. Дата — дата основания.",
+      },
+      deleteConfirm: "Вы уверены, что хотите удалить эту карту? Это действие необратимо.",
+    },
+    timing: {
+      title: "Отношения во времени",
+      subtitle: "Оценка говорит, насколько вы близки. Год и месяцы говорят, где вас застаёт это время.",
+      thisYear: "В этом году",
+      monthByMonth: "Месяц за месяцем",
+      yourYear: "Ваш личный год",
+      theirYear: "Его личный год",
+      bands: {
+        harmony: "Вы тянете в одну сторону",
+        mixed: "Вы идёте параллельно",
+        tension: "Вы тянете в разные стороны",
+      },
+      bandHints: {
+        harmony: "Чего хочет один, того хочет и другой. Это время, когда большие дела даются легко.",
+        mixed: "Ни вместе, ни против. Годится что угодно, если вы говорите друг другу, где находитесь.",
+        tension: "Один собирает, другой отпускает. Это не поломка между вами — это расстояние, о котором стоит помнить.",
+      },
+    },
+
     // Lucky Dates
     luckyDates: {
       title: "Удачные Даты",
@@ -1236,45 +1235,6 @@ export const translations = {
       dayNumber: "Число дня",
       universalNumber: "Универсальное число"
     },
-    
-    // Premium
-    premium: {
-      title: "Премиум",
-      subtitle: "Разблокировать расширенные функции",
-      plans: "Планы подписки",
-      aiConsultant: "ИИ Консультант",
-      features: "Премиум функции",
-      currentPlan: "Ваш текущий план",
-      upgrade: "Обновить",
-      premiumFeatures: "Премиум функции",
-      advancedReports: "Расширенные отчеты",
-      aiConsultantDesc: "ИИ консультант для нумерологических вопросов",
-      unlimitedAccess: "Неограниченный доступ",
-      prioritySupport: "Приоритетная поддержка",
-      exportPDF: "Экспорт PDF",
-      customReports: "Пользовательские отчеты",
-      monthly: "Ежемесячно",
-      yearly: "Ежегодно",
-      subscribe: "Подписаться",
-      mostPopular: "Самый популярный",
-      save: "Сэкономить",
-      perMonth: "/месяц",
-      perYear: "/год",
-      featureTitle: "Премиум функция",
-      featureDescription: "Эта функция требует премиум подписки.",
-      upgradeToPremium: "Обновить до Премиум",
-      unlockAdvanced: "Разблокировать расширенные функции",
-      getStarted: "Начать",
-      consultantTitle: "ИИ Нумерологический консультант",
-      consultantDescription: "Задавайте вопросы о нумерологии и получайте персонализированные ответы",
-      consultantPlaceholder: "Например: Что означает мое Число Жизненного Пути для меня?",
-      ask: "Спросить",
-      quickQuestions: "Быстрые вопросы",
-      relatedNumbers: "Связанные числа",
-      suggestions: "Предложения",
-      followUp: "Вопросы для продолжения",
-      noResponse: "Задайте вопрос, чтобы начать разговор"
-    }
   }
 };
 

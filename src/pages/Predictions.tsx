@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Sun, Moon, Calendar, TrendingUp, Sparkles } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Sun, Moon, Calendar, TrendingUp } from 'lucide-react';
 import { format } from 'date-fns';
 import { ro, enUS, ru } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
@@ -7,8 +7,11 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PageLayout } from '@/components/layout/PageLayout';
+import { SectionHead } from '@/components/layout/SectionHead';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { dayFocus, dayChallenge, dayOpportunity, type GuidanceLang } from '@/lib/dayGuidance';
+import { Today } from '@/components/Today';
 import { useProfile } from '@/hooks/use-profile';
 import { 
   getDailyPrediction, 
@@ -21,11 +24,33 @@ import {
 } from '@/lib/predictions';
 import { DailyPredictionCard } from '@/components/DailyPredictionCard';
 import { WeeklyMonthlyPredictionCard } from '@/components/WeeklyMonthlyPredictionCard';
+import { BirthDateSelect } from "@/components/BirthDateSelect";
+import { DayNavigator } from '@/components/predictions/DayNavigator';
+import { CalendarAndHours } from '@/components/predictions/CalendarAndHours';
+import { useSelectedDay } from '@/hooks/use-selected-day';
+import { getDayContent } from '@/lib/dayContent';
+import { calculatePersonalYearNumber } from '@/lib/numerology';
 
 const locales = { ro, en: enUS, ru };
 
+// The daily data carries energies as English keys ("change", "harmony"); the
+// label beside them was translated but the value was not, producing "Energie:
+// Change" in the Romanian UI.
+const ENERGY_LABELS: Record<string, Record<string, string>> = {
+  leadership:    { ro: 'Leadership',   en: 'Leadership',   ru: 'Лидерство' },
+  cooperation:   { ro: 'Cooperare',    en: 'Cooperation',  ru: 'Сотрудничество' },
+  creativity:    { ro: 'Creativitate', en: 'Creativity',   ru: 'Творчество' },
+  stability:     { ro: 'Stabilitate',  en: 'Stability',    ru: 'Стабильность' },
+  change:        { ro: 'Schimbare',    en: 'Change',       ru: 'Перемены' },
+  harmony:       { ro: 'Armonie',      en: 'Harmony',      ru: 'Гармония' },
+  introspection: { ro: 'Introspecție', en: 'Introspection',ru: 'Интроспекция' },
+  abundance:     { ro: 'Abundență',    en: 'Abundance',    ru: 'Изобилие' },
+  completion:    { ro: 'Împlinire',    en: 'Completion',   ru: 'Завершение' },
+};
+
 const Predictions = () => {
   const { language, t } = useLanguage();
+  const guidanceLang = (("ro en ru").split(" ").includes(language) ? language : "en") as GuidanceLang;
   const { profileData, hasProfile, loading: profileLoading } = useProfile();
   const [birthDate, setBirthDate] = useState<Date>();
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
@@ -40,7 +65,13 @@ const Predictions = () => {
   }, [hasProfile, profileData, birthDate]);
 
   const dateLocale = locales[language];
-  const today = new Date();
+  // `today` rămâne ancora: orizontul se măsoară din el, iar cardul de zi
+  // universală de mai sus e despre ziua reală. Ce s-a schimbat e că ziua
+  // *citită* nu mai e obligată să fie aceeași -- se alege, și alegerea stă în
+  // adresă. Memoizat pentru că e dependență în `useSelectedDay`; fără asta,
+  // fiecare render ar produce altă ancoră.
+  const today = useMemo(() => new Date(), []);
+  const { selectedDay, selectDay } = useSelectedDay(today);
 
   const labels = {
     ro: {
@@ -49,11 +80,12 @@ const Predictions = () => {
       label: 'Previziuni',
       enterBirthDate: 'Introdu data nașterii pentru previziuni personalizate',
       selectBirthDate: 'Selectează data nașterii',
-      daily: 'Ziua de Azi',
+      daily: 'Ziua',
       monthly: 'Luna Curentă',
       universalDay: 'Ziua Universală',
       personalDay: 'Ziua Ta Personală',
       personalMonth: 'Luna Ta Personală',
+      personalYear: 'Anul tău personal',
       energy: 'Energie',
       focus: 'Focus',
       advice: 'Sfat',
@@ -76,11 +108,12 @@ const Predictions = () => {
       label: 'Predictions',
       enterBirthDate: 'Enter your birth date for personalized predictions',
       selectBirthDate: 'Select birth date',
-      daily: 'Today',
+      daily: 'The day',
       monthly: 'This Month',
       universalDay: 'Universal Day',
       personalDay: 'Your Personal Day',
       personalMonth: 'Your Personal Month',
+      personalYear: 'Your personal year',
       energy: 'Energy',
       focus: 'Focus',
       advice: 'Advice',
@@ -103,11 +136,12 @@ const Predictions = () => {
       label: 'Прогнозы',
       enterBirthDate: 'Введите дату рождения для персонализированных прогнозов',
       selectBirthDate: 'Выберите дату рождения',
-      daily: 'Сегодня',
+      daily: 'День',
       monthly: 'Этот месяц',
       universalDay: 'Универсальный День',
       personalDay: 'Ваш Личный День',
       personalMonth: 'Ваш Личный Месяц',
+      personalYear: 'Ваш личный год',
       energy: 'Энергия',
       focus: 'Фокус',
       advice: 'Совет',
@@ -128,8 +162,9 @@ const Predictions = () => {
 
   const l = labels[language];
   const universalEnergy = getUniversalDayEnergy(today);
-  const dailyPrediction = birthDate ? getDailyPrediction(birthDate, today) : null;
-  const monthlyPrediction = birthDate ? getMonthlyPrediction(birthDate, selectedMonth, selectedYear) : null;
+  const dailyPrediction = birthDate ? getDailyPrediction(birthDate, selectedDay) : null;
+  const dayContent = birthDate ? getDayContent(birthDate, selectedDay, language) : null;
+  const monthlyPrediction = birthDate ? getMonthlyPrediction(birthDate, selectedMonth, selectedYear, language) : null;
   
   // Calculate weekly prediction (start of current week - Monday)
   const getWeekStart = (date: Date): Date => {
@@ -139,85 +174,76 @@ const Predictions = () => {
     return new Date(d.setDate(diff));
   };
   const weekStart = getWeekStart(today);
-  const weeklyPrediction = birthDate ? calculateWeeklyTheme(birthDate, weekStart) : null;
+  const weeklyPrediction = birthDate ? calculateWeeklyTheme(birthDate, weekStart, language) : null;
   
   // Calculate annual predictions
-  const annualTheme = birthDate ? calculateAnnualTheme(birthDate, selectedYear) : null;
-  const annualOpportunities = birthDate ? calculateAnnualOpportunities(birthDate, selectedYear) : null;
-  const annualChallenges = birthDate ? calculateAnnualChallenges(birthDate, selectedYear) : null;
+  const personalYear = birthDate ? calculatePersonalYearNumber(birthDate, selectedYear) : null;
+  const annualTheme = birthDate ? calculateAnnualTheme(birthDate, selectedYear, language) : null;
+  const annualOpportunities = birthDate ? calculateAnnualOpportunities(birthDate, selectedYear, language) : null;
+  const annualChallenges = birthDate ? calculateAnnualChallenges(birthDate, selectedYear, language) : null;
+
+  // Ziua ta, citită prin harta ta. Pagina asta calcula ziua personală corect
+  // și apoi o descria singură: ziua 5 spunea același lucru unui Drum 6 și unui
+  // Drum 1. Aia e o efemeridă -- adevărată despre toată lumea, deci despre
+  // nimeni. Antetul dispare când ea e pe ecran, din același motiv ca la hartă:
+  // un titlu deasupra unei descoperiri o transformă în raport.
+  const mine = hasProfile && profileData ? profileData : null;
 
   return (
     <PageLayout>
-      <PageHeader
-        title={l.title}
-        subtitle={l.subtitle}
-        badge={{
-          icon: <TrendingUp className="h-4 w-4 text-primary" />,
-          label: l.label
-        }}
-      />
+      {!mine && (
+        <PageHeader
+          title={l.title}
+          subtitle={l.subtitle}
+          badge={{
+            icon: <TrendingUp className="h-4 w-4" />,
+            label: l.label
+          }}
+        />
+      )}
 
       {/* Main Content */}
-      <main className="relative z-10 px-4 pb-16">
-        <div className="max-w-4xl mx-auto space-y-8 pt-4">
+      <main className="relative z-10 pb-16">
+        <div className="page-measure pt-4 page-rhythm">
+          {mine && <Today fullName={mine.fullName} birthDate={mine.birthDate} />}
+
           
           {/* Universal Day Energy */}
-          <div className="card-mystic rounded-xl p-6 text-center">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <Sun className="h-6 w-6 text-primary" />
-              <h2 className="font-cinzel text-xl text-foreground">{l.universalDay}</h2>
+          <SectionHead index={1} title={l.universalDay} />
+
+          {/* Cifra e vizualul, ca peste tot. Blocul era centrat, într-o casetă,
+              cu titlul repetat sub placa numerotată care tocmai îl spusese. */}
+          <div className="flex items-baseline gap-6">
+            <span className="num text-6xl leading-none text-accent">{universalEnergy.number}</span>
+            <div className="min-w-0">
+              <p className="font-heading text-xl capitalize text-foreground">
+                {ENERGY_LABELS[universalEnergy.energy]?.[language] ?? universalEnergy.energy}
+              </p>
+              <p className="num mt-1.5 text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">
+                {format(today, 'EEEE, d MMMM yyyy', { locale: dateLocale })}
+              </p>
             </div>
-            <div className="number-display mx-auto mb-4">
-              {universalEnergy.number}
-            </div>
-            <p className="text-muted-foreground capitalize">{l.energy}: {universalEnergy.energy}</p>
-            <p className="text-xs text-muted-foreground mt-2">
-              {format(today, 'EEEE, d MMMM yyyy', { locale: dateLocale })}
-            </p>
           </div>
 
           {/* Birth Date Selector */}
           {!birthDate && (
-            <div className="card-mystic rounded-xl p-8 text-center">
-              <Sparkles className="h-12 w-12 text-primary mx-auto mb-4" />
-              <h3 className="font-cinzel text-xl text-foreground mb-2">{l.enterBirthDate}</h3>
-              <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="mt-4 border-primary/30 text-foreground hover:bg-primary/10">
-                    <Calendar className="mr-2 h-4 w-4 text-primary" />
-                    {l.selectBirthDate}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 bg-card border-border z-50" align="center">
-                  <CalendarComponent
-                    mode="single"
-                    selected={birthDate}
-                    onSelect={(date) => {
-                      setBirthDate(date);
-                      setIsCalendarOpen(false);
-                    }}
-                    disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
-                    initialFocus
-                    className="pointer-events-auto"
-                    captionLayout="dropdown-buttons"
-                    fromYear={1920}
-                    toYear={new Date().getFullYear()}
-                    locale={dateLocale}
-                  />
-                </PopoverContent>
-              </Popover>
+            <div className="border-t border-line pt-6">
+              <h3 className="mb-4 font-heading text-xl text-foreground">{l.enterBirthDate}</h3>
+              <BirthDateSelect value={birthDate} onChange={setBirthDate} />
             </div>
           )}
+
+          <SectionHead index={2} title={l.title} question={l.subtitle} />
 
           {/* Personal Predictions */}
           {birthDate && (
             <Tabs defaultValue="daily" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6 bg-card/50">
-                <TabsTrigger value="daily" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsList className="mb-6">
+                <TabsTrigger value="daily">
                   <Sun className="h-4 w-4 mr-2" />
                   {l.daily}
                 </TabsTrigger>
-                <TabsTrigger value="monthly" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsTrigger value="monthly">
                   <Moon className="h-4 w-4 mr-2" />
                   {l.monthly}
                 </TabsTrigger>
@@ -227,44 +253,60 @@ const Predictions = () => {
               <TabsContent value="daily" className="space-y-6">
                 {dailyPrediction && birthDate && (
                   <>
-                    <DailyPredictionCard 
-                      prediction={dailyPrediction} 
+                    <DayNavigator date={selectedDay} today={today} onChange={selectDay} />
+
+                    {dayContent && (
+                      <div className="card-mystic grid grid-cols-3 gap-3 py-4 text-center">
+                        <div>
+                          <p className="font-raleway text-xs text-muted-foreground">{t.today.personalDay}</p>
+                          <p className="num text-2xl text-primary">{dayContent.personalDay}</p>
+                        </div>
+                        <div>
+                          <p className="font-raleway text-xs text-muted-foreground">{t.today.personalMonth}</p>
+                          <p className="num text-2xl text-foreground">{dayContent.personalMonth}</p>
+                        </div>
+                        <div>
+                          <p className="font-raleway text-xs text-muted-foreground">{t.today.universalDay}</p>
+                          <p className="num text-2xl text-foreground">{dayContent.universalDay}</p>
+                        </div>
+                        <div className="col-span-3 border-t border-border/40 pt-3 text-left">
+                          <p className="font-heading text-sm text-foreground">{dayContent.keywords}</p>
+                          <p className="mt-1 text-sm text-foreground/90">{dayContent.meaning}</p>
+                          <p className="mt-3 font-raleway text-xs text-muted-foreground">{t.today.advice}</p>
+                          <p className="text-sm text-foreground/90">{dayContent.advice}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    <DailyPredictionCard
+                      prediction={dailyPrediction}
                       birthDate={birthDate}
-                      date={today}
+                      date={selectedDay}
                     />
-                    <div className="card-mystic rounded-xl p-6 space-y-6">
-                      <div className="text-center">
-                        <h3 className="font-cinzel text-lg text-muted-foreground">{l.personalDay}</h3>
-                        <div className="number-display-large mx-auto my-4 animate-float">
-                          {dailyPrediction.number}
-                        </div>
-                        <p className="text-primary font-cinzel text-xl capitalize">{dailyPrediction.energy}</p>
+                    {/* Cifra zilei personale și energia ei nu se mai scriu aici.
+                        Componenta Today, din capul paginii, le arată deja --
+                        mare, cu arhetipul, cu relația față de hartă și cu
+                        cartea zilei.
+                        Orele norocoase nu se mai scriu nici ele: cardul de
+                        deasupra le are deja, cu filet, lângă culoare și muzică.
+                        Iar „Sfat" spunea cu alte cuvinte primul gest din
+                        „Recomandări", la trei centimetri sub el.
+                        Ce a rămas -- focusul, ce se strică, ce se deschide --
+                        nu e nicăieri altundeva, și e pe limba omului. */}
+                    <div className="space-y-6">
+                      <div className="border-t border-line pt-4">
+                        <h4 className="mb-2 font-heading text-sm text-foreground">{l.focus}</h4>
+                        <p className="capitalize text-foreground/90">{dayFocus(dailyPrediction.number, guidanceLang)}</p>
                       </div>
 
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                          <h4 className="font-cinzel text-sm text-primary mb-2">{l.focus}</h4>
-                          <p className="text-foreground/90 capitalize">{dailyPrediction.focus}</p>
+                      <div className="grid gap-6 md:grid-cols-2">
+                        <div className="border-t border-tension pt-4">
+                          <h4 className="mb-2 font-heading text-sm text-tension">{l.challenges}</h4>
+                          <p className="text-sm text-foreground/80">{dayChallenge(dailyPrediction.number, guidanceLang)}</p>
                         </div>
-                        <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                          <h4 className="font-cinzel text-sm text-primary mb-2">{l.luckyHours}</h4>
-                          <p className="text-foreground/90">{dailyPrediction.luckyHours.join(', ')}</p>
-                        </div>
-                      </div>
-
-                      <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
-                        <h4 className="font-cinzel text-sm text-primary mb-2">{l.advice}</h4>
-                        <p className="text-foreground/90">{dailyPrediction.advice}</p>
-                      </div>
-
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                          <h4 className="font-cinzel text-sm text-destructive/80 mb-2">{l.challenges}</h4>
-                          <p className="text-foreground/80 text-sm">{dailyPrediction.challenges}</p>
-                        </div>
-                        <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                          <h4 className="font-cinzel text-sm text-green-500 mb-2">{l.opportunities}</h4>
-                          <p className="text-foreground/80 text-sm">{dailyPrediction.opportunities}</p>
+                        <div className="border-t border-harmony pt-4">
+                          <h4 className="mb-2 font-heading text-sm text-harmony">{l.opportunities}</h4>
+                          <p className="text-sm text-foreground/80">{dayOpportunity(dailyPrediction.number, guidanceLang)}</p>
                         </div>
                       </div>
                     </div>
@@ -291,15 +333,18 @@ const Predictions = () => {
                       />
                     )}
                     {annualTheme && (
-                      <div className="card-mystic rounded-xl p-6 space-y-4">
-                        <h3 className="font-cinzel text-xl text-gradient-gold">{l.personalMonth} - {selectedYear}</h3>
+                      <div className="card-mystic py-6 space-y-4">
+                        {/* Era „Luna Ta Personală - 2026" deasupra temei anului personal. */}
+                        <h3 className="font-heading text-xl">
+                          {l.personalYear} {selectedYear}: <span className="num text-primary">{personalYear}</span>
+                        </h3>
                         <div>
-                          <h4 className="font-cinzel text-sm text-primary mb-2">{annualTheme.theme}</h4>
+                          <h4 className="font-heading text-sm text-foreground mb-2">{annualTheme.theme}</h4>
                           <p className="text-foreground/90">{annualTheme.description}</p>
                         </div>
                         {annualOpportunities && annualOpportunities.length > 0 && (
                           <div>
-                            <h4 className="font-cinzel text-sm text-primary mb-2">Oportunități</h4>
+                            <h4 className="font-heading text-sm text-foreground mb-2">{l.opportunities}</h4>
                             <ul className="space-y-1">
                               {annualOpportunities.slice(0, 5).map((opp, index) => (
                                 <li key={index} className="text-sm text-foreground/90 flex items-start gap-2">
@@ -312,7 +357,7 @@ const Predictions = () => {
                         )}
                         {annualChallenges && annualChallenges.length > 0 && (
                           <div>
-                            <h4 className="font-cinzel text-sm text-destructive/80 mb-2">Provocări</h4>
+                            <h4 className="mb-2 font-heading text-sm text-tension">{l.challenges}</h4>
                             <ul className="space-y-1">
                               {annualChallenges.slice(0, 5).map((challenge, index) => (
                                 <li key={index} className="text-sm text-foreground/80 flex items-start gap-2">
@@ -325,49 +370,49 @@ const Predictions = () => {
                         )}
                       </div>
                     )}
-                    <div className="card-mystic rounded-xl p-6 space-y-6">
+                    <div className="card-mystic py-6 space-y-6">
                     <div className="text-center">
-                      <h3 className="font-cinzel text-lg text-muted-foreground">{l.personalMonth}</h3>
-                      <div className="number-display-large mx-auto my-4 animate-float">
+                      <h3 className="font-heading text-lg text-muted-foreground">{l.personalMonth}</h3>
+                      <div className="number-display-large mx-auto my-4">
                         {monthlyPrediction.number}
                       </div>
-                      <p className="text-primary font-cinzel text-xl">{monthlyPrediction.theme}</p>
+                      <p className="text-foreground font-heading text-xl">{monthlyPrediction.theme}</p>
                     </div>
 
-                    <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
-                      <h4 className="font-cinzel text-sm text-primary mb-2">{l.overview}</h4>
+                    <div className="pt-4 border-t border-line">
+                      <h4 className="font-heading text-sm text-foreground mb-2">{l.overview}</h4>
                       <p className="text-foreground/90">{monthlyPrediction.overview}</p>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-4">
-                      <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                        <h4 className="font-cinzel text-sm text-primary mb-2">{l.career}</h4>
+                      <div className="pt-4 border-t border-line">
+                        <h4 className="font-heading text-sm text-foreground mb-2">{l.career}</h4>
                         <p className="text-foreground/80 text-sm">{monthlyPrediction.career}</p>
                       </div>
-                      <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                        <h4 className="font-cinzel text-sm text-primary mb-2">{l.relationships}</h4>
+                      <div className="pt-4 border-t border-line">
+                        <h4 className="font-heading text-sm text-foreground mb-2">{l.relationships}</h4>
                         <p className="text-foreground/80 text-sm">{monthlyPrediction.relationships}</p>
                       </div>
-                      <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                        <h4 className="font-cinzel text-sm text-primary mb-2">{l.health}</h4>
+                      <div className="pt-4 border-t border-line">
+                        <h4 className="font-heading text-sm text-foreground mb-2">{l.health}</h4>
                         <p className="text-foreground/80 text-sm">{monthlyPrediction.health}</p>
                       </div>
-                      <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                        <h4 className="font-cinzel text-sm text-primary mb-2">{l.finances}</h4>
+                      <div className="pt-4 border-t border-line">
+                        <h4 className="font-heading text-sm text-foreground mb-2">{l.finances}</h4>
                         <p className="text-foreground/80 text-sm">{monthlyPrediction.finances}</p>
                       </div>
                     </div>
 
-                    <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                      <h4 className="font-cinzel text-sm text-primary mb-2">{l.spirituality}</h4>
+                    <div className="pt-4 border-t border-line">
+                      <h4 className="font-heading text-sm text-foreground mb-2">{l.spirituality}</h4>
                       <p className="text-foreground/80 text-sm">{monthlyPrediction.spirituality}</p>
                     </div>
 
-                    <div className="p-4 rounded-lg bg-card/50 border border-border/30">
-                      <h4 className="font-cinzel text-sm text-primary mb-2">{l.keyDays}</h4>
+                    <div className="pt-4 border-t border-line">
+                      <h4 className="font-heading text-sm text-foreground mb-2">{l.keyDays}</h4>
                       <div className="flex flex-wrap gap-2">
                         {monthlyPrediction.keyDays.map(day => (
-                          <span key={day} className="px-3 py-1 rounded-full bg-primary/20 text-primary text-sm font-cinzel">
+                          <span key={day} className="num text-[0.68rem] uppercase tracking-[0.14em] text-accent">
                             {day}
                           </span>
                         ))}
@@ -380,13 +425,15 @@ const Predictions = () => {
             </Tabs>
           )}
 
+          {birthDate && <CalendarAndHours birthDate={birthDate} />}
+
           {/* Change birth date button */}
           {birthDate && (
             <div className="text-center">
               <Button
                 variant="outline"
                 onClick={() => setBirthDate(undefined)}
-                className="border-primary/30 text-primary hover:bg-primary/10"
+                className="border-line text-primary hover:bg-sunken"
               >
                 <Calendar className="mr-2 h-4 w-4" />
                 {l.selectBirthDate}
@@ -396,12 +443,6 @@ const Predictions = () => {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="relative z-10 py-6 border-t border-border mt-16">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <p className="text-sm text-foreground/70 font-raleway">{t.footer}</p>
-        </div>
-      </footer>
     </PageLayout>
   );
 };

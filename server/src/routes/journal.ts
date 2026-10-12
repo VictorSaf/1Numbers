@@ -1,22 +1,32 @@
 import { Router, Request, Response } from 'express';
+import { z } from 'zod';
 import pool from '../db';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
+// `content` is a TEXT column and `tags` a TEXT[]: without a schema the first
+// took a request-body-sized string and the second took whatever array-ish thing
+// node-postgres could coerce.
+const entrySchema = z.object({
+  entryType: z.enum(['journal', 'prediction']),
+  title: z.string().trim().min(1).max(200),
+  content: z.string().max(20000).optional().nullable(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  numerologyData: z.record(z.string(), z.unknown()).optional().nullable(),
+  tags: z.array(z.string().trim().min(1).max(50)).max(20).default([]),
+  mood: z.string().trim().max(50).optional().nullable(),
+});
+
 // Create journal entry
 router.post('/entry', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId;
-    const { entryType, title, content, date, numerologyData, tags, mood } = req.body;
-
-    if (!title || !entryType) {
-      return res.status(400).json({ error: 'Title and entry type are required' });
+    const parsed = entrySchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: 'Invalid journal entry', details: parsed.error.issues });
     }
-
-    if (!['journal', 'prediction'].includes(entryType)) {
-      return res.status(400).json({ error: 'Invalid entry type' });
-    }
+    const { entryType, title, content, date, numerologyData, tags, mood } = parsed.data;
 
     const result = await pool.query(
       `INSERT INTO journal_entries (user_id, entry_type, title, content, date, numerology_data, tags, mood)
@@ -29,7 +39,7 @@ router.post('/entry', authenticateToken, async (req: AuthRequest, res: Response)
         content || null,
         date || new Date().toISOString().split('T')[0],
         numerologyData ? JSON.stringify(numerologyData) : null,
-        tags || [],
+        tags,
         mood || null,
       ]
     );
@@ -61,6 +71,8 @@ router.post('/entry', authenticateToken, async (req: AuthRequest, res: Response)
   }
 });
 
+const MAX_ENTRIES = 100;
+
 // Get all journal entries for user
 router.get('/entries', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
@@ -69,7 +81,13 @@ router.get('/entries', authenticateToken, async (req: AuthRequest, res: Response
       return res.status(401).json({ error: 'User ID not found' });
     }
 
-    const { entryType, startDate, endDate, limit = 100, offset = 0 } = req.query;
+    const { entryType, startDate, endDate } = req.query;
+    // Din query string vine orice: `abc` ar ajunge NaN în SQL, iar 100000 ar
+    // scoate tot jurnalul dintr-o bucată. 100 e și implicitul, și plafonul.
+    const asked = parseInt(String(req.query.limit), 10);
+    const limit = Number.isFinite(asked) && asked > 0 ? Math.min(asked, MAX_ENTRIES) : MAX_ENTRIES;
+    const skipped = parseInt(String(req.query.offset), 10);
+    const offset = Number.isFinite(skipped) && skipped > 0 ? skipped : 0;
 
     let query = `
       SELECT id, user_id, entry_type, title, content, date, numerology_data, tags, mood, created_at, updated_at
@@ -98,7 +116,7 @@ router.get('/entries', authenticateToken, async (req: AuthRequest, res: Response
     }
 
     query += ` ORDER BY date DESC, created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
-    params.push(parseInt(limit as string), parseInt(offset as string));
+    params.push(limit, offset);
 
     const result = await pool.query(query, params);
 
@@ -247,54 +265,53 @@ router.get('/statistics', authenticateToken, async (req: AuthRequest, res: Respo
       paramIndex += 2;
     }
 
-    // Get total entries
-    const totalResult = await pool.query(
-      `SELECT COUNT(*) as count FROM journal_entries WHERE user_id = $1${dateFilter}`,
-      params
-    );
-
-    // Get entries by type
-    const typeResult = await pool.query(
-      `SELECT entry_type, COUNT(*) as count
-       FROM journal_entries
-       WHERE user_id = $1${dateFilter}
-       GROUP BY entry_type`,
-      params
-    );
-
-    // Get entries by mood
-    const moodResult = await pool.query(
-      `SELECT mood, COUNT(*) as count
-       FROM journal_entries
-       WHERE user_id = $1 AND mood IS NOT NULL${dateFilter}
-       GROUP BY mood
-       ORDER BY count DESC`,
-      params
-    );
-
-    // Get most common tags
-    const tagsResult = await pool.query(
-      `SELECT unnest(tags) as tag, COUNT(*) as count
-       FROM journal_entries
-       WHERE user_id = $1 AND array_length(tags, 1) > 0${dateFilter}
-       GROUP BY tag
-       ORDER BY count DESC
-       LIMIT 10`,
-      params
-    );
-
-    // Get entries per month
-    const monthlyResult = await pool.query(
-      `SELECT 
-         TO_CHAR(date, 'YYYY-MM') as month,
-         COUNT(*) as count
-       FROM journal_entries
-       WHERE user_id = $1${dateFilter}
-       GROUP BY month
-       ORDER BY month DESC
-       LIMIT 12`,
-      params
-    );
+    // Cinci întrebări care nu se așteaptă una pe alta: plecate deodată.
+    const [totalResult, typeResult, moodResult, tagsResult, monthlyResult] = await Promise.all([
+      // Get total entries
+      pool.query(
+        `SELECT COUNT(*) as count FROM journal_entries WHERE user_id = $1${dateFilter}`,
+        params
+      ),
+      // Get entries by type
+      pool.query(
+        `SELECT entry_type, COUNT(*) as count
+         FROM journal_entries
+         WHERE user_id = $1${dateFilter}
+         GROUP BY entry_type`,
+        params
+      ),
+      // Get entries by mood
+      pool.query(
+        `SELECT mood, COUNT(*) as count
+         FROM journal_entries
+         WHERE user_id = $1 AND mood IS NOT NULL${dateFilter}
+         GROUP BY mood
+         ORDER BY count DESC`,
+        params
+      ),
+      // Get most common tags
+      pool.query(
+        `SELECT unnest(tags) as tag, COUNT(*) as count
+         FROM journal_entries
+         WHERE user_id = $1 AND array_length(tags, 1) > 0${dateFilter}
+         GROUP BY tag
+         ORDER BY count DESC
+         LIMIT 10`,
+        params
+      ),
+      // Get entries per month
+      pool.query(
+        `SELECT
+           TO_CHAR(date, 'YYYY-MM') as month,
+           COUNT(*) as count
+         FROM journal_entries
+         WHERE user_id = $1${dateFilter}
+         GROUP BY month
+         ORDER BY month DESC
+         LIMIT 12`,
+        params
+      ),
+    ]);
 
     res.json({
       success: true,

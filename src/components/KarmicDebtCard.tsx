@@ -28,19 +28,19 @@ export const KarmicDebtCard = ({ debt, delay = 0 }: KarmicDebtCardProps) => {
   return (
     <div
       className={cn(
-        "p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 backdrop-blur-sm opacity-0 animate-fade-in",
+        "border-l-2 border-warn py-3 pl-4 opacity-0 animate-fade-in",
         getDelayClass(delay)
       )}
     >
       <div className="flex items-start gap-3">
-        <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center">
-          <AlertTriangle className="h-6 w-6 text-amber-500" />
+        <div className="w-12 h-12 rounded-full flex items-center justify-center">
+          <AlertTriangle className="h-6 w-6 text-warn" />
         </div>
         
         <div className="flex-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <h4 className="font-cinzel text-lg text-amber-400">{debtInfo.title[language]}</h4>
-            <span className="px-2 py-0.5 text-xs rounded-full bg-amber-500/20 text-amber-300">
+            <h4 className="font-heading text-lg text-warn">{debtInfo.title[language]}</h4>
+            <span className="px-2 py-0.5 text-xs rounded-full text-warn">
               {sourceLabels[debt.source][language]}
             </span>
           </div>
@@ -51,16 +51,16 @@ export const KarmicDebtCard = ({ debt, delay = 0 }: KarmicDebtCardProps) => {
 
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="mt-3 flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300 transition-colors"
+            className="mt-3 flex items-center gap-1 text-xs text-warn hover:text-warn transition-colors"
           >
             {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
             {language === 'ro' ? 'Vindecarea' : language === 'ru' ? 'Исцеление' : 'Healing'}
           </button>
 
           {isExpanded && (
-            <div className="mt-3 pt-3 border-t border-amber-500/20 space-y-3 animate-fade-in">
+            <div className="mt-3 pt-3 border-t border-warn space-y-3 animate-fade-in">
               <div>
-                <p className="text-xs font-medium text-amber-400 mb-1 flex items-center gap-1">
+                <p className="text-xs font-medium text-warn mb-1 flex items-center gap-1">
                   <Sparkles className="h-3 w-3" />
                   {language === 'ro' ? 'Lecția' : language === 'ru' ? 'Урок' : 'Lesson'}
                 </p>
@@ -69,7 +69,7 @@ export const KarmicDebtCard = ({ debt, delay = 0 }: KarmicDebtCardProps) => {
                 </p>
               </div>
               <div>
-                <p className="text-xs font-medium text-green-400 mb-1">
+                <p className="text-xs font-medium text-ok mb-1">
                   {language === 'ro' ? 'Vindecarea' : language === 'ru' ? 'Исцеление' : 'Healing'}
                 </p>
                 <p className="text-xs text-muted-foreground">

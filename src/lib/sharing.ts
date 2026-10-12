@@ -1,18 +1,10 @@
 // Social Media Sharing and Link Generation
-import { Language } from './translations';
 
 export interface ShareData {
   title: string;
   text: string;
   url: string;
   imageUrl?: string;
-}
-
-export interface CompatibilityShareData {
-  person1Name: string;
-  person2Name: string;
-  compatibilityScore: number;
-  url: string;
 }
 
 /**
@@ -119,98 +111,6 @@ export const sendReportByEmail = (data: ShareData, recipientEmail?: string): voi
 };
 
 /**
- * Create email template for numerology report.
- * @param reportData - Report data
- * @param language - Language for template
- * @returns Email template HTML/text
- */
-export const createEmailTemplate = (
-  reportData: {
-    fullName: string;
-    birthDate: Date;
-    lifePath: number;
-    destiny: number;
-  },
-  language: Language = 'en'
-): string => {
-  const templates = {
-    en: {
-      subject: 'My Numerology Report',
-      body: `Hello!
-
-I wanted to share my numerology report with you:
-
-Name: ${reportData.fullName}
-Birth Date: ${reportData.birthDate.toLocaleDateString()}
-Life Path Number: ${reportData.lifePath}
-Destiny Number: ${reportData.destiny}
-
-Check out my full report at: {URL}
-
-Best regards!`
-    },
-    ro: {
-      subject: 'Raportul Meu Numerologic',
-      body: `Bună!
-
-Am vrut să îți împărtășesc raportul meu numerologic:
-
-Nume: ${reportData.fullName}
-Data Nașterii: ${reportData.birthDate.toLocaleDateString('ro-RO')}
-Numărul Drumului Vieții: ${reportData.lifePath}
-Numărul Destinului: ${reportData.destiny}
-
-Vezi raportul complet la: {URL}
-
-Cu respect!`
-    },
-    ru: {
-      subject: 'Мой Нумерологический Отчёт',
-      body: `Привет!
-
-Я хотел поделиться с тобой своим нумерологическим отчётом:
-
-Имя: ${reportData.fullName}
-Дата Рождения: ${reportData.birthDate.toLocaleDateString('ru-RU')}
-Число Жизненного Пути: ${reportData.lifePath}
-Число Судьбы: ${reportData.destiny}
-
-Посмотри мой полный отчёт здесь: {URL}
-
-С уважением!`
-    }
-  };
-  
-  return templates[language].body;
-};
-
-/**
- * Schedule email reports (client-side only - stores in localStorage).
- * Note: Actual email sending requires backend.
- * @param reportData - Report data
- * @param scheduleDate - Date to send report
- * @param recipientEmail - Recipient email
- */
-export const scheduleEmailReports = (
-  reportData: ShareData,
-  scheduleDate: Date,
-  recipientEmail: string
-): void => {
-  // Store in localStorage (in production, this would be sent to backend)
-  const scheduledReports = JSON.parse(localStorage.getItem('scheduledReports') || '[]');
-  scheduledReports.push({
-    ...reportData,
-    recipientEmail,
-    scheduleDate: scheduleDate.toISOString(),
-    createdAt: new Date().toISOString()
-  });
-  localStorage.setItem('scheduledReports', JSON.stringify(scheduledReports));
-  
-  // Show confirmation
-  alert(`Report scheduled to be sent to ${recipientEmail} on ${scheduleDate.toLocaleDateString()}`);
-};
-
-/**
  * Generate shareable link for numerology report.
  * @param reportData - Report data (name, birth date)
  * @param baseUrl - Base URL of the application
@@ -230,55 +130,6 @@ export const generateShareableLink = (
   });
   
   return `${baseUrl}/?${params.toString()}`;
-};
-
-/**
- * Generate compatibility link for sharing compatibility results.
- * @param data - Compatibility share data
- * @param baseUrl - Base URL of the application
- * @returns Shareable URL with encoded compatibility data
- */
-export const generateCompatibilityLink = (
-  data: CompatibilityShareData,
-  baseUrl: string = window.location.origin
-): string => {
-  const params = new URLSearchParams({
-    person1: data.person1Name,
-    person2: data.person2Name,
-    score: data.compatibilityScore.toString(),
-    type: 'compatibility'
-  });
-  
-  return `${baseUrl}/compatibility?${params.toString()}`;
-};
-
-/**
- * Create temporary shareable link (with expiration).
- * Stores link data in localStorage with expiration timestamp.
- * @param data - Share data
- * @param expiresInHours - Hours until link expires (default: 24)
- * @returns Temporary shareable link
- */
-export const createTemporaryLink = (
-  data: ShareData,
-  expiresInHours: number = 24
-): string => {
-  const expirationDate = new Date();
-  expirationDate.setHours(expirationDate.getHours() + expiresInHours);
-  
-  const linkId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  
-  // Store in localStorage
-  const tempLinks = JSON.parse(localStorage.getItem('tempShareLinks') || '{}');
-  tempLinks[linkId] = {
-    ...data,
-    expiresAt: expirationDate.toISOString(),
-    createdAt: new Date().toISOString()
-  };
-  localStorage.setItem('tempShareLinks', JSON.stringify(tempLinks));
-  
-  const baseUrl = window.location.origin;
-  return `${baseUrl}/share/${linkId}`;
 };
 
 /**
@@ -332,4 +183,3 @@ export const nativeShare = async (data: ShareData): Promise<boolean> => {
     return false;
   }
 };
-

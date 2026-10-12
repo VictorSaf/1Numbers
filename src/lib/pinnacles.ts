@@ -1,11 +1,8 @@
-import { 
-  reduceToSingleDigit,
-  calculateLifePathNumber,
-  calculateDestinyNumber,
-  calculateSoulUrgeNumber,
-  calculatePersonalityNumber,
-  calculateMaturityNumber
-} from "./numerology";
+// Imported from the module, not the barrel: the barrel re-exports the content
+// layer, which would drag arcana and archetypes into this chunk.
+import { lifePath, pinnacles, challenges, lifeCycles } from './numerology-plus/pythagorean';
+
+const toBirthDate = (d: Date) => ({ day: d.getDate(), month: d.getMonth() + 1, year: d.getFullYear() });
 
 export interface PinnacleData {
   number: number;
@@ -19,215 +16,81 @@ export interface ChallengeData {
   period: number; // 1-4
 }
 
+export interface LifeCycleData {
+  stage: 'formative' | 'productive' | 'harvest';
+  number: number;
+  startAge: number;
+  endAge: number;
+}
+
 // Calculate the 4 Pinnacle Numbers
+//
+// The arithmetic lives in the engine. This module used to carry its own copy,
+// which reduced the month, day and year without preserving masters while
+// numerology-plus preserved them -- so the same page could show two different
+// Life Paths, and the pinnacle ages were computed from two different scales.
+// Both now come from one place; what stays here is the shape the cards expect.
 export const calculatePinnacles = (birthDate: Date): PinnacleData[] => {
-  const day = birthDate.getDate();
-  const month = birthDate.getMonth() + 1;
-  const year = birthDate.getFullYear();
-
-  const reducedDay = reduceToSingleDigit(day, false);
-  const reducedMonth = reduceToSingleDigit(month, false);
-  const reducedYear = reduceToSingleDigit(
-    String(year).split('').reduce((sum, digit) => sum + parseInt(digit), 0),
-    false
-  );
-
-  // Life Path Number determines the timing
-  const lifePath = reduceToSingleDigit(reducedDay + reducedMonth + reducedYear, false);
-  
-  // First pinnacle ends at age 36 - Life Path Number
-  const firstPinnacleEnd = 36 - lifePath;
-  
-  // Pinnacle calculations
-  const pinnacle1 = reduceToSingleDigit(reducedMonth + reducedDay, true);
-  const pinnacle2 = reduceToSingleDigit(reducedDay + reducedYear, true);
-  const pinnacle3 = reduceToSingleDigit(pinnacle1 + pinnacle2, true);
-  const pinnacle4 = reduceToSingleDigit(reducedMonth + reducedYear, true);
-
-  return [
-    { number: pinnacle1, startAge: 0, endAge: firstPinnacleEnd, period: 1 },
-    { number: pinnacle2, startAge: firstPinnacleEnd + 1, endAge: firstPinnacleEnd + 9, period: 2 },
-    { number: pinnacle3, startAge: firstPinnacleEnd + 10, endAge: firstPinnacleEnd + 18, period: 3 },
-    { number: pinnacle4, startAge: firstPinnacleEnd + 19, endAge: 99, period: 4 },
-  ];
+  const b = toBirthDate(birthDate);
+  return pinnacles(b, lifePath(b)).map((p) => ({
+    number: p.value,
+    startAge: p.fromAge,
+    // The engine leaves the last pinnacle open; the cards want a number.
+    endAge: p.toAge ?? 99,
+    period: p.index,
+  }));
 };
 
 // Calculate the 4 Challenge Numbers
 export const calculateChallenges = (birthDate: Date): ChallengeData[] => {
-  const day = birthDate.getDate();
-  const month = birthDate.getMonth() + 1;
-  const year = birthDate.getFullYear();
-
-  const reducedDay = reduceToSingleDigit(day, false);
-  const reducedMonth = reduceToSingleDigit(month, false);
-  const reducedYear = reduceToSingleDigit(
-    String(year).split('').reduce((sum, digit) => sum + parseInt(digit), 0),
-    false
-  );
-
-  // Challenge calculations (absolute differences)
-  const challenge1 = Math.abs(reducedMonth - reducedDay);
-  const challenge2 = Math.abs(reducedDay - reducedYear);
-  const challenge3 = Math.abs(challenge1 - challenge2);
-  const challenge4 = Math.abs(reducedMonth - reducedYear);
-
-  return [
-    { number: challenge1, period: 1 },
-    { number: challenge2, period: 2 },
-    { number: challenge3, period: 3 },
-    { number: challenge4, period: 4 },
-  ];
+  const b = toBirthDate(birthDate);
+  return challenges(b, lifePath(b)).map((c) => ({ number: c.value, period: c.index }));
 };
 
-// Get current pinnacle based on age
-export const getCurrentPinnacle = (birthDate: Date): PinnacleData | null => {
-  const pinnacles = calculatePinnacles(birthDate);
-  const today = new Date();
-  const age = today.getFullYear() - birthDate.getFullYear();
-  
-  return pinnacles.find(p => age >= p.startAge && age <= p.endAge) || pinnacles[3];
+// The three Life Cycles: month, day and year of birth, each reduced on its
+// own and given the same age boundaries the engine already uses for the
+// first Pinnacle -- formative ends there, productive runs 27 years, harvest
+// is open-ended. The engine (`lifeCycles`) has carried this since it was
+// written for Pinnacles' sake; nothing in the app ever called it.
+export const calculateLifeCycles = (birthDate: Date): LifeCycleData[] => {
+  const b = toBirthDate(birthDate);
+  return lifeCycles(b, lifePath(b)).map((c) => ({
+    stage: c.name as LifeCycleData['stage'],
+    number: c.value,
+    startAge: c.fromAge,
+    endAge: c.toAge ?? 99,
+  }));
 };
 
-// Get current challenge based on age
-export const getCurrentChallenge = (birthDate: Date): ChallengeData | null => {
-  const challenges = calculateChallenges(birthDate);
-  const pinnacles = calculatePinnacles(birthDate);
-  const today = new Date();
-  const age = today.getFullYear() - birthDate.getFullYear();
-  
-  for (let i = 0; i < pinnacles.length; i++) {
-    if (age >= pinnacles[i].startAge && age <= pinnacles[i].endAge) {
-      return challenges[i];
-    }
-  }
-  return challenges[3];
-};
-
-/**
- * Calculate Achievement Numbers (hidden talents and potential).
- * These numbers reveal talents that may not be immediately obvious but can be developed.
- * @param birthDate - Birth date
- * @param fullName - Full name at birth
- * @returns Array of achievement numbers representing hidden talents
- */
-export interface AchievementData {
-  number: number;
-  source: 'lifePath' | 'destiny' | 'soulUrge' | 'personality' | 'maturity';
-  description: { ro: string; en: string; ru: string };
-}
-
-export const calculateAchievements = (
-  birthDate: Date,
-  fullName: string
-): AchievementData[] => {
-  const lifePath = calculateLifePathNumber(birthDate);
-  const destiny = calculateDestinyNumber(fullName);
-  const soulUrge = calculateSoulUrgeNumber(fullName);
-  const personality = calculatePersonalityNumber(fullName);
-  const maturity = calculateMaturityNumber(birthDate, fullName);
-  
-  // Collect unique numbers
-  const numbers = [
-    { num: lifePath, source: 'lifePath' as const },
-    { num: destiny, source: 'destiny' as const },
-    { num: soulUrge, source: 'soulUrge' as const },
-    { num: personality, source: 'personality' as const },
-    { num: maturity, source: 'maturity' as const }
-  ];
-  
-  // Find numbers that appear multiple times (stronger talents)
-  const frequencyMap = new Map<number, { count: number; sources: Array<'lifePath' | 'destiny' | 'soulUrge' | 'personality' | 'maturity'> }>();
-  
-  for (const { num, source } of numbers) {
-    const reduced = reduceToSingleDigit(num, false);
-    const existing = frequencyMap.get(reduced) || { count: 0, sources: [] };
-    frequencyMap.set(reduced, {
-      count: existing.count + 1,
-      sources: [...existing.sources, source]
-    });
-  }
-  
-  // Convert to achievement data, prioritizing numbers that appear multiple times
-  const achievementMap = new Map<number, AchievementData>();
-  
-  for (const [num, { sources }] of frequencyMap.entries()) {
-    if (!achievementMap.has(num)) {
-      const meaning = getAchievementMeaning(num);
-      achievementMap.set(num, {
-        number: num,
-        source: sources[0],
-        description: meaning
-      });
-    }
-  }
-  
-  return Array.from(achievementMap.values())
-    .sort((a, b) => {
-      const aFreq = frequencyMap.get(a.number)?.count || 0;
-      const bFreq = frequencyMap.get(b.number)?.count || 0;
-      return bFreq - aFreq; // Higher frequency first
-    });
-};
-
-/**
- * Get achievement meaning for a number.
- * @param num - Number (1-9)
- * @returns Achievement description in all languages
- */
-const getAchievementMeaning = (num: number): { ro: string; en: string; ru: string } => {
-  const meanings: Record<number, { ro: string; en: string; ru: string }> = {
-    1: {
-      ro: "Talent pentru leadership și inițiativă. Poți conduce și inova.",
-      en: "Talent for leadership and initiative. You can lead and innovate.",
-      ru: "Талант к лидерству и инициативе. Вы можете вести и инноваровать."
+// What each Life Cycle stage is about, independent of its number -- the
+// number's own flavour comes from PINNACLE_MEANINGS below, keyed the same way
+// a Pinnacle already is: the energy of a 3 doesn't change because it's a
+// cycle instead of a peak.
+export const LIFE_CYCLE_STAGE_LABELS: Record<LifeCycleData['stage'], { title: { ro: string; en: string; ru: string }; description: { ro: string; en: string; ru: string } }> = {
+  formative: {
+    title: { ro: "Formarea", en: "The Formative Cycle", ru: "Формирующий цикл" },
+    description: {
+      ro: "De la naștere până aici, cifra vine din luna în care te-ai născut. E terenul pe care ai crescut, nu o alegere -- felul în care ai învățat, primele obiceiuri, ce ai luat drept normal înainte să poți compara.",
+      en: "From birth to here, the number comes from the month you were born in. It's the ground you grew up on, not a choice -- how you learned, your first habits, what you took as normal before you had anything to compare it to.",
+      ru: "От рождения и до этого возраста число идёт от месяца рождения. Это почва, на которой вы выросли, не выбор — то, как вы учились, первые привычки, что казалось нормой, пока не с чем было сравнить.",
     },
-    2: {
-      ro: "Talent pentru cooperare și diplomație. Poți crea armonie.",
-      en: "Talent for cooperation and diplomacy. You can create harmony.",
-      ru: "Талант к сотрудничеству и дипломатии. Вы можете создавать гармонию."
+  },
+  productive: {
+    title: { ro: "Producția", en: "The Productive Cycle", ru: "Продуктивный цикл" },
+    description: {
+      ro: "Cei douăzeci și șapte de ani în care se construiește cea mai mare parte a unei vieți -- carieră, familie, ce rămâne după. Cifra vine din ziua nașterii: reflexul cu care acționezi când chiar contează.",
+      en: "The twenty-seven years in which most of a life gets built -- career, family, what stays behind. The number comes from the day of birth: the reflex you act on when it actually matters.",
+      ru: "Двадцать семь лет, в которые строится основная часть жизни — карьера, семья, то, что остаётся. Число идёт от дня рождения: рефлекс, которым вы действуете, когда это действительно важно.",
     },
-    3: {
-      ro: "Talent creativ și expresiv. Poți inspira prin artă și comunicare.",
-      en: "Creative and expressive talent. You can inspire through art and communication.",
-      ru: "Творческий и выразительный талант. Вы можете вдохновлять через искусство и общение."
+  },
+  harvest: {
+    title: { ro: "Recolta", en: "The Harvest Cycle", ru: "Цикл жатвы" },
+    description: {
+      ro: "Ce rămâne, fără termen. Cifra vine din anul nașterii -- cea mai lentă dintre cele trei, și cea care judecă mai puțin cât ai făcut și mai mult ce a rezistat.",
+      en: "What remains, with no end date. The number comes from the year of birth -- the slowest of the three, and the one that judges less how much you did and more what lasted.",
+      ru: "То, что остаётся, без срока. Число идёт от года рождения — самое медленное из трёх, и то, что судит не столько о сделанном, сколько о том, что устояло.",
     },
-    4: {
-      ro: "Talent pentru construcție și organizare. Poți construi fundații solide.",
-      en: "Talent for building and organization. You can build solid foundations.",
-      ru: "Талант к строительству и организации. Вы можете строить прочные основы."
-    },
-    5: {
-      ro: "Talent pentru adaptare și explorare. Poți prospera în schimbare.",
-      en: "Talent for adaptation and exploration. You can thrive in change.",
-      ru: "Талант к адаптации и исследованию. Вы можете процветать в переменах."
-    },
-    6: {
-      ro: "Talent pentru îngrijire și responsabilitate. Poți proteja și ajuta.",
-      en: "Talent for care and responsibility. You can protect and help.",
-      ru: "Талант к заботе и ответственности. Вы можете защищать и помогать."
-    },
-    7: {
-      ro: "Talent pentru analiză și înțelepciune. Poți descoperi adevăruri profunde.",
-      en: "Talent for analysis and wisdom. You can discover deep truths.",
-      ru: "Талант к анализу и мудрости. Вы можете открывать глубокие истины."
-    },
-    8: {
-      ro: "Talent pentru realizare materială. Poți construi abundență.",
-      en: "Talent for material achievement. You can build abundance.",
-      ru: "Талант к материальным достижениям. Вы можете создавать изобилие."
-    },
-    9: {
-      ro: "Talent pentru compasiune și serviciu. Poți ajuta umanitatea.",
-      en: "Talent for compassion and service. You can help humanity.",
-      ru: "Талант к состраданию и служению. Вы можете помогать человечеству."
-    }
-  };
-  
-  return meanings[num] || {
-    ro: "Talent ascuns care poate fi dezvoltat.",
-    en: "Hidden talent that can be developed.",
-    ru: "Скрытый талант, который можно развить."
-  };
+  },
 };
 
 // Pinnacle interpretations

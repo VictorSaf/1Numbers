@@ -4,7 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { JournalEntry, JournalStatistics } from '@/lib/journal';
+import { JournalEntry, JournalStatistics, PredictionEntry } from '@/lib/journal';
 import { api } from '@/services/api';
 import { JournalEntry as JournalEntryComponent } from '@/components/JournalEntry';
 import { PersonalStatistics } from '@/components/PersonalStatistics';
@@ -208,14 +208,14 @@ const Journal = () => {
     setEditingEntry(null);
   };
 
-  const predictions = entries.filter(e => e.entryType === 'prediction');
+  const predictions = entries.filter((e): e is PredictionEntry => e.entryType === 'prediction');
 
   if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-pulse flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-primary/20 border-2 border-primary/40" />
-          <div className="h-4 w-32 bg-primary/20 rounded" />
+          <div className="w-16 h-16 rounded-full bg-sunken border-2 border-line" />
+          <div className="h-4 w-32 bg-sunken rounded" />
         </div>
       </div>
     );
@@ -227,13 +227,13 @@ const Journal = () => {
         title="Jurnal Numerologic"
         subtitle="Ține evidența experiențelor tale numerologice și previziunilor"
         badge={{
-          icon: <BookOpen className="h-4 w-4 text-primary" />,
+          icon: <BookOpen className="h-4 w-4" />,
           label: 'Jurnal'
         }}
       />
 
-      <main className="relative z-10 px-4 pb-16">
-        <div className="max-w-6xl mx-auto space-y-6">
+      <main className="relative z-10 pb-16">
+        <div className="page-measure page-rhythm">
           {/* Actions Bar */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -255,7 +255,7 @@ const Journal = () => {
               if (!open) resetForm();
             }}>
               <DialogTrigger asChild>
-                <Button className="btn-mystic">
+                <Button>
                   <Plus className="h-4 w-4 mr-2" />
                   Adaugă Intrare
                 </Button>
@@ -337,7 +337,7 @@ const Journal = () => {
                     }}>
                       Anulează
                     </Button>
-                    <Button onClick={handleSave} className="btn-mystic">
+                    <Button onClick={handleSave}>
                       Salvează
                     </Button>
                   </div>
@@ -354,7 +354,7 @@ const Journal = () => {
 
           {/* Journal Entries */}
           <div className="space-y-4">
-            <h2 className="font-cinzel text-2xl text-foreground">
+            <h2 className="font-heading text-2xl text-foreground">
               {filterType === 'all' ? 'Toate Intrările' : filterType === 'journal' ? 'Jurnal' : 'Previziuni'}
             </h2>
             {entries.length > 0 ? (

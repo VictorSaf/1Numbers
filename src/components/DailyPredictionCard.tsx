@@ -1,8 +1,7 @@
-import { Music, Palette, Lightbulb, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { DailyPrediction, getDayRecommendations, calculateDayColor, getDayMusicRecommendations } from '@/lib/predictions';
+import { DailyPrediction } from '@/lib/predictions';
+import { dayAdvice, dayColor, dayMusic, type GuidanceLang } from '@/lib/dayGuidance';
 
 interface DailyPredictionCardProps {
   prediction: DailyPrediction;
@@ -13,9 +12,16 @@ interface DailyPredictionCardProps {
 export const DailyPredictionCard = ({ prediction, birthDate, date }: DailyPredictionCardProps) => {
   const { language, t } = useLanguage();
   
-  const recommendations = getDayRecommendations(birthDate, date);
-  const color = calculateDayColor(prediction.number);
-  const music = getDayMusicRecommendations(prediction.number);
+  const recommendations = dayAdvice(prediction.number, (['ro','en','ru'].includes(language) ? language : 'en') as GuidanceLang);
+  /**
+   * Recomandările, culoarea și genurile veneau din predictions.ts, unde erau
+   * scrise doar în engleză. Etichetele din jur erau traduse, deci pagina în
+   * română arăta titluri românești peste conținut englezesc -- mai rău decât
+   * o pagină întreagă într-o limbă, fiindcă pare o traducere abandonată.
+   */
+  const guidanceLang = (["ro", "en", "ru"].includes(language) ? language : "en") as GuidanceLang;
+  const color = dayColor(prediction.number, guidanceLang);
+  const music = dayMusic(prediction.number, guidanceLang);
   
   const labels = {
     ro: {
@@ -44,76 +50,61 @@ export const DailyPredictionCard = ({ prediction, birthDate, date }: DailyPredic
            labels.recommendations === "Recommendations" ? "Daily Prediction" : "Ежедневный Прогноз"
   };
   
+  /* Registrul plăcii: fiecare bloc se deschide cu un filet de alamă și o
+     etichetă mică, iar listele sunt cuvinte separate, nu pastile conturate.
+     Iconițele lucide de deasupra titlurilor spuneau ce spune deja titlul. */
+  const Head = ({ children }: { children: string }) => (
+    <div className="mb-3 flex items-center gap-3">
+      <span className="h-px w-10 shrink-0 bg-gilt" aria-hidden="true" />
+      <h3 className="num text-[0.63rem] uppercase tracking-[0.18em] text-gilt">{children}</h3>
+    </div>
+  );
+
   return (
-    <Card className="card-mystic">
+    <Card className="border-t-0">
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="font-cinzel text-xl text-gradient-gold">
-            {predExt.daily}
-          </CardTitle>
-          <div 
-            className="w-8 h-8 rounded-full border-2 border-primary/30"
+        <div className="flex items-center justify-between gap-4">
+          <CardTitle>{predExt.daily}</CardTitle>
+          {/* Culoarea zilei e chiar o culoare: aici eșantionul e conținut, nu
+              decor, deci rămâne singurul disc din pagină. */}
+          <div
+            className="h-6 w-6 shrink-0 rounded-full"
             style={{ backgroundColor: color.hex }}
             title={color.name}
           />
         </div>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Recommendations */}
+      <CardContent className="space-y-8">
         <div>
-          <div className="flex items-center gap-2 mb-3">
-            <Lightbulb className="h-5 w-5 text-primary" />
-            <h3 className="font-cinzel text-lg text-foreground">{labels.recommendations}</h3>
-          </div>
+          <Head>{labels.recommendations}</Head>
           <ul className="space-y-2">
             {recommendations.map((rec, index) => (
-              <li key={index} className="flex items-start gap-2 text-sm text-foreground/90">
-                <span className="text-primary mt-1">•</span>
+              <li key={index} className="flex items-start gap-3 text-sm text-foreground/90">
+                <span className="num shrink-0 text-muted-foreground">{index + 1}</span>
                 <span>{rec}</span>
               </li>
             ))}
           </ul>
         </div>
-        
-        {/* Color */}
+
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <Palette className="h-5 w-5 text-primary" />
-            <h3 className="font-cinzel text-sm text-foreground">{labels.color}</h3>
-          </div>
-          <Badge className="bg-primary/20 text-primary border-primary/30">
-            {color.name}
-          </Badge>
+          <Head>{labels.color}</Head>
+          <p className="num text-[0.68rem] uppercase tracking-[0.14em] text-accent">{color.name}</p>
         </div>
-        
-        {/* Music */}
+
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <Music className="h-5 w-5 text-primary" />
-            <h3 className="font-cinzel text-sm text-foreground">{labels.music}</h3>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {music.map((genre, index) => (
-              <Badge key={index} variant="outline" className="text-xs">
-                {genre}
-              </Badge>
-            ))}
-          </div>
+          <Head>{labels.music}</Head>
+          <p className="num text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">
+            {music.join(" · ")}
+          </p>
         </div>
-        
-        {/* Lucky Hours */}
+
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <Clock className="h-5 w-5 text-primary" />
-            <h3 className="font-cinzel text-sm text-foreground">{labels.luckyHours}</h3>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {prediction.luckyHours.map((hour, index) => (
-              <Badge key={index} className="bg-amber-500/20 text-amber-300 border-amber-400/30">
-                {hour}
-              </Badge>
-            ))}
-          </div>
+          <Head>{labels.luckyHours}</Head>
+          {/* O oră norocoasă nu e o avertizare: `--warn` nu are ce căuta aici. */}
+          <p className="num text-[0.68rem] tracking-[0.14em] text-accent">
+            {prediction.luckyHours.join(" · ")}
+          </p>
         </div>
       </CardContent>
     </Card>

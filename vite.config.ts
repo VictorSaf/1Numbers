@@ -1,13 +1,28 @@
-/// <reference types="vitest" />
-import { defineConfig } from "vite";
+// vitest 4 ships its own defineConfig; the one from "vite" does not accept `test`.
+import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
 // https://vitejs.dev/config/
-export default defineConfig(() => ({
+export default defineConfig({
   server: {
     host: "::",
-    port: 8080,
+    // 8080 and 8081 are held by the llama-server that One21 uses for embeddings.
+    // Vite would fall through to the next free port on its own, but silently, so
+    // the address printed at startup stopped matching the one in the docs.
+    // strictPort turns the next such collision into a startup error rather than
+    // a quiet move to another port.
+    port: 8082,
+    strictPort: true,
+    // In production the tunnel routes /api/* to the backend on the same origin.
+    // Proxying here makes dev behave identically, so API calls stay relative in
+    // both environments and no host is ever hardcoded in the frontend.
+    proxy: {
+      "/api": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+      },
+    },
   },
   plugins: [react()],
   resolve: {
@@ -31,15 +46,14 @@ export default defineConfig(() => ({
             "@radix-ui/react-accordion",
           ],
           "vendor-charts": ["recharts"],
-          "vendor-forms": ["react-hook-form", "@hookform/resolvers", "zod"],
           "vendor-query": ["@tanstack/react-query"],
           "vendor-utils": ["date-fns", "clsx", "tailwind-merge", "class-variance-authority"],
-          // App-specific chunks
+          // App-specific chunks. compatibility.ts și predictions.ts nu stau aici:
+          // le folosesc doar pagini lazy, iar în acest chunk erau preîncărcate
+          // (~60KB) pe pagina de start.
           "numerology-core": [
             "./src/lib/numerology.ts",
-            "./src/lib/compatibility.ts",
             "./src/lib/karmic.ts",
-            "./src/lib/predictions.ts",
           ],
         },
       },
@@ -75,4 +89,4 @@ export default defineConfig(() => ({
       include: ["src/lib/**/*.ts"],
     },
   },
-}));
+});

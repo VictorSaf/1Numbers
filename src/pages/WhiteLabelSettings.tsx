@@ -214,7 +214,7 @@ const WhiteLabelSettings = () => {
       <PageLayout>
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center min-h-[400px]">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <Loader2 className="h-8 w-8 animate-spin" />
           </div>
         </div>
       </PageLayout>
@@ -227,12 +227,12 @@ const WhiteLabelSettings = () => {
         <div className="container mx-auto px-4 py-8">
           <Card className="max-w-lg mx-auto text-center">
             <CardContent className="pt-12 pb-12">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-100 flex items-center justify-center">
-                <Crown className="h-8 w-8 text-purple-500" />
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary flex items-center justify-center">
+                <Crown className="h-8 w-8" />
               </div>
               <h2 className="text-2xl font-bold mb-2">{t.title}</h2>
               <p className="text-muted-foreground mb-6">{t.proOnly}</p>
-              <Button onClick={() => (window.location.href = '/premium')}>
+              <Button onClick={() => (window.location.href = '/raport')}>
                 <Crown className="h-4 w-4 mr-2" />
                 {t.upgradeToPro}
               </Button>
@@ -245,14 +245,14 @@ const WhiteLabelSettings = () => {
 
   return (
     <PageLayout>
-      <div className="container max-w-3xl mx-auto px-4 py-8 space-y-6">
+      <div className="page-measure py-4 page-rhythm">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <Crown className="h-6 w-6 text-purple-500" />
+              <Crown className="h-6 w-6" />
               <h1 className="text-2xl font-bold">{t.title}</h1>
-              <Badge variant="secondary" className="bg-purple-100 text-purple-700">
+              <Badge variant="secondary" className="bg-primary text-primary">
                 Pro
               </Badge>
             </div>
@@ -315,7 +315,7 @@ const WhiteLabelSettings = () => {
                 placeholder={t.logoPlaceholder}
               />
               {config.logo && (
-                <div className="mt-2 p-4 bg-muted rounded-lg">
+                <div className="border-t border-line mt-2 pt-4">
                   <img
                     src={config.logo}
                     alt="Logo preview"
@@ -369,13 +369,13 @@ const WhiteLabelSettings = () => {
           </Button>
           <div className="flex items-center gap-3">
             {error && (
-              <div className="flex items-center gap-2 text-red-500 text-sm">
+              <div className="flex items-center gap-2 text-crit text-sm">
                 <AlertCircle className="h-4 w-4" />
                 {error}
               </div>
             )}
             {saved && (
-              <div className="flex items-center gap-2 text-green-500 text-sm">
+              <div className="flex items-center gap-2 text-ok text-sm">
                 <CheckCircle className="h-4 w-4" />
                 {t.saved}
               </div>

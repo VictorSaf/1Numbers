@@ -1,4 +1,11 @@
 import { reduceToSingleDigit } from "./numerology";
+// Imported from the module, not the barrel: the barrel re-exports the content
+// layer, and karmic.ts sits inside the numerology-core manual chunk, so a
+// barrel import drags arcana and archetypes into a chunk that is preloaded.
+import { classifyFullName, PYTHAGOREAN } from './numerology-plus/core';
+import {
+  lifePath, expression, soulUrge, personality, birthday, detectKarmicDebts,
+} from './numerology-plus/pythagorean';
 
 export interface KarmicDebtInfo {
   number: number;
@@ -11,93 +18,44 @@ export interface KarmicLessonInfo {
   description: { ro: string; en: string; ru: string };
 }
 
-// Karmic Debt Numbers and their meanings
-export const KARMIC_DEBT_NUMBERS = [13, 14, 16, 19];
-
-// Check if a number contains karmic debt (before reduction)
-export const hasKarmicDebt = (originalSum: number): number | null => {
-  if (KARMIC_DEBT_NUMBERS.includes(originalSum)) {
-    return originalSum;
-  }
-  return null;
-};
-
 // Calculate all potential karmic debts from birth date and name
+//
+// This used to redo the sums itself and then ask whether the total was one of
+// 13, 14, 16 or 19. For the Life Path that works -- three reduced segments
+// cannot pass 27 -- but a name's letter sum lands between 40 and 120, so the
+// name positions could never report a debt: expression('Ștefan Țîrlea') is 49,
+// and the 13 it reduces through was dropped in silence. The engine walks the
+// whole reduction chain, so the answer here is its answer.
+const SOURCES = ['lifePath', 'destiny', 'soulUrge', 'personality', 'birthday'] as const;
+
 export const calculateKarmicDebts = (
   birthDate: Date,
   fullName: string
 ): KarmicDebtInfo[] => {
-  const debts: KarmicDebtInfo[] = [];
-  
-  // Check Life Path (from birth date)
-  const day = birthDate.getDate();
-  const month = birthDate.getMonth() + 1;
-  const year = birthDate.getFullYear();
-  
-  const daySum = day;
-  const monthSum = month;
-  const yearSum = String(year).split('').reduce((sum, d) => sum + parseInt(d), 0);
-  const totalSum = reduceToSingleDigit(daySum, false) + reduceToSingleDigit(monthSum, false) + reduceToSingleDigit(yearSum, false);
-  
-  if (KARMIC_DEBT_NUMBERS.includes(totalSum)) {
-    debts.push({ number: totalSum, hasDebt: true, source: 'lifePath' });
-  }
-  
-  // Check Birthday
-  if (KARMIC_DEBT_NUMBERS.includes(day)) {
-    debts.push({ number: day, hasDebt: true, source: 'birthday' });
-  }
-  
-  // Check name numbers
-  const PYTHAGOREAN_VALUES: Record<string, number> = {
-    A: 1, B: 2, C: 3, D: 4, E: 5, F: 6, G: 7, H: 8, I: 9,
-    J: 1, K: 2, L: 3, M: 4, N: 5, O: 6, P: 7, Q: 8, R: 9,
-    S: 1, T: 2, U: 3, V: 4, W: 5, X: 6, Y: 7, Z: 8
-  };
-  const VOWELS = ['A', 'E', 'I', 'O', 'U'];
-  
-  const cleanName = fullName.toUpperCase().replace(/[^A-Z]/g, '');
-  
-  let destinySum = 0;
-  let soulUrgeSum = 0;
-  let personalitySum = 0;
-  
-  for (const char of cleanName) {
-    const value = PYTHAGOREAN_VALUES[char] || 0;
-    destinySum += value;
-    if (VOWELS.includes(char)) {
-      soulUrgeSum += value;
-    } else {
-      personalitySum += value;
-    }
-  }
-  
-  if (KARMIC_DEBT_NUMBERS.includes(destinySum)) {
-    debts.push({ number: destinySum, hasDebt: true, source: 'destiny' });
-  }
-  if (KARMIC_DEBT_NUMBERS.includes(soulUrgeSum)) {
-    debts.push({ number: soulUrgeSum, hasDebt: true, source: 'soulUrge' });
-  }
-  if (KARMIC_DEBT_NUMBERS.includes(personalitySum)) {
-    debts.push({ number: personalitySum, hasDebt: true, source: 'personality' });
-  }
-  
-  return debts;
+  const b = { day: birthDate.getDate(), month: birthDate.getMonth() + 1, year: birthDate.getFullYear() };
+
+  const found = detectKarmicDebts({
+    lifePath: lifePath(b),
+    destiny: expression(fullName),
+    soulUrge: soulUrge(fullName),
+    personality: personality(fullName),
+    birthday: birthday(b),
+  });
+
+  // Ordered the way the cards read them, and the way calculateKarmicPath picks
+  // its primary debt -- Object.entries order is not something to lean on.
+  return SOURCES.flatMap((source) => {
+    const hit = found.find((d) => d.source === source);
+    return hit ? [{ number: hit.debt, hasDebt: true, source }] : [];
+  });
 };
 
 // Calculate Karmic Lessons (missing numbers from name)
 export const calculateKarmicLessons = (fullName: string): number[] => {
-  const PYTHAGOREAN_VALUES: Record<string, number> = {
-    A: 1, B: 2, C: 3, D: 4, E: 5, F: 6, G: 7, H: 8, I: 9,
-    J: 1, K: 2, L: 3, M: 4, N: 5, O: 6, P: 7, Q: 8, R: 9,
-    S: 1, T: 2, U: 3, V: 4, W: 5, X: 6, Y: 7, Z: 8
-  };
-  
   const presentNumbers = new Set<number>();
-  const cleanName = fullName.toUpperCase().replace(/[^A-Z]/g, '');
-  
-  for (const char of cleanName) {
-    const value = PYTHAGOREAN_VALUES[char];
+
+  for (const { ch } of classifyFullName(fullName)) {
+    const value = PYTHAGOREAN[ch];
     if (value) {
       presentNumbers.add(value);
     }

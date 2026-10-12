@@ -1,45 +1,10 @@
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell, Legend } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+import { chartTheme, SERIES } from './chartTheme';
 import { analyzeIndividualLetters } from '@/lib/nameAnalysis';
 
 interface LetterAnalysisChartProps {
   name: string;
 }
-
-const COLORS = [
-  'hsl(45 80% 55%)',   // 1 - Gold
-  'hsl(280 50% 50%)',  // 2 - Purple
-  'hsl(200 70% 50%)',  // 3 - Blue
-  'hsl(120 50% 45%)',  // 4 - Green
-  'hsl(35 90% 55%)',   // 5 - Orange
-  'hsl(340 70% 55%)',  // 6 - Pink
-  'hsl(260 60% 55%)',  // 7 - Violet
-  'hsl(180 60% 45%)',  // 8 - Teal
-  'hsl(0 70% 55%)',    // 9 - Red
-];
-
-const COLORS_VOWELS = [
-  'hsla(45, 80%, 55%, 0.7)',   // 1 - Gold
-  'hsla(280, 50%, 50%, 0.7)',  // 2 - Purple
-  'hsla(200, 70%, 50%, 0.7)',  // 3 - Blue
-  'hsla(120, 50%, 45%, 0.7)',  // 4 - Green
-  'hsla(35, 90%, 55%, 0.7)',   // 5 - Orange
-  'hsla(340, 70%, 55%, 0.7)',  // 6 - Pink
-  'hsla(260, 60%, 55%, 0.7)',  // 7 - Violet
-  'hsla(180, 60%, 45%, 0.7)',  // 8 - Teal
-  'hsla(0, 70%, 55%, 0.7)',    // 9 - Red
-];
-
-const COLORS_CONSONANTS = [
-  'hsla(45, 80%, 55%, 0.4)',   // 1 - Gold
-  'hsla(280, 50%, 50%, 0.4)',  // 2 - Purple
-  'hsla(200, 70%, 50%, 0.4)',  // 3 - Blue
-  'hsla(120, 50%, 45%, 0.4)',  // 4 - Green
-  'hsla(35, 90%, 55%, 0.4)',   // 5 - Orange
-  'hsla(340, 70%, 55%, 0.4)',  // 6 - Pink
-  'hsla(260, 60%, 55%, 0.4)',  // 7 - Violet
-  'hsla(180, 60%, 45%, 0.4)',  // 8 - Teal
-  'hsla(0, 70%, 55%, 0.4)',    // 9 - Red
-];
 
 const calculateLetterDistribution = (name: string) => {
   const letters = analyzeIndividualLetters(name);
@@ -85,20 +50,15 @@ export const LetterAnalysisChart = ({ name }: LetterAnalysisChartProps) => {
         <BarChart data={data} margin={{ top: 10, right: 10, bottom: 10, left: 0 }}>
           <XAxis 
             dataKey="number" 
-            tick={{ fill: 'hsl(45 30% 95%)', fontSize: 12 }}
-            axisLine={{ stroke: 'hsl(260 30% 20%)' }}
+            tick={{ fill: chartTheme.label, fontSize: 12 }}
+            axisLine={{ stroke: chartTheme.line }}
           />
           <YAxis 
-            tick={{ fill: 'hsl(240 10% 60%)', fontSize: 10 }}
-            axisLine={{ stroke: 'hsl(260 30% 20%)' }}
+            tick={{ fill: chartTheme.labelMuted, fontSize: 10 }}
+            axisLine={{ stroke: chartTheme.line }}
           />
           <Tooltip 
-            contentStyle={{
-              backgroundColor: 'hsl(240 15% 12%)',
-              border: '1px solid hsl(260 30% 20%)',
-              borderRadius: '8px',
-              color: 'hsl(45 30% 95%)'
-            }}
+            contentStyle={chartTheme.tooltip}
             formatter={(value: number, name: string) => {
               if (name === 'total') return [`${value} litere`, 'Total'];
               if (name === 'vowels') return [`${value} vocale`, 'Vocale'];
@@ -107,24 +67,15 @@ export const LetterAnalysisChart = ({ name }: LetterAnalysisChartProps) => {
             }}
           />
           <Legend 
-            wrapperStyle={{ color: 'hsl(45 30% 95%)' }}
+            wrapperStyle={{ color: chartTheme.label }}
             iconType="circle"
           />
-          <Bar dataKey="total" name="Total" radius={[4, 4, 0, 0]}>
-            {data.map((entry, index) => (
-              <Cell key={`cell-total-${index}`} fill={COLORS[index]} />
-            ))}
-          </Bar>
-          <Bar dataKey="vowels" name="Vocale" radius={[4, 4, 0, 0]}>
-            {data.map((entry, index) => (
-              <Cell key={`cell-vowels-${index}`} fill={COLORS_VOWELS[index]} />
-            ))}
-          </Bar>
-          <Bar dataKey="consonants" name="Consoane" radius={[4, 4, 0, 0]}>
-            {data.map((entry, index) => (
-              <Cell key={`cell-consonants-${index}`} fill={COLORS_CONSONANTS[index]} />
-            ))}
-          </Bar>
+          {/* Colour distinguishes the three series, which is what the legend
+              names. It used to also vary per number, which the x-axis already
+              says -- one encoding, not two. */}
+          <Bar dataKey="total" name="Total" radius={[4, 4, 0, 0]} fill={SERIES[0]} />
+          <Bar dataKey="vowels" name="Vocale" radius={[4, 4, 0, 0]} fill={SERIES[1]} />
+          <Bar dataKey="consonants" name="Consoane" radius={[4, 4, 0, 0]} fill={SERIES[2]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

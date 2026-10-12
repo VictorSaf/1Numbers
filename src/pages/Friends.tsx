@@ -1,7 +1,7 @@
 // Friends Page
 // Manage friends, send requests, compare numerology profiles
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFriends, Friend } from '@/hooks/useFriends';
@@ -13,6 +13,11 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useProfile } from '@/hooks/use-profile';
+import { PageLayout } from '@/components/layout/PageLayout';
+import { PagePlate } from '@/components/layout/PagePlate';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,
   DialogContent,
@@ -39,9 +44,37 @@ import {
   QrCode,
 } from 'lucide-react';
 
+const INVITE_COPY = {
+  ro: {
+    accepted: 'Invitație acceptată',
+    acceptedBody: 'Sunteți acum în cercul celuilalt.',
+    failed: 'Invitația nu a putut fi folosită',
+    failedBody: 'Linkul e expirat, dezactivat sau deja folosit.',
+    needAccount: 'Ai nevoie de un cont',
+    needAccountBody: 'Conectează-te și invitația se acceptă singură.',
+  },
+  en: {
+    accepted: 'Invitation accepted',
+    acceptedBody: 'You are in each other\u2019s circle now.',
+    failed: 'The invitation could not be used',
+    failedBody: 'The link is expired, deactivated or already used.',
+    needAccount: 'You need an account',
+    needAccountBody: 'Sign in and the invitation is accepted for you.',
+  },
+  ru: {
+    accepted: 'Приглашение принято',
+    acceptedBody: 'Теперь вы в кругу друг друга.',
+    failed: 'Приглашение не удалось использовать',
+    failedBody: 'Ссылка истекла, отключена или уже использована.',
+    needAccount: 'Нужен аккаунт',
+    needAccountBody: 'Войдите, и приглашение примется само.',
+  },
+} as const;
+
 const Friends = () => {
+  const { profileData } = useProfile();
   const { language } = useLanguage();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const {
     friends,
     receivedRequests,
@@ -55,8 +88,42 @@ const Friends = () => {
     rejectRequest,
     removeFriend,
     generateInviteLink,
+    redeemInviteLink,
     deactivateInviteLink,
   } = useFriends();
+
+  // /invite/:code used to ignore its parameter entirely -- this component never
+  // called useParams, so following an invitation link landed on the friends page
+  // and did nothing at all. The hook to consume one was already written and
+  // already exported; nothing had ever called it.
+  const { code } = useParams<{ code: string }>();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const consumed = useRef(false);
+
+  useEffect(() => {
+    if (!code || consumed.current) return;
+
+    const t = INVITE_COPY[language as keyof typeof INVITE_COPY] ?? INVITE_COPY.en;
+
+    if (!isAuthenticated) {
+      // Come back here after signing in, so the code is not lost on the way.
+      toast({ title: t.needAccount, description: t.needAccountBody });
+      navigate(`/auth?redirect=${encodeURIComponent(`/invite/${code}`)}`, { replace: true });
+      return;
+    }
+
+    consumed.current = true;
+    void (async () => {
+      const friend = await redeemInviteLink(code);
+      toast(
+        friend
+          ? { title: t.accepted, description: t.acceptedBody }
+          : { title: t.failed, description: t.failedBody, variant: 'destructive' },
+      );
+      navigate('/cercul-meu', { replace: true });
+    })();
+  }, [code, isAuthenticated, language, navigate, toast, redeemInviteLink]);
 
   const [emailInput, setEmailInput] = useState('');
   const [messageInput, setMessageInput] = useState('');
@@ -214,7 +281,7 @@ const Friends = () => {
 
   if (!user) {
     return (
-      <div className="container max-w-4xl mx-auto px-4 py-8">
+      <div className="page-measure py-4 page-rhythm">
         <Alert>
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>{t.loginRequired}</AlertDescription>
@@ -224,9 +291,9 @@ const Friends = () => {
   }
 
   // Show comparison view if a friend is selected
-  if (selectedFriend && user.birthDate && user.fullName) {
+  if (selectedFriend && profileData) {
     return (
-      <div className="container max-w-4xl mx-auto px-4 py-8">
+      <div className="page-measure py-4 page-rhythm">
         <Button
           variant="ghost"
           onClick={() => setSelectedFriend(null)}
@@ -236,8 +303,8 @@ const Friends = () => {
         </Button>
         <FriendComparison
           user={{
-            birthDate: user.birthDate,
-            fullName: user.fullName,
+            birthDate: profileData.birthDate.toISOString(),
+            fullName: profileData.fullName,
           }}
           friend={{
             birthDate: selectedFriend.birthDate,
@@ -250,16 +317,13 @@ const Friends = () => {
     );
   }
 
+  // Wrapped in PageLayout like every other route. Without it this page had no
+  // header at all: no way back, no language switcher, no theme switcher -- and
+  // the language a reader had chosen was simply not changeable from here.
   return (
-    <div className="container max-w-4xl mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <div className="flex justify-center mb-4">
-          <Users className="h-12 w-12 text-primary" />
-        </div>
-        <h1 className="text-3xl font-bold mb-2">{t.title}</h1>
-        <p className="text-muted-foreground">{t.description}</p>
-      </div>
+    <PageLayout>
+      <div className="page-measure py-4 page-rhythm">
+      <PagePlate eyebrow="cercul meu" title={t.title} subtitle={t.description} />
 
       {/* Error display */}
       {error && (
@@ -270,7 +334,7 @@ const Friends = () => {
       )}
 
       <Tabs defaultValue="friends" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList>
           <TabsTrigger value="friends" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             {t.myFriends}
@@ -336,7 +400,7 @@ const Friends = () => {
           {/* Friends List */}
           {isLoading ? (
             <div className="flex justify-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <Loader2 className="h-8 w-8 animate-spin" />
             </div>
           ) : friends.length === 0 ? (
             <Card>
@@ -576,8 +640,9 @@ const Friends = () => {
             </div>
           )}
         </TabsContent>
-      </Tabs>
-    </div>
+        </Tabs>
+      </div>
+    </PageLayout>
   );
 };
 

@@ -1,7 +1,7 @@
 // ChaldeanAnalysis Page
 // Display Chaldean numerology analysis with compound numbers
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useProfile } from '@/hooks/use-profile';
 import {
   calculateChaldeanAnalysis,
   getCompoundMeaning,
@@ -20,6 +21,11 @@ import {
   calculateBusinessNameNumber,
   ChaldeanAnalysis as ChaldeanAnalysisType,
 } from '@/lib/chaldean';
+import { parseCalendarDate } from '@/lib/calendarDate';
+import { PageLayout } from '@/components/layout/PageLayout';
+import { PagePlate } from '@/components/layout/PagePlate';
+import { SectionHead } from '@/components/layout/SectionHead';
+import { formatCalendarDate } from '@/lib/calendarDate';
 import {
   Star,
   Calendar,
@@ -34,14 +40,44 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 
+// getFavorableDays întoarce zilele în engleză („MONDAY” apărea în pagina română).
+const WEEKDAY: Record<string, Record<string, string>> = {
+  ro: { Sunday: "duminică", Monday: "luni", Tuesday: "marți", Wednesday: "miercuri", Thursday: "joi", Friday: "vineri", Saturday: "sâmbătă" },
+  en: {},
+  ru: { Sunday: "воскресенье", Monday: "понедельник", Tuesday: "вторник", Wednesday: "среда", Thursday: "четверг", Friday: "пятница", Saturday: "суббота" },
+};
+
 const ChaldeanAnalysis = () => {
+  const { profileData } = useProfile();
   const { language } = useLanguage();
   const { user } = useAuth();
 
-  const [fullName, setFullName] = useState(user?.fullName || '');
-  const [birthDate, setBirthDate] = useState(user?.birthDate || '');
+  // Birth data lives on the active profile; User carries only id, email, name
+  // and createdAt, so these always initialised empty.
+  const [fullName, setFullName] = useState('');
+  const [birthDate, setBirthDate] = useState('');
   const [businessName, setBusinessName] = useState('');
   const [showResults, setShowResults] = useState(false);
+
+  /**
+   * Profilul sosește după prima randare, deci un `useState(profileData…)` îl
+   * ratează întotdeauna.
+   *
+   * Inițializatorul rulează o singură dată, la montare, când hook-ul de
+   * profiluri încă încarcă și `profileData` e null. Câmpurile rămâneau goale
+   * pentru un om autentificat, iar codul părea să facă precompletarea.
+   *
+   * Aici se umplu când datele ajung, dar numai câmpurile pe care omul nu le-a
+   * atins: altfel, o sosire întârziată ar șterge ce tocmai a tastat.
+   */
+  useEffect(() => {
+    if (!profileData) return;
+    setFullName((v) => v || profileData.fullName);
+    // formatCalendarDate, nu toISOString: acela convertește în UTC și mută
+    // ziua de naștere cu o zi în jumătate din fusurile lumii.
+    setBirthDate((v) => v || formatCalendarDate(profileData.birthDate));
+  }, [profileData]);
+
 
   const translations: Record<string, Record<string, string>> = {
     ro: {
@@ -64,8 +100,8 @@ const ChaldeanAnalysis = () => {
       planet: 'Planetă',
       favorableDays: 'Zile Favorabile',
       compatibleNumbers: 'Numere Compatibile',
-      positive: 'Pozitiv',
-      negative: 'Negativ',
+      positive: 'Favorabil la Cheiro',
+      negative: 'Dificil la Cheiro',
       neutral: 'Neutru',
       businessAnalysis: 'Analiză Nume Business',
       isLucky: 'Este Norocos',
@@ -96,8 +132,8 @@ const ChaldeanAnalysis = () => {
       planet: 'Planet',
       favorableDays: 'Favorable Days',
       compatibleNumbers: 'Compatible Numbers',
-      positive: 'Positive',
-      negative: 'Negative',
+      positive: 'Favourable for Cheiro',
+      negative: 'Difficult for Cheiro',
       neutral: 'Neutral',
       businessAnalysis: 'Business Name Analysis',
       isLucky: 'Is Lucky',
@@ -128,8 +164,8 @@ const ChaldeanAnalysis = () => {
       planet: 'Планета',
       favorableDays: 'Благоприятные Дни',
       compatibleNumbers: 'Совместимые Числа',
-      positive: 'Положительный',
-      negative: 'Отрицательный',
+      positive: 'Благоприятное у Хейро',
+      negative: 'Трудное у Хейро',
       neutral: 'Нейтральный',
       businessAnalysis: 'Анализ Названия Бизнеса',
       isLucky: 'Удачное',
@@ -146,7 +182,7 @@ const ChaldeanAnalysis = () => {
 
   const analysis = useMemo<ChaldeanAnalysisType | null>(() => {
     if (!fullName || !birthDate || !showResults) return null;
-    return calculateChaldeanAnalysis(fullName, new Date(birthDate));
+    return calculateChaldeanAnalysis(fullName, parseCalendarDate(birthDate));
   }, [fullName, birthDate, showResults]);
 
   const businessAnalysis = useMemo(() => {
@@ -163,20 +199,21 @@ const ChaldeanAnalysis = () => {
   const getNatureColor = (nature: 'positive' | 'negative' | 'neutral') => {
     switch (nature) {
       case 'positive':
-        return 'text-green-500';
+        return 'text-ok';
       case 'negative':
-        return 'text-red-500';
+        return 'text-crit';
       default:
-        return 'text-yellow-500';
+        return 'text-warn';
     }
   };
 
   const getNatureBadge = (nature: 'positive' | 'negative' | 'neutral') => {
     switch (nature) {
       case 'positive':
-        return <Badge className="bg-green-500">{t.positive}</Badge>;
+        return <Badge variant="outline" className="border-harmony text-harmony">{t.positive}</Badge>;
       case 'negative':
-        return <Badge variant="destructive">{t.negative}</Badge>;
+        // Lectura lui Cheiro, nu un verdict al aplicației: tensiune, nu eroare (R3).
+        return <Badge variant="outline" className="border-tension text-tension">{t.negative}</Badge>;
       default:
         return <Badge variant="secondary">{t.neutral}</Badge>;
     }
@@ -202,12 +239,12 @@ const ChaldeanAnalysis = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-4 bg-muted rounded-lg">
+            <div className="border-t border-line text-center pt-4">
               <div className="text-3xl font-bold text-primary">{compound}</div>
               <div className="text-sm text-muted-foreground">{t.compoundNumber}</div>
             </div>
-            <div className="text-center p-4 bg-muted rounded-lg">
-              <div className="text-3xl font-bold text-amber-500">{single}</div>
+            <div className="border-t border-line text-center pt-4">
+              <div className="text-3xl font-bold text-warn">{single}</div>
               <div className="text-sm text-muted-foreground">{t.singleDigit}</div>
             </div>
           </div>
@@ -248,42 +285,43 @@ const ChaldeanAnalysis = () => {
     );
   };
 
+  // Wrapped in PageLayout like every other route. Without it this page had no
+  // header at all: no way back, no language switcher, no theme switcher -- and
+  // the language a reader had chosen was simply not changeable from here.
   return (
-    <div className="container max-w-4xl mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <div className="flex justify-center mb-4">
-          <div className="relative">
-            <Star className="h-12 w-12 text-amber-500" />
-            <Sparkles className="h-6 w-6 text-amber-400 absolute -top-1 -right-1" />
-          </div>
-        </div>
-        <h1 className="text-3xl font-bold mb-2">{t.title}</h1>
-        <p className="text-muted-foreground">{t.description}</p>
-      </div>
+    <PageLayout>
+      <main>
+      <div className="page-measure py-4 page-rhythm">
+      {/* Placa de deschidere, ca la hartă. Figura ei e chiar alfabetul: opt
+          valori în loc de nouă, adică toată deosebirea sistemului. */}
+      <PagePlate
+        eyebrow="numerologie caldeeană"
+        title={t.title}
+        subtitle={t.description}
+      />
 
-      {/* How It Works */}
-      <Card className="mb-8 border-amber-500/20 bg-amber-500/5">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Hash className="h-5 w-5 text-amber-500" />
-            {t.howItWorks}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">{t.howItWorksDesc}</p>
-          <div className="mt-4 flex gap-1 flex-wrap">
+      <SectionHead index={1} title={t.howItWorks} />
+
+      <div className="space-y-4">
+        <div>
+          <p className="max-w-[65ch] text-sm text-muted-foreground">{t.howItWorksDesc}</p>
+          {/* Tabelul literelor e un TABEL: perechi aliniate, cu spațiu între
+              ele. Douăzeci și șase de pastile conturate desenau 104 laturi în
+              jurul a 26 de cifre. */}
+          <div className="mt-5 grid grid-cols-[repeat(auto-fill,minmax(3.5rem,1fr))] gap-x-4 gap-y-2 border-t border-line pt-4">
             {['A=1', 'B=2', 'C=3', 'D=4', 'E=5', 'F=8', 'G=3', 'H=5', 'I=1', 'J=1', 'K=2', 'L=3', 'M=4', 'N=5', 'O=7', 'P=8', 'Q=1', 'R=2', 'S=3', 'T=4', 'U=6', 'V=6', 'W=6', 'X=5', 'Y=1', 'Z=7'].map((pair) => (
-              <Badge key={pair} variant="outline" className="font-mono text-xs">
+              <span key={pair} className="num text-[0.72rem] text-muted-foreground">
                 {pair}
-              </Badge>
+              </span>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+
+      <SectionHead index={2} title={t.personalTab} />
 
       <Tabs defaultValue="personal" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList>
           <TabsTrigger value="personal" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             {t.personalTab}
@@ -311,7 +349,7 @@ const ChaldeanAnalysis = () => {
                       setFullName(e.target.value);
                       setShowResults(false);
                     }}
-                    placeholder="John Doe"
+                    placeholder={language === "ru" ? "Иван Петрович Иванов" : language === "en" ? "John William Smith" : "Ion Popescu"}
                   />
                 </div>
                 <div className="space-y-2">
@@ -346,13 +384,13 @@ const ChaldeanAnalysis = () => {
                     {analysis.letterBreakdown.map((item, idx) => (
                       <div
                         key={idx}
-                        className="flex flex-col items-center p-2 bg-muted rounded-lg min-w-[40px]"
+                        className="border-t border-line flex flex-col items-center pt-2 min-w-[40px]"
                       >
                         <span className="font-bold">{item.letter}</span>
-                        <span className="text-sm text-amber-500">{item.value}</span>
+                        <span className="text-sm text-warn">{item.value}</span>
                       </div>
                     ))}
-                    <div className="flex flex-col items-center p-2 bg-primary/20 rounded-lg min-w-[40px]">
+                    <div className="border-t border-line flex flex-col items-center pt-2 min-w-[40px]">
                       <span className="font-bold">=</span>
                       <span className="text-sm text-primary">
                         {analysis.nameNumber.compound}
@@ -368,19 +406,19 @@ const ChaldeanAnalysis = () => {
                   t.nameNumber,
                   analysis.nameNumber.compound,
                   analysis.nameNumber.single,
-                  <User className="h-5 w-5 text-primary" />
+                  <User className="h-5 w-5" />
                 )}
                 {renderNumberCard(
                   t.birthNumber,
                   analysis.birthNumber.compound,
                   analysis.birthNumber.single,
-                  <Calendar className="h-5 w-5 text-blue-500" />
+                  <Calendar className="h-5 w-5 text-info" />
                 )}
                 {renderNumberCard(
                   t.destinyNumber,
                   analysis.destinyNumber.compound,
                   analysis.destinyNumber.single,
-                  <Star className="h-5 w-5 text-amber-500" />
+                  <Star className="h-5 w-5 text-warn" />
                 )}
               </div>
 
@@ -389,7 +427,7 @@ const ChaldeanAnalysis = () => {
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg flex items-center gap-2">
-                      <Sun className="h-5 w-5 text-amber-500" />
+                      <Sun className="h-5 w-5 text-warn" />
                       {t.favorableDays}
                     </CardTitle>
                   </CardHeader>
@@ -397,7 +435,7 @@ const ChaldeanAnalysis = () => {
                     <div className="flex flex-wrap gap-2">
                       {getFavorableDays(analysis.nameNumber.single).map((day) => (
                         <Badge key={day} variant="secondary">
-                          {day}
+                          {WEEKDAY[language]?.[day] ?? day}
                         </Badge>
                       ))}
                     </div>
@@ -407,7 +445,7 @@ const ChaldeanAnalysis = () => {
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg flex items-center gap-2">
-                      <Moon className="h-5 w-5 text-purple-500" />
+                      <Moon className="h-5 w-5" />
                       {t.compatibleNumbers}
                     </CardTitle>
                   </CardHeader>
@@ -447,7 +485,7 @@ const ChaldeanAnalysis = () => {
 
           {businessName && businessAnalysis && (
             <>
-              <Card className={businessAnalysis.isLucky ? 'border-green-500/50' : 'border-red-500/50'}>
+              <Card className={businessAnalysis.isLucky ? 'border-ok' : 'border-crit'}>
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-4">
@@ -458,7 +496,7 @@ const ChaldeanAnalysis = () => {
                         <div className="text-sm text-muted-foreground">{t.compoundNumber}</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-4xl font-bold text-amber-500">
+                        <div className="text-4xl font-bold text-warn">
                           {businessAnalysis.single}
                         </div>
                         <div className="text-sm text-muted-foreground">{t.singleDigit}</div>
@@ -467,13 +505,13 @@ const ChaldeanAnalysis = () => {
                     <div className="flex items-center gap-2">
                       {businessAnalysis.isLucky ? (
                         <>
-                          <CheckCircle className="h-8 w-8 text-green-500" />
-                          <span className="font-bold text-green-500">{t.isLucky}</span>
+                          <CheckCircle className="h-8 w-8 text-ok" />
+                          <span className="font-bold text-ok">{t.isLucky}</span>
                         </>
                       ) : (
                         <>
-                          <XCircle className="h-8 w-8 text-red-500" />
-                          <span className="font-bold text-red-500">{t.notLucky}</span>
+                          <XCircle className="h-8 w-8 text-crit" />
+                          <span className="font-bold text-crit">{t.notLucky}</span>
                         </>
                       )}
                     </div>
@@ -499,9 +537,9 @@ const ChaldeanAnalysis = () => {
               </Card>
 
               <div className="grid md:grid-cols-2 gap-4">
-                <Card className="border-green-500/20">
+                <Card className="border-ok">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-lg flex items-center gap-2 text-green-500">
+                    <CardTitle className="text-lg flex items-center gap-2 text-ok">
                       <CheckCircle className="h-5 w-5" />
                       {t.luckyNumbers}
                     </CardTitle>
@@ -518,7 +556,7 @@ const ChaldeanAnalysis = () => {
                           }
                           className={
                             num === businessAnalysis.compound || num === businessAnalysis.single
-                              ? 'bg-green-500'
+                              ? 'bg-ok'
                               : ''
                           }
                         >
@@ -529,9 +567,9 @@ const ChaldeanAnalysis = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="border-red-500/20">
+                <Card className="border-crit">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-lg flex items-center gap-2 text-red-500">
+                    <CardTitle className="text-lg flex items-center gap-2 text-crit">
                       <AlertTriangle className="h-5 w-5" />
                       {t.avoidNumbers}
                     </CardTitle>
@@ -557,8 +595,10 @@ const ChaldeanAnalysis = () => {
             </>
           )}
         </TabsContent>
-      </Tabs>
-    </div>
+        </Tabs>
+      </div>
+      </main>
+    </PageLayout>
   );
 };
 

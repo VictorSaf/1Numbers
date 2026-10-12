@@ -13,6 +13,9 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { BirthDateSelect } from "@/components/BirthDateSelect";
+import { track } from '@/lib/analytics';
+import { isNameSupported } from '@/lib/numerology-plus/core';
 
 interface NumerologyFormProps {
   onCalculate: (data: { fullName: string; birthDate: Date }) => void;
@@ -20,6 +23,16 @@ interface NumerologyFormProps {
 }
 
 const locales = { ro, en: enUS, ru };
+
+// A name the engine cannot romanise reduces to no letters at all, and every
+// position then comes out 0 -- which the results page renders as a perfectly
+// confident reading of nothing. Cyrillic is transliterated now; anything else
+// gets told, here, before a profile is built.
+const UNREADABLE_NAME = {
+  ro: 'Numele trebuie scris cu litere latine sau chirilice. Alte alfabete nu pot fi calculate încă.',
+  en: 'The name has to be written in Latin or Cyrillic letters. Other scripts cannot be calculated yet.',
+  ru: 'Имя должно быть написано латиницей или кириллицей. Другие алфавиты пока не поддерживаются.',
+} as const;
 
 export const NumerologyForm = ({ onCalculate, profileData }: NumerologyFormProps) => {
   const { language, t } = useLanguage();
@@ -34,9 +47,12 @@ export const NumerologyForm = ({ onCalculate, profileData }: NumerologyFormProps
     }
   }, [profileData]);
 
+  const nameIsReadable = !fullName.trim() || isNameSupported(fullName);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (fullName.trim() && birthDate) {
+    if (fullName.trim() && birthDate && nameIsReadable) {
+      track('calculate_submitted');
       onCalculate({ fullName: fullName.trim(), birthDate });
     }
   };
@@ -59,8 +75,8 @@ export const NumerologyForm = ({ onCalculate, profileData }: NumerologyFormProps
           className="input-mystic h-12 text-base"
           required
         />
-        <p className="text-xs text-muted-foreground">
-          {t.fullNameHint}
+        <p className={cn('text-xs', nameIsReadable ? 'text-muted-foreground' : 'text-destructive')}>
+          {nameIsReadable ? t.fullNameHint : (UNREADABLE_NAME[language] ?? UNREADABLE_NAME.en)}
         </p>
       </div>
 
@@ -68,49 +84,13 @@ export const NumerologyForm = ({ onCalculate, profileData }: NumerologyFormProps
         <Label className="text-foreground/90 font-raleway text-sm tracking-wide">
           {t.birthDateLabel}
         </Label>
-        <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                "w-full justify-start text-left font-normal h-12 input-mystic",
-                !birthDate && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4 text-primary" />
-              {birthDate ? (
-                format(birthDate, "d MMMM yyyy", { locale: dateLocale })
-              ) : (
-                <span>{t.birthDatePlaceholder}</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0 bg-card border-border z-50" align="start">
-            <Calendar
-              mode="single"
-              selected={birthDate}
-              onSelect={(date) => {
-                setBirthDate(date);
-                setIsCalendarOpen(false);
-              }}
-              disabled={(date) =>
-                date > new Date() || date < new Date("1900-01-01")
-              }
-              initialFocus
-              className="pointer-events-auto"
-              captionLayout="dropdown-buttons"
-              fromYear={1920}
-              toYear={currentYear}
-              locale={dateLocale}
-            />
-          </PopoverContent>
-        </Popover>
+        <BirthDateSelect value={birthDate} onChange={setBirthDate} />
       </div>
 
       <Button
         type="submit"
-        className="btn-mystic w-full h-14 text-lg"
-        disabled={!fullName.trim() || !birthDate}
+        className="w-full h-14 text-lg"
+        disabled={!fullName.trim() || !birthDate || !nameIsReadable}
       >
         <Sparkles className="mr-2 h-5 w-5" />
         {t.calculateButton}

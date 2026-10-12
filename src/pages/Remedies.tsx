@@ -1,7 +1,8 @@
 // Remedies Page
 // Display numerological remedies based on user's numbers
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { parseCalendarDate } from '@/lib/calendarDate';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +14,12 @@ import { Badge } from '@/components/ui/badge';
 import { RemedyCard } from '@/components/RemedyCard';
 import { getRemedyForNumber, getAllRemedies, getDailyRemedy, NumberRemedy } from '@/lib/remedies';
 import { calculateLifePathNumber, calculateDestinyNumber } from '@/lib/numerology';
+import { mulank } from '@/lib/numerology-plus/systems';
+import { toBirthDate } from '@/lib/numerology-plus/core';
+import { useProfile } from '@/hooks/use-profile';
+import { PageLayout } from '@/components/layout/PageLayout';
+import { PagePlate } from '@/components/layout/PagePlate';
+import { formatCalendarDate } from '@/lib/calendarDate';
 import {
   Sparkles,
   User,
@@ -26,11 +33,34 @@ import {
 } from 'lucide-react';
 
 const Remedies = () => {
+  const { profileData } = useProfile();
   const { language } = useLanguage();
   const { user } = useAuth();
 
-  const [birthDate, setBirthDate] = useState(user?.birthDate || '');
-  const [fullName, setFullName] = useState(user?.fullName || '');
+  // Birth data lives on the active profile; User carries only id, email, name
+  // and createdAt, so these always initialised empty.
+  const [birthDate, setBirthDate] = useState('');
+  const [fullName, setFullName] = useState('');
+
+  /**
+   * Profilul sosește după prima randare, deci un `useState(profileData…)` îl
+   * ratează întotdeauna.
+   *
+   * Inițializatorul rulează o singură dată, la montare, când hook-ul de
+   * profiluri încă încarcă și `profileData` e null. Câmpurile rămâneau goale
+   * pentru un om autentificat, iar codul părea să facă precompletarea.
+   *
+   * Aici se umplu când datele ajung, dar numai câmpurile pe care omul nu le-a
+   * atins: altfel, o sosire întârziată ar șterge ce tocmai a tastat.
+   */
+  useEffect(() => {
+    if (!profileData) return;
+    setFullName((v) => v || profileData.fullName);
+    // formatCalendarDate, nu toISOString: acela convertește în UTC și mută
+    // ziua de naștere cu o zi în jumătate din fusurile lumii.
+    setBirthDate((v) => v || formatCalendarDate(profileData.birthDate));
+  }, [profileData]);
+
   const [selectedNumber, setSelectedNumber] = useState<number | null>(null);
 
   const translations: Record<string, Record<string, string>> = {
@@ -41,8 +71,11 @@ const Remedies = () => {
       todayRemedy: 'Remediul Zilei',
       allRemedies: 'Toate Remediile',
       yourNumbers: 'Numerele Tale',
-      lifePath: 'Life Path',
+      birthDate: 'Data Nașterii',
+      lifePath: 'Drumul Vieții',
       destiny: 'Destin',
+      mulank: 'Mulank (vedic)',
+      schools: 'Școlile nu pun remediile pe același număr: tradiția vedică le citește din Mulank — ziua nașterii —, aplicațiile occidentale din Drumul Vieții. Unde cele două dau planete diferite, le vezi pe amândouă.',
       enterDetails: 'Introdu datele pentru remedii personalizate',
       calculate: 'Calculează Remedii',
       selectNumber: 'Selectează un număr pentru detalii',
@@ -58,8 +91,11 @@ const Remedies = () => {
       todayRemedy: "Today's Remedy",
       allRemedies: 'All Remedies',
       yourNumbers: 'Your Numbers',
+      birthDate: 'Birth Date',
       lifePath: 'Life Path',
       destiny: 'Destiny',
+      mulank: 'Mulank (Vedic)',
+      schools: 'The schools do not hang remedies on the same number: the Vedic tradition reads them from Mulank — your day of birth —, Western apps from the Life Path. Where the two give different planets, you see both.',
       enterDetails: 'Enter your details for personalized remedies',
       calculate: 'Calculate Remedies',
       selectNumber: 'Select a number for details',
@@ -75,8 +111,11 @@ const Remedies = () => {
       todayRemedy: 'Средство Дня',
       allRemedies: 'Все Средства',
       yourNumbers: 'Ваши Числа',
+      birthDate: 'Дата рождения',
       lifePath: 'Путь Жизни',
       destiny: 'Судьба',
+      mulank: 'Мулянк (ведич.)',
+      schools: 'Школы привязывают средства к разным числам: ведическая традиция читает их из Мулянка — дня рождения, — западные приложения из Пути жизни. Где планеты расходятся, вы видите обе.',
       enterDetails: 'Введите данные для персональных средств',
       calculate: 'Рассчитать Средства',
       selectNumber: 'Выберите число для подробностей',
@@ -91,10 +130,13 @@ const Remedies = () => {
 
   const userNumbers = useMemo(() => {
     if (!birthDate || !fullName) return null;
-    const date = new Date(birthDate);
+    const date = parseCalendarDate(birthDate);
     return {
       lifePath: calculateLifePathNumber(date),
       destiny: calculateDestinyNumber(fullName),
+      // Remediile vedice (Navagraha) se citesc din Mulank, ziua nașterii;
+      // aplicațiile occidentale le pun pe Drumul Vieții. Arătăm ambele (R9).
+      mulank: mulank(toBirthDate(date)),
     };
   }, [birthDate, fullName]);
 
@@ -106,6 +148,11 @@ const Remedies = () => {
   const destinyRemedy = useMemo(() => {
     if (!userNumbers) return null;
     return getRemedyForNumber(userNumbers.destiny, language);
+  }, [userNumbers, language]);
+
+  const mulankRemedy = useMemo(() => {
+    if (!userNumbers) return null;
+    return getRemedyForNumber(userNumbers.mulank, language);
   }, [userNumbers, language]);
 
   const todayRemedy = useMemo(() => {
@@ -123,7 +170,7 @@ const Remedies = () => {
 
   if (selectedRemedy) {
     return (
-      <div className="container max-w-4xl mx-auto px-4 py-8">
+      <div className="page-measure py-4 page-rhythm">
         <Button
           variant="ghost"
           onClick={() => setSelectedNumber(null)}
@@ -136,22 +183,17 @@ const Remedies = () => {
     );
   }
 
+  // Wrapped in PageLayout like every other route. Without it this page had no
+  // header at all: no way back, no language switcher, no theme switcher -- and
+  // the language a reader had chosen was simply not changeable from here.
   return (
-    <div className="container max-w-4xl mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <div className="flex justify-center mb-4">
-          <div className="relative">
-            <Gem className="h-12 w-12 text-purple-500" />
-            <Sparkles className="h-6 w-6 text-amber-400 absolute -top-1 -right-1" />
-          </div>
-        </div>
-        <h1 className="text-3xl font-bold mb-2">{t.title}</h1>
-        <p className="text-muted-foreground">{t.description}</p>
-      </div>
+    <PageLayout>
+      <main>
+      <div className="page-measure py-4 page-rhythm">
+      <PagePlate eyebrow="remedii numerologice" title={t.title} subtitle={t.description} />
 
       <Tabs defaultValue="personal" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList>
           <TabsTrigger value="personal" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             {t.personalRemedies}
@@ -181,11 +223,11 @@ const Remedies = () => {
                       id="fullName"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      placeholder="John Doe"
+                      placeholder={language === "ru" ? "Иван Петрович Иванов" : language === "en" ? "John William Smith" : "Ion Popescu"}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="birthDate">Birth Date</Label>
+                    <Label htmlFor="birthDate">{t.birthDate}</Label>
                     <Input
                       id="birthDate"
                       type="date"
@@ -199,7 +241,7 @@ const Remedies = () => {
           ) : (
             <>
               {/* Your Numbers Summary */}
-              <Card className="border-primary/20 bg-primary/5">
+              <Card className="border-line bg-sunken">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg">{t.yourNumbers}</CardTitle>
                 </CardHeader>
@@ -237,11 +279,24 @@ const Remedies = () => {
                 </CardContent>
               </Card>
 
+              <p className="max-w-prose text-sm leading-relaxed text-muted-foreground">{t.schools}</p>
+
+              {/* Mulank Remedy — school vedică, dacă dă altă planetă */}
+              {mulankRemedy && userNumbers.mulank !== userNumbers.lifePath && (
+                <div>
+                  <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                    <Star className="h-5 w-5 text-tension" />
+                    {t.mulank} {userNumbers.mulank} - {mulankRemedy.planet.name}
+                  </h2>
+                  <RemedyCard remedy={mulankRemedy} showAll />
+                </div>
+              )}
+
               {/* Life Path Remedy */}
               {lifePathRemedy && (
                 <div>
                   <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                    <Star className="h-5 w-5 text-amber-500" />
+                    <Star className="h-5 w-5 text-warn" />
                     {t.lifePath} {userNumbers.lifePath} - {lifePathRemedy.planet.name}
                   </h2>
                   <RemedyCard remedy={lifePathRemedy} showAll />
@@ -252,7 +307,7 @@ const Remedies = () => {
               {destinyRemedy && userNumbers.destiny !== userNumbers.lifePath && (
                 <div>
                   <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                    <Star className="h-5 w-5 text-purple-500" />
+                    <Star className="h-5 w-5" />
                     {t.destiny} {userNumbers.destiny} - {destinyRemedy.planet.name}
                   </h2>
                   <RemedyCard remedy={destinyRemedy} showAll />
@@ -266,10 +321,10 @@ const Remedies = () => {
         <TabsContent value="today" className="space-y-6">
           {todayRemedy && (
             <>
-              <Card className="border-amber-500/20 bg-amber-500/5">
+              <Card className="border-warn">
                 <CardHeader>
                   <div className="flex items-center gap-3">
-                    <Sun className="h-8 w-8 text-amber-500" />
+                    <Sun className="h-8 w-8 text-warn" />
                     <div>
                       <CardTitle>
                         {t.todayIs} {todayRemedy.remedy.planet.symbol} {todayRemedy.remedy.planet.name}
@@ -280,22 +335,22 @@ const Remedies = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="grid md:grid-cols-3 gap-4">
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-background">
+                    <div className="border-t border-line flex items-center gap-3 pt-3">
                       <Palette className="h-5 w-5" style={{ color: todayRemedy.remedy.colors.hex }} />
                       <div>
                         <p className="text-sm text-muted-foreground">Color</p>
                         <p className="font-medium">{todayRemedy.remedy.colors.primary}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-background">
-                      <Gem className="h-5 w-5 text-purple-500" />
+                    <div className="border-t border-line flex items-center gap-3 pt-3">
+                      <Gem className="h-5 w-5" />
                       <div>
                         <p className="text-sm text-muted-foreground">Gemstone</p>
                         <p className="font-medium">{todayRemedy.remedy.gemstones.primary}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-background">
-                      <Quote className="h-5 w-5 text-amber-500" />
+                    <div className="border-t border-line flex items-center gap-3 pt-3">
+                      <Quote className="h-5 w-5 text-warn" />
                       <div>
                         <p className="text-sm text-muted-foreground">Mantra</p>
                         <p className="font-medium text-sm">{todayRemedy.remedy.mantras.vedic}</p>
@@ -367,7 +422,7 @@ const Remedies = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Gem className="h-5 w-5 text-purple-500" />
+                  <Gem className="h-5 w-5" />
                   Gemstones
                 </CardTitle>
               </CardHeader>
@@ -389,7 +444,7 @@ const Remedies = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-blue-500" />
+                  <Calendar className="h-5 w-5 text-info" />
                   Days
                 </CardTitle>
               </CardHeader>
@@ -408,8 +463,10 @@ const Remedies = () => {
             </Card>
           </div>
         </TabsContent>
-      </Tabs>
-    </div>
+        </Tabs>
+      </div>
+      </main>
+    </PageLayout>
   );
 };
 

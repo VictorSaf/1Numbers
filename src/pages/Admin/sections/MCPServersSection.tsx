@@ -55,7 +55,7 @@ export const MCPServersSection = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-cinzel font-bold mb-2">MCP Servers</h2>
+        <h2 className="text-2xl font-heading font-bold mb-2">MCP Servers</h2>
         <p className="text-muted-foreground">
           Model Context Protocol server configuration
         </p>
@@ -65,8 +65,8 @@ export const MCPServersSection = () => {
       <Card className="card-mystic">
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
-            <div className={`p-3 rounded-lg ${configured ? 'bg-green-500/10' : 'bg-amber-500/10'}`}>
-              <Server className={`h-6 w-6 ${configured ? 'text-green-500' : 'text-amber-500'}`} />
+            <div className={`p-3 rounded-lg ${configured ? '' : ''}`}>
+              <Server className={`h-6 w-6 ${configured ? 'text-ok' : 'text-warn'}`} />
             </div>
             <div>
               <div className="text-2xl font-bold">
@@ -109,8 +109,8 @@ export const MCPServersSection = () => {
                   className="flex items-center justify-between p-4 rounded-lg bg-muted/30 border border-border/30"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="p-2 rounded-lg bg-green-500/10">
-                      <CheckCircle className="h-5 w-5 text-green-500" />
+                    <div className="p-2 rounded-lg">
+                      <CheckCircle className="h-5 w-5 text-ok" />
                     </div>
                     <div>
                       <div className="font-medium flex items-center gap-2">
@@ -140,11 +140,11 @@ export const MCPServersSection = () => {
       )}
 
       {/* Info Card */}
-      <Card className="card-mystic border-primary/30">
+      <Card className="card-mystic border-line">
         <CardContent className="p-6">
           <div className="flex items-start gap-4">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Settings className="h-5 w-5 text-primary" />
+            <div className="p-2 rounded-lg bg-sunken">
+              <Settings className="h-5 w-5" />
             </div>
             <div>
               <div className="font-medium mb-1">About MCP</div>

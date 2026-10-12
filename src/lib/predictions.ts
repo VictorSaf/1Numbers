@@ -1,11 +1,19 @@
 // Daily and Monthly Predictions based on Numerology
-import { 
-  reduceToSingleDigit,
+import {
   calculateLifePathNumber,
   calculateDestinyNumber,
   calculatePersonalYearNumber
 } from './numerology';
 import { calculateLuckyScore } from './luckyDates';
+// The cycles live in one place. This module used to carry its own copies, which
+// agreed by accident -- repeated digit sums are associative -- rather than by
+// construction.
+import {
+  calculatePersonalDayNumber,
+  calculateUniversalDay,
+  calculatePersonalMonthNumber as personalMonthFor,
+} from './personalCycles';
+import type { Language } from './translations';
 
 export interface DailyPrediction {
   number: number;
@@ -28,54 +36,6 @@ export interface MonthlyPrediction {
   spirituality: string;
   keyDays: number[];
 }
-
-// Calculate Universal Day Number
-export const calculateUniversalDayNumber = (date: Date = new Date()): number => {
-  const day = date.getDate();
-  const month = date.getMonth() + 1;
-  const year = date.getFullYear();
-  
-  const total = day + month + String(year).split('').reduce((sum, d) => sum + parseInt(d), 0);
-  return reduceToSingleDigit(total, false);
-};
-
-// Calculate Personal Day Number
-export const calculatePersonalDayNumber = (birthDate: Date, date: Date = new Date()): number => {
-  const birthDay = birthDate.getDate();
-  const birthMonth = birthDate.getMonth() + 1;
-  const currentDay = date.getDate();
-  const currentMonth = date.getMonth() + 1;
-  const currentYear = date.getFullYear();
-  
-  const reducedBirthDay = reduceToSingleDigit(birthDay, false);
-  const reducedBirthMonth = reduceToSingleDigit(birthMonth, false);
-  const reducedCurrentDay = reduceToSingleDigit(currentDay, false);
-  const reducedCurrentMonth = reduceToSingleDigit(currentMonth, false);
-  const reducedYear = reduceToSingleDigit(
-    String(currentYear).split('').reduce((sum, d) => sum + parseInt(d), 0),
-    false
-  );
-  
-  const total = reducedBirthDay + reducedBirthMonth + reducedCurrentDay + reducedCurrentMonth + reducedYear;
-  return reduceToSingleDigit(total, false);
-};
-
-// Calculate Personal Month Number
-export const calculatePersonalMonthNumber = (birthDate: Date, month: number, year: number): number => {
-  const birthDay = birthDate.getDate();
-  const birthMonth = birthDate.getMonth() + 1;
-  
-  const reducedBirthDay = reduceToSingleDigit(birthDay, false);
-  const reducedBirthMonth = reduceToSingleDigit(birthMonth, false);
-  const reducedMonth = reduceToSingleDigit(month, false);
-  const reducedYear = reduceToSingleDigit(
-    String(year).split('').reduce((sum, d) => sum + parseInt(d), 0),
-    false
-  );
-  
-  const total = reducedBirthDay + reducedBirthMonth + reducedMonth + reducedYear;
-  return reduceToSingleDigit(total, false);
-};
 
 // Daily predictions data
 const dailyPredictionsData: Record<number, Omit<DailyPrediction, 'number'>> = {
@@ -153,88 +113,275 @@ const dailyPredictionsData: Record<number, Omit<DailyPrediction, 'number'>> = {
   }
 };
 
-// Monthly predictions data
-const monthlyPredictionsData: Record<number, Omit<MonthlyPrediction, 'number' | 'keyDays'>> = {
-  1: {
-    theme: "New Beginnings",
-    overview: "A month of fresh starts and new opportunities. Take initiative and plant seeds for future growth.",
-    career: "Excellent for launching new projects or seeking leadership roles. Your confidence attracts success.",
-    relationships: "Assert your needs while remaining considerate. New connections may form.",
-    health: "High energy levels. Start new fitness routines or health habits now.",
-    finances: "Good time for investments and new income streams. Trust your instincts.",
-    spirituality: "Connect with your inner purpose. Set intentions for personal growth."
+// ===== Text, în trei limbi =====
+//
+// Tabelele de mai jos erau scrise numai în engleză, iar /azi le punea sub
+// titluri românești: „Luna Curentă" deasupra lui „New Beginnings". Fiecare
+// funcție primește acum limba și o alege aici. Engleza rămâne varianta `en`,
+// curățată de clișee („trust the universe's timing"); româna și rusa sunt
+// scrise pe limba omului, ca `dayContent.ts`: un gest concret, nu o
+// caracterizare a energiei.
+
+type ByLang<T> = Record<Language, Record<number, T>>;
+
+/** Masterii nu apar aici (ciclurile personale nu-i păstrează), dar dacă apar,
+ *  cad pe rădăcina lor, nu pe 1. */
+const pick = <T>(table: ByLang<T>, lang: Language, n: number): T => {
+  const byNumber = table[lang] ?? table.en;
+  return byNumber[n] ?? byNumber[((n - 1) % 9) + 1] ?? byNumber[1];
+};
+
+type MonthText = Omit<MonthlyPrediction, 'number' | 'keyDays'>;
+
+const MONTHLY: ByLang<MonthText> = {
+  en: {
+    1: {
+      theme: "A month for starting",
+      overview: "Something new wants a first step this month. What you begin now sets the direction for the next nine months, so start what you actually want, not what is convenient.",
+      career: "Pitch the project, ask to lead, send the application. People notice whoever moves first.",
+      relationships: "Say plainly what you need. New people may come in; let them see who you are, not who fits.",
+      health: "You have energy to spare. A habit started now sticks better than in any other month.",
+      finances: "A good month to open a new source of income. Decide on your own judgement, but write the numbers down first.",
+      spirituality: "Ask yourself what you want for yourself, not for others. Write the answer down."
+    },
+    2: {
+      theme: "A month for patience",
+      overview: "Things move slowly this month, and through other people. What you push alone stalls; what you build with someone holds.",
+      career: "Work in pairs, not alone. Keep the ultimatum in your pocket; a conversation settles more.",
+      relationships: "Listen to the end before you answer. Small gestures count for more than big declarations.",
+      health: "Your body feels the tension at home. Sleep and quiet matter more than the gym.",
+      finances: "Don't sign anything big. Gather information, compare, wait for next month.",
+      spirituality: "Notice what you feel before you explain it. A few quiet minutes a day are enough."
+    },
+    3: {
+      theme: "A month to speak up",
+      overview: "This month asks you to show what you have: write, talk, go out among people. Ideas kept in your head go stale.",
+      career: "Show your work, even unfinished. Your ideas land better when said out loud.",
+      relationships: "Go out, call, invite. Tell people what you like about them now, not later.",
+      health: "Your mood lifts when you make something with your hands. Watch the late nights and the extra glass.",
+      finances: "Money can come from what you create or say. Small, scattered spending adds up fast.",
+      spirituality: "Each evening, write down three things that went well. It changes what you notice the next day."
+    },
+    4: {
+      theme: "A month of groundwork",
+      overview: "A month of steady, unglamorous work. What you build carefully now holds for years.",
+      career: "Finish what is half-done before starting anything new. Details and deadlines count now.",
+      relationships: "Show up when you said you would. Trust grows from reliability, not from words.",
+      health: "Fix the routine: bedtime, meals, the check-up you keep postponing.",
+      finances: "Make a budget and keep it for four weeks. What you save now is the foundation for later.",
+      spirituality: "A small habit done every day beats a big one done once."
+    },
+    5: {
+      theme: "A month of change",
+      overview: "Plans shift this month. Something unexpected comes in; make room for it instead of fighting it.",
+      career: "Something at work is likely to change. Whoever adapts first gets the better seat.",
+      relationships: "Do something new together. Watch the urge to leave when things turn routine.",
+      health: "Try a different kind of movement. Notice where you overdo it: food, screens, coffee.",
+      finances: "Unexpected money may come, and unexpected costs too. Don't bet what you can't afford to lose.",
+      spirituality: "Go somewhere you have never been, even close to home. A new place shows you something new about yourself."
+    },
+    6: {
+      theme: "A month for home and the people close to you",
+      overview: "Home, family and the people who rely on you come first. Care is the work this month, including care for yourself.",
+      career: "Help where it is needed; work that serves others goes well. Don't take on everyone's tasks.",
+      relationships: "Old tensions can be mended. Make the call, cook the dinner, say what you have to say.",
+      health: "Rest at home counts. Look after yourself the way you look after others.",
+      finances: "Money spent on home and family comes back. Don't lend more than you can afford to lose.",
+      spirituality: "Ordinary chores, done with attention, are practice enough this month."
+    },
+    7: {
+      theme: "A month to look inward",
+      overview: "A quieter month. You need time alone to understand what is going on; give yourself that time.",
+      career: "Research, analysis and working on your own go well. Decide after you have checked, not before.",
+      relationships: "Fewer people, longer conversations. Say you need space before others have to guess.",
+      health: "Your mind tires before your body does. Sleep, walks, fewer screens.",
+      finances: "Read the small print. Something hidden may come to light; wait until it does.",
+      spirituality: "Read something difficult, meditate, take long walks alone. This is the month for questions."
+    },
+    8: {
+      theme: "A month for ambition and money",
+      overview: "Work, money and authority move to the front. Ask for what you deserve; people will take you seriously.",
+      career: "Ask for the promotion, the raise, the bigger role. Decisions you make now carry weight.",
+      relationships: "Watch who gets the last word. Generosity strengthens a relationship more than being right.",
+      health: "You can push hard; notice too where the stress settles in your body.",
+      finances: "A good month for big money decisions. Think larger, but check the numbers twice.",
+      spirituality: "Ask yourself what the money is for. The answer says more than the amount."
+    },
+    9: {
+      theme: "A month for closing",
+      overview: "Something ends this month: a project, a habit, a chapter. Let it go to make room for what comes next.",
+      career: "Finish the projects that keep dragging on and hand over what you no longer want to carry.",
+      relationships: "Forgive what can be forgiven. Some people leave; others come back changed.",
+      health: "Clear out the cupboard, the inbox, the grudges. It shows in how you sleep.",
+      finances: "Pay off debts, close what is still open. What you give now costs less than it seems.",
+      spirituality: "Look back over the last nine months. Write down what you take with you and what you leave."
+    }
   },
-  2: {
-    theme: "Partnership & Patience",
-    overview: "A month for cooperation, patience, and building relationships. Success comes through collaboration.",
-    career: "Focus on teamwork and diplomatic solutions. Avoid forcing issues.",
-    relationships: "Deep connections form through understanding and compromise. Listen actively.",
-    health: "Pay attention to emotional well-being. Balance and rest are essential.",
-    finances: "Patience with financial matters. Avoid major decisions; gather information instead.",
-    spirituality: "Develop intuition through meditation. Trust the universe's timing."
+  ro: {
+    1: {
+      theme: "Lună de început",
+      overview: "Luna asta cere un prim pas. Ce începi acum dă direcția pentru următoarele nouă luni, așa că începe ce vrei cu adevărat, nu ce e comod.",
+      career: "Propune proiectul, cere să conduci, trimite cererea. Se observă cine se mișcă primul.",
+      relationships: "Spune limpede de ce ai nevoie. Pot apărea oameni noi; lasă-i să vadă cine ești, nu cine se potrivește.",
+      health: "Ai energie de dat. Un obicei început acum se prinde mai ușor decât în orice altă lună.",
+      finances: "Lună bună pentru o sursă nouă de venit. Decide după capul tău, dar scrie mai întâi cifrele pe hârtie.",
+      spirituality: "Întreabă-te ce vrei pentru tine, nu pentru alții. Scrie răspunsul."
+    },
+    2: {
+      theme: "Lună de răbdare",
+      overview: "Lucrurile merg încet luna asta și trec prin alți oameni. Ce împingi singur se blochează; ce construiești cu cineva ține.",
+      career: "Lucrează în doi, nu singur. Ține ultimatumul în buzunar; o discuție rezolvă mai mult.",
+      relationships: "Ascultă până la capăt înainte să răspunzi. Gesturile mici contează mai mult decât declarațiile mari.",
+      health: "Corpul simte tensiunea din casă. Somnul și liniștea contează mai mult decât sala.",
+      finances: "Nu semna nimic mare. Strânge informații, compară, așteaptă luna următoare.",
+      spirituality: "Observă ce simți înainte să-ți explici. Câteva minute de liniște pe zi ajung."
+    },
+    3: {
+      theme: "Lună în care să vorbești",
+      overview: "Luna asta îți cere să arăți ce ai: scrie, vorbește, ieși printre oameni. Ideile ținute în cap se învechesc.",
+      career: "Arată la ce lucrezi, chiar neterminat. Ideile tale prind mai bine spuse cu voce tare.",
+      relationships: "Ieși, sună, invită. Spune-le oamenilor ce-ți place la ei acum, nu mai târziu.",
+      health: "Starea se ridică atunci când faci ceva cu mâinile. Ai grijă la nopțile lungi și la paharul în plus.",
+      finances: "Banii pot veni din ce creezi sau din ce spui. Cheltuielile mici și împrăștiate se adună repede.",
+      spirituality: "Seara, scrie trei lucruri care au mers bine. Schimbă ce observi a doua zi."
+    },
+    4: {
+      theme: "Lună de temelie",
+      overview: "Lună de muncă migăloasă, fără strălucire. Ce construiești atent acum ține ani de zile.",
+      career: "Termină ce e pe jumătate înainte să începi altceva. Acum contează detaliile și termenele.",
+      relationships: "Fii acolo când ai spus că vii. Încrederea crește din seriozitate, nu din vorbe.",
+      health: "Pune la punct rutina: ora de culcare, mesele, controlul medical pe care îl tot amâni.",
+      finances: "Fă un buget și ține-l patru săptămâni. Ce economisești acum e temelia de mai târziu.",
+      spirituality: "Un obicei mic, făcut zilnic, bate unul mare făcut o dată."
+    },
+    5: {
+      theme: "Lună de schimbare",
+      overview: "Planurile se mută luna asta. Intră ceva neprevăzut; fă-i loc în loc să te lupți cu el.",
+      career: "La muncă se schimbă probabil ceva. Cine se adaptează primul prinde locul mai bun.",
+      relationships: "Faceți ceva nou împreună. Ai grijă la pornirea de a pleca atunci când totul devine rutină.",
+      health: "Încearcă un alt fel de mișcare. Observă unde exagerezi: mâncare, ecrane, cafea.",
+      finances: "Pot veni bani neașteptați, dar și cheltuieli neașteptate. Nu miza ce nu-ți permiți să pierzi.",
+      spirituality: "Du-te undeva unde n-ai mai fost, chiar și aproape de casă. Un loc nou îți arată ceva nou despre tine."
+    },
+    6: {
+      theme: "Lună pentru casă și pentru cei apropiați",
+      overview: "Casa, familia și oamenii care se bazează pe tine trec pe primul loc. Grija e munca lunii, inclusiv grija față de tine.",
+      career: "Ajută acolo unde e nevoie; munca în folosul altora merge bine. Nu prelua sarcinile tuturor.",
+      relationships: "Tensiunile vechi se pot repara. Dă telefonul, gătește cina, spune ce ai de spus.",
+      health: "Odihna acasă contează. Ai grijă de tine cum ai grijă de alții.",
+      finances: "Banii puși în casă și în familie se întorc. Nu împrumuta mai mult decât îți permiți să pierzi.",
+      spirituality: "Treburile obișnuite, făcute cu atenție, sunt de ajuns ca practică luna asta."
+    },
+    7: {
+      theme: "Lună de privit înăuntru",
+      overview: "O lună mai liniștită. Ai nevoie de timp singur ca să înțelegi ce se întâmplă; dă-ți timpul ăsta.",
+      career: "Merg bine cercetarea, analiza și munca pe cont propriu. Decide după ce ai verificat, nu înainte.",
+      relationships: "Mai puțini oameni, discuții mai lungi. Spune că ai nevoie de spațiu înainte să fie nevoiți alții să ghicească.",
+      health: "Mintea obosește înaintea corpului. Somn, plimbări, mai puține ecrane.",
+      finances: "Citește literele mici. Poate ieși la iveală ceva ascuns; așteaptă să iasă.",
+      spirituality: "Citește ceva greu, meditează, plimbă-te mult singur. E luna întrebărilor."
+    },
+    8: {
+      theme: "Lună de ambiție și bani",
+      overview: "Munca, banii și autoritatea trec în prim-plan. Cere ce meriți; ceilalți te vor lua în serios.",
+      career: "Cere promovarea, mărirea, rolul mai mare. Deciziile de acum au greutate.",
+      relationships: "Fii atent cine are ultimul cuvânt. Generozitatea întărește o relație mai mult decât a avea dreptate.",
+      health: "Poți trage tare; observă și unde se așază stresul în corp.",
+      finances: "Lună bună pentru deciziile mari cu bani. Gândește mai larg, dar verifică cifrele de două ori.",
+      spirituality: "Întreabă-te la ce-ți folosesc banii. Răspunsul spune mai mult decât suma."
+    },
+    9: {
+      theme: "Lună de încheiere",
+      overview: "Ceva se termină luna asta: un proiect, un obicei, un capitol. Lasă-l să plece ca să faci loc pentru ce urmează.",
+      career: "Termină proiectele care se tot lungesc și predă ce nu mai vrei să cari.",
+      relationships: "Iartă ce se poate ierta. Unii oameni pleacă; alții se întorc schimbați.",
+      health: "Fă curat în dulap, în mesaje, în supărări. Se vede în cum dormi.",
+      finances: "Plătește datoriile, închide ce e încă deschis. Ce dai acum costă mai puțin decât pare.",
+      spirituality: "Privește înapoi la ultimele nouă luni. Scrie ce iei cu tine și ce lași în urmă."
+    }
   },
-  3: {
-    theme: "Creative Expression",
-    overview: "A vibrant month for creativity, socializing, and self-expression. Joy and inspiration abound.",
-    career: "Creative solutions lead to success. Communication and networking flourish.",
-    relationships: "Social activities bring happiness. Express love and appreciation openly.",
-    health: "Mental health improves through creative outlets. Avoid overindulgence.",
-    finances: "Opportunities through creative ventures. Avoid scattered spending.",
-    spirituality: "Express gratitude. Find the divine in beauty and art."
-  },
-  4: {
-    theme: "Building Foundations",
-    overview: "A month for hard work, organization, and creating stability. Discipline brings lasting results.",
-    career: "Focus on structure and long-term planning. Details matter now.",
-    relationships: "Build trust through reliability. Address practical matters together.",
-    health: "Establish consistent routines. Address any neglected health issues.",
-    finances: "Budget and save. This is a foundation-building period for wealth.",
-    spirituality: "Ground yourself in practice. Consistency in spiritual routines pays off."
-  },
-  5: {
-    theme: "Change & Freedom",
-    overview: "An exciting month of change, travel, and new experiences. Flexibility is your greatest asset.",
-    career: "Embrace changes in your work environment. Adaptability leads to opportunities.",
-    relationships: "Variety and spontaneity refresh connections. Avoid restlessness.",
-    health: "Try new forms of exercise. Address addictive patterns.",
-    finances: "Unexpected opportunities arise. Balance risk with wisdom.",
-    spirituality: "Explore new spiritual practices. Freedom leads to growth."
-  },
-  6: {
-    theme: "Love & Responsibility",
-    overview: "A month focused on home, family, and nurturing. Love and beauty guide your path.",
-    career: "Service-oriented work thrives. Create harmony in your workplace.",
-    relationships: "Deep healing in close relationships. Commitment strengthens.",
-    health: "Nurture yourself as you nurture others. Home-based healing works well.",
-    finances: "Investments in home and family pay off. Avoid overextending for others.",
-    spirituality: "Find the sacred in daily life. Service is a spiritual practice."
-  },
-  7: {
-    theme: "Inner Wisdom",
-    overview: "A reflective month for inner work, study, and spiritual development. Trust your intuition.",
-    career: "Research and analysis excel. Work independently when possible.",
-    relationships: "Quality over quantity in social interactions. Deep conversations satisfy.",
-    health: "Mental and spiritual health take priority. Rest and reflection heal.",
-    finances: "Analyze before acting. Hidden information may surface.",
-    spirituality: "Peak month for spiritual growth. Meditation and study transform."
-  },
-  8: {
-    theme: "Power & Abundance",
-    overview: "A powerful month for achievement, recognition, and material success. Step into your power.",
-    career: "Authority and leadership are highlighted. Major career advances possible.",
-    relationships: "Balance power dynamics. Generosity strengthens bonds.",
-    health: "Strong vitality. Address stress from ambitious pursuits.",
-    finances: "Peak financial opportunities. Large-scale thinking pays off.",
-    spirituality: "Integrate material and spiritual values. Abundance is spiritual."
-  },
-  9: {
-    theme: "Completion & Release",
-    overview: "A month of endings, release, and humanitarian focus. Let go to make room for the new.",
-    career: "Complete long-term projects. Give back through your work.",
-    relationships: "Heal old wounds. Forgiveness opens new chapters.",
-    health: "Detox and release. Emotional clearing supports physical health.",
-    finances: "Tie up loose ends. Charitable giving brings unexpected returns.",
-    spirituality: "Universal love and compassion guide you. Prepare for a new cycle."
+  ru: {
+    1: {
+      theme: "Месяц начинаний",
+      overview: "Этот месяц просит первого шага. То, что вы начнёте сейчас, задаст направление на следующие девять месяцев, поэтому начинайте то, чего действительно хотите, а не то, что удобно.",
+      career: "Предложите проект, попросите руководящую роль, отправьте заявку. Замечают того, кто двинулся первым.",
+      relationships: "Говорите прямо, что вам нужно. Могут появиться новые люди — покажите им, кто вы, а не кем удобно быть.",
+      health: "Сил с запасом. Привычка, начатая сейчас, приживается легче, чем в любой другой месяц.",
+      finances: "Хороший месяц для нового источника дохода. Решайте сами, но сначала запишите цифры.",
+      spirituality: "Спросите себя, чего вы хотите для себя, а не для других. Запишите ответ."
+    },
+    2: {
+      theme: "Месяц терпения",
+      overview: "В этом месяце всё движется медленно и через других людей. То, что вы толкаете в одиночку, застревает; то, что строите с кем-то, держится.",
+      career: "Работайте в паре, а не в одиночку. Ультиматум отложите — разговор решит больше.",
+      relationships: "Дослушайте до конца, прежде чем отвечать. Маленькие жесты значат больше громких слов.",
+      health: "Тело чувствует напряжение в доме. Сон и тишина важнее спортзала.",
+      finances: "Не подписывайте ничего крупного. Собирайте информацию, сравнивайте, ждите следующего месяца.",
+      spirituality: "Замечайте, что чувствуете, прежде чем объяснять это. Нескольких минут тишины в день достаточно."
+    },
+    3: {
+      theme: "Месяц, чтобы говорить",
+      overview: "Этот месяц просит показать, что у вас есть: пишите, говорите, выходите к людям. Идеи, оставленные в голове, черствеют.",
+      career: "Покажите свою работу, даже незаконченную. Идеи, сказанные вслух, принимают лучше.",
+      relationships: "Выходите, звоните, приглашайте. Скажите людям, что вам в них нравится, сейчас, а не потом.",
+      health: "Настроение поднимается, когда вы делаете что-то руками. Осторожнее с поздними ночами и лишним бокалом.",
+      finances: "Деньги могут прийти от того, что вы создаёте или говорите. Мелкие разбросанные траты быстро складываются.",
+      spirituality: "Вечером записывайте три вещи, которые получились. Это меняет то, что вы замечаете на следующий день."
+    },
+    4: {
+      theme: "Месяц фундамента",
+      overview: "Месяц кропотливой работы без блеска. То, что вы аккуратно построите сейчас, простоит годы.",
+      career: "Доделайте начатое, прежде чем браться за новое. Сейчас важны детали и сроки.",
+      relationships: "Приходите, когда обещали. Доверие растёт из надёжности, а не из слов.",
+      health: "Наладьте режим: время сна, еду, обследование, которое всё откладываете.",
+      finances: "Составьте бюджет и держитесь его четыре недели. Сбережения сейчас — фундамент на потом.",
+      spirituality: "Маленькая привычка, которой вы следуете каждый день, лучше большой, сделанной один раз."
+    },
+    5: {
+      theme: "Месяц перемен",
+      overview: "В этом месяце планы сдвигаются. Приходит что-то неожиданное — освободите для него место, вместо того чтобы бороться.",
+      career: "На работе, вероятно, что-то изменится. Кто приспособится первым, займёт лучшее место.",
+      relationships: "Сделайте вместе что-то новое. Следите за желанием сбежать, когда всё становится привычным.",
+      health: "Попробуйте новый вид движения. Заметьте, где перебираете: еда, экраны, кофе.",
+      finances: "Могут прийти неожиданные деньги — и неожиданные расходы. Не ставьте на кон то, что не можете потерять.",
+      spirituality: "Съездите туда, где ещё не были, пусть и рядом с домом. Новое место показывает что-то новое о вас самих."
+    },
+    6: {
+      theme: "Месяц дома и близких",
+      overview: "Дом, семья и люди, которые на вас рассчитывают, выходят на первый план. Забота — главная работа месяца, включая заботу о себе.",
+      career: "Помогайте там, где нужно: работа на благо других идёт хорошо. Но не берите на себя чужие задачи.",
+      relationships: "Старые обиды можно залечить. Позвоните, приготовьте ужин, скажите то, что хотели сказать.",
+      health: "Отдых дома тоже считается. Заботьтесь о себе так, как заботитесь о других.",
+      finances: "Траты на дом и семью окупаются. Не одалживайте больше, чем готовы потерять.",
+      spirituality: "Обычные домашние дела, сделанные со вниманием, — достаточная практика в этом месяце."
+    },
+    7: {
+      theme: "Месяц, чтобы заглянуть внутрь",
+      overview: "Более тихий месяц. Вам нужно время наедине с собой, чтобы понять, что происходит, — дайте его себе.",
+      career: "Хорошо идут исследования, анализ и самостоятельная работа. Решайте после проверки, а не до неё.",
+      relationships: "Меньше людей, длиннее разговоры. Скажите, что вам нужно пространство, прежде чем другим придётся догадываться.",
+      health: "Голова устаёт раньше тела. Сон, прогулки, меньше экранов.",
+      finances: "Читайте мелкий шрифт. Может всплыть что-то скрытое — дождитесь этого.",
+      spirituality: "Читайте что-то трудное, медитируйте, подолгу гуляйте в одиночестве. Это месяц вопросов."
+    },
+    8: {
+      theme: "Месяц амбиций и денег",
+      overview: "Работа, деньги и авторитет выходят на первый план. Просите то, чего заслуживаете, — к вам отнесутся серьёзно.",
+      career: "Просите повышения, прибавки, большей роли. Решения, принятые сейчас, имеют вес.",
+      relationships: "Следите, за кем последнее слово. Щедрость укрепляет отношения больше, чем правота.",
+      health: "Вы можете работать с полной отдачей; заметьте и то, где в теле оседает стресс.",
+      finances: "Хороший месяц для крупных денежных решений. Думайте шире, но проверяйте цифры дважды.",
+      spirituality: "Спросите себя, для чего вам деньги. Ответ скажет больше, чем сумма."
+    },
+    9: {
+      theme: "Месяц завершений",
+      overview: "В этом месяце что-то заканчивается: проект, привычка, глава. Отпустите это, чтобы освободить место для следующего.",
+      career: "Завершите затянувшиеся проекты и передайте то, что больше не хотите нести.",
+      relationships: "Простите то, что можно простить. Кто-то уходит, кто-то возвращается другим.",
+      health: "Разберите шкаф, почту, обиды. Это скажется на том, как вы спите.",
+      finances: "Погасите долги, закройте то, что ещё открыто. Отдать что-то сейчас стоит меньше, чем кажется.",
+      spirituality: "Оглянитесь на последние девять месяцев. Запишите, что берёте с собой, а что оставляете."
+    }
   }
 };
 
@@ -246,13 +393,18 @@ export const getDailyPrediction = (birthDate: Date, date: Date = new Date()): Da
   };
 };
 
-export const getMonthlyPrediction = (birthDate: Date, month: number, year: number): MonthlyPrediction => {
-  const number = calculatePersonalMonthNumber(birthDate, month, year);
-  
+export const getMonthlyPrediction = (
+  birthDate: Date,
+  month: number,
+  year: number,
+  lang: Language = 'en'
+): MonthlyPrediction => {
+  const number = personalMonthFor(birthDate, year, month);
+
   // Calculate key days for this month (days where personal day number matches personal month number)
   const daysInMonth = new Date(year, month, 0).getDate();
   const keyDays: number[] = [];
-  
+
   for (let day = 1; day <= daysInMonth; day++) {
     const date = new Date(year, month - 1, day);
     const dayNumber = calculatePersonalDayNumber(birthDate, date);
@@ -260,308 +412,365 @@ export const getMonthlyPrediction = (birthDate: Date, month: number, year: numbe
       keyDays.push(day);
     }
   }
-  
+
   return {
     number,
     keyDays: keyDays.slice(0, 5), // Return top 5 key days
-    ...monthlyPredictionsData[number]
+    ...pick(MONTHLY, lang, number)
   };
 };
 
 export const getUniversalDayEnergy = (date: Date = new Date()): { number: number; energy: string } => {
-  const number = calculateUniversalDayNumber(date);
+  const number = calculateUniversalDay(date);
   return {
     number,
     energy: dailyPredictionsData[number].energy
   };
 };
 
-// ===== PHASE 5.1: Extended Daily Predictions =====
-
-/**
- * Get detailed recommendations for a specific day based on personal day number.
- * @param birthDate - Birth date
- * @param date - Target date (default: today)
- * @returns Array of specific recommendations for the day
- */
-export const getDayRecommendations = (birthDate: Date, date: Date = new Date()): string[] => {
-  const dayNumber = calculatePersonalDayNumber(birthDate, date);
-  const recommendations: Record<number, string[]> = {
-    1: [
-      "Start new projects or initiatives",
-      "Take leadership roles",
-      "Make important decisions",
-      "Set goals for the future",
-      "Express your independence"
-    ],
-    2: [
-      "Focus on partnerships and collaboration",
-      "Practice patience and diplomacy",
-      "Listen to others' perspectives",
-      "Work on details and organization",
-      "Nurture relationships"
-    ],
-    3: [
-      "Engage in creative activities",
-      "Express yourself through art or writing",
-      "Socialize and network",
-      "Share your ideas with enthusiasm",
-      "Find joy in everyday moments"
-    ],
-    4: [
-      "Focus on practical matters",
-      "Organize your workspace",
-      "Build solid foundations",
-      "Work on long-term projects",
-      "Establish routines"
-    ],
-    5: [
-      "Embrace change and new experiences",
-      "Try something new or adventurous",
-      "Be flexible with plans",
-      "Travel or explore new places",
-      "Break out of routines"
-    ],
-    6: [
-      "Spend time with family",
-      "Focus on home and domestic matters",
-      "Help others in need",
-      "Create harmony in relationships",
-      "Practice self-care"
-    ],
-    7: [
-      "Take time for solitude and reflection",
-      "Meditate or practice mindfulness",
-      "Study or research topics of interest",
-      "Trust your intuition",
-      "Seek inner wisdom"
-    ],
-    8: [
-      "Focus on career and financial goals",
-      "Make important business decisions",
-      "Invest in your future",
-      "Take calculated risks",
-      "Step into positions of authority"
-    ],
-    9: [
-      "Complete unfinished projects",
-      "Let go of what no longer serves you",
-      "Help others or volunteer",
-      "Practice forgiveness",
-      "Prepare for new beginnings"
-    ]
-  };
-  
-  return recommendations[dayNumber] || recommendations[1];
-};
-
-/**
- * Calculate color associated with a day number for visualization.
- * @param dayNumber - Personal day number (1-9)
- * @returns Color name and hex code
- */
-export const calculateDayColor = (dayNumber: number): { name: string; hex: string } => {
-  const colors: Record<number, { name: string; hex: string }> = {
-    1: { name: "Red", hex: "#EF4444" },      // Leadership, action
-    2: { name: "Orange", hex: "#F97316" },   // Cooperation, warmth
-    3: { name: "Yellow", hex: "#EAB308" },    // Creativity, joy
-    4: { name: "Green", hex: "#22C55E" },     // Stability, growth
-    5: { name: "Blue", hex: "#3B82F6" },      // Change, freedom
-    6: { name: "Indigo", hex: "#6366F1" },    // Harmony, responsibility
-    7: { name: "Violet", hex: "#8B5CF6" },   // Introspection, spirituality
-    8: { name: "Gold", hex: "#F59E0B" },      // Abundance, achievement
-    9: { name: "Purple", hex: "#A855F7" }     // Completion, compassion
-  };
-  
-  return colors[dayNumber] || colors[1];
-};
-
-/**
- * Get music recommendations based on day number energy.
- * @param dayNumber - Personal day number (1-9)
- * @returns Array of music genre/style recommendations
- */
-export const getDayMusicRecommendations = (dayNumber: number): string[] => {
-  const music: Record<number, string[]> = {
-    1: ["Upbeat motivational", "Powerful anthems", "Energetic rock", "Confident pop"],
-    2: ["Soft instrumental", "Harmonious melodies", "Peaceful ambient", "Gentle acoustic"],
-    3: ["Joyful pop", "Creative jazz", "Expressive classical", "Upbeat dance"],
-    4: ["Structured classical", "Steady rhythms", "Organized instrumental", "Grounding beats"],
-    5: ["Dynamic electronic", "Adventurous world music", "Varied playlists", "Energetic fusion"],
-    6: ["Warm ballads", "Harmonious vocals", "Family-friendly", "Nurturing melodies"],
-    7: ["Meditative sounds", "Spiritual chants", "Ambient space music", "Reflective instrumental"],
-    8: ["Powerful orchestral", "Success anthems", "Confident beats", "Achievement music"],
-    9: ["Transcendent spiritual", "Compassionate melodies", "Completion themes", "Universal harmony"]
-  };
-  
-  return music[dayNumber] || music[1];
-};
-
 // ===== PHASE 5.2: Weekly Predictions =====
 
-export interface WeeklyPrediction {
-  weekStart: Date;
-  weekEnd: Date;
-  theme: string;
-  overallEnergy: string;
-  keyEvents: string[];
-  focusAreas: string[];
-  advice: string;
+/** O zi din săptămână: data ei, cifra ei personală, un rând. */
+export interface WeekDay {
+  date: Date;
+  personalDay: number;
+  line: string;
 }
 
 /**
- * Calculate weekly theme based on personal month and week number.
- * @param birthDate - Birth date
- * @param weekStartDate - Start date of the week
- * @returns Weekly prediction data
+ * Săptămâna nu are o cifră a ei. Era calculată ca media celor șapte zile
+ * personale -- o cifră care nu iese din niciun calcul numerologic și pe care
+ * doctrina o interzice (R1: nu facem medii). Acum săptămâna e ce e: șapte
+ * zile, fiecare cu cifra ei, în cadrul lunii personale în care începe.
  */
-export const calculateWeeklyTheme = (
-  birthDate: Date,
-  weekStartDate: Date = new Date()
-): WeeklyPrediction => {
-  // Get the week number within the month (1-4 or 5)
-  const month = weekStartDate.getMonth() + 1;
-  const year = weekStartDate.getFullYear();
-  const firstDayOfMonth = new Date(year, month - 1, 1);
-  const daysDiff = Math.floor((weekStartDate.getTime() - firstDayOfMonth.getTime()) / (1000 * 60 * 60 * 24));
-  const weekNumber = Math.floor(daysDiff / 7) + 1;
-  
-  const personalMonth = calculatePersonalMonthNumber(birthDate, month, year);
-  
-  // Calculate average day numbers for the week
-  const weekDays: number[] = [];
-  for (let i = 0; i < 7; i++) {
-    const day = new Date(weekStartDate);
-    day.setDate(weekStartDate.getDate() + i);
-    weekDays.push(calculatePersonalDayNumber(birthDate, day));
+export interface WeeklyPrediction {
+  weekStart: Date;
+  weekEnd: Date;
+  /** Luna personală a zilei de început. */
+  personalMonth: number;
+  monthTheme: string;
+  days: WeekDay[];
+}
+
+/** Un rând scurt pe zi personală. */
+const WEEK_DAY_LINES: ByLang<string> = {
+  en: {
+    1: "Make a first move on something.",
+    2: "Do it together, not alone.",
+    3: "Say it out loud, show it to someone.",
+    4: "Finish one practical thing.",
+    5: "Leave room for the unplanned.",
+    6: "Time for home and the people close to you.",
+    7: "Keep an hour just for yourself.",
+    8: "Ask, negotiate, settle money matters.",
+    9: "Close something and let it go."
+  },
+  ro: {
+    1: "Fă primul pas la ceva.",
+    2: "Fă-o împreună, nu singur.",
+    3: "Spune-o cu voce tare, arat-o cuiva.",
+    4: "Termină un lucru practic.",
+    5: "Lasă loc pentru neprevăzut.",
+    6: "Timp pentru casă și pentru cei apropiați.",
+    7: "Păstrează o oră doar pentru tine.",
+    8: "Cere, negociază, rezolvă ce ține de bani.",
+    9: "Închide ceva și dă-i drumul."
+  },
+  ru: {
+    1: "Сделайте первый шаг к чему-то.",
+    2: "Делайте вместе, а не в одиночку.",
+    3: "Скажите вслух, покажите кому-нибудь.",
+    4: "Доведите до конца одно практическое дело.",
+    5: "Оставьте место для незапланированного.",
+    6: "Время для дома и близких.",
+    7: "Оставьте час только для себя.",
+    8: "Просите, договаривайтесь, решайте денежное.",
+    9: "Закройте что-то и отпустите."
   }
-  const avgDayNumber = Math.round(weekDays.reduce((a, b) => a + b, 0) / 7);
-  
-  const themes: Record<number, { theme: string; energy: string; events: string[]; focus: string[]; advice: string }> = {
-    1: {
-      theme: "New Beginnings Week",
-      energy: "High initiative and leadership",
-      events: ["Project launches", "Important decisions", "New opportunities"],
-      focus: ["Starting fresh", "Taking action", "Setting intentions"],
-      advice: "This week is perfect for initiating new projects and taking the lead."
-    },
-    2: {
-      theme: "Cooperation Week",
-      energy: "Collaborative and diplomatic",
-      events: ["Partnerships form", "Team meetings", "Mediation needed"],
-      focus: ["Working together", "Listening", "Building relationships"],
-      advice: "Focus on collaboration and patience. Success comes through teamwork."
-    },
-    3: {
-      theme: "Creative Expression Week",
-      energy: "Joyful and expressive",
-      events: ["Social gatherings", "Creative projects", "Communication opportunities"],
-      focus: ["Self-expression", "Socializing", "Sharing ideas"],
-      advice: "Express yourself creatively and enjoy social connections this week."
-    },
-    4: {
-      theme: "Foundation Building Week",
-      energy: "Stable and organized",
-      events: ["Planning sessions", "Organizational work", "Structure building"],
-      focus: ["Organization", "Planning", "Building foundations"],
-      advice: "Focus on creating structure and working systematically."
-    },
-    5: {
-      theme: "Change and Adventure Week",
-      energy: "Dynamic and flexible",
-      events: ["Unexpected changes", "Travel opportunities", "New experiences"],
-      focus: ["Adaptability", "Exploration", "Embracing change"],
-      advice: "Be open to change and new experiences. Flexibility is key."
-    },
-    6: {
-      theme: "Harmony and Responsibility Week",
-      energy: "Nurturing and caring",
-      events: ["Family time", "Home activities", "Community service"],
-      focus: ["Family", "Home", "Caring for others"],
-      advice: "Focus on creating harmony in relationships and home life."
-    },
-    7: {
-      theme: "Reflection Week",
-      energy: "Introspective and spiritual",
-      events: ["Quiet time", "Study periods", "Spiritual practices"],
-      focus: ["Inner work", "Reflection", "Seeking wisdom"],
-      advice: "Take time for solitude and inner reflection this week."
-    },
-    8: {
-      theme: "Achievement Week",
-      energy: "Powerful and ambitious",
-      events: ["Career opportunities", "Financial decisions", "Major accomplishments"],
-      focus: ["Success", "Achievement", "Material goals"],
-      advice: "Focus on professional goals and financial matters with confidence."
-    },
-    9: {
-      theme: "Completion Week",
-      energy: "Transformative and compassionate",
-      events: ["Project completions", "Endings", "Charitable activities"],
-      focus: ["Letting go", "Completing cycles", "Service to others"],
-      advice: "Complete unfinished business and prepare for new beginnings."
-    }
-  };
-  
-  const weekData = themes[avgDayNumber] || themes[1];
-  const weekEnd = new Date(weekStartDate);
-  weekEnd.setDate(weekStartDate.getDate() + 6);
-  
-  return {
-    weekStart: weekStartDate,
-    weekEnd,
-    theme: weekData.theme,
-    overallEnergy: weekData.energy,
-    keyEvents: weekData.events,
-    focusAreas: weekData.focus,
-    advice: weekData.advice
-  };
 };
 
 /**
- * Calculate key events for the week based on numerology.
+ * The week as its seven personal days, framed by the personal month.
  * @param birthDate - Birth date
- * @param weekStartDate - Start date of the week
- * @returns Array of predicted events/opportunities
+ * @param weekStartDate - First day of the week
+ * @param lang - Language of the text
  */
-export const calculateWeeklyEvents = (
+export const calculateWeeklyTheme = (
   birthDate: Date,
-  weekStartDate: Date = new Date()
-): string[] => {
-  const weekly = calculateWeeklyTheme(birthDate, weekStartDate);
-  return weekly.keyEvents;
+  weekStartDate: Date = new Date(),
+  lang: Language = 'en'
+): WeeklyPrediction => {
+  const start = new Date(weekStartDate.getFullYear(), weekStartDate.getMonth(), weekStartDate.getDate());
+  const month = start.getMonth() + 1;
+  const year = start.getFullYear();
+
+  const days: WeekDay[] = [];
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(year, start.getMonth(), start.getDate() + i);
+    const personalDay = calculatePersonalDayNumber(birthDate, date);
+    days.push({ date, personalDay, line: pick(WEEK_DAY_LINES, lang, personalDay) });
+  }
+
+  const monthly = getMonthlyPrediction(birthDate, month, year, lang);
+
+  return {
+    weekStart: start,
+    weekEnd: days[6].date,
+    personalMonth: monthly.number,
+    monthTheme: monthly.theme,
+    days
+  };
 };
 
 // ===== PHASE 5.2: Extended Monthly Predictions =====
+
+const MONTHLY_FOCUS: ByLang<string[]> = {
+  en: {
+    1: ["New projects", "Leading", "Independence", "Initiative"],
+    2: ["Partnerships", "Cooperation", "Patience", "Details"],
+    3: ["Creativity", "Expression", "Friends", "Conversation"],
+    4: ["Order", "Structure", "Groundwork", "Discipline"],
+    5: ["Change", "Freedom", "Travel", "Flexibility"],
+    6: ["Family", "Home", "Responsibility", "Care"],
+    7: ["Reflection", "Study", "Solitude", "Questions"],
+    8: ["Career", "Money", "Authority", "Results"],
+    9: ["Endings", "Letting go", "Forgiveness", "Giving"]
+  },
+  ro: {
+    1: ["Proiecte noi", "Conducere", "Independență", "Inițiativă"],
+    2: ["Parteneriate", "Cooperare", "Răbdare", "Detalii"],
+    3: ["Creativitate", "Exprimare", "Prieteni", "Conversație"],
+    4: ["Ordine", "Structură", "Temelie", "Disciplină"],
+    5: ["Schimbare", "Libertate", "Drumuri", "Flexibilitate"],
+    6: ["Familie", "Casă", "Răspundere", "Grijă"],
+    7: ["Reflecție", "Studiu", "Singurătate", "Întrebări"],
+    8: ["Carieră", "Bani", "Autoritate", "Rezultate"],
+    9: ["Încheieri", "Desprindere", "Iertare", "Dăruire"]
+  },
+  ru: {
+    1: ["Новые проекты", "Лидерство", "Независимость", "Инициатива"],
+    2: ["Партнёрство", "Сотрудничество", "Терпение", "Детали"],
+    3: ["Творчество", "Самовыражение", "Друзья", "Разговоры"],
+    4: ["Порядок", "Структура", "Фундамент", "Дисциплина"],
+    5: ["Перемены", "Свобода", "Поездки", "Гибкость"],
+    6: ["Семья", "Дом", "Ответственность", "Забота"],
+    7: ["Размышление", "Учёба", "Уединение", "Вопросы"],
+    8: ["Карьера", "Деньги", "Авторитет", "Результаты"],
+    9: ["Завершения", "Отпускание", "Прощение", "Отдача"]
+  }
+};
 
 /**
  * Calculate detailed monthly focus areas.
  * @param birthDate - Birth date
  * @param month - Month number (1-12)
  * @param year - Year
+ * @param lang - Language of the text
  * @returns Array of focus areas for the month
  */
 export const calculateMonthlyFocus = (
   birthDate: Date,
   month: number,
-  year: number
-): string[] => {
-  const personalMonth = calculatePersonalMonthNumber(birthDate, month, year);
-  const monthly = getMonthlyPrediction(birthDate, month, year);
-  
-  const focusAreas: Record<number, string[]> = {
-    1: ["New projects", "Leadership", "Independence", "Initiative"],
-    2: ["Partnerships", "Cooperation", "Patience", "Details"],
-    3: ["Creativity", "Expression", "Socializing", "Communication"],
-    4: ["Organization", "Structure", "Foundation", "Discipline"],
-    5: ["Change", "Freedom", "Adventure", "Flexibility"],
-    6: ["Family", "Home", "Responsibility", "Harmony"],
-    7: ["Reflection", "Study", "Spirituality", "Inner work"],
-    8: ["Achievement", "Success", "Finances", "Power"],
-    9: ["Completion", "Release", "Compassion", "Service"]
-  };
-  
-  return focusAreas[personalMonth] || focusAreas[1];
+  year: number,
+  lang: Language = 'en'
+): string[] => pick(MONTHLY_FOCUS, lang, personalMonthFor(birthDate, year, month));
+
+const MONTHLY_RECOMMENDATIONS: ByLang<string[]> = {
+  en: {
+    1: [
+      "Start the project you keep putting off",
+      "Offer to lead something",
+      "Write down one clear goal for the month",
+      "Make the first move instead of waiting",
+      "Decide on your own judgement, then act"
+    ],
+    2: [
+      "Do the important work together with someone",
+      "Give slow things the time they need",
+      "Check the details twice",
+      "Listen more than you speak",
+      "Choose collaboration over competition"
+    ],
+    3: [
+      "Make something and show it",
+      "Say yes to invitations",
+      "Share an idea before it is perfect",
+      "Notice one good thing every day",
+      "Say what you think, kindly and clearly"
+    ],
+    4: [
+      "Clear your desk and your inbox",
+      "Finish what is half-done",
+      "Deal with the practical things first",
+      "Keep the same routine for four weeks",
+      "Break the big goal into weekly steps"
+    ],
+    5: [
+      "Say yes to something you have never done",
+      "Keep your plans loose",
+      "Change one habit",
+      "Go somewhere, even briefly",
+      "Do one thing that scares you a little"
+    ],
+    6: [
+      "Spend unhurried time with your family",
+      "Fix something in the house",
+      "Make up with someone",
+      "Help whoever asks you",
+      "Say one no that protects your own time"
+    ],
+    7: [
+      "Keep a few hours alone each week",
+      "Study something in depth",
+      "Keep a journal",
+      "Wait before answering what upset you",
+      "Write down the questions you can't answer yet"
+    ],
+    8: [
+      "Ask for the raise or the promotion",
+      "Make the money decision you keep delaying",
+      "Take a risk you have calculated",
+      "Invest in a skill that pays",
+      "Take responsibility in front of others"
+    ],
+    9: [
+      "Finish what has dragged on",
+      "Give away what you no longer use",
+      "Forgive one old grudge",
+      "Help without expecting anything back",
+      "Write down what you want to start next"
+    ]
+  },
+  ro: {
+    1: [
+      "Începe proiectul pe care îl tot amâni",
+      "Oferă-te să conduci ceva",
+      "Scrie un singur scop limpede pentru luna asta",
+      "Fă tu primul pas, nu aștepta",
+      "Decide după capul tău, apoi treci la fapte"
+    ],
+    2: [
+      "Fă lucrul important împreună cu cineva",
+      "Dă-le timp lucrurilor care merg încet",
+      "Verifică detaliile de două ori",
+      "Ascultă mai mult decât vorbești",
+      "Alege colaborarea, nu întrecerea"
+    ],
+    3: [
+      "Fă ceva și arată-l",
+      "Spune da la invitații",
+      "Împărtășește o idee înainte să fie perfectă",
+      "Observă în fiecare zi un lucru bun",
+      "Spune ce crezi, blând și limpede"
+    ],
+    4: [
+      "Fă ordine pe birou și în mesaje",
+      "Termină ce e pe jumătate",
+      "Rezolvă întâi lucrurile practice",
+      "Ține aceeași rutină patru săptămâni",
+      "Împarte scopul mare în pași de o săptămână"
+    ],
+    5: [
+      "Spune da la ceva ce n-ai mai făcut",
+      "Ține planurile largi",
+      "Schimbă un obicei",
+      "Pleacă undeva, fie și pentru puțin",
+      "Fă un lucru care te sperie puțin"
+    ],
+    6: [
+      "Petrece timp fără grabă cu familia",
+      "Repară ceva în casă",
+      "Împacă-te cu cineva",
+      "Ajută-l pe cel care îți cere",
+      "Spune un „nu” care îți apără timpul"
+    ],
+    7: [
+      "Păstrează câteva ore doar pentru tine în fiecare săptămână",
+      "Studiază ceva în profunzime",
+      "Ține un jurnal",
+      "Așteaptă înainte să răspunzi la ce te-a supărat",
+      "Scrie întrebările la care încă n-ai răspuns"
+    ],
+    8: [
+      "Cere mărirea sau promovarea",
+      "Ia decizia cu bani pe care o tot amâni",
+      "Asumă-ți un risc calculat",
+      "Investește într-o abilitate care aduce bani",
+      "Asumă-ți răspunderea în fața celorlalți"
+    ],
+    9: [
+      "Termină ce s-a tot lungit",
+      "Dă ce nu mai folosești",
+      "Iartă o supărare veche",
+      "Ajută fără să aștepți nimic înapoi",
+      "Scrie ce vrei să începi după"
+    ]
+  },
+  ru: {
+    1: [
+      "Начните проект, который всё откладываете",
+      "Вызовитесь чем-то руководить",
+      "Запишите одну ясную цель на месяц",
+      "Сделайте первый шаг сами, не ждите",
+      "Решите своим умом и действуйте"
+    ],
+    2: [
+      "Делайте важное вместе с кем-то",
+      "Дайте медленным делам время",
+      "Проверяйте детали дважды",
+      "Слушайте больше, чем говорите",
+      "Выбирайте сотрудничество, а не соперничество"
+    ],
+    3: [
+      "Сделайте что-то и покажите",
+      "Принимайте приглашения",
+      "Делитесь идеей, пока она ещё не идеальна",
+      "Каждый день замечайте одну хорошую вещь",
+      "Говорите, что думаете, мягко и ясно"
+    ],
+    4: [
+      "Разберите стол и почту",
+      "Доделайте начатое",
+      "Сначала решите практические вопросы",
+      "Держите один режим четыре недели",
+      "Разбейте большую цель на шаги по неделям"
+    ],
+    5: [
+      "Согласитесь на то, чего никогда не делали",
+      "Не стройте жёстких планов",
+      "Измените одну привычку",
+      "Съездите куда-нибудь, хотя бы ненадолго",
+      "Сделайте одну вещь, которая немного пугает"
+    ],
+    6: [
+      "Проведите неспешное время с семьёй",
+      "Почините что-то дома",
+      "Помиритесь с кем-то",
+      "Помогите тому, кто просит",
+      "Скажите одно «нет», которое бережёт ваше время"
+    ],
+    7: [
+      "Выделяйте каждую неделю несколько часов наедине с собой",
+      "Изучите что-то глубоко",
+      "Ведите дневник",
+      "Не отвечайте сразу на то, что задело",
+      "Запишите вопросы, на которые пока нет ответа"
+    ],
+    8: [
+      "Попросите прибавку или повышение",
+      "Примите денежное решение, которое откладываете",
+      "Пойдите на просчитанный риск",
+      "Вложитесь в навык, который приносит деньги",
+      "Возьмите ответственность на виду у других"
+    ],
+    9: [
+      "Завершите то, что затянулось",
+      "Отдайте то, чем больше не пользуетесь",
+      "Простите одну старую обиду",
+      "Помогите, ничего не ожидая взамен",
+      "Запишите, что хотите начать потом"
+    ]
+  }
 };
 
 /**
@@ -569,333 +778,165 @@ export const calculateMonthlyFocus = (
  * @param birthDate - Birth date
  * @param month - Month number (1-12)
  * @param year - Year
+ * @param lang - Language of the text
  * @returns Array of specific recommendations for the month
  */
 export const getMonthlyRecommendations = (
   birthDate: Date,
   month: number,
-  year: number
-): string[] => {
-  const personalMonth = calculatePersonalMonthNumber(birthDate, month, year);
-  const monthly = getMonthlyPrediction(birthDate, month, year);
-  
-  const recommendations: Record<number, string[]> = {
-    1: [
-      "Start new projects or initiatives",
-      "Take on leadership roles",
-      "Set clear goals for the month",
-      "Be proactive in pursuing opportunities",
-      "Trust your instincts and take action"
-    ],
-    2: [
-      "Focus on building partnerships",
-      "Practice patience in all matters",
-      "Pay attention to details",
-      "Listen more than you speak",
-      "Seek collaboration over competition"
-    ],
-    3: [
-      "Express yourself creatively",
-      "Engage in social activities",
-      "Share your ideas and enthusiasm",
-      "Find joy in everyday moments",
-      "Communicate openly and honestly"
-    ],
-    4: [
-      "Organize your life and workspace",
-      "Build solid foundations",
-      "Focus on practical matters",
-      "Establish consistent routines",
-      "Work systematically toward goals"
-    ],
-    5: [
-      "Embrace change and new experiences",
-      "Be flexible with plans",
-      "Try new things",
-      "Travel or explore",
-      "Break out of comfort zones"
-    ],
-    6: [
-      "Spend quality time with family",
-      "Focus on home improvements",
-      "Nurture relationships",
-      "Help others in need",
-      "Create harmony in your environment"
-    ],
-    7: [
-      "Take time for solitude",
-      "Engage in study or research",
-      "Practice meditation or reflection",
-      "Trust your intuition",
-      "Seek inner wisdom"
-    ],
-    8: [
-      "Focus on career advancement",
-      "Make important financial decisions",
-      "Take calculated risks",
-      "Invest in your future",
-      "Step into positions of authority"
-    ],
-    9: [
-      "Complete unfinished projects",
-      "Let go of what no longer serves",
-      "Practice forgiveness",
-      "Help others through service",
-      "Prepare for new cycles"
-    ]
-  };
-  
-  return recommendations[personalMonth] || recommendations[1];
-};
+  year: number,
+  lang: Language = 'en'
+): string[] => pick(MONTHLY_RECOMMENDATIONS, lang, personalMonthFor(birthDate, year, month));
 
 // ===== PHASE 5.3: Annual Predictions =====
+
+const ANNUAL_THEMES: ByLang<{ theme: string; description: string }> = {
+  en: {
+    1: { theme: "A year of beginnings", description: "The first year of a nine-year cycle. What you start now sets the direction of the years that follow, so choose deliberately." },
+    2: { theme: "A year of patience and partnership", description: "Things grow slowly this year, and through other people. Cooperation, patience and attention to detail pay off more than force." },
+    3: { theme: "A year of expression", description: "A year to show what you have: create, speak, meet people. What stays unsaid this year stays unused." },
+    4: { theme: "A year of groundwork", description: "A year of steady work and structure. It is not spectacular, but what you build now holds for a long time." },
+    5: { theme: "A year of change", description: "Plans move this year: a new place, a new job, new people. Flexibility serves you better than control." },
+    6: { theme: "A year of home and responsibility", description: "Family, home and the people who rely on you come first. The work is caring well, including for yourself." },
+    7: { theme: "A year to look inward", description: "A quieter year of study and reflection. You understand more than you achieve, and that is the point of it." },
+    8: { theme: "A year of ambition and results", description: "Work, money and recognition are in play. What you built in the past years can pay off now — ask for it." },
+    9: { theme: "A year of closing", description: "The last year of the cycle. Finish, let go, clear space. What ends now makes room for what starts next year." }
+  },
+  ro: {
+    1: { theme: "An de început", description: "Primul an dintr-un ciclu de nouă. Ce începi acum dă direcția anilor care urmează, așa că alege cu bună știință." },
+    2: { theme: "An de răbdare și de parteneriat", description: "Lucrurile cresc încet anul ăsta și trec prin alți oameni. Colaborarea, răbdarea și atenția la detalii aduc mai mult decât forța." },
+    3: { theme: "An de exprimare", description: "Un an în care să arăți ce ai: creează, vorbește, ieși printre oameni. Ce rămâne nespus anul ăsta rămâne nefolosit." },
+    4: { theme: "An de temelie", description: "Un an de muncă constantă și de ordine. Nu e spectaculos, dar ce construiești acum ține mult." },
+    5: { theme: "An de schimbare", description: "Planurile se mută anul ăsta: alt loc, altă slujbă, alți oameni. Flexibilitatea te ajută mai mult decât controlul." },
+    6: { theme: "An pentru casă și răspundere", description: "Familia, casa și oamenii care se bazează pe tine vin pe primul loc. Munca anului e să ai grijă bine, inclusiv de tine." },
+    7: { theme: "An de privit înăuntru", description: "Un an mai liniștit, de studiu și de reflecție. Înțelegi mai mult decât realizezi, și tocmai ăsta e rostul lui." },
+    8: { theme: "An de ambiție și rezultate", description: "Munca, banii și recunoașterea sunt în joc. Ce ai construit în anii din urmă poate da roade acum — cere-le." },
+    9: { theme: "An de încheiere", description: "Ultimul an din ciclu. Termină, dă drumul, fă loc. Ce se încheie acum face loc pentru ce începe anul viitor." }
+  },
+  ru: {
+    1: { theme: "Год начинаний", description: "Первый год девятилетнего цикла. То, что вы начнёте сейчас, задаст направление следующим годам, поэтому выбирайте осознанно." },
+    2: { theme: "Год терпения и партнёрства", description: "В этом году всё растёт медленно и через других людей. Сотрудничество, терпение и внимание к деталям дают больше, чем напор." },
+    3: { theme: "Год самовыражения", description: "Год, чтобы показать, что у вас есть: создавайте, говорите, выходите к людям. То, что останется несказанным, останется неиспользованным." },
+    4: { theme: "Год фундамента", description: "Год упорной работы и порядка. Он не эффектный, но то, что вы построите сейчас, продержится долго." },
+    5: { theme: "Год перемен", description: "В этом году планы сдвигаются: новое место, новая работа, новые люди. Гибкость поможет больше, чем контроль." },
+    6: { theme: "Год дома и ответственности", description: "Семья, дом и люди, которые на вас рассчитывают, на первом месте. Задача года — хорошо заботиться, в том числе о себе." },
+    7: { theme: "Год, чтобы заглянуть внутрь", description: "Более тихий год учёбы и размышлений. Вы больше понимаете, чем достигаете, — в этом и смысл." },
+    8: { theme: "Год амбиций и результатов", description: "Работа, деньги и признание в игре. То, что вы строили в прошлые годы, может принести плоды сейчас — просите о них." },
+    9: { theme: "Год завершений", description: "Последний год цикла. Заканчивайте, отпускайте, освобождайте место. То, что закончится сейчас, даст место тому, что начнётся в следующем году." }
+  }
+};
 
 /**
  * Calculate annual theme based on personal year number.
  * @param birthDate - Birth date
  * @param year - Year to analyze
+ * @param lang - Language of the text
  * @returns Annual theme description
  */
 export const calculateAnnualTheme = (
   birthDate: Date,
-  year: number
-): { theme: string; description: string } => {
-  const personalYear = calculatePersonalYearNumber(birthDate, year);
-  
-  const themes: Record<number, { theme: string; description: string }> = {
-    1: {
-      theme: "New Beginnings Year",
-      description: "A year of fresh starts, new opportunities, and taking initiative. Plant seeds for future growth."
-    },
-    2: {
-      theme: "Partnership Year",
-      description: "A year focused on cooperation, patience, and building relationships. Success comes through collaboration."
-    },
-    3: {
-      theme: "Creative Expression Year",
-      description: "A vibrant year for creativity, socializing, and self-expression. Joy and inspiration abound."
-    },
-    4: {
-      theme: "Foundation Building Year",
-      description: "A year for hard work, organization, and creating stability. Discipline brings lasting results."
-    },
-    5: {
-      theme: "Change and Freedom Year",
-      description: "An exciting year of change, travel, and new experiences. Flexibility is your greatest asset."
-    },
-    6: {
-      theme: "Love and Responsibility Year",
-      description: "A year focused on home, family, and nurturing. Love and harmony guide your path."
-    },
-    7: {
-      theme: "Inner Wisdom Year",
-      description: "A reflective year for inner work, study, and spiritual development. Trust your intuition."
-    },
-    8: {
-      theme: "Power and Abundance Year",
-      description: "A powerful year for achievement, recognition, and material success. Step into your power."
-    },
-    9: {
-      theme: "Completion and Release Year",
-      description: "A year of endings, release, and humanitarian focus. Let go to make room for the new."
-    }
-  };
-  
-  return themes[personalYear] || themes[1];
+  year: number,
+  lang: Language = 'en'
+): { theme: string; description: string } =>
+  pick(ANNUAL_THEMES, lang, calculatePersonalYearNumber(birthDate, year));
+
+const ANNUAL_OPPORTUNITIES: ByLang<string[]> = {
+  en: {
+    1: ["Starting something of your own", "Taking the lead", "Changing direction at work", "Learning a new skill", "Deciding where the next nine years go"],
+    2: ["Finding the right partner for a project", "Deepening a close relationship", "Working as a team", "Settling a conflict calmly", "Learning to wait without giving up"],
+    3: ["Creative projects", "Meeting new people", "Writing, speaking, performing", "Making your work visible", "Enjoying things again"],
+    4: ["Putting your finances in order", "Planning for the long term", "Building a routine you can rely on", "Finishing a qualification", "Steady progress"],
+    5: ["Travel", "Moving house or changing jobs", "Trying new things", "More freedom in your schedule", "Saying yes to the unexpected"],
+    6: ["Mending family relationships", "Improving your home", "Committing to someone", "Helping the people around you", "Making things beautiful around you"],
+    7: ["Studying something in depth", "Understanding yourself better", "Research and analysis", "A regular quiet practice", "Answering questions you have avoided"],
+    8: ["A promotion or a bigger role", "Better income", "Recognition for past work", "Business opportunities", "Taking on authority"],
+    9: ["Finishing long projects", "Clearing out what no longer fits", "Helping others", "Forgiving and moving on", "Preparing for a new cycle"]
+  },
+  ro: {
+    1: ["Să începi ceva al tău", "Să iei conducerea", "O schimbare de direcție la muncă", "Să înveți o abilitate nouă", "Să hotărăști încotro merg următorii nouă ani"],
+    2: ["Să găsești partenerul potrivit pentru un proiect", "Să adâncești o relație apropiată", "Lucrul în echipă", "Să rezolvi un conflict cu calm", "Să înveți să aștepți fără să renunți"],
+    3: ["Proiecte creative", "Oameni noi", "Să scrii, să vorbești, să urci pe scenă", "Să faci vizibil ce lucrezi", "Să te bucuri din nou de lucruri"],
+    4: ["Să-ți pui banii în ordine", "Planuri pe termen lung", "O rutină pe care te poți baza", "Să termini o calificare", "Progres constant"],
+    5: ["Călătorii", "O mutare sau o slujbă nouă", "Să încerci lucruri noi", "Mai multă libertate în program", "Să spui da neprevăzutului"],
+    6: ["Să repari relațiile din familie", "Să-ți îmbunătățești casa", "Să te angajezi față de cineva", "Să-i ajuți pe cei din jur", "Să faci frumos în jurul tău"],
+    7: ["Să studiezi ceva în profunzime", "Să te înțelegi mai bine", "Cercetare și analiză", "O practică liniștită, regulată", "Să răspunzi la întrebările pe care le-ai ocolit"],
+    8: ["Promovare sau un rol mai mare", "Venit mai bun", "Recunoaștere pentru munca de până acum", "Oportunități de afaceri", "Să-ți asumi autoritatea"],
+    9: ["Să termini proiectele lungi", "Să scapi de ce nu se mai potrivește", "Să-i ajuți pe alții", "Să ierți și să mergi mai departe", "Să te pregătești pentru un ciclu nou"]
+  },
+  ru: {
+    1: ["Начать что-то своё", "Взять руководство на себя", "Сменить направление в работе", "Освоить новый навык", "Решить, куда пойдут следующие девять лет"],
+    2: ["Найти подходящего партнёра для проекта", "Углубить близкие отношения", "Работа в команде", "Спокойно уладить конфликт", "Научиться ждать, не сдаваясь"],
+    3: ["Творческие проекты", "Новые знакомства", "Писать, выступать, говорить", "Сделать свою работу заметной", "Снова радоваться жизни"],
+    4: ["Навести порядок в финансах", "Долгосрочные планы", "Распорядок, на который можно положиться", "Получить квалификацию", "Постоянный прогресс"],
+    5: ["Путешествия", "Переезд или новая работа", "Пробовать новое", "Больше свободы в расписании", "Говорить «да» неожиданному"],
+    6: ["Наладить отношения в семье", "Обустроить дом", "Серьёзные обязательства перед близким человеком", "Помогать людям вокруг", "Создавать красоту вокруг себя"],
+    7: ["Глубоко изучить что-то", "Лучше понять себя", "Исследования и анализ", "Регулярная тихая практика", "Ответить на вопросы, которых вы избегали"],
+    8: ["Повышение или более крупная роль", "Более высокий доход", "Признание прежней работы", "Деловые возможности", "Взять на себя ответственность и власть"],
+    9: ["Завершить долгие проекты", "Избавиться от того, что больше не подходит", "Помогать другим", "Простить и идти дальше", "Подготовиться к новому циклу"]
+  }
 };
 
 /**
  * Calculate annual opportunities based on personal year.
  * @param birthDate - Birth date
  * @param year - Year to analyze
+ * @param lang - Language of the text
  * @returns Array of opportunities for the year
  */
 export const calculateAnnualOpportunities = (
   birthDate: Date,
-  year: number
-): string[] => {
-  const personalYear = calculatePersonalYearNumber(birthDate, year);
-  
-  const opportunities: Record<number, string[]> = {
-    1: [
-      "Starting new ventures",
-      "Leadership opportunities",
-      "Career changes",
-      "Personal growth initiatives",
-      "Setting new life directions"
-    ],
-    2: [
-      "Forming partnerships",
-      "Building strong relationships",
-      "Collaborative projects",
-      "Diplomatic solutions",
-      "Developing patience and understanding"
-    ],
-    3: [
-      "Creative projects",
-      "Social networking",
-      "Self-expression opportunities",
-      "Artistic endeavors",
-      "Joyful experiences"
-    ],
-    4: [
-      "Building solid foundations",
-      "Long-term planning",
-      "Organizational improvements",
-      "Stability creation",
-      "Systematic progress"
-    ],
-    5: [
-      "Travel and adventure",
-      "New experiences",
-      "Embracing change",
-      "Freedom and flexibility",
-      "Unexpected opportunities"
-    ],
-    6: [
-      "Family harmony",
-      "Home improvements",
-      "Nurturing relationships",
-      "Community service",
-      "Creating beauty"
-    ],
-    7: [
-      "Spiritual growth",
-      "Inner discovery",
-      "Study and research",
-      "Meditation practices",
-      "Wisdom development"
-    ],
-    8: [
-      "Career advancement",
-      "Financial success",
-      "Material achievements",
-      "Recognition and authority",
-      "Business opportunities"
-    ],
-    9: [
-      "Completing cycles",
-      "Helping others",
-      "Charitable work",
-      "Transformation",
-      "Preparing for new beginnings"
-    ]
-  };
-  
-  return opportunities[personalYear] || opportunities[1];
+  year: number,
+  lang: Language = 'en'
+): string[] => pick(ANNUAL_OPPORTUNITIES, lang, calculatePersonalYearNumber(birthDate, year));
+
+const ANNUAL_CHALLENGES: ByLang<string[]> = {
+  en: {
+    1: ["Acting on impulse", "Doing everything alone", "Impatience", "Forgetting the people around you"],
+    2: ["Indecision", "Taking things too personally", "Losing yourself in others", "Depending on someone's approval"],
+    3: ["Spreading yourself too thin", "Too much going out, too little rest", "Staying on the surface", "Overdoing food, drink or spending"],
+    4: ["Rigidity", "Working without rest", "Turning into a workaholic", "Resisting a change you need"],
+    5: ["Acting on impulse", "Freedom without responsibility", "Restlessness", "Hasty decisions"],
+    6: ["Overprotecting others", "Forgetting to look after yourself", "Giving up what you need", "Perfectionism"],
+    7: ["Isolating yourself", "Too little contact with others", "Withdrawing completely", "Overthinking"],
+    8: ["Measuring everything in money", "Ambition without kindness", "Needing control", "Stress from pushing too hard"],
+    9: ["Holding on to the past", "Starting new things too early", "Melancholy", "Clinging to what is ending"]
+  },
+  ro: {
+    1: ["Să acționezi din impuls", "Să faci totul singur", "Nerăbdarea", "Să-i uiți pe cei din jur"],
+    2: ["Nehotărârea", "Să iei totul personal", "Să te pierzi în ceilalți", "Să depinzi de aprobarea cuiva"],
+    3: ["Să te împrăștii în prea multe", "Prea multe ieșiri, prea puțină odihnă", "Să rămâi la suprafață", "Excesul de mâncare, băutură sau cumpărături"],
+    4: ["Rigiditatea", "Munca fără odihnă", "Să nu mai știi să te oprești din muncă", "Să te împotrivești unei schimbări de care ai nevoie"],
+    5: ["Să acționezi din impuls", "Libertate fără răspundere", "Neliniștea", "Deciziile grăbite"],
+    6: ["Să-i protejezi prea mult pe ceilalți", "Să uiți să ai grijă de tine", "Să renunți la ce-ți trebuie", "Perfecționismul"],
+    7: ["Să te izolezi", "Prea puțin contact cu ceilalți", "Să te retragi de tot", "Să gândești prea mult"],
+    8: ["Să măsori totul în bani", "Ambiție fără bunătate", "Nevoia de control", "Stresul de a trage prea tare"],
+    9: ["Să ții de trecut", "Să începi lucruri noi prea devreme", "Melancolia", "Să te agăți de ce se termină"]
+  },
+  ru: {
+    1: ["Действовать импульсивно", "Делать всё в одиночку", "Нетерпение", "Забывать о людях рядом"],
+    2: ["Нерешительность", "Принимать всё на свой счёт", "Растворяться в других", "Зависеть от чужого одобрения"],
+    3: ["Распыляться", "Слишком много встреч, слишком мало отдыха", "Оставаться на поверхности", "Излишества в еде, выпивке или покупках"],
+    4: ["Жёсткость", "Работа без отдыха", "Превратиться в трудоголика", "Сопротивляться нужным переменам"],
+    5: ["Действовать импульсивно", "Свобода без ответственности", "Беспокойство", "Поспешные решения"],
+    6: ["Чрезмерная опека", "Забывать заботиться о себе", "Жертвовать своими нуждами", "Перфекционизм"],
+    7: ["Изоляция", "Слишком мало общения", "Полный уход в себя", "Слишком много размышлений"],
+    8: ["Измерять всё деньгами", "Амбиции без доброты", "Желание всё контролировать", "Стресс от чрезмерного напора"],
+    9: ["Держаться за прошлое", "Начинать новое слишком рано", "Меланхолия", "Цепляться за то, что заканчивается"]
+  }
 };
 
 /**
  * Calculate annual challenges based on personal year.
  * @param birthDate - Birth date
  * @param year - Year to analyze
+ * @param lang - Language of the text
  * @returns Array of challenges for the year
  */
 export const calculateAnnualChallenges = (
   birthDate: Date,
-  year: number
-): string[] => {
-  const personalYear = calculatePersonalYearNumber(birthDate, year);
-  
-  const challenges: Record<number, string[]> = {
-    1: [
-      "Avoiding impulsivity",
-      "Balancing independence with cooperation",
-      "Managing impatience",
-      "Not being too self-centered"
-    ],
-    2: [
-      "Overcoming indecision",
-      "Avoiding excessive sensitivity",
-      "Balancing cooperation with self-assertion",
-      "Managing dependency"
-    ],
-    3: [
-      "Avoiding scattered energy",
-      "Balancing social life with personal time",
-      "Not being superficial",
-      "Managing overindulgence"
-    ],
-    4: [
-      "Avoiding rigidity",
-      "Balancing work with rest",
-      "Not becoming workaholic",
-      "Managing resistance to change"
-    ],
-    5: [
-      "Avoiding impulsivity",
-      "Balancing freedom with responsibility",
-      "Managing restlessness",
-      "Not making hasty decisions"
-    ],
-    6: [
-      "Avoiding overprotectiveness",
-      "Balancing care for others with self-care",
-      "Not sacrificing personal needs",
-      "Managing perfectionism"
-    ],
-    7: [
-      "Avoiding isolation",
-      "Balancing solitude with social connection",
-      "Not becoming too withdrawn",
-      "Managing overthinking"
-    ],
-    8: [
-      "Avoiding materialism",
-      "Balancing ambition with compassion",
-      "Not becoming power-obsessed",
-      "Managing stress from ambition"
-    ],
-    9: [
-      "Letting go of the past",
-      "Balancing completion with new beginnings",
-      "Avoiding melancholy",
-      "Managing emotional attachments"
-    ]
-  };
-  
-  return challenges[personalYear] || challenges[1];
-};
-
-/**
- * Calculate cycle transitions - when personal year transitions occur.
- * @param birthDate - Birth date
- * @param startYear - Starting year (default: current year)
- * @param yearsAhead - Number of years to look ahead (default: 5)
- * @returns Array of cycle transition years
- */
-export const calculateCycleTransitions = (
-  birthDate: Date,
-  startYear: number = new Date().getFullYear(),
-  yearsAhead: number = 5
-): Array<{ year: number; fromYear: number; toYear: number; significance: string }> => {
-  const transitions: Array<{ year: number; fromYear: number; toYear: number; significance: string }> = [];
-  
-  for (let i = 0; i < yearsAhead; i++) {
-    const year = startYear + i;
-    const currentYear = calculatePersonalYearNumber(birthDate, year);
-    const nextYear = calculatePersonalYearNumber(birthDate, year + 1);
-    
-    // Major transitions: 9 to 1, or when year changes significantly
-    if (currentYear === 9 && nextYear === 1) {
-      transitions.push({
-        year: year + 1,
-        fromYear: currentYear,
-        toYear: nextYear,
-        significance: "Major cycle completion - ending a 9-year cycle and beginning a new one"
-      });
-    } else if (Math.abs(currentYear - nextYear) >= 4) {
-      transitions.push({
-        year: year + 1,
-        fromYear: currentYear,
-        toYear: nextYear,
-        significance: "Significant energy shift in personal year"
-      });
-    }
-  }
-  
-  return transitions;
-};
+  year: number,
+  lang: Language = 'en'
+): string[] => pick(ANNUAL_CHALLENGES, lang, calculatePersonalYearNumber(birthDate, year));
 
 // ===== PHASE 5.4: Calendar Functions =====
 
@@ -933,148 +974,4 @@ export const getFavorableDays = (
   }
   
   return favorableDays.sort((a, b) => b.score - a.score);
-};
-
-/**
- * Get unfavorable days in a date range.
- * @param birthDate - Birth date
- * @param startDate - Start date of range
- * @param endDate - End date of range
- * @param maxScore - Maximum lucky score (default: 20)
- * @returns Array of unfavorable dates
- */
-export const getUnfavorableDays = (
-  birthDate: Date,
-  startDate: Date,
-  endDate: Date,
-  maxScore: number = 20
-): Array<{ date: Date; score: number; reasons: string[] }> => {
-  const lifePath = calculateLifePathNumber(birthDate);
-  const unfavorableDays: Array<{ date: Date; score: number; reasons: string[] }> = [];
-  
-  const currentDate = new Date(startDate);
-  while (currentDate <= endDate) {
-    const personalYear = calculatePersonalYearNumber(birthDate, currentDate.getFullYear());
-    const { score, reasons } = calculateLuckyScore(currentDate, lifePath, 0, personalYear);
-    
-    if (score <= maxScore) {
-      unfavorableDays.push({
-        date: new Date(currentDate),
-        score,
-        reasons
-      });
-    }
-    
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-  
-  return unfavorableDays.sort((a, b) => a.score - b.score);
-};
-
-/**
- * Get optimal days for specific actions based on numerology.
- * @param birthDate - Birth date
- * @param actionType - Type of action (e.g., "start_project", "sign_contract", "travel")
- * @param startDate - Start date of range
- * @param endDate - End date of range
- * @returns Array of optimal dates for the action
- */
-export const getOptimalDaysForAction = (
-  birthDate: Date,
-  actionType: string,
-  startDate: Date,
-  endDate: Date
-): Array<{ date: Date; dayNumber: number; reason: string }> => {
-  const optimalDays: Array<{ date: Date; dayNumber: number; reason: string }> = [];
-  
-  // Map action types to preferred day numbers
-  const actionPreferences: Record<string, number[]> = {
-    start_project: [1, 8],
-    sign_contract: [4, 8],
-    travel: [5, 3],
-    social_event: [3, 6],
-    financial_decision: [8, 4],
-    creative_work: [3, 7],
-    spiritual_practice: [7, 9],
-    family_time: [6, 2],
-    career_move: [1, 8],
-    health_focus: [6, 4]
-  };
-  
-  const preferredNumbers = actionPreferences[actionType] || [1, 8];
-  
-  const currentDate = new Date(startDate);
-  while (currentDate <= endDate) {
-    const dayNumber = calculatePersonalDayNumber(birthDate, currentDate);
-    
-    if (preferredNumbers.includes(dayNumber)) {
-      const reason = dayNumber === 1 
-        ? "Day of new beginnings - perfect for starting"
-        : dayNumber === 8
-        ? "Day of achievement - ideal for important actions"
-        : `Day number ${dayNumber} aligns with ${actionType}`;
-        
-      optimalDays.push({
-        date: new Date(currentDate),
-        dayNumber,
-        reason
-      });
-    }
-    
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-  
-  return optimalDays;
-};
-
-/**
- * Analyze a specific event date for numerology compatibility.
- * @param birthDate - Birth date
- * @param eventDate - Date of the event
- * @param eventType - Type of event (optional)
- * @returns Analysis of the event date
- */
-export const analyzeEventDate = (
-  birthDate: Date,
-  eventDate: Date,
-  eventType?: string
-): {
-  personalDay: number;
-  universalDay: number;
-  compatibility: "excellent" | "good" | "neutral" | "challenging";
-  analysis: string;
-  recommendations: string[];
-} => {
-  const personalDay = calculatePersonalDayNumber(birthDate, eventDate);
-  const universalDay = calculateUniversalDayNumber(eventDate);
-  const lifePath = calculateLifePathNumber(birthDate);
-  const personalYear = calculatePersonalYearNumber(birthDate, eventDate.getFullYear());
-  const { score } = calculateLuckyScore(eventDate, lifePath, 0, personalYear);
-  
-  let compatibility: "excellent" | "good" | "neutral" | "challenging";
-  let analysis: string;
-  
-  if (score >= 60) {
-    compatibility = "excellent";
-    analysis = "This is an excellent date for your event. The numerological energies are highly favorable.";
-  } else if (score >= 40) {
-    compatibility = "good";
-    analysis = "This is a good date for your event. The energies are generally favorable.";
-  } else if (score >= 25) {
-    compatibility = "neutral";
-    analysis = "This date has neutral energies. Consider if this timing aligns with your intentions.";
-  } else {
-    compatibility = "challenging";
-    analysis = "This date may present challenges. Consider alternative dates or prepare for potential obstacles.";
-  }
-  
-  const recommendations = getDayRecommendations(birthDate, eventDate);
-  
-  return {
-    personalDay,
-    universalDay,
-    compatibility,
-    analysis,
-    recommendations
-  };
 };

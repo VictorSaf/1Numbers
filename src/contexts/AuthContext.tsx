@@ -3,6 +3,9 @@ import { User, AuthState, LoginCredentials, RegisterCredentials, ApiResponse } f
 import { api } from '@/services/api';
 
 interface AuthContextType extends AuthState {
+  /** Consumers such as useFriends build Authorization headers from this and
+   *  re-run when it changes; reading api.getToken() ad hoc would not be reactive. */
+  token: string | null;
   login: (credentials: LoginCredentials) => Promise<ApiResponse<User>>;
   register: (credentials: RegisterCredentials) => Promise<ApiResponse<User>>;
   logout: () => Promise<void>;
@@ -128,6 +131,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   return (
     <AuthContext.Provider value={{ 
       user, 
+      token: api.getToken(),
       isAuthenticated, 
       isLoading, 
       login, 

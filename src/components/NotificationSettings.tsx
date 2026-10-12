@@ -157,7 +157,7 @@ export const NotificationSettings = () => {
     <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <Bell className="h-5 w-5 text-primary" />
+          <Bell className="h-5 w-5" />
           <CardTitle>{t.title}</CardTitle>
         </div>
         <CardDescription>{t.description}</CardDescription>
@@ -180,10 +180,10 @@ export const NotificationSettings = () => {
         )}
 
         {/* Main toggle */}
-        <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
+        <div className="border-t border-line flex items-center justify-between pt-4">
           <div className="flex items-center gap-3">
             {isSubscribed ? (
-              <BellRing className="h-5 w-5 text-green-500" />
+              <BellRing className="h-5 w-5 text-ok" />
             ) : (
               <BellOff className="h-5 w-5 text-muted-foreground" />
             )}
@@ -216,7 +216,7 @@ export const NotificationSettings = () => {
             {/* Daily Prediction */}
             <div className="flex items-center justify-between p-3 rounded-lg border">
               <div className="flex items-center gap-3">
-                <Sun className="h-5 w-5 text-amber-500" />
+                <Sun className="h-5 w-5 text-warn" />
                 <div>
                   <Label htmlFor="daily-prediction" className="font-medium">
                     {t.dailyPrediction}
@@ -243,7 +243,7 @@ export const NotificationSettings = () => {
             {/* Streak Reminder */}
             <div className="flex items-center justify-between p-3 rounded-lg border">
               <div className="flex items-center gap-3">
-                <Flame className="h-5 w-5 text-orange-500" />
+                <Flame className="h-5 w-5 text-warn" />
                 <div>
                   <Label htmlFor="streak-reminder" className="font-medium">
                     {t.streakReminder}
@@ -270,7 +270,7 @@ export const NotificationSettings = () => {
             {/* Special Dates */}
             <div className="flex items-center justify-between p-3 rounded-lg border">
               <div className="flex items-center gap-3">
-                <Calendar className="h-5 w-5 text-purple-500" />
+                <Calendar className="h-5 w-5" />
                 <div>
                   <Label htmlFor="special-dates" className="font-medium">
                     {t.specialDates}
@@ -288,7 +288,7 @@ export const NotificationSettings = () => {
             {/* Achievements */}
             <div className="flex items-center justify-between p-3 rounded-lg border">
               <div className="flex items-center gap-3">
-                <Trophy className="h-5 w-5 text-yellow-500" />
+                <Trophy className="h-5 w-5 text-warn" />
                 <div>
                   <Label htmlFor="achievements" className="font-medium">
                     {t.achievements}
@@ -313,7 +313,7 @@ export const NotificationSettings = () => {
               >
                 {testSent ? (
                   <>
-                    <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
+                    <CheckCircle className="h-4 w-4 mr-2 text-ok" />
                     {t.testSent}
                   </>
                 ) : (

@@ -4,13 +4,17 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  // Doar literă. Chenarul de 1px pe patru laturi în jurul a două cuvinte era
+  // ultima cutie din sistem; înainte de el fusese pastila plină și rotundă.
+  // Ce distinge o etichetă de textul din jur e corpul mic, spațierea și
+  // culoarea -- nu o casetă.
+  "num inline-flex items-center text-[0.63rem] uppercase tracking-[0.14em] transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
   {
     variants: {
       variant: {
-        default: "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
-        secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive: "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
+        default: "text-gilt",
+        secondary: "text-muted-foreground",
+        destructive: "text-tension",
         outline: "text-foreground",
       },
     },

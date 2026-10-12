@@ -1,6 +1,14 @@
 import { Link, useLocation } from 'react-router-dom';
-import { BookOpen, Heart, TrendingUp, GraduationCap, HelpCircle, Wrench, User, Menu, X, Sparkles, Shield } from 'lucide-react';
+import { BookOpen, Heart, CalendarDays, Wrench, User, Menu, X, Shield, Map, NotebookPen, Users, FileText, LogOut, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeSelector } from '@/components/ThemeSelector';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -11,25 +19,41 @@ import { cn } from '@/lib/utils';
 interface NavItem {
   path: string;
   icon: React.ComponentType<{ className?: string }>;
-  labelKey: string;
-  mobileLabel?: string;
+  label: Record<string, string>;
 }
 
+// The bar had seven destinations and had already overflowed at 1900px, so the
+// labels were hidden below 2xl and it became a row of seven anonymous icons --
+// while five complete features had no link into them at all.
+//
+// Five public destinations, named. Everything that needs an account is behind
+// the account menu, where it does not compete with them.
+const PUBLIC_NAV: NavItem[] = [
+  { path: '/', icon: Map, label: { ro: 'Citește-ți harta', en: 'Read your map', ru: 'Ваша карта' } },
+  { path: '/doi', icon: Heart, label: { ro: 'Voi doi', en: 'The two of you', ru: 'Вы двое' } },
+  { path: '/azi', icon: CalendarDays, label: { ro: 'Azi', en: 'Today', ru: 'Сегодня' } },
+  { path: '/unelte', icon: Wrench, label: { ro: 'Unelte', en: 'Tools', ru: 'Инструменты' } },
+  { path: '/invata', icon: BookOpen, label: { ro: 'Învață', en: 'Learn', ru: 'Изучайте' } },
+];
+
+const ACCOUNT_NAV: NavItem[] = [
+  { path: '/eu', icon: User, label: { ro: 'Hărțile mele', en: 'My maps', ru: 'Мои карты' } },
+  { path: '/jurnal', icon: NotebookPen, label: { ro: 'Jurnal', en: 'Journal', ru: 'Дневник' } },
+  { path: '/cercul-meu', icon: Users, label: { ro: 'Cercul meu', en: 'My circle', ru: 'Мой круг' } },
+  { path: '/raport', icon: FileText, label: { ro: 'Raportul complet', en: 'The full report', ru: 'Полный отчёт' } },
+];
+
+const ACCOUNT_LABEL = { ro: 'Contul meu', en: 'My account', ru: 'Мой аккаунт' };
+const SIGN_IN = { ro: 'Intră în cont', en: 'Sign in', ru: 'Войти' };
+const SIGN_OUT = { ro: 'Ieși din cont', en: 'Sign out', ru: 'Выйти' };
+
 const AppHeader = () => {
-  const { t } = useLanguage();
-  const { isAuthenticated, isAdmin } = useAuth();
+  const { t, language } = useLanguage();
+  const { isAuthenticated, isAdmin, logout } = useAuth();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navItems: NavItem[] = [
-    { path: '/guide', icon: BookOpen, labelKey: 'viewGuide', mobileLabel: 'Guide' },
-    { path: '/compatibility', icon: Heart, labelKey: 'viewCompatibility', mobileLabel: 'Compatibility' },
-    { path: '/predictions', icon: TrendingUp, labelKey: 'predictions', mobileLabel: 'Predictions' },
-    { path: '/tools', icon: Wrench, labelKey: 'tools', mobileLabel: 'Tools' },
-    { path: '/angel-numbers', icon: Sparkles, labelKey: 'angelNumbers', mobileLabel: 'Angels' },
-    { path: '/tutorials', icon: GraduationCap, labelKey: 'tutorials', mobileLabel: 'Tutorials' },
-    { path: '/faq', icon: HelpCircle, labelKey: 'faq', mobileLabel: 'FAQ' },
-  ];
+  const say = (copy: Record<string, string>) => copy[language] ?? copy.en;
 
   const isActive = (path: string) => {
     if (path === '/') {
@@ -39,25 +63,24 @@ const AppHeader = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50 shadow-lg shadow-black/20">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-line">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo / Home */}
           <Link to="/" className="flex items-center gap-2 group">
             <div className="relative">
-              <div className="absolute inset-0 bg-primary/20 rounded-full blur-md group-hover:bg-primary/30 transition-colors" />
-              <div className="relative w-8 h-8 rounded-full bg-gradient-to-br from-primary to-amber-500 flex items-center justify-center">
-                <span className="text-primary-foreground font-cinzel font-bold text-lg">N</span>
+              <div className="relative flex h-8 w-8 items-center justify-center rounded-full border border-gilt">
+                <span className="font-heading text-lg text-gilt">N</span>
               </div>
             </div>
-            <span className="hidden sm:inline font-cinzel text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
+            <span className="hidden sm:inline font-heading text-xl font-semibold text-foreground group-hover:text-foreground transition-colors">
               {t.title}
             </span>
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-1">
-            {navItems.map((item) => {
+            {PUBLIC_NAV.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);
               return (
@@ -66,14 +89,19 @@ const AppHeader = () => {
                     variant="ghost"
                     size="sm"
                     className={cn(
-                      "h-9 px-3 gap-2 font-raleway text-sm transition-all",
+                      // Five buttons with their names on them fit where seven
+                      // icon-only ones did not.
+                      // Aceeași gramatică ca filele: filet de alamă dedesubt,
+                      // fără fundal. Pastila colorată cu chenar albastru dădea
+                      // două semnale pentru aceeași stare, în culoarea veche.
+                      "h-11 gap-2 rounded-none border-b-2 px-3 font-raleway text-sm transition-colors",
                       active
-                        ? "bg-primary/10 text-primary border-b-2 border-primary"
-                        : "text-foreground/90 hover:text-primary hover:bg-primary/5"
+                        ? "border-gilt text-gilt"
+                        : "border-transparent text-foreground/80 hover:border-line hover:text-foreground"
                     )}
                   >
                     <Icon className="h-4 w-4" />
-                    <span>{(t[item.labelKey as keyof typeof t] as string) || item.mobileLabel}</span>
+                    <span>{say(item.label)}</span>
                   </Button>
                 </Link>
               );
@@ -82,66 +110,83 @@ const AppHeader = () => {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-2">
-            {/* Profile / Auth */}
+            {/* Everything that needs an account lives here, so it does not
+                compete with the five public destinations. */}
             {isAuthenticated ? (
-              <Link to="/profile">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn(
-                    "h-9 px-3 gap-2 font-raleway text-sm",
-                    isActive('/profile')
-                      ? "bg-primary/10 text-primary"
-                      : "text-foreground/90 hover:text-primary hover:bg-primary/5"
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "h-11 gap-2 rounded-none border-b-2 px-3 font-raleway text-sm transition-colors",
+                      ACCOUNT_NAV.some((i) => isActive(i.path))
+                        ? "border-gilt text-gilt"
+                        : "border-transparent text-foreground/80 hover:border-line hover:text-foreground"
+                    )}
+                  >
+                    <User className="h-4 w-4" />
+                    <span className="hidden sm:inline">{say(ACCOUNT_LABEL)}</span>
+                    <ChevronDown className="h-3 w-3 opacity-60" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>{say(ACCOUNT_LABEL)}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {ACCOUNT_NAV.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <DropdownMenuItem key={item.path} asChild>
+                        <Link to={item.path} className="gap-2">
+                          <Icon className="h-4 w-4" />
+                          {say(item.label)}
+                        </Link>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin" className="gap-2">
+                          <Shield className="h-4 w-4" />
+                          Admin
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
                   )}
-                >
-                  <User className="h-4 w-4" />
-                  <span className="hidden sm:inline">{t.myProfile}</span>
-                </Button>
-              </Link>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onSelect={() => { void logout(); }} className="gap-2">
+                    <LogOut className="h-4 w-4" />
+                    {say(SIGN_OUT)}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <Link to="/auth">
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-9 px-3 gap-2 font-raleway text-sm text-foreground/90 hover:text-primary hover:bg-primary/5"
+                  className="h-11 gap-2 px-3 font-raleway text-sm text-foreground/80 hover:text-foreground"
                 >
                   <User className="h-4 w-4" />
-                  <span className="hidden sm:inline">{t.login}</span>
-                </Button>
-              </Link>
-            )}
-
-            {/* Admin Link */}
-            {isAdmin && (
-              <Link to="/admin">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn(
-                    "h-9 px-3 gap-2 font-raleway text-sm",
-                    isActive('/admin')
-                      ? "bg-primary/10 text-primary"
-                      : "text-foreground/90 hover:text-primary hover:bg-primary/5"
-                  )}
-                >
-                  <Shield className="h-4 w-4" />
-                  <span className="hidden sm:inline">Admin</span>
+                  <span className="hidden sm:inline">{say(SIGN_IN)}</span>
                 </Button>
               </Link>
             )}
 
             {/* Theme Selector */}
-            <ThemeSelector />
+            <LanguageSwitcher />
 
             {/* Language Switcher */}
-            <LanguageSwitcher />
+            <ThemeSelector />
 
             {/* Mobile Menu Button */}
             <Button
               variant="ghost"
               size="sm"
-              className="lg:hidden h-9 w-9 p-0 text-foreground/90"
+              // Butonul care deschide meniul pe mobil: 36px erau sub pragul de atingere.
+              className="lg:hidden h-11 w-11 p-0 text-foreground/90"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? (
@@ -157,43 +202,70 @@ const AppHeader = () => {
         {mobileMenuOpen && (
           <div className="lg:hidden border-t border-border/50 py-4 animate-fade-in">
             <nav className="flex flex-col gap-2">
-              {navItems.map((item) => {
+              {PUBLIC_NAV.map((item) => {
                 const Icon = item.icon;
-                const active = isActive(item.path);
                 return (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
+                  <Link key={item.path} to={item.path} onClick={() => setMobileMenuOpen(false)}>
                     <Button
                       variant="ghost"
                       className={cn(
                         "w-full justify-start h-10 px-4 gap-3 font-raleway text-sm",
-                        active
-                          ? "bg-primary/10 text-primary"
-                          : "text-foreground/90 hover:text-primary hover:bg-primary/5"
+                        isActive(item.path)
+                          ? "bg-sunken text-primary"
+                          : "text-foreground/90 hover:text-primary hover:bg-sunken"
                       )}
                     >
                       <Icon className="h-4 w-4" />
-                      <span>{t[item.labelKey as keyof typeof t] || item.mobileLabel}</span>
+                      <span>{say(item.label)}</span>
                     </Button>
                   </Link>
                 );
               })}
-              {/* Admin Link in Mobile Menu */}
+
+              {isAuthenticated && (
+                <>
+                  <div className="mt-2 border-t border-border/50 px-4 pt-3 text-xs uppercase tracking-wide text-muted-foreground">
+                    {say(ACCOUNT_LABEL)}
+                  </div>
+                  {ACCOUNT_NAV.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <Link key={item.path} to={item.path} onClick={() => setMobileMenuOpen(false)}>
+                        <Button
+                          variant="ghost"
+                          className={cn(
+                            "w-full justify-start h-10 px-4 gap-3 font-raleway text-sm",
+                            isActive(item.path)
+                              ? "bg-sunken text-primary"
+                              : "text-foreground/90 hover:text-primary hover:bg-sunken"
+                          )}
+                        >
+                          <Icon className="h-4 w-4" />
+                          <span>{say(item.label)}</span>
+                        </Button>
+                      </Link>
+                    );
+                  })}
+                  <Button
+                    variant="ghost"
+                    onClick={() => { setMobileMenuOpen(false); void logout(); }}
+                    className="w-full justify-start h-10 px-4 gap-3 font-raleway text-sm text-foreground/90"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>{say(SIGN_OUT)}</span>
+                  </Button>
+                </>
+              )}
+
               {isAdmin && (
-                <Link
-                  to="/admin"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
+                <Link to="/admin" onClick={() => setMobileMenuOpen(false)}>
                   <Button
                     variant="ghost"
                     className={cn(
                       "w-full justify-start h-10 px-4 gap-3 font-raleway text-sm",
                       isActive('/admin')
-                        ? "bg-primary/10 text-primary"
-                        : "text-foreground/90 hover:text-primary hover:bg-primary/5"
+                        ? "bg-sunken text-primary"
+                        : "text-foreground/90 hover:text-primary hover:bg-sunken"
                     )}
                   >
                     <Shield className="h-4 w-4" />

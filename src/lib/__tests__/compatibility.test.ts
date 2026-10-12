@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { parseCalendarDate } from '../calendarDate';
 import {
   getCompatibilityScore,
   calculateCompatibility,
@@ -74,12 +75,12 @@ describe("getCompatibilityScore", () => {
 describe("calculateCompatibility", () => {
   const person1 = {
     fullName: "Maria Elena Popescu",
-    birthDate: new Date("1990-05-15"),
+    birthDate: parseCalendarDate("1990-05-15"),
   };
 
   const person2 = {
     fullName: "Ion Alexandru Ionescu",
-    birthDate: new Date("1988-08-22"),
+    birthDate: parseCalendarDate("1988-08-22"),
   };
 
   it("returns overall score between 0 and 100", () => {

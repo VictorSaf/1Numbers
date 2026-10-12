@@ -2,190 +2,189 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { reduceToSingleDigit } from "@/lib/numerology";
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Briefcase, Heart, Lightbulb, Shield, AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { getDelayClass } from "@/components/design-system";
+import { ResolveNumber } from "@/components/numerology/ResolveNumber";
+
+/**
+ * Unul dintre numerele de bază: cifra, arhetipul, și ce se deschide sub ele.
+ *
+ * Cardul ăsta era ultimul loc care ținea stilul vechi în viață: cerc luminos cu
+ * halou, pastile rotunde albastre, iconițe lucide colorate, totul centrat
+ * într-o cutie rotunjită. Peste el am pus o placă cerească -- iar două stiluri
+ * pe aceeași pagină sunt mai rău decât oricare dintre ele singur.
+ *
+ * Acum e un rând cu filet, ca tot restul citirii: cifra e vizualul, la 30px
+ * într-un cerc decorativ chiar produsul paginii cântărea cât o notă de subsol.
+ * Culoarea semantică rămâne pe etichete -- puterile sunt verzi, provocările
+ * chihlimbar -- fiindcă acolo spune ceva; ce a plecat sunt pastilele și
+ * iconițele, care nu spuneau nimic.
+ *
+ * Comportamentul e neatins: aceeași replay a reducerii, aceeași eșalonare,
+ * aceleași cinci secțiuni de detaliu.
+ */
 
 interface NumberCardProps {
   title: string;
   number: number;
-  description: string;
+  /**
+   * The unreduced total this number came from, when the caller has it. Only
+   * used to replay the reduction; the displayed value is always `number`.
+   */
+  raw?: number;
+  /** Play that replay. Off everywhere except the first reading a visitor sees. */
+  resolve?: boolean;
   delay?: number;
   isMain?: boolean;
   showDetails?: boolean;
 }
 
-export const NumberCard = ({ title, number, description, delay = 0, isMain = false, showDetails = true }: NumberCardProps) => {
-  const { t } = useLanguage();
-  const [isExpanded, setIsExpanded] = useState(false);
-  
-  const meaningKey = number as keyof typeof t.meanings;
-  const meaning = t.meanings[meaningKey] || t.meanings[reduceToSingleDigit(number, false) as keyof typeof t.meanings];
-  
-  const hasDetailedInfo = meaning && 'strengths' in meaning;
-  
-  return (
-    <div
+/** O secțiune din panoul de detaliu: filet, etichetă de culoarea ei, conținut. */
+const Detail = ({
+  label,
+  tone,
+  children,
+}: {
+  label: string;
+  tone: "ok" | "warn" | "info" | "tension" | "gilt";
+  children: React.ReactNode;
+}) => (
+  <div
+    className={cn(
+      "border-t pt-3",
+      tone === "ok" && "border-ok",
+      tone === "warn" && "border-warn",
+      tone === "info" && "border-info",
+      tone === "tension" && "border-tension",
+      tone === "gilt" && "border-gilt/40",
+    )}
+  >
+    <span
       className={cn(
-        "card-mystic rounded-xl p-6 opacity-0 animate-fade-in",
-        isMain && "col-span-full lg:col-span-2",
-        getDelayClass(delay)
+        "num text-[0.6rem] uppercase tracking-[0.18em]",
+        tone === "ok" && "text-ok",
+        tone === "warn" && "text-warn",
+        tone === "info" && "text-info",
+        tone === "tension" && "text-tension",
+        tone === "gilt" && "text-gilt",
       )}
     >
-      <div className="flex flex-col items-center text-center space-y-4">
-        <span className="text-xs uppercase tracking-[0.2em] text-primary/70 font-raleway">
-          {title}
+      {label}
+    </span>
+    <div className="mt-2 text-sm leading-relaxed text-foreground/85">{children}</div>
+  </div>
+);
+
+export const NumberCard = ({
+  title,
+  number,
+  raw,
+  resolve = false,
+  delay = 0,
+  isMain = false,
+  showDetails = true,
+}: NumberCardProps) => {
+  const { t } = useLanguage();
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const meaningKey = number as keyof typeof t.meanings;
+  const meaning = t.meanings[meaningKey] || t.meanings[reduceToSingleDigit(number, false) as keyof typeof t.meanings];
+
+  const hasDetailedInfo = meaning && "strengths" in meaning;
+  const list = (xs: string[]) => xs.join(" · ");
+
+  return (
+    <article className={cn("border-b border-line opacity-0 animate-fade-in", getDelayClass(delay))}>
+      <div className="flex items-start gap-5 py-6 sm:gap-7">
+        <span
+          className={cn(
+            "num shrink-0 text-right leading-[0.86] text-accent",
+            isMain ? "w-16 text-5xl sm:w-[88px] sm:text-6xl" : "w-14 text-4xl sm:w-[88px] sm:text-5xl",
+          )}
+        >
+          <ResolveNumber value={number} raw={raw} play={resolve} />
         </span>
-        
-        <div className={cn("number-display", isMain && "number-display-large")}>
-          {number}
-        </div>
-        
-        <h3 className="font-cinzel text-xl text-foreground">
-          {meaning.title}
-        </h3>
-        
-        <div className="flex flex-wrap justify-center gap-2">
-          {meaning.traits.map((trait, index) => (
-            <span
-              key={index}
-              className="px-3 py-1 text-xs rounded-full bg-primary/10 text-primary border border-primary/20"
-            >
-              {trait}
-            </span>
-          ))}
-        </div>
-        
-        <p className="text-sm text-muted-foreground leading-relaxed max-w-md">
-          {description}
-        </p>
-        
-        <p className="text-sm text-foreground/80 leading-relaxed">
-          {meaning.description}
-        </p>
 
-        {/* Expandable Detailed Section */}
-        {showDetails && hasDetailedInfo && (
-          <>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="flex items-center gap-2 text-primary hover:text-primary/80"
-            >
-              {isExpanded ? (
-                <>
-                  <ChevronUp className="h-4 w-4" />
-                  {t.adviceLabel ? 'Ascunde detalii' : 'Hide details'}
-                </>
-              ) : (
-                <>
-                  <ChevronDown className="h-4 w-4" />
-                  {t.adviceLabel || 'Sfaturi Personalizate'}
-                </>
-              )}
-            </Button>
+        <div className="min-w-0 flex-1">
+          <span className="num block text-[0.6rem] uppercase tracking-[0.18em] text-gilt">
+            {title}
+          </span>
+          <h3 className="mt-1.5 font-heading text-xl text-foreground sm:text-2xl">
+            {meaning.title}
+          </h3>
+          <p className="num mt-1.5 text-[0.68rem] uppercase tracking-[0.12em] text-muted-foreground">
+            {list(meaning.traits)}
+          </p>
 
-            {isExpanded && (
-              <div className="w-full space-y-4 pt-4 border-t border-border/30 animate-fade-in text-left">
-                {/* Strengths */}
-                {'strengths' in meaning && meaning.strengths && (
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-emerald-500">
-                      <Shield className="h-4 w-4" />
-                      <span className="text-sm font-medium">{t.strengthsLabel || 'Puncte Forte'}</span>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {(meaning.strengths as string[]).map((strength, idx) => (
-                        <span
-                          key={idx}
-                          className="px-2 py-1 text-xs rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
-                        >
-                          {strength}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
+          {/* The number's own reading. A second paragraph used to sit above this
+              one -- t.lifePathDesc and its four siblings -- describing what a Life
+              Path *is*, identical for every visitor, placed above the sentence
+              that was actually about them. */}
+          <p className="mt-3 max-w-[65ch] font-heading text-[1.05rem] leading-relaxed text-foreground/90">
+            {meaning.description}
+          </p>
 
-                {/* Challenges */}
-                {'challenges' in meaning && meaning.challenges && (
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-amber-500">
-                      <AlertTriangle className="h-4 w-4" />
-                      <span className="text-sm font-medium">{t.challengesLabel || 'Provocări'}</span>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {(meaning.challenges as string[]).map((challenge, idx) => (
-                        <span
-                          key={idx}
-                          className="px-2 py-1 text-xs rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20"
-                        >
-                          {challenge}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
+          {showDetails && hasDetailedInfo && (
+            <>
+              <button
+                type="button"
+                onClick={() => setIsExpanded((v) => !v)}
+                aria-expanded={isExpanded}
+                className="num mt-4 inline-flex min-h-11 items-center gap-2.5 text-[0.68rem] uppercase tracking-[0.14em] text-gilt transition-colors hover:text-foreground"
+              >
+                <span>
+                  {isExpanded
+                    ? t.adviceLabel
+                      ? "Ascunde detalii"
+                      : "Hide details"
+                    : t.adviceLabel || "Sfaturi Personalizate"}
+                </span>
+                <span aria-hidden="true" className={cn("transition-transform", isExpanded && "rotate-180")}>
+                  ▾
+                </span>
+              </button>
 
-                {/* Career */}
-                {'career' in meaning && meaning.career && (
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-blue-500">
-                      <Briefcase className="h-4 w-4" />
-                      <span className="text-sm font-medium">{t.careerLabel || 'Carieră Potrivită'}</span>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {(meaning.career as string[]).map((job, idx) => (
-                        <span
-                          key={idx}
-                          className="px-2 py-1 text-xs rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"
-                        >
-                          {job}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Relationships */}
-                {'relationships' in meaning && meaning.relationships && (
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-rose-500">
-                      <Heart className="h-4 w-4" />
-                      <span className="text-sm font-medium">{t.relationshipsLabel || 'Relații'}</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+              {isExpanded && (
+                <div className="mt-4 grid animate-fade-in gap-5 sm:grid-cols-2">
+                  {"strengths" in meaning && meaning.strengths && (
+                    <Detail label={t.strengthsLabel || "Puncte Forte"} tone="ok">
+                      {list(meaning.strengths as string[])}
+                    </Detail>
+                  )}
+                  {"challenges" in meaning && meaning.challenges && (
+                    <Detail label={t.challengesLabel || "Provocări"} tone="warn">
+                      {list(meaning.challenges as string[])}
+                    </Detail>
+                  )}
+                  {"career" in meaning && meaning.career && (
+                    <Detail label={t.careerLabel || "Carieră Potrivită"} tone="info">
+                      {list(meaning.career as string[])}
+                    </Detail>
+                  )}
+                  {"relationships" in meaning && meaning.relationships && (
+                    <Detail label={t.relationshipsLabel || "Relații"} tone="tension">
                       {meaning.relationships as string}
-                    </p>
-                  </div>
-                )}
-
-                {/* Personalized Advice */}
-                {'advice' in meaning && meaning.advice && (
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-purple-500">
-                      <Lightbulb className="h-4 w-4" />
-                      <span className="text-sm font-medium">{t.adviceLabel || 'Sfaturi Personalizate'}</span>
+                    </Detail>
+                  )}
+                  {"advice" in meaning && meaning.advice && (
+                    <div className="sm:col-span-2">
+                      <Detail label={t.adviceLabel || "Sfaturi Personalizate"} tone="gilt">
+                        <ul className="space-y-1.5">
+                          {(meaning.advice as string[]).map((tip, idx) => (
+                            <li key={idx} className="flex items-start gap-2.5">
+                              <span className="num shrink-0 text-gilt">—</span>
+                              <span>{tip}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </Detail>
                     </div>
-                    <ul className="space-y-1.5">
-                      {(meaning.advice as string[]).map((tip, idx) => (
-                        <li
-                          key={idx}
-                          className="flex items-start gap-2 text-sm text-muted-foreground"
-                        >
-                          <span className="text-primary mt-1">•</span>
-                          <span>{tip}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            )}
-          </>
-        )}
+                  )}
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </article>
   );
 };

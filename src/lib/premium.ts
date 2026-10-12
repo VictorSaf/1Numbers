@@ -3,10 +3,11 @@
 
 export type PremiumTier = 'free' | 'premium' | 'pro';
 
+// Presentation only. Amounts deliberately live on the server (subscription_plans)
+// so the price shown can never drift from the price charged; the UI reads them
+// from GET /api/subscriptions/plans.
 export interface TierPricing {
-  monthly: number;
-  yearly: number;
-  yearlyDiscount: number; // percentage saved
+  yearlyDiscount: number; // percentage saved, for the marketing badge
   currency: string;
 }
 
@@ -133,8 +134,6 @@ export const TIERS: TierDefinition[] = [
       ru: 'Полный опыт нумерологии для энтузиастов',
     },
     pricing: {
-      monthly: 4.99,
-      yearly: 39.99,
       yearlyDiscount: 33,
       currency: 'EUR',
     },
@@ -248,8 +247,6 @@ export const TIERS: TierDefinition[] = [
       ru: 'Профессиональные инструменты для практиков и консультантов',
     },
     pricing: {
-      monthly: 9.99,
-      yearly: 79.99,
       yearlyDiscount: 33,
       currency: 'EUR',
     },
@@ -455,35 +452,6 @@ export function getTierById(tierId: PremiumTier): TierDefinition | undefined {
   return TIERS.find(t => t.id === tierId);
 }
 
-export function hasFeature(userTier: PremiumTier, featureId: string): boolean {
-  const tier = getTierById(userTier);
-  if (!tier) return false;
-
-  // Pro includes all Premium features
-  if (userTier === 'pro') {
-    const premiumTier = getTierById('premium');
-    const premiumHas = premiumTier?.features.some(f => f.id === featureId && f.included);
-    if (premiumHas) return true;
-  }
-
-  return tier.features.some(f => f.id === featureId && f.included);
-}
-
-export function getFeatureLimit(userTier: PremiumTier, featureId: string): number | 'unlimited' | null {
-  const tier = getTierById(userTier);
-  if (!tier) return null;
-
-  // Pro overrides for unlimited
-  if (userTier === 'pro') {
-    if (featureId === FEATURES.AI_CONSULTANT || featureId === FEATURES.COMPATIBILITY) {
-      return 'unlimited';
-    }
-  }
-
-  const feature = tier.features.find(f => f.id === featureId);
-  return feature?.limit ?? null;
-}
-
 export function formatPrice(price: number, currency: string): string {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -491,22 +459,6 @@ export function formatPrice(price: number, currency: string): string {
   }).format(price);
 }
 
-export function calculateYearlySavings(tier: TierDefinition): number {
-  if (!tier.pricing) return 0;
-  const monthlyTotal = tier.pricing.monthly * 12;
-  return monthlyTotal - tier.pricing.yearly;
-}
-
-// Feature comparison for upgrade prompts
-export function getUpgradeFeatures(currentTier: PremiumTier, targetTier: PremiumTier): TierFeature[] {
-  const current = getTierById(currentTier);
-  const target = getTierById(targetTier);
-
-  if (!current || !target) return [];
-
-  const currentFeatureIds = new Set(
-    current.features.filter(f => f.included).map(f => f.id)
-  );
-
-  return target.features.filter(f => f.included && !currentFeatureIds.has(f.id));
+export function calculateYearlySavings(monthly: number, yearly: number): number {
+  return monthly * 12 - yearly;
 }

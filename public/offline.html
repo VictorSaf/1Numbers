@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Offline — Numerology Compass</title>
+<style>
+  /* The tokens, copied from src/index.css rather than imported.
+     This page is served by the service worker precisely when nothing else
+     loaded, so it cannot reach a hashed stylesheet -- but it can carry the same
+     values, which is what keeps it from drifting back to the two hardcoded
+     mystic colours it used to hold. Light and dark, same split as the app. */
+  :root {
+    color-scheme: light dark;
+    --bg: 225 17% 95%;
+    --surface: 0 0% 100%;
+    --ink: 232 16% 10%;
+    --muted-ink: 232 10% 43%;
+    --line: 228 19% 89%;
+    --accent: 256 45% 45%;
+    --accent-ink: 256 49% 38%;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: 231 19% 7%;
+      --surface: 229 19% 12%;
+      --ink: 231 23% 94%;
+      --muted-ink: 232 11% 62%;
+      --line: 229 17% 19%;
+      --accent: 252 73% 75%;
+      --accent-ink: 252 80% 82%;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: 231 19% 7%;
+    --surface: 229 19% 12%;
+    --ink: 231 23% 94%;
+    --muted-ink: 232 11% 62%;
+    --line: 229 17% 19%;
+    --accent: 252 73% 75%;
+    --accent-ink: 252 80% 82%;
+  }
+
+  body {
+    margin: 0; min-height: 100vh; display: flex; align-items: center;
+    justify-content: center; padding: 24px; text-align: center;
+    background: hsl(var(--bg)); color: hsl(var(--ink));
+    font-family: Raleway, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .card { max-width: 30rem; }
+  .mark {
+    width: 56px; height: 56px; margin: 0 auto 28px; border-radius: 50%;
+    border: 2px solid hsl(var(--line));
+    display: flex; align-items: center; justify-content: center;
+    color: hsl(var(--accent)); font-size: 24px; font-weight: 600;
+  }
+  h1 { font-size: 1.4rem; font-weight: 600; margin: 0 0 12px; letter-spacing: -.01em; }
+  p { margin: 0 0 24px; line-height: 1.6; color: hsl(var(--muted-ink)); }
+  button {
+    font: inherit; font-weight: 600; cursor: pointer;
+    background: hsl(var(--accent)); color: hsl(var(--surface)); border: 0;
+    padding: 11px 24px; border-radius: 8px;
+  }
+  button:hover { background: hsl(var(--accent-ink)); }
+  button:focus-visible { outline: 2px solid hsl(var(--ink)); outline-offset: 3px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="mark">?</div>
+    <h1 id="title"></h1>
+    <p id="body"></p>
+    <button type="button" id="retry"></button>
+  </div>
+  <script src="/offline.js"></script>
+</body>
+</html>

@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS subscription_plans (
 -- Create subscriptions table
 CREATE TABLE IF NOT EXISTS subscriptions (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   plan_id INTEGER NOT NULL REFERENCES subscription_plans(id),
   status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'cancelled', 'expired', 'pending')),
   billing_period VARCHAR(10) NOT NULL CHECK (billing_period IN ('monthly', 'yearly')),
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS subscriptions (
 -- Create subscription usage tracking table
 CREATE TABLE IF NOT EXISTS subscription_usage (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   feature_name VARCHAR(100) NOT NULL,
   usage_count INTEGER NOT NULL DEFAULT 0,
   period_start TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -60,7 +60,7 @@ ON CONFLICT (name) DO NOTHING;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS current_subscription_id INTEGER REFERENCES subscriptions(id);
 
 -- Create function to check subscription status
-CREATE OR REPLACE FUNCTION check_subscription_status(user_id_param INTEGER)
+CREATE OR REPLACE FUNCTION check_subscription_status(user_id_param UUID)
 RETURNS TABLE (
   is_premium BOOLEAN,
   plan_name VARCHAR(50),

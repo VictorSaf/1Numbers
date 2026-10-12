@@ -56,7 +56,7 @@ export const SkillsSection = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-cinzel font-bold mb-2">Skills</h2>
+        <h2 className="text-2xl font-heading font-bold mb-2">Skills</h2>
         <p className="text-muted-foreground">
           Custom Claude skills and workflows from .claude/skills/
         </p>
@@ -66,8 +66,8 @@ export const SkillsSection = () => {
       <Card className="card-mystic">
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
-            <div className="p-3 rounded-lg bg-primary/10">
-              <Zap className="h-6 w-6 text-primary" />
+            <div className="p-3 rounded-lg bg-sunken">
+              <Zap className="h-6 w-6" />
             </div>
             <div>
               <div className="text-2xl font-bold">{skills.length} Skills</div>
@@ -99,8 +99,8 @@ export const SkillsSection = () => {
                 className="flex items-center justify-between p-4 rounded-lg bg-muted/30 border border-border/30"
               >
                 <div className="flex items-center gap-4">
-                  <div className="p-2 rounded-lg bg-amber-500/10">
-                    <Terminal className="h-5 w-5 text-amber-500" />
+                  <div className="p-2 rounded-lg">
+                    <Terminal className="h-5 w-5 text-warn" />
                   </div>
                   <div>
                     <div className="font-medium flex items-center gap-2">
@@ -131,11 +131,11 @@ export const SkillsSection = () => {
       </Card>
 
       {/* Info Card */}
-      <Card className="card-mystic border-primary/30">
+      <Card className="card-mystic border-line">
         <CardContent className="p-6">
           <div className="flex items-start gap-4">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Zap className="h-5 w-5 text-primary" />
+            <div className="p-2 rounded-lg bg-sunken">
+              <Zap className="h-5 w-5" />
             </div>
             <div>
               <div className="font-medium mb-1">Using Skills</div>

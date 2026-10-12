@@ -47,13 +47,13 @@ const Admin = () => {
         title="Admin Panel"
         subtitle="Manage your platform settings and users"
         badge={{
-          icon: <Shield className="h-4 w-4 text-primary" />,
+          icon: <Shield className="h-4 w-4" />,
           label: 'Administrator',
         }}
       />
 
-      <main className="relative z-10 px-4 pb-16">
-        <div className="max-w-6xl mx-auto">
+      <main className="relative z-10 pb-16">
+        <div className="page-measure">
           {/* Mobile Navigation */}
           <AdminMobileNav
             activeSection={activeSection}

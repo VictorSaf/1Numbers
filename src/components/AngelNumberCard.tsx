@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { AngelNumberMeaning } from "@/lib/angelNumbers";
+import { AngelNumberMeaning } from "@/lib/angel";
 import { ChevronDown, ChevronUp, Sparkles, MessageCircle, Lightbulb, Link } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -32,9 +32,9 @@ export const AngelNumberCard = ({
   };
 
   const frequencyColors = {
-    common: "bg-green-500/20 text-green-600 dark:text-green-400",
-    uncommon: "bg-blue-500/20 text-blue-600 dark:text-blue-400",
-    rare: "bg-purple-500/20 text-purple-600 dark:text-purple-400",
+    common: "text-ok",
+    uncommon: "text-info",
+    rare: "bg-sunken text-primary",
   };
 
   const sectionLabels = {
@@ -45,7 +45,7 @@ export const AngelNumberCard = ({
   };
 
   return (
-    <div className="card-mystic rounded-xl overflow-hidden">
+    <div className="card-mystic overflow-hidden">
       {/* Header - Always visible */}
       <div
         className="p-4 cursor-pointer hover:bg-muted/20 transition-colors"
@@ -54,18 +54,18 @@ export const AngelNumberCard = ({
         <div className="flex items-start gap-4">
           {/* Number Display */}
           <div className="relative flex-shrink-0">
-            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary/20 to-purple-500/20 border border-primary/30 flex items-center justify-center">
-              <span className="font-cinzel text-2xl text-gradient-gold">
+            <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-primary/20 to-accent-ink/20 border border-line flex items-center justify-center">
+              <span className="num text-2xl">
                 {meaning.number}
               </span>
             </div>
-            <Sparkles className="absolute -top-2 -right-2 h-5 w-5 text-yellow-400" />
+            <Sparkles className="absolute -top-2 -right-2 h-5 w-5 text-warn" />
           </div>
 
           {/* Title and Message */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-cinzel text-lg text-foreground truncate">
+              <h3 className="font-heading text-lg text-foreground truncate">
                 {meaning.title[language]}
               </h3>
               <Badge className={cn("text-[10px]", frequencyColors[meaning.frequency])}>
@@ -92,7 +92,7 @@ export const AngelNumberCard = ({
           {meaning.keywords[language].map((keyword, idx) => (
             <span
               key={idx}
-              className="px-2 py-0.5 text-xs rounded-full bg-primary/10 text-primary border border-primary/20"
+              className="num text-[0.63rem] uppercase tracking-[0.14em] text-accent"
             >
               {keyword}
             </span>
@@ -118,7 +118,7 @@ export const AngelNumberCard = ({
 
           {/* Spiritual Significance */}
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-purple-500">
+            <div className="flex items-center gap-2 text-primary">
               <Sparkles className="h-4 w-4" />
               <span className="text-sm font-medium">
                 {sectionLabels.spiritual[language]}
@@ -131,7 +131,7 @@ export const AngelNumberCard = ({
 
           {/* Action Advice */}
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-amber-500">
+            <div className="flex items-center gap-2 text-warn">
               <Lightbulb className="h-4 w-4" />
               <span className="text-sm font-medium">
                 {sectionLabels.action[language]}
@@ -143,7 +143,7 @@ export const AngelNumberCard = ({
                   key={idx}
                   className="text-sm text-muted-foreground flex items-start gap-2"
                 >
-                  <span className="text-amber-500 mt-1">•</span>
+                  <span className="text-warn mt-1">•</span>
                   <span>{advice}</span>
                 </li>
               ))}
@@ -152,7 +152,7 @@ export const AngelNumberCard = ({
 
           {/* Related Numbers */}
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-blue-500">
+            <div className="flex items-center gap-2 text-info">
               <Link className="h-4 w-4" />
               <span className="text-sm font-medium">
                 {sectionLabels.related[language]}
@@ -162,7 +162,7 @@ export const AngelNumberCard = ({
               {meaning.relatedNumbers.map((num) => (
                 <span
                   key={num}
-                  className="px-3 py-1 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 text-sm font-medium"
+                  className="px-3 py-1 rounded-lg text-info text-sm font-medium"
                 >
                   {num}
                 </span>
@@ -190,10 +190,10 @@ export const AngelNumberCompact = ({
   return (
     <button
       onClick={onClick}
-      className="w-full p-3 rounded-xl bg-card/50 border border-border/50 hover:bg-card/70 transition-colors text-left"
+      className="w-full border-t border-line pt-3 text-left transition-colors hover:border-gilt"
     >
       <div className="flex items-center gap-3">
-        <span className="font-cinzel text-xl text-primary">{meaning.number}</span>
+        <span className="num text-xl text-primary">{meaning.number}</span>
         <div className="flex-1 min-w-0">
           <h4 className="text-sm font-medium text-foreground truncate">
             {meaning.title[language]}

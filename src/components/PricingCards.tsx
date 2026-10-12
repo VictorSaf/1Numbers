@@ -1,7 +1,8 @@
 // PricingCards Component
 // Displays tier-based pricing with feature comparison
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { API_BASE } from '@/lib/apiBase';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,17 +20,53 @@ import {
   type TierDefinition,
 } from '@/lib/premium';
 import { api } from '@/services/api';
+import { track } from '@/lib/analytics';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface PricingCardsProps {
   onSubscribe?: (tierId: PremiumTier, billingPeriod: 'monthly' | 'yearly') => void;
   currentTier?: PremiumTier;
 }
 
+/** Plățile se deschid odată cu ALLOW_BILLING pe server; până atunci butoanele nu pornesc. */
+const BILLING_OPEN = import.meta.env.VITE_ALLOW_BILLING === 'true';
+
 export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCardsProps) => {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const { language } = useLanguage();
   const { user } = useAuth();
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('yearly');
   const [loadingTier, setLoadingTier] = useState<PremiumTier | null>(null);
+
+  // Amounts come from the server, never from the bundle: the two used to disagree
+  // by up to 2.5x. While this is null no price is rendered at all -- showing a
+  // stale or guessed figure on a checkout page is worse than showing none.
+  const [serverPricing, setServerPricing] = useState<Record<string, { monthly: number; yearly: number }> | null>(null);
+
+  useEffect(() => { track('paywall_shown'); }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${API_BASE}/subscriptions/plans`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((data) => {
+        if (cancelled) return;
+        const byName: Record<string, { monthly: number; yearly: number }> = {};
+        for (const plan of data.plans ?? []) {
+          byName[plan.name] = { monthly: Number(plan.priceMonthly), yearly: Number(plan.priceYearly) };
+        }
+        setServerPricing(byName);
+      })
+      .catch(() => {
+        if (!cancelled) setServerPricing(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const translations: Record<string, Record<string, string>> = {
     ro: {
@@ -43,6 +80,12 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
       subscribe: 'Abonează-te',
       getStarted: 'Începe Gratuit',
       mostPopular: 'Cel Mai Popular',
+      loginRequired: 'Cont necesar',
+      loginRequiredDesc: 'Conectează-te sau creează un cont pentru a te abona.',
+      errorTitle: 'Abonarea nu a reușit',
+      errorGeneric: 'A apărut o eroare. Încearcă din nou.',
+      billingClosed: 'Plățile nu sunt disponibile',
+      billingClosedDesc: 'Abonamentele nu se pot cumpăra încă. Nu ți s-a luat niciun ban.',
       bestValue: 'Cea Mai Bună Valoare',
       billedYearly: 'Facturat anual',
       billedMonthly: 'Facturat lunar',
@@ -63,6 +106,12 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
       subscribe: 'Subscribe',
       getStarted: 'Get Started Free',
       mostPopular: 'Most Popular',
+      loginRequired: 'Account required',
+      loginRequiredDesc: 'Sign in or create an account to subscribe.',
+      errorTitle: 'Subscription failed',
+      errorGeneric: 'Something went wrong. Please try again.',
+      billingClosed: 'Payments are unavailable',
+      billingClosedDesc: 'Subscriptions cannot be bought yet. You have not been charged.',
       bestValue: 'Best Value',
       billedYearly: 'Billed yearly',
       billedMonthly: 'Billed monthly',
@@ -83,6 +132,12 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
       subscribe: 'Подписаться',
       getStarted: 'Начать Бесплатно',
       mostPopular: 'Самый Популярный',
+      loginRequired: 'Требуется аккаунт',
+      loginRequiredDesc: 'Войдите или создайте аккаунт, чтобы оформить подписку.',
+      errorTitle: 'Не удалось оформить подписку',
+      errorGeneric: 'Произошла ошибка. Попробуйте ещё раз.',
+      billingClosed: 'Оплата недоступна',
+      billingClosedDesc: 'Подписку пока нельзя купить. Деньги не списаны.',
       bestValue: 'Лучшая Цена',
       billedYearly: 'Оплата за год',
       billedMonthly: 'Оплата за месяц',
@@ -97,7 +152,16 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
   const t = translations[language] || translations.en;
 
   const handleSubscribe = async (tier: TierDefinition) => {
+    track('subscribe_clicked', { plan: tier.id, period: billingPeriod });
     if (tier.id === 'free' || tier.id === currentTier) return;
+
+    // Subscribing needs an account; without this the request 401'd in silence.
+    // The chosen plan travels along so the visitor returns to where they were.
+    if (!isAuthenticated) {
+      toast({ title: t.loginRequired, description: t.loginRequiredDesc });
+      navigate(`/auth?redirect=${encodeURIComponent(`/raport?plan=${tier.id}&period=${billingPeriod}`)}`);
+      return;
+    }
 
     setLoadingTier(tier.id);
     try {
@@ -110,11 +174,26 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
           billingPeriod,
         });
         if (response.success) {
-          window.location.href = '/premium?success=true';
+          window.location.href = '/raport?success=true';
         }
       }
     } catch (error) {
+      // Previously this only reached the console: the button stopped spinning and
+      // the visitor was told nothing at all.
       console.error('Subscription error:', error);
+      // 403 is the billing gate on the API, not a failure the visitor caused, so
+      // it gets its own copy in their language rather than the server's English.
+      const status = (error as { status?: number } | null)?.status;
+      toast({
+        title: status === 403 ? t.billingClosed : t.errorTitle,
+        description:
+          status === 403
+            ? t.billingClosedDesc
+            : error instanceof Error
+              ? error.message
+              : t.errorGeneric,
+        variant: 'destructive',
+      });
     } finally {
       setLoadingTier(null);
     }
@@ -125,21 +204,29 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
       case 'free':
         return <Zap className="h-6 w-6" />;
       case 'premium':
-        return <Star className="h-6 w-6 text-amber-500" />;
+        return <Star className="h-6 w-6 text-warn" />;
       case 'pro':
-        return <Crown className="h-6 w-6 text-purple-500" />;
+        return <Crown className="h-6 w-6" />;
     }
   };
 
   const getButtonText = (tier: TierDefinition) => {
     if (tier.id === currentTier) return t.currentPlan;
+    if (!BILLING_OPEN && tier.id !== 'free') return t.billingClosed;
     if (tier.id === 'free') return t.getStarted;
-    if (currentTier !== 'free' && tier.id !== 'free') return t.upgrade;
+    if (currentTier !== 'free') return t.upgrade;
     return t.subscribe;
   };
 
   return (
     <div className="space-y-8">
+      {/* Un buton care dă 403 nu se arată activ (R6): spunem dinainte. */}
+      {!BILLING_OPEN && (
+        <p data-billing-closed className="border-l-2 border-tension py-1 pl-4 text-sm text-foreground/85">
+          {t.billingClosed}.
+        </p>
+      )}
+
       {/* Billing Toggle */}
       <div className="flex items-center justify-center gap-4">
         <Label
@@ -158,7 +245,7 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
           className={billingPeriod === 'yearly' ? 'font-semibold' : 'text-muted-foreground'}
         >
           {t.yearly}
-          <Badge variant="secondary" className="ml-2 bg-green-100 text-green-700">
+          <Badge variant="secondary" className="ml-2 text-harmony">
             {t.savePercent} 33%
           </Badge>
         </Label>
@@ -170,36 +257,25 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
           const isCurrentTier = tier.id === currentTier;
           const isHighlighted = tier.highlighted;
           const isFree = tier.id === 'free';
-          const price = tier.pricing
-            ? billingPeriod === 'monthly'
-              ? tier.pricing.monthly
-              : tier.pricing.yearly / 12
-            : 0;
-          const totalPrice = tier.pricing
-            ? billingPeriod === 'monthly'
-              ? tier.pricing.monthly
-              : tier.pricing.yearly
-            : 0;
-          const savings = tier.pricing ? calculateYearlySavings(tier) : 0;
+          const amounts = serverPricing?.[tier.id] ?? null;
+          const price = amounts ? (billingPeriod === 'monthly' ? amounts.monthly : amounts.yearly / 12) : 0;
+          const totalPrice = amounts ? (billingPeriod === 'monthly' ? amounts.monthly : amounts.yearly) : 0;
+          const savings = amounts ? calculateYearlySavings(amounts.monthly, amounts.yearly) : 0;
 
           return (
             <Card
               key={tier.id}
-              className={`relative flex flex-col transition-all duration-200 ${
-                isHighlighted
-                  ? 'border-primary border-2 shadow-lg scale-105 z-10'
-                  : 'hover:border-primary/50'
-              } ${isCurrentTier ? 'ring-2 ring-primary/20' : ''}`}
+              className={`relative flex flex-col transition-all duration-200 ${ isHighlighted ? 'border-gilt border-2 z-10' : 'hover:border-line' } ${isCurrentTier ? 'ring-2 ring-primary/20' : ''}`}
             >
               {/* Badge */}
               {isHighlighted && (
-                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">
+                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-background px-2">
                   <Sparkles className="h-3 w-3 mr-1" />
                   {t.mostPopular}
                 </Badge>
               )}
               {tier.id === 'pro' && (
-                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-600">
+                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-background px-2">
                   <Crown className="h-3 w-3 mr-1" />
                   {t.bestValue}
                 </Badge>
@@ -220,6 +296,10 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
                 <div className="text-center mb-6">
                   {isFree ? (
                     <div className="text-4xl font-bold">{t.free}</div>
+                  ) : !amounts ? (
+                    <div className="h-16 flex items-center justify-center">
+                      <div className="h-8 w-28 rounded bg-muted animate-pulse" />
+                    </div>
                   ) : (
                     <>
                       <div className="flex items-baseline justify-center gap-1">
@@ -234,7 +314,7 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
                           : t.billedMonthly}
                       </p>
                       {billingPeriod === 'yearly' && savings > 0 && (
-                        <Badge variant="outline" className="mt-2 text-green-600 border-green-600">
+                        <Badge variant="outline" className="mt-2 text-ok border-ok">
                           {t.save} {formatPrice(savings, tier.pricing!.currency)}
                         </Badge>
                       )}
@@ -247,11 +327,14 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
                   {tier.features.map((feature) => (
                     <li key={feature.id} className="flex items-start gap-3">
                       {feature.included ? (
-                        <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                        <Check className="h-5 w-5 text-ok shrink-0 mt-0.5" />
                       ) : (
-                        <X className="h-5 w-5 text-muted-foreground/50 shrink-0 mt-0.5" />
+                        <X className="h-5 w-5 text-tension shrink-0 mt-0.5" />
                       )}
-                      <div className={!feature.included ? 'text-muted-foreground/50' : ''}>
+                      {/* Jumătatea de opacitate scotea textul la 2,49 -- de
+                          necitit, nu doar estompat. Ce nu e inclus se vede din
+                          iconiță; textul rămâne lizibil. */}
+                      <div className={!feature.included ? 'text-muted-foreground' : ''}>
                         <span className="text-sm font-medium">
                           {feature.name[language] || feature.name.en}
                         </span>
@@ -276,7 +359,7 @@ export const PricingCards = ({ onSubscribe, currentTier = 'free' }: PricingCards
                   className="w-full"
                   variant={isHighlighted ? 'default' : tier.id === 'pro' ? 'default' : 'outline'}
                   size="lg"
-                  disabled={isCurrentTier || loadingTier === tier.id}
+                  disabled={isCurrentTier || loadingTier === tier.id || (!BILLING_OPEN && tier.id !== 'free')}
                   onClick={() => handleSubscribe(tier)}
                 >
                   {loadingTier === tier.id ? (
@@ -366,7 +449,7 @@ export const OneTimePurchases = () => {
               {products.map((product) => (
                 <div
                   key={product.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
+                  className="border-t border-line flex items-center justify-between pt-3"
                 >
                   <div>
                     <p className="font-medium text-sm">
@@ -379,7 +462,7 @@ export const OneTimePurchases = () => {
                   <Button
                     size="sm"
                     variant="outline"
-                    disabled={purchasing === product.id}
+                    disabled={purchasing === product.id || !BILLING_OPEN}
                     onClick={() => handlePurchase(product.id)}
                   >
                     {purchasing === product.id

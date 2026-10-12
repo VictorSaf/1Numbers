@@ -31,64 +31,64 @@ const quickActions: QuickAction[] = [
     icon: <Calculator className="h-5 w-5" />,
     label: { en: 'Calculator', ro: 'Calculator', ru: 'Калькулятор' },
     href: '/',
-    color: 'text-primary',
-    bgColor: 'bg-primary/10 hover:bg-primary/20',
+    color: 'text-chart-1',
+    bgColor: 'bg-chart-1/10 hover:bg-chart-1/20',
   },
   {
     id: 'compatibility',
     icon: <Heart className="h-5 w-5" />,
     label: { en: 'Compatibility', ro: 'Compatibilitate', ru: 'Совместимость' },
-    href: '/compatibility',
-    color: 'text-pink-500',
-    bgColor: 'bg-pink-500/10 hover:bg-pink-500/20',
+    href: '/doi',
+    color: 'text-chart-6',
+    bgColor: 'bg-chart-6/10 hover:bg-chart-6/20',
   },
   {
     id: 'predictions',
     icon: <Calendar className="h-5 w-5" />,
     label: { en: 'Predictions', ro: 'Predicții', ru: 'Прогнозы' },
-    href: '/predictions',
-    color: 'text-purple-500',
-    bgColor: 'bg-purple-500/10 hover:bg-purple-500/20',
+    href: '/azi',
+    color: 'text-chart-2',
+    bgColor: 'bg-chart-2/10 hover:bg-chart-2/20',
   },
   {
     id: 'loShu',
     icon: <Grid3X3 className="h-5 w-5" />,
     label: { en: 'Lo Shu', ro: 'Lo Shu', ru: 'Ло Шу' },
-    href: '/tools',
-    color: 'text-amber-500',
-    bgColor: 'bg-amber-500/10 hover:bg-amber-500/20',
+    href: '/unelte',
+    color: 'text-chart-3',
+    bgColor: 'bg-chart-3/10 hover:bg-chart-3/20',
   },
   {
     id: 'remedies',
     icon: <Gem className="h-5 w-5" />,
     label: { en: 'Remedies', ro: 'Remedii', ru: 'Средства' },
     href: '/remedies',
-    color: 'text-green-500',
-    bgColor: 'bg-green-500/10 hover:bg-green-500/20',
+    color: 'text-chart-5',
+    bgColor: 'bg-chart-5/10 hover:bg-chart-5/20',
   },
   {
     id: 'angel',
     icon: <Sparkles className="h-5 w-5" />,
     label: { en: 'Angel #', ro: 'Îngeri #', ru: 'Ангел #' },
-    href: '/angel-numbers',
-    color: 'text-sky-500',
-    bgColor: 'bg-sky-500/10 hover:bg-sky-500/20',
+    href: '/unelte?s=angel',
+    color: 'text-chart-4',
+    bgColor: 'bg-chart-4/10 hover:bg-chart-4/20',
   },
   {
     id: 'friends',
     icon: <Users className="h-5 w-5" />,
     label: { en: 'Friends', ro: 'Prieteni', ru: 'Друзья' },
-    href: '/friends',
-    color: 'text-indigo-500',
-    bgColor: 'bg-indigo-500/10 hover:bg-indigo-500/20',
+    href: '/cercul-meu',
+    color: 'text-chart-1',
+    bgColor: 'bg-chart-1/10 hover:bg-chart-1/20',
   },
   {
     id: 'guide',
     icon: <BookOpen className="h-5 w-5" />,
     label: { en: 'Guide', ro: 'Ghid', ru: 'Гид' },
-    href: '/guide',
-    color: 'text-orange-500',
-    bgColor: 'bg-orange-500/10 hover:bg-orange-500/20',
+    href: '/invata',
+    color: 'text-chart-3',
+    bgColor: 'bg-chart-3/10 hover:bg-chart-3/20',
   },
 ];
 
@@ -106,11 +106,14 @@ export const QuickActions = () => {
       <h3 className="text-sm font-medium text-muted-foreground px-1">
         {translations[language] || translations.en}
       </h3>
-      <div className="grid grid-cols-4 gap-3">
+      {/* Two rows of four on a phone, not four columns of anything. The fixed
+          grid-cols-4 had no responsive prefix, so eight actions squeezed into
+          four columns at every width. */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {quickActions.map((action) => (
           <Link key={action.id} to={action.href}>
             <div
-              className={`flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-200 ${action.bgColor}`}
+              className={`flex flex-col items-center justify-center min-h-11 p-3 rounded-sm transition-colors duration-200 ${action.bgColor}`}
             >
               <div className={action.color}>{action.icon}</div>
               <span className="text-xs font-medium mt-2 text-center">

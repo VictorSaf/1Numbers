@@ -7,8 +7,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { calculateLifePathNumber, calculateDestinyNumber, calculateSoulUrgeNumber, calculatePersonalityNumber } from '@/lib/numerology';
-import { calculateCompatibility } from '@/lib/compatibility';
+import { calculateFriendshipCompatibility } from '@/lib/compatibility';
 import { Heart, Users, Sparkles, ArrowRight, Star } from 'lucide-react';
+import { parseCalendarDate } from '@/lib/calendarDate';
 
 interface PersonData {
   birthDate: string;
@@ -99,7 +100,7 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
   const t = translations[language] || translations.en;
 
   const userNumbers = useMemo(() => {
-    const birthDate = new Date(user.birthDate);
+    const birthDate = parseCalendarDate(user.birthDate);
     return {
       lifePath: calculateLifePathNumber(birthDate),
       destiny: calculateDestinyNumber(user.fullName),
@@ -109,7 +110,7 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
   }, [user.birthDate, user.fullName]);
 
   const friendNumbers = useMemo(() => {
-    const birthDate = new Date(friend.birthDate);
+    const birthDate = parseCalendarDate(friend.birthDate);
     return {
       lifePath: calculateLifePathNumber(birthDate),
       destiny: calculateDestinyNumber(friend.fullName),
@@ -119,13 +120,16 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
   }, [friend.birthDate, friend.fullName]);
 
   const compatibility = useMemo(() => {
-    const userDate = new Date(user.birthDate);
-    const friendDate = new Date(friend.birthDate);
-    return calculateCompatibility(
-      userDate,
-      user.fullName,
-      friendDate,
-      friend.fullName
+    const userDate = parseCalendarDate(user.birthDate);
+    const friendDate = parseCalendarDate(friend.birthDate);
+    // calculateCompatibility takes two person objects and returns only the three
+    // base scores. This component was written against a richer shape it never
+    // received, so every score read undefined and the analysis never rendered.
+    // calculateFriendshipCompatibility returns that richer shape, weighted for
+    // friendship rather than romance.
+    return calculateFriendshipCompatibility(
+      { fullName: user.fullName, birthDate: userDate },
+      { fullName: friend.fullName, birthDate: friendDate }
     );
   }, [user, friend]);
 
@@ -138,19 +142,19 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 90) return 'text-green-500';
-    if (score >= 75) return 'text-emerald-500';
-    if (score >= 60) return 'text-yellow-500';
-    if (score >= 45) return 'text-orange-500';
-    return 'text-red-500';
+    if (score >= 90) return 'text-ok';
+    if (score >= 75) return 'text-ok';
+    if (score >= 60) return 'text-warn';
+    if (score >= 45) return 'text-warn';
+    return 'text-crit';
   };
 
   const getProgressColor = (score: number) => {
-    if (score >= 90) return 'bg-green-500';
-    if (score >= 75) return 'bg-emerald-500';
-    if (score >= 60) return 'bg-yellow-500';
-    if (score >= 45) return 'bg-orange-500';
-    return 'bg-red-500';
+    if (score >= 90) return 'bg-ok';
+    if (score >= 75) return 'bg-ok';
+    if (score >= 60) return 'bg-warn';
+    if (score >= 45) return 'bg-warn';
+    return 'bg-crit';
   };
 
   const displayName = friendName || friend.fullName.split(' ')[0];
@@ -158,10 +162,10 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
   return (
     <div className="space-y-6">
       {/* Overall Compatibility Card */}
-      <Card className="border-2 border-primary/20">
+      <Card className="border-2 border-line">
         <CardHeader className="text-center pb-2">
           <div className="flex justify-center mb-2">
-            <Heart className="h-8 w-8 text-red-500 fill-red-500" />
+            <Heart className="h-8 w-8 text-crit fill-crit" />
           </div>
           <CardTitle className="text-2xl">{t.overallCompatibility}</CardTitle>
           <CardDescription>
@@ -195,7 +199,7 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
         <Card>
           <CardHeader className="pb-2">
             <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-primary" />
+              <Users className="h-5 w-5" />
               <CardTitle className="text-lg">{t.yourNumbers}</CardTitle>
             </div>
           </CardHeader>
@@ -233,7 +237,7 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
         <Card>
           <CardHeader className="pb-2">
             <div className="flex items-center gap-2">
-              <Star className="h-5 w-5 text-amber-500" />
+              <Star className="h-5 w-5 text-warn" />
               <CardTitle className="text-lg">{t.friendNumbers}</CardTitle>
             </div>
           </CardHeader>
@@ -272,7 +276,7 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-purple-500" />
+            <Sparkles className="h-5 w-5" />
             <CardTitle>{t.analysis}</CardTitle>
           </div>
         </CardHeader>
@@ -286,12 +290,12 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
                   ({userNumbers.lifePath} <ArrowRight className="inline h-3 w-3" /> {friendNumbers.lifePath})
                 </span>
               </div>
-              <span className={`font-bold ${getScoreColor(compatibility.lifePathScore)}`}>
-                {compatibility.lifePathScore}%
+              <span className={`font-bold ${getScoreColor(compatibility.lifePathCompatibility.score)}`}>
+                {compatibility.lifePathCompatibility.score}%
               </span>
             </div>
             <Progress
-              value={compatibility.lifePathScore}
+              value={compatibility.lifePathCompatibility.score}
               className="h-2"
             />
           </div>
@@ -305,12 +309,12 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
                   ({userNumbers.destiny} <ArrowRight className="inline h-3 w-3" /> {friendNumbers.destiny})
                 </span>
               </div>
-              <span className={`font-bold ${getScoreColor(compatibility.destinyScore)}`}>
-                {compatibility.destinyScore}%
+              <span className={`font-bold ${getScoreColor(compatibility.destinyCompatibility.score)}`}>
+                {compatibility.destinyCompatibility.score}%
               </span>
             </div>
             <Progress
-              value={compatibility.destinyScore}
+              value={compatibility.destinyCompatibility.score}
               className="h-2"
             />
           </div>
@@ -324,50 +328,35 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
                   ({userNumbers.soulUrge} <ArrowRight className="inline h-3 w-3" /> {friendNumbers.soulUrge})
                 </span>
               </div>
-              <span className={`font-bold ${getScoreColor(compatibility.soulUrgeScore)}`}>
-                {compatibility.soulUrgeScore}%
+              <span className={`font-bold ${getScoreColor(compatibility.soulUrgeCompatibility.score)}`}>
+                {compatibility.soulUrgeCompatibility.score}%
               </span>
             </div>
             <Progress
-              value={compatibility.soulUrgeScore}
+              value={compatibility.soulUrgeCompatibility.score}
               className="h-2"
             />
           </div>
 
-          {/* Personality Match */}
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <span>{t.personalityMatch}</span>
-                <span className="text-muted-foreground text-sm">
-                  ({userNumbers.personality} <ArrowRight className="inline h-3 w-3" /> {friendNumbers.personality})
-                </span>
-              </div>
-              <span className={`font-bold ${getScoreColor(compatibility.personalityScore || 50)}`}>
-                {compatibility.personalityScore || 50}%
-              </span>
-            </div>
-            <Progress
-              value={compatibility.personalityScore || 50}
-              className="h-2"
-            />
-          </div>
+          {/* Personality had no score behind it. Compatibility is weighted Life Path 50%,
+              Destiny 30%, Soul Urge 20% -- personality is not part of the model, and the
+              bar here read `personalityScore || 50`, showing a fabricated 50% to everyone. */}
         </CardContent>
       </Card>
 
       {/* Strengths and Challenges */}
-      {compatibility.analysis && (
+      {(compatibility.strengths || compatibility.challenges) && (
         <div className="grid md:grid-cols-2 gap-4">
           {/* Strengths */}
-          <Card className="border-green-500/20">
+          <Card className="border-ok">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg text-green-500">{t.strengths}</CardTitle>
+              <CardTitle className="text-lg text-ok">{t.strengths}</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
-                {compatibility.analysis.strengths?.map((strength, index) => (
+                {(compatibility.strengths?.[language] ?? []).map((strength, index) => (
                   <li key={index} className="flex items-start gap-2">
-                    <span className="text-green-500">+</span>
+                    <span className="text-ok">+</span>
                     <span className="text-sm">{strength}</span>
                   </li>
                 ))}
@@ -376,15 +365,15 @@ export const FriendComparison = ({ user, friend, friendName }: FriendComparisonP
           </Card>
 
           {/* Challenges */}
-          <Card className="border-orange-500/20">
+          <Card className="border-warn">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg text-orange-500">{t.challenges}</CardTitle>
+              <CardTitle className="text-lg text-warn">{t.challenges}</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
-                {compatibility.analysis.challenges?.map((challenge, index) => (
+                {(compatibility.challenges?.[language] ?? []).map((challenge, index) => (
                   <li key={index} className="flex items-start gap-2">
-                    <span className="text-orange-500">!</span>
+                    <span className="text-warn">!</span>
                     <span className="text-sm">{challenge}</span>
                   </li>
                 ))}

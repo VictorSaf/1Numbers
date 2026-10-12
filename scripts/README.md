@@ -1,56 +1,35 @@
 # Scripts
 
-## create-admin-user.js
+## Conturi de admin
 
-Creates an admin user in the PostgreSQL database.
+Aici stătea `create-admin-user.js`. A fost scos pe 12 octombrie 2026: avea un
+email și o parolă de admin scrise în cod și cădea pe
+`postgres:postgres@localhost` când lipsea `DATABASE_URL`.
 
-### Prerequisites
+Ce îl înlocuiește:
 
-1. **PostgreSQL installed and running**
-   - macOS: `brew install postgresql@14 && brew services start postgresql@14`
-   - Linux: `sudo apt-get install postgresql postgresql-contrib`
-   - Windows: Download from [postgresql.org](https://www.postgresql.org/download/)
+- **Un cont nou** se face din API, de către un admin: `POST /api/admin/users`
+  (`server/src/routes/admin.ts`). Parola trece prin același bcrypt ca la
+  înregistrare, iar rolul se dă explicit (`role: "admin"`).
+- **O parolă nouă pe un cont existent**: `npm --prefix server run set-password`.
+  Parola se citește fără ecou și nu ajunge nici în istoricul shell-ului, nici
+  în lista de procese.
 
-2. **Database created**
-   ```bash
-   createdb numerology_compass
-   ```
+Niciunul nu face primul admin pe o bază goală: `set-password` nu schimbă rolul,
+iar `POST /admin/users` cere deja un admin. Pe o bază nouă, rolul primului cont
+se pune de mână, în `psql`.
 
-3. **Environment variables set**
-   Create `.env.local` in the project root:
-   ```env
-   DATABASE_URL=postgresql://postgres:postgres@localhost:5432/numerology_compass
-   ```
-   
-   Adjust the connection string based on your PostgreSQL setup:
-   - `postgres` = default username
-   - `postgres` = default password (change if you set a different one)
-   - `localhost:5432` = default host and port
-   - `numerology_compass` = database name
-
-### Usage
+## set-anthropic-key.sh
 
 ```bash
-npm run create-admin-user
+bash scripts/set-anthropic-key.sh
 ```
 
-This will create an admin user with:
-- **Email**: victor@victor.ro
-- **Password**: victor
-- **Role**: admin
-
-### Troubleshooting
-
-**Connection refused error:**
-- Ensure PostgreSQL is running: `pg_isready`
-- Check if port 5432 is correct: `lsof -i :5432`
-- Verify DATABASE_URL format
-
-**Authentication failed:**
-- Check PostgreSQL username and password
-- Verify database exists: `psql -l`
-
-**Table doesn't exist:**
-- The script will create the `users` table automatically
-- If you need to run migrations manually, see `supabase/migrations/`
-
+Pune cheia Anthropic în `server/.env` și repornește `compass-api` sub pm2.
+Cheia se citește de la tastatură fără ecou și nu se tipărește; înainte de
+scriere se face o copie `server/.env.bak.<dată>` (ignorată de git, pentru că
+conține secrete). Procesul pornește cu `env -u ANTHROPIC_BASE_URL`, ca să nu
+moștenească proxy-ul unei sesiuni de Claude Code, apoi scriptul verifică trei
+lucruri: că variabila n-a scăpat în proces, că procesul e online și că
+`/api/health` răspunde 200. Cheia trebuie să fie una de workspace — una legată
+de identitate dă 502 la fiecare întrebare.
