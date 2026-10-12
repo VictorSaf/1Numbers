@@ -160,7 +160,7 @@ const DistanceMatrix = ({ c, title }: { c: Comparison; title: string }) => {
 
 const Row = ({ c, t }: { c: Comparison; t: (typeof COPY)[Lang] }) => (
   <details data-comparison={c.key} className={`group border-t pt-4 ${RULE[c.verdict]}`}>
-    <summary className="flex cursor-pointer list-none items-baseline gap-3 pb-3 [&::-webkit-details-marker]:hidden">
+    <summary className="flex cursor-pointer list-none flex-wrap items-baseline gap-x-3 gap-y-1 pb-3 [&::-webkit-details-marker]:hidden">
       <span className={`mt-1.5 h-1.5 w-1.5 shrink-0 self-start rounded-full ${DOT[c.verdict]}`} aria-hidden="true" />
       <span className="min-w-0 flex-1">
         <span className="block font-heading text-base text-foreground sm:text-lg">{c.question}</span>
@@ -169,7 +169,9 @@ const Row = ({ c, t }: { c: Comparison; t: (typeof COPY)[Lang] }) => (
           {c.verdict !== "agree" && c.verdict !== "octave" && c.scale !== "category" && ` · ${t.spread} ${c.spread}`}
         </span>
       </span>
-      <span className="num shrink-0 text-right text-lg text-primary sm:text-xl">
+      {/* Pe telefon valorile coboară sub întrebare și se pot rupe: o mulțime
+          lungă („Ce îți lipsește?”) ieșea cu 200px din ecran. */}
+      <span className="num order-last basis-full break-words pl-[1.125rem] text-lg text-primary sm:order-none sm:basis-auto sm:shrink-0 sm:pl-0 sm:text-right sm:text-xl">
         {/* Un grup e un răspuns; „/” le desparte, „·” stă în interiorul unei mulțimi. */}
         {c.groups.map((g) => g.display).join("  /  ")}
       </span>
