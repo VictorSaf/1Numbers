@@ -43,7 +43,7 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
       universalDay: "Zi Universală",
       luckyDay: "Zi Norocoasă",
       masterDay: "Zi Maestru",
-      score: "Scor Noroc",
+      score: "Criterii îndeplinite (din 7)",
       dayEnergy: "Energia Zilei",
       keywords: "Cuvinte cheie",
       meaning: "Semnificație",
@@ -73,7 +73,7 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
       universalDay: "Universal Day",
       luckyDay: "Lucky Day",
       masterDay: "Master Day",
-      score: "Lucky Score",
+      score: "Criteria met (of 7)",
       dayEnergy: "Day Energy",
       keywords: "Keywords",
       meaning: "Meaning",
@@ -103,7 +103,7 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
       universalDay: "Универсальный День",
       luckyDay: "Счастливый День",
       masterDay: "Мастер День",
-      score: "Счёт Удачи",
+      score: "Выполнено критериев (из 7)",
       dayEnergy: "Энергия Дня",
       keywords: "Ключевые слова",
       meaning: "Значение",
@@ -246,6 +246,11 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
           </div>
         </div>
 
+        {/* Cele două cifre mici din fiecare zi n-aveau legendă. */}
+        <p className="mb-2 hidden text-xs text-muted-foreground sm:block">
+          <span className="num text-primary/80">6</span> / <span className="num text-warn/80">3</span> = {t.personalDay} / {t.universalDay}
+        </p>
+
         {/* Weekday headers */}
         <div className="grid grid-cols-7 gap-1 mb-2">
           {t.weekDays.map((day) => (
@@ -315,8 +320,9 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
                       {day.luckyScore > 0 && (
                         <div className="flex items-center justify-between pt-3 border-t border-line">
                           <span className="text-sm text-muted-foreground">{t.score}</span>
-                          <span className={`text-xl font-bold ${getScoreColor(day.luckyScore)}`}>
-                            {day.luckyScore}%
+                          {/* Punctele erau o sumă fără scară (maximul e 135) afișată cu „%”. */}
+                          <span className={`num text-xl font-bold ${getScoreColor(day.luckyScore)}`}>
+                            {day.reasons.length}
                           </span>
                         </div>
                       )}
@@ -377,7 +383,7 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
 
         {/* Month Summary */}
         <div className="mt-6 pt-4 border-t border-border/50">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          <div className="grid grid-cols-3 gap-3 text-center">
             <div className="rounded-lg p-3">
               <div className="text-2xl font-bold text-warn">
                 {monthData.filter(d => d.isLucky).length}
@@ -395,12 +401,6 @@ export const NumerologyCalendar = ({ birthDate, fullName }: NumerologyCalendarPr
                 {monthData.filter(d => d.luckyScore >= 25 && !d.isLucky).length}
               </div>
               <div className="text-xs text-muted-foreground">{t.highEnergy}</div>
-            </div>
-            <div className="border-t border-line pt-3">
-              <div className="text-2xl font-bold text-primary">
-                {Math.max(...monthData.map(d => d.luckyScore))}%
-              </div>
-              <div className="text-xs text-muted-foreground">{t.score}</div>
             </div>
           </div>
         </div>
