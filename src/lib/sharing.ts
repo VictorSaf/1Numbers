@@ -7,13 +7,6 @@ export interface ShareData {
   imageUrl?: string;
 }
 
-export interface CompatibilityShareData {
-  person1Name: string;
-  person2Name: string;
-  compatibilityScore: number;
-  url: string;
-}
-
 /**
  * Share to Facebook using Web Share API or Facebook URL.
  * @param data - Share data
@@ -137,28 +130,6 @@ export const generateShareableLink = (
   });
   
   return `${baseUrl}/?${params.toString()}`;
-};
-
-/**
- * Generate compatibility link for sharing compatibility results.
- * @param data - Compatibility share data
- * @param baseUrl - Base URL of the application
- * @returns Shareable URL with encoded compatibility data
- */
-export const generateCompatibilityLink = (
-  // `url` is what this function returns, so requiring it as input was circular;
-  // every caller had to invent one just to get one back.
-  data: Omit<CompatibilityShareData, 'url'>,
-  baseUrl: string = window.location.origin
-): string => {
-  const params = new URLSearchParams({
-    person1: data.person1Name,
-    person2: data.person2Name,
-    score: data.compatibilityScore.toString(),
-    type: 'compatibility'
-  });
-  
-  return `${baseUrl}/compatibility?${params.toString()}`;
 };
 
 /**

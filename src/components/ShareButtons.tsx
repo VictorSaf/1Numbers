@@ -26,18 +26,12 @@ interface ShareButtonsProps {
   shareData: ShareData;
   showEmail?: boolean;
   showLink?: boolean;
-  compatibilityData?: {
-    person1Name: string;
-    person2Name: string;
-    compatibilityScore: number;
-  };
 }
 
 export const ShareButtons = ({ 
   shareData, 
   showEmail = true, 
   showLink = true,
-  compatibilityData 
 }: ShareButtonsProps) => {
   const { language, t } = useLanguage();
   const { toast } = useToast();

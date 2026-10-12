@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { Users, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,8 +14,7 @@ import { buildDial, type DialLang } from "@/lib/dial";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useProfile } from "@/hooks/use-profile";
 import { 
-  calculateCompatibility, 
-  getCompatibilityLevel, 
+  calculateCompatibility,
   CompatibilityResult,
   RelationshipType,
   calculateRomanticCompatibility,
@@ -27,7 +26,6 @@ import {
 import { RelationshipTypeSelector } from "@/components/RelationshipTypeSelector";
 import { RelationshipDynamicsCard } from "@/components/RelationshipDynamicsCard";
 import { ShareButtons } from "@/components/ShareButtons";
-import { generateCompatibilityLink } from "@/lib/sharing";
 import { format } from "date-fns";
 import { ro, enUS, ru } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
@@ -35,11 +33,16 @@ import { cn } from "@/lib/utils";
 import { BirthDateSelect } from "@/components/BirthDateSelect";
 import { RelationshipTimingCard } from "@/components/compatibility/RelationshipTimingCard";
 import { calculateRelationshipTiming, type RelationshipTiming } from "@/lib/relationshipTiming";
-import { TwoJudgements } from "@/components/numerology/TwoJudgements";
+import { AllMethods } from "@/components/compatibility/AllMethods";
+import type { Gender } from "@/lib/models/compatibility";
+
+const CoupleMatrix = lazy(() => import("@/components/numerology/CoupleMatrix"));
 
 interface PersonData {
   fullName: string;
   birthDate: Date | undefined;
+  /** Opțional: folosit doar de metoda Kua. */
+  gender?: Gender;
 }
 
 const locales = { ro, en: enUS, ru };
@@ -52,9 +55,11 @@ const Compatibility = () => {
     // Întrebarea fiecărei secțiuni spune ALTCEVA decât subtitlul plăcii.
     // Repetat cuvânt cu cuvânt la două rânduri distanță, textul face pagina să
     // pară scrisă de două ori -- același defect pe care l-am scos de pe /azi.
-    ro: { scorQ: "Cât de aproape sunt cele două hărți, într-o singură cifră.", scoruri: "Scorurile pe rând", procent: "Ce ascunde procentul", dinamica: "Dinamica relației" },
-    en: { scorQ: "How close the two maps are, in a single figure.", scoruri: "The scores, one by one", procent: "What the percentage hides", dinamica: "How the relationship moves" },
-    ru: { scorQ: "Насколько близки две карты — одним числом.", scoruri: "Оценки по отдельности", procent: "Что скрывает процент", dinamica: "Динамика отношений" },
+    // Nu mai stă nicio cifră de sinteză deasupra: fiecare metodă își spune
+    // verdictul, iar împărțirea dintre ele e răspunsul.
+    ro: { scorQ: "Aceeași pereche, prin fiecare metodă din piață — și unde se despart.", scoruri: "Matricea aplicației, pe componente", dinamica: "Dinamica relației", gender: "Gen (folosit doar pentru Kua)", genderNone: "nespecificat", male: "bărbat", female: "femeie", share: "Perechea noastră, citită prin fiecare metodă" },
+    en: { scorQ: "The same couple, through every method on the market — and where they part.", scoruri: "This app's matrix, component by component", dinamica: "How the relationship moves", gender: "Gender (used only for Kua)", genderNone: "not specified", male: "male", female: "female", share: "Our couple, read through every method" },
+    ru: { scorQ: "Одна пара через каждый метод — и где они расходятся.", scoruri: "Матрица приложения, по компонентам", dinamica: "Динамика отношений", gender: "Пол (только для Гуа)", genderNone: "не указан", male: "мужской", female: "женский", share: "Наша пара, прочитанная каждым методом" },
   }[lang];
   const { profileData, hasProfile } = useProfile();
   const [person1, setPerson1] = useState<PersonData>({ fullName: "", birthDate: undefined });
@@ -75,6 +80,19 @@ const Compatibility = () => {
       });
     }
   }, [hasProfile, profileData, person1]);
+
+  // Aceeași pereche pentru toate metodele; memorată ca AllMethods să nu
+  // recalculeze la fiecare randare.
+  const couple = useMemo(
+    () =>
+      result && person1.birthDate && person2.birthDate
+        ? {
+            a: { name: person1.fullName, birthDate: person1.birthDate },
+            b: { name: person2.fullName, birthDate: person2.birthDate },
+          }
+        : null,
+    [result, person1.fullName, person1.birthDate, person2.fullName, person2.birthDate],
+  );
 
   const dateLocale = locales[language];
   const currentYear = new Date().getFullYear();
@@ -147,11 +165,27 @@ const Compatibility = () => {
     return "text-tension";
   };
 
-  const getScoreRule = (score: number) => {
-    if (score >= 70) return "border-harmony";
-    if (score >= 55) return "border-line";
-    return "border-tension";
-  };
+  // Genul e opțional și întreabă o singură metodă: Kua. Fără el, Kua lipsește
+  // din listă și o spune, restul metodelor nu se schimbă.
+  const genderField = (
+    person: PersonData,
+    setPerson: (p: PersonData) => void,
+    id: string,
+  ) => (
+    <div className="space-y-2">
+      <Label htmlFor={id} className="text-sm">{sections.gender}</Label>
+      <select
+        id={id}
+        value={person.gender ?? ""}
+        onChange={(e) => setPerson({ ...person, gender: (e.target.value || undefined) as Gender | undefined })}
+        className="h-11 w-full rounded-none border-0 border-b border-line bg-transparent px-0 text-sm text-foreground transition-colors focus:border-gilt focus:outline-none"
+      >
+        <option value="">{sections.genderNone}</option>
+        <option value="female">{sections.female}</option>
+        <option value="male">{sections.male}</option>
+      </select>
+    </div>
+  );
 
   return (
     <PageLayout>
@@ -208,6 +242,8 @@ const Compatibility = () => {
                     <Label className="text-sm">{t.birthDateLabel}</Label>
                     <BirthDateSelect value={person1.birthDate} onChange={(date) => setPerson1({ ...person1, birthDate: date })} />
                   </div>
+
+                  {genderField(person1, setPerson1, "gender-1")}
                 </div>
 
                 {/* Person 2 */}
@@ -233,6 +269,8 @@ const Compatibility = () => {
                     <Label className="text-sm">{t.birthDateLabel}</Label>
                     <BirthDateSelect value={person2.birthDate} onChange={(date) => setPerson2({ ...person2, birthDate: date })} />
                   </div>
+
+                  {genderField(person2, setPerson2, "gender-2")}
                 </div>
 
                 <div className="md:col-span-2">
@@ -267,47 +305,37 @@ const Compatibility = () => {
                 index={1}
               >
 
-              {/* Scorul e o CIFRĂ, ca peste tot: stă mare și singură, deschisă
-                  de un filet care poartă culoarea distanței. Caseta cu degrade
-                  pe două direcții și chenar colorat era ultimul loc din
-                  aplicație care mai arăta a stil vechi. */}
-              <div className={cn("border-t-2 pt-6", getScoreRule(result.overallScore))}>
-                <span className="num text-[0.63rem] uppercase tracking-[0.18em] text-muted-foreground">
-                  {t.overallCompatibility}
-                </span>
-                <div className="mt-4 flex flex-wrap items-baseline gap-x-6 gap-y-2">
-                  <span className={cn("num text-7xl leading-none md:text-8xl", getScoreColor(result.overallScore))}>
-                    {result.overallScore}%
-                  </span>
-                  <span className="font-heading text-xl text-foreground">
-                    {t.compatibilityLevels[getCompatibilityLevel(result.overallScore)]}
-                  </span>
-                </div>
-                <p className="mt-4 max-w-[65ch] text-muted-foreground">
-                  {t.compatibilityDescriptions[getCompatibilityLevel(result.overallScore)]}
-                </p>
-              </div>
+              {/* Nicio cifră de sinteză deasupra. Procentul mare de aici era o
+                  medie ponderată peste trei tabele -- exact ce doctrina nu
+                  permite să stea peste dezacorduri. Acum pagina se deschide cu
+                  fiecare metodă din piață și cu împărțirea dintre ele. */}
+              {couple && (
+                <AllMethods
+                  a={couple.a}
+                  b={couple.b}
+                  genderA={person1.gender}
+                  genderB={person2.gender}
+                />
+              )}
+
+              {/* A treia tradiție pe aceeași relație: Matricea destinului a
+                  cuplului, în ambele reduceri peste 22. */}
+              {couple && (
+                <Suspense fallback={null}>
+                  <CoupleMatrix birthDateA={couple.a.birthDate} birthDateB={couple.b.birthDate} />
+                </Suspense>
+              )}
 
               <SectionHead index={2} title={sections.scoruri} />
 
-              {/* Detailed Scores */}
+              {/* Scorurile matricei aplicației, fiecare pe componenta lui. Nu se
+                  mai adună într-un procent comun, deci nici ponderile nu mai
+                  au ce pondera. */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
-                  { 
-                    title: t.lifePathTitle, 
-                    data: result.lifePathCompatibility,
-                    weight: "50%"
-                  },
-                  { 
-                    title: t.destinyTitle, 
-                    data: result.destinyCompatibility,
-                    weight: "30%"
-                  },
-                  { 
-                    title: t.soulUrgeTitle, 
-                    data: result.soulUrgeCompatibility,
-                    weight: "20%"
-                  },
+                  { title: t.lifePathTitle, data: result.lifePathCompatibility },
+                  { title: t.destinyTitle, data: result.destinyCompatibility },
+                  { title: t.soulUrgeTitle, data: result.soulUrgeCompatibility },
                 ].map((item, i) => (
                   <div key={i} className="card-mystic py-5 text-center">
                     <span className="text-xs uppercase tracking-[0.15em] text-primary/70">
@@ -325,30 +353,11 @@ const Compatibility = () => {
                     <div className={cn("num text-2xl font-bold", getScoreColor(item.data.score))}>
                       {item.data.score}%
                     </div>
-                    <span className="text-xs text-muted-foreground">
-                      {t.weight}: {item.weight}
-                    </span>
                   </div>
                 ))}
               </div>
 
-              <SectionHead index={3} title={sections.procent} />
-
-              {/* Ce ascunde procentul, și ce spune a doua tradiție.
-                  Procentul de deasupra e o medie ponderată: două perechi cu
-                  același 74% pot fi una echilibrată pe toate liniile și alta
-                  ruptă în două. Iar tradiția vedică judecă aceeași pereche
-                  prin alt criteriu -- prietenie sau dușmănie între planetele
-                  zilelor de naștere -- și poate să nu fie de acord.
-                  Stă imediat sub scor, fiindcă despre scorul ăla vorbește. */}
-              {person1.birthDate && person2.birthDate && (
-                <TwoJudgements
-                  a={{ name: person1.fullName, birthDate: person1.birthDate }}
-                  b={{ name: person2.fullName, birthDate: person2.birthDate }}
-                />
-              )}
-
-              <SectionHead index={4} title={sections.dinamica} />
+              <SectionHead index={3} title={sections.dinamica} />
 
               {/* Relationship Dynamics Card */}
               {detailedResult && (
@@ -369,17 +378,10 @@ const Compatibility = () => {
                   <ShareButtons
                     shareData={{
                       title: `${person1.fullName} & ${person2.fullName} - Compatibility`,
-                      text: `Our compatibility score is ${result.overallScore}%!`,
-                      url: generateCompatibilityLink({
-                        person1Name: person1.fullName,
-                        person2Name: person2.fullName,
-                        compatibilityScore: result.overallScore
-                      })
-                    }}
-                    compatibilityData={{
-                      person1Name: person1.fullName,
-                      person2Name: person2.fullName,
-                      compatibilityScore: result.overallScore
+                      text: sections.share,
+                      // Fără nume și fără date în link (R6): cine îl deschide își
+                      // pune propriii oameni.
+                      url: `${window.location.origin}/doi`
                     }}
                   />
                 </div>
