@@ -29,6 +29,7 @@ import { DayNavigator } from '@/components/predictions/DayNavigator';
 import { CalendarAndHours } from '@/components/predictions/CalendarAndHours';
 import { useSelectedDay } from '@/hooks/use-selected-day';
 import { getDayContent } from '@/lib/dayContent';
+import { calculatePersonalYearNumber } from '@/lib/numerology';
 
 const locales = { ro, en: enUS, ru };
 
@@ -84,6 +85,7 @@ const Predictions = () => {
       universalDay: 'Ziua Universală',
       personalDay: 'Ziua Ta Personală',
       personalMonth: 'Luna Ta Personală',
+      personalYear: 'Anul tău personal',
       energy: 'Energie',
       focus: 'Focus',
       advice: 'Sfat',
@@ -111,6 +113,7 @@ const Predictions = () => {
       universalDay: 'Universal Day',
       personalDay: 'Your Personal Day',
       personalMonth: 'Your Personal Month',
+      personalYear: 'Your personal year',
       energy: 'Energy',
       focus: 'Focus',
       advice: 'Advice',
@@ -138,6 +141,7 @@ const Predictions = () => {
       universalDay: 'Универсальный День',
       personalDay: 'Ваш Личный День',
       personalMonth: 'Ваш Личный Месяц',
+      personalYear: 'Ваш личный год',
       energy: 'Энергия',
       focus: 'Фокус',
       advice: 'Совет',
@@ -160,7 +164,7 @@ const Predictions = () => {
   const universalEnergy = getUniversalDayEnergy(today);
   const dailyPrediction = birthDate ? getDailyPrediction(birthDate, selectedDay) : null;
   const dayContent = birthDate ? getDayContent(birthDate, selectedDay, language) : null;
-  const monthlyPrediction = birthDate ? getMonthlyPrediction(birthDate, selectedMonth, selectedYear) : null;
+  const monthlyPrediction = birthDate ? getMonthlyPrediction(birthDate, selectedMonth, selectedYear, language) : null;
   
   // Calculate weekly prediction (start of current week - Monday)
   const getWeekStart = (date: Date): Date => {
@@ -170,12 +174,13 @@ const Predictions = () => {
     return new Date(d.setDate(diff));
   };
   const weekStart = getWeekStart(today);
-  const weeklyPrediction = birthDate ? calculateWeeklyTheme(birthDate, weekStart) : null;
+  const weeklyPrediction = birthDate ? calculateWeeklyTheme(birthDate, weekStart, language) : null;
   
   // Calculate annual predictions
-  const annualTheme = birthDate ? calculateAnnualTheme(birthDate, selectedYear) : null;
-  const annualOpportunities = birthDate ? calculateAnnualOpportunities(birthDate, selectedYear) : null;
-  const annualChallenges = birthDate ? calculateAnnualChallenges(birthDate, selectedYear) : null;
+  const personalYear = birthDate ? calculatePersonalYearNumber(birthDate, selectedYear) : null;
+  const annualTheme = birthDate ? calculateAnnualTheme(birthDate, selectedYear, language) : null;
+  const annualOpportunities = birthDate ? calculateAnnualOpportunities(birthDate, selectedYear, language) : null;
+  const annualChallenges = birthDate ? calculateAnnualChallenges(birthDate, selectedYear, language) : null;
 
   // Ziua ta, citită prin harta ta. Pagina asta calcula ziua personală corect
   // și apoi o descria singură: ziua 5 spunea același lucru unui Drum 6 și unui
@@ -329,14 +334,17 @@ const Predictions = () => {
                     )}
                     {annualTheme && (
                       <div className="card-mystic py-6 space-y-4">
-                        <h3 className="font-heading text-xl">{l.personalMonth} - {selectedYear}</h3>
+                        {/* Era „Luna Ta Personală - 2026" deasupra temei anului personal. */}
+                        <h3 className="font-heading text-xl">
+                          {l.personalYear} {selectedYear}: <span className="num text-primary">{personalYear}</span>
+                        </h3>
                         <div>
                           <h4 className="font-heading text-sm text-foreground mb-2">{annualTheme.theme}</h4>
                           <p className="text-foreground/90">{annualTheme.description}</p>
                         </div>
                         {annualOpportunities && annualOpportunities.length > 0 && (
                           <div>
-                            <h4 className="font-heading text-sm text-foreground mb-2">Oportunități</h4>
+                            <h4 className="font-heading text-sm text-foreground mb-2">{l.opportunities}</h4>
                             <ul className="space-y-1">
                               {annualOpportunities.slice(0, 5).map((opp, index) => (
                                 <li key={index} className="text-sm text-foreground/90 flex items-start gap-2">
@@ -349,7 +357,7 @@ const Predictions = () => {
                         )}
                         {annualChallenges && annualChallenges.length > 0 && (
                           <div>
-                            <h4 className="mb-2 font-heading text-sm text-tension">Provocări</h4>
+                            <h4 className="mb-2 font-heading text-sm text-tension">{l.challenges}</h4>
                             <ul className="space-y-1">
                               {annualChallenges.slice(0, 5).map((challenge, index) => (
                                 <li key={index} className="text-sm text-foreground/80 flex items-start gap-2">

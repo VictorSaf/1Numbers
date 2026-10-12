@@ -49,13 +49,13 @@ describe("KeepNameButton", () => {
   it("nu se lasă apăsat fără un nume", () => {
     renderButton("");
 
-    expect(screen.getByRole("button", { name: /Păstrează numele/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Salvează numele/i })).toBeDisabled();
   });
 
   it("cere o dată înainte să salveze", () => {
     renderButton();
 
-    fireEvent.click(screen.getByRole("button", { name: /Păstrează numele/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Salvează numele/i }));
 
     expect(screen.getByLabelText(/Data înființării/i)).toBeInTheDocument();
     expect(createProfile).not.toHaveBeenCalled();
@@ -64,7 +64,7 @@ describe("KeepNameButton", () => {
   it("salvează numele cu data și categoria, fără să activeze nimic", async () => {
     renderButton();
 
-    fireEvent.click(screen.getByRole("button", { name: /Păstrează numele/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Salvează numele/i }));
     fireEvent.change(screen.getByLabelText(/Data înființării/i), {
       target: { value: "2019-03-02" },
     });
@@ -82,7 +82,7 @@ describe("KeepNameButton", () => {
   it("cere data nașterii, nu a înființării, pentru o hartă de om", () => {
     renderButton("Ana Pop", "eu");
 
-    fireEvent.click(screen.getByRole("button", { name: /Păstrează numele/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Salvează numele/i }));
 
     expect(screen.getByLabelText(/Data nașterii/i)).toBeInTheDocument();
   });
