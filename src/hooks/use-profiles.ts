@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 import type { ProfileCategory } from '@/lib/profileCategories';
@@ -16,44 +17,51 @@ export interface Profile {
   updatedAt: string;
 }
 
+/**
+ * Cheia listei de profiluri în cache-ul React Query.
+ *
+ * Una singură pentru toată aplicația: pe /eu pagina, comutatorul, comparația și
+ * consultantul citesc aceeași listă, iar înainte o cerea fiecare la montare --
+ * patru `GET /profiles/all` pentru același răspuns, și o comutare făcută într-un
+ * loc nu se vedea în celelalte. Utilizatorul intră în cheie ca un cont nou să
+ * nu vadă, nici o clipă, lista celui de dinainte.
+ */
+export const PROFILES_KEY = ['profiles'] as const;
+
 export const useProfiles = () => {
-  const { isAuthenticated } = useAuth();
-  const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [activeProfile, setActiveProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { isAuthenticated, user } = useAuth();
+  const queryClient = useQueryClient();
 
-  const loadProfiles = useCallback(async () => {
-    if (!isAuthenticated) {
-      setProfiles([]);
-      setActiveProfile(null);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
+  const query = useQuery({
+    queryKey: [...PROFILES_KEY, user?.id ?? null],
+    queryFn: async () => {
       const response = await api.getAllProfiles();
-      if (response.success && response.profiles) {
-        const profilesList = response.profiles as Profile[];
-        setProfiles(profilesList);
-        const active = profilesList.find(p => p.isActive) || profilesList[0] || null;
-        setActiveProfile(active);
-      } else {
-        setProfiles([]);
-        setActiveProfile(null);
-      }
-    } catch (error) {
-      console.error('Error loading profiles:', error);
-      setProfiles([]);
-      setActiveProfile(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [isAuthenticated]);
+      // Un răspuns fără succes e o eroare, nu o listă goală: altfel ar sta în
+      // cache drept „n-ai nicio hartă” până expiră.
+      if (!response.success || !response.profiles) throw new Error('Failed to load profiles');
+      return response.profiles as Profile[];
+    },
+    // Fără token nu se cere nimic, ca înainte: serverul ar răspunde 401.
+    enabled: isAuthenticated,
+    // Spus aici, nu lăsat pe seama celor cinci minute implicite din App: cine
+    // se montează după ce lista a sosit (butonul de salvare de sub hartă, de
+    // exemplu) n-o mai cere, dar o hartă schimbată pe alt dispozitiv se vede
+    // după cel mult un minut. Schimbările făcute aici o invalidează imediat.
+    staleTime: 60 * 1000,
+  });
 
-  useEffect(() => {
-    loadProfiles();
-  }, [loadProfiles]);
+  // Datele rămân în cache și după ieșirea din cont; nu se arată nimănui.
+  const profiles = useMemo(
+    () => (isAuthenticated ? query.data ?? [] : []),
+    [isAuthenticated, query.data],
+  );
+  const activeProfile = profiles.find(p => p.isActive) || profiles[0] || null;
+  const loading = isAuthenticated && query.isLoading;
+
+  // Invalidarea reîncarcă lista o dată, pentru toți cei care o citesc.
+  const loadProfiles = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey: PROFILES_KEY });
+  }, [queryClient]);
 
   const switchProfile = useCallback(async (profileId: string) => {
     try {

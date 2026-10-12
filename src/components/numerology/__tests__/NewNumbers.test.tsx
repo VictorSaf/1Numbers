@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { fullProfile } from "@/lib/numerology-plus";
+import { fullPythagoreanProfile } from "@/lib/numerology-plus/pythagorean";
 import { interpretProfile } from "@/lib/numerology-plus/content/interpret";
 import NewNumbers from "../NewNumbers";
 import { ALL_CHAPTER_KEYS } from "../chapterKeys";
@@ -15,7 +16,10 @@ import { ALL_CHAPTER_KEYS } from "../chapterKeys";
 const renderSection = () =>
   render(
     <LanguageProvider>
-      <NewNumbers fullName="Victor Ion Safta" birthDate={new Date(1990, 7, 25)} keys={ALL_CHAPTER_KEYS} />
+      <NewNumbers
+        profile={fullPythagoreanProfile("Victor Ion Safta", { day: 25, month: 8, year: 1990 })}
+        keys={ALL_CHAPTER_KEYS}
+      />
     </LanguageProvider>,
   );
 

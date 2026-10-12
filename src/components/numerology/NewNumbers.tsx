@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { fullProfile } from "@/lib/numerology-plus";
+import type { fullPythagoreanProfile } from "@/lib/numerology-plus/pythagorean";
 import { interpretProfile } from "@/lib/numerology-plus/content/interpret";
 import { NumberCard } from "./NumberCard";
 
@@ -14,9 +14,17 @@ import { NumberCard } from "./NumberCard";
  * asks for a reading.
  */
 
+type PythagoreanProfile = ReturnType<typeof fullPythagoreanProfile>;
+
 interface NewNumbersProps {
-  fullName: string;
-  birthDate: Date;
+  /**
+   * Profilul pitagoreic al hărții, calculat o dată de pagina de rezultate.
+   *
+   * Fiecare din cele patru instanțe își calcula înainte `fullProfile()` --
+   * toate sistemele, plus treizeci de zile de bioritm -- doar ca să citească
+   * `.pythagorean`.
+   */
+  profile: PythagoreanProfile;
   /**
    * Which interpretations to render, in this order.
    *
@@ -28,22 +36,17 @@ interface NewNumbersProps {
   keys: readonly string[];
 }
 
-const NewNumbers = ({ fullName, birthDate, keys }: NewNumbersProps) => {
+const NewNumbers = ({ profile, keys }: NewNumbersProps) => {
   const { language } = useLanguage();
 
   const cards = useMemo(() => {
-    const profile = fullProfile(fullName, {
-      day: birthDate.getDate(),
-      month: birthDate.getMonth() + 1,
-      year: birthDate.getFullYear(),
-    });
-    const extended = profile.pythagorean.extended as Record<
+    const extended = profile.extended as Record<
       string,
       { raw?: number; value?: number; isMaster?: boolean; karmicDebt?: number | null }
     >;
 
     const byKey = new Map(
-      interpretProfile(profile.pythagorean, language).map((i) => [i.key, i]),
+      interpretProfile(profile, language).map((i) => [i.key, i]),
     );
 
     return keys.flatMap((key) => {
@@ -60,7 +63,7 @@ const NewNumbers = ({ fullName, birthDate, keys }: NewNumbersProps) => {
         isMaster: source?.isMaster ?? false,
       }];
     });
-  }, [fullName, birthDate, language, keys]);
+  }, [profile, language, keys]);
 
   return (
     <div className="grid gap-3">
