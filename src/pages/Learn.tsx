@@ -1,18 +1,18 @@
 import { lazy, Suspense } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { BookOpen, GraduationCap, HelpCircle, Newspaper } from 'lucide-react';
+import { BookOpen, GraduationCap, HelpCircle } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 /**
- * The four reading pages, in one place.
+ * The reading pages, in one place.
  *
- * /guide, /tutorials, /faq and /articles were four separate destinations, and
- * only the first two ever had a link in the header -- the other two were
- * reachable by typing the URL. They answer one intent between them, so they are
- * one destination with four sections.
+ * /guide, /tutorials and /faq were separate destinations, and only the first
+ * two ever had a link in the header. They answer one intent between them, so
+ * they are one destination with three sections. The articles that were a fourth
+ * are gone: one-sentence bodies under a "10 min" label (docs/produs/03-filtru.md).
  *
  * The section is in the query string rather than in component state so a link
  * to the questions is still a link to the questions: the 301s from the old
@@ -22,46 +22,41 @@ import { useLanguage } from '@/contexts/LanguageContext';
 const Guide = lazy(() => import('@/components/learn/NumerologyGuide'));
 const Tutorials = lazy(() => import('@/components/learn/Tutorials'));
 const FAQ = lazy(() => import('@/components/learn/FAQ'));
-const Articles = lazy(() => import('@/components/learn/Articles'));
 
 const COPY = {
   ro: {
     title: 'Învață',
-    subtitle: 'Ce înseamnă numerele, cum se calculează și ce s-a mai scris despre ele.',
+    subtitle: 'Ce înseamnă numerele și cum se calculează.',
     badge: 'Ghid și tutoriale',
     ghid: 'Ghid',
     tutoriale: 'Tutoriale',
     intrebari: 'Întrebări',
-    articole: 'Articole',
   },
   en: {
     title: 'Learn',
-    subtitle: 'What the numbers mean, how they are worked out, and what has been written about them.',
+    subtitle: 'What the numbers mean and how they are worked out.',
     badge: 'Guide and tutorials',
     ghid: 'Guide',
     tutoriale: 'Tutorials',
     intrebari: 'Questions',
-    articole: 'Articles',
   },
   ru: {
     title: 'Изучайте',
-    subtitle: 'Что означают числа, как они вычисляются и что о них написано.',
+    subtitle: 'Что означают числа и как они вычисляются.',
     badge: 'Руководство и уроки',
     ghid: 'Руководство',
     tutoriale: 'Уроки',
     intrebari: 'Вопросы',
-    articole: 'Статьи',
   },
 } as const;
 
-const SECTIONS = ['ghid', 'tutoriale', 'intrebari', 'articole'] as const;
+const SECTIONS = ['ghid', 'tutoriale', 'intrebari'] as const;
 type Section = (typeof SECTIONS)[number];
 
 const ICONS = {
   ghid: BookOpen,
   tutoriale: GraduationCap,
   intrebari: HelpCircle,
-  articole: Newspaper,
 } as const;
 
 const PanelSkeleton = () => (
@@ -113,7 +108,6 @@ const Learn = () => {
           <TabsContent value="ghid"><Guide /></TabsContent>
           <TabsContent value="tutoriale"><Tutorials /></TabsContent>
           <TabsContent value="intrebari"><FAQ /></TabsContent>
-          <TabsContent value="articole"><Articles /></TabsContent>
           </Suspense>
         </div>
       </Tabs>

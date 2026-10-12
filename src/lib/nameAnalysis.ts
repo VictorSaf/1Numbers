@@ -359,83 +359,6 @@ export const analyzeBusinessName = (name: string, language: 'ro' | 'en' | 'ru'):
   };
 };
 
-// Name Optimizer - suggest variations
-export interface NameSuggestion {
-  name: string;
-  destinyNumber: number;
-  improvement: number;
-  reason: string;
-}
-
-const VOWELS = ['a', 'e', 'i', 'o', 'u', 'y'];
-const COMMON_ADDITIONS = ['a', 'e', 'i', 'o', 'n', 's', 'h', 'y'];
-
-export const generateNameSuggestions = (
-  originalName: string, 
-  targetNumbers: number[],
-  language: 'ro' | 'en' | 'ru'
-): NameSuggestion[] => {
-  const suggestions: NameSuggestion[] = [];
-  const originalDestiny = calculateDestinyNumber(originalName);
-  
-  const reasons = {
-    ro: {
-      masterNumber: 'Număr Master - energie spirituală intensificată',
-      targetMatch: 'Potrivire cu numărul țintă dorit',
-      balancedEnergy: 'Energie mai echilibrată'
-    },
-    en: {
-      masterNumber: 'Master Number - intensified spiritual energy',
-      targetMatch: 'Match with desired target number',
-      balancedEnergy: 'More balanced energy'
-    },
-    ru: {
-      masterNumber: 'Мастер-число - усиленная духовная энергия',
-      targetMatch: 'Совпадение с желаемым целевым числом',
-      balancedEnergy: 'Более сбалансированная энергия'
-    }
-  };
-  
-  // Try adding single letters
-  for (const letter of COMMON_ADDITIONS) {
-    const newName = originalName + letter;
-    const newDestiny = calculateDestinyNumber(newName);
-    
-    if (targetNumbers.includes(newDestiny) || [11, 22, 33].includes(newDestiny)) {
-      suggestions.push({
-        name: newName,
-        destinyNumber: newDestiny,
-        improvement: [11, 22, 33].includes(newDestiny) ? 3 : 1,
-        reason: [11, 22, 33].includes(newDestiny) 
-          ? reasons[language].masterNumber 
-          : reasons[language].targetMatch
-      });
-    }
-  }
-  
-  // Try double letters at end
-  const lastChar = originalName.slice(-1).toLowerCase();
-  if (!VOWELS.includes(lastChar)) {
-    const doubledName = originalName + lastChar;
-    const doubledDestiny = calculateDestinyNumber(doubledName);
-    if (targetNumbers.includes(doubledDestiny) || doubledDestiny !== originalDestiny) {
-      suggestions.push({
-        name: doubledName,
-        destinyNumber: doubledDestiny,
-        improvement: 1,
-        reason: reasons[language].balancedEnergy
-      });
-    }
-  }
-  
-  // Sort by improvement and remove duplicates
-  const unique = suggestions.filter((s, i, arr) => 
-    arr.findIndex(x => x.name.toLowerCase() === s.name.toLowerCase()) === i
-  );
-  
-  return unique.sort((a, b) => b.improvement - a.improvement).slice(0, 5);
-};
-
 // Extended Name Analysis Functions
 
 /**
@@ -552,5 +475,5 @@ const getLetterMeaning = (
 // page: the first two re-interpreted Soul Urge and Personality, which chapter 1
 // gives from the engine; findHiddenNumbers counted the Hidden Passion a second
 // way; and getNameOptimizationSuggestions wrapped generateNameSuggestions, which
-// /unelte calls directly. `git show 12a48ea~1` has them if a paid report ever
+// went too, with the name optimiser on /unelte (docs/produs/03-filtru.md). `git show 12a48ea~1` has them if a paid report ever
 // wants the longer form.
