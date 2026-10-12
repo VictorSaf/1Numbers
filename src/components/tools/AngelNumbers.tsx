@@ -132,7 +132,7 @@ const AngelNumbers = () => {
   return (
     <>
 
-      <main className="relative z-10 px-4 pb-16">
+      <div className="relative z-10 px-4 pb-16">
         <div className="space-y-8">
           {/* Search Section */}
           <div className="card-mystic py-6">
@@ -272,7 +272,7 @@ const AngelNumbers = () => {
             </div>
           )}
         </div>
-      </main>
+      </div>
     </>
   );
 };

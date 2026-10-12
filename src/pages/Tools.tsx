@@ -59,6 +59,8 @@ const SCHOOL_TOOL_COPY: Record<"ro" | "en" | "ru", Record<SchoolToolId, { label:
 import { Badge } from "@/components/ui/badge";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { NameChangeCompare } from "@/components/tools/NameChangeCompare";
+import { chaldeanName } from "@/lib/numerology-plus/systems";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useProfile } from "@/hooks/use-profile";
 import { compareNameChange, analyzeBusinessName } from "@/lib/nameAnalysis";
@@ -331,15 +333,6 @@ const Tools = () => {
   const calendarDate = parseCalendarDate(calendarBirthDate);
   const loShuDate = parseCalendarDate(loShuBirthDate);
 
-  const getImpactColor = (impact: string) => {
-    switch (impact) {
-      case 'positive': return 'text-ok';
-      case 'negative': return 'text-crit';
-      case 'mixed': return 'text-warn';
-      default: return 'bg-muted text-muted-foreground';
-    }
-  };
-
   return (
     <PageLayout>
       <PageHeader
@@ -490,32 +483,9 @@ const Tools = () => {
                   
                   {nameComparison && (
                     <div className="mt-6 space-y-4 animate-fade-in">
-                      <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground">{t.impact}:</span>
-                        <Badge className={getImpactColor(nameComparison.overallImpact)}>
-                          {t[nameComparison.overallImpact as keyof typeof t]}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-foreground/80">{nameComparison.summary[language]}</p>
-                      
-                      <div className="grid grid-cols-2 gap-4">
-                        <Card className="bg-card/50">
-                          <CardHeader className="py-3"><CardTitle className="text-sm">{t.before}</CardTitle></CardHeader>
-                          <CardContent className="space-y-2 text-sm">
-                            <div>{t.destiny}: <span className="text-primary font-bold">{nameComparison.before.destinyNumber}</span></div>
-                            <div>{t.soulUrge}: <span className="text-primary font-bold">{nameComparison.before.soulUrgeNumber}</span></div>
-                            <div>{t.personality}: <span className="text-primary font-bold">{nameComparison.before.personalityNumber}</span></div>
-                          </CardContent>
-                        </Card>
-                        <Card className="bg-card/50">
-                          <CardHeader className="py-3"><CardTitle className="text-sm">{t.after}</CardTitle></CardHeader>
-                          <CardContent className="space-y-2 text-sm">
-                            <div>{t.destiny}: <span className="text-primary font-bold">{nameComparison.after.destinyNumber}</span> {nameComparison.changes.destiny.changed && <Badge variant="outline" className="ml-1 text-xs">!</Badge>}</div>
-                            <div>{t.soulUrge}: <span className="text-primary font-bold">{nameComparison.after.soulUrgeNumber}</span> {nameComparison.changes.soulUrge.changed && <Badge variant="outline" className="ml-1 text-xs">!</Badge>}</div>
-                            <div>{t.personality}: <span className="text-primary font-bold">{nameComparison.after.personalityNumber}</span> {nameComparison.changes.personality.changed && <Badge variant="outline" className="ml-1 text-xs">!</Badge>}</div>
-                          </CardContent>
-                        </Card>
-                      </div>
+                      {/* Fără verdict „pozitiv / negativ”: o schimbare de număr e o altă
+                          temă, nu un defect (R3). Două alfabete, cu distanța. */}
+                      <NameChangeCompare before={originalName} after={newName} />
 
                       <div className="flex justify-end pt-2">
                         <KeepNameButton name={newName} defaultCategory="eu" />
@@ -545,9 +515,13 @@ const Tools = () => {
                         <div className="number-display">{businessAnalysis.destinyNumber}</div>
                         <div>
                           <div className="text-lg font-heading text-foreground">{businessAnalysis.name}</div>
-                          <Badge className={businessAnalysis.vibrationalEnergy === 'strong' ? 'text-ok' : businessAnalysis.vibrationalEnergy === 'moderate' ? 'text-warn' : 'text-crit'}>
-                            {t.vibrationalEnergy}: {t[businessAnalysis.vibrationalEnergy]}
-                          </Badge>
+                          {/* „Energie vibrațională: slabă” era un verdict; aici stau
+                              cele două alfabete, cu numărul compus caldeean. */}
+                          <p className="num mt-1 text-xs text-muted-foreground">
+                            {language === "ru" ? "Пифагорейская" : language === "en" ? "Pythagorean" : "Pitagoreic"} {businessAnalysis.destinyNumber}
+                            {"  ·  "}
+                            {language === "ru" ? "Халдейская" : language === "en" ? "Chaldean" : "Caldeean"} {chaldeanName(businessAnalysis.name).display}
+                          </p>
                         </div>
                       </div>
                       
@@ -611,6 +585,14 @@ const Tools = () => {
                           {yearForecast.keyMonths.map(m => (
                             <Badge key={m} className="bg-sunken text-primary">{yearForecast.monthlyForecasts[m-1].monthName}</Badge>
                           ))}
+                          {/* De ce acestea: fără explicație, lista părea aleasă la întâmplare. */}
+                          <span className="basis-full text-xs text-muted-foreground">
+                            {language === "ru"
+                              ? `Личный месяц равен Пути (${yearForecast.lifePathNumber}) или Личному году (${yearForecast.personalYearNumber}).`
+                              : language === "en"
+                                ? `The personal month equals your Life Path (${yearForecast.lifePathNumber}) or Personal Year (${yearForecast.personalYearNumber}).`
+                                : `Luna personală e egală cu Drumul Vieții (${yearForecast.lifePathNumber}) sau cu Anul Personal (${yearForecast.personalYearNumber}).`}
+                          </span>
                         </div>
                       )}
                       
