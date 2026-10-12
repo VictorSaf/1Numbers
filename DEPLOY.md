@@ -41,11 +41,17 @@ cd server && npm ci && npm run build && npm run migrate && cd ..
 pm2 restart compass compass-api
 ```
 
-Apoi, în browser: **`DevTools → Application → Service Workers → Unregister`.**
-Nu e opțional. Workerul înregistrat anterior servește shell-ul vechi de pe origin
-indiferent ce s-a deployat, iar un `Cmd+Shift+R` nu-l scoate. Verifici că te uiți
-la build-ul nou comparând hash-ul lui `index-*.js` din `Network` cu cel tipărit
-de comanda de build.
+Apoi, în browser: un reload. Documentul se cere mereu din rețea întâi
+(`public/sw.js`), deci un reload aduce HTML-ul nou, care numește bundle-ul nou.
+`sw.js` diferă la fiecare build (`stamp-sw`), așa că browserul instalează workerul
+nou, iar aplicația oferă butonul „Reîncarcă” ca să preia controlul.
+Verifici că te uiți la build-ul nou comparând hash-ul lui `index-*.js` din
+`Network` cu cel tipărit de comanda de build. `Unregister` din DevTools rămâne
+ieșirea de urgență, nu un pas al deploy-ului.
+
+Până la 2026-10-12 niciun worker nu se înregistra în producție: ascultătorul de
+`load` era pus după ce `load` trecuse (`src/lib/serviceWorker.ts`). De aceea
+pagina Service Workers era goală.
 
 `build:internal` e `VITE_INCLUDE_INTERNAL=1 npm run build`, deci rulează tot ce
 rulează și `build`: `prerender-meta`, `stamp-sw` și `emit-routes`. Adică

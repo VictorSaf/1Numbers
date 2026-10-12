@@ -33,7 +33,7 @@ export function registerServiceWorker(onUpdateAvailable: UpdateAvailable): void 
     window.location.reload();
   });
 
-  window.addEventListener('load', () => {
+  const register = () => {
     navigator.serviceWorker
       .register('/sw.js', { scope: '/' })
       .then((registration) => {
@@ -59,5 +59,12 @@ export function registerServiceWorker(onUpdateAvailable: UpdateAvailable): void 
       .catch((error) => {
         console.error('Service Worker registration failed:', error);
       });
-  });
+  };
+
+  // AppUpdatePrompt se montează după „load”, deci un ascultător pus abia acum
+  // nu se mai declanșa: în producție nu se înregistra niciun worker (verificat
+  // pe compass.oneaigency.com, 2026-10-12). Dacă pagina e deja încărcată,
+  // înregistrăm pe loc.
+  if (document.readyState === 'complete') register();
+  else window.addEventListener('load', register, { once: true });
 }
