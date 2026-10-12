@@ -460,41 +460,8 @@ const Profile = () => {
                 </Popover>
               </div>
 
-              {/* Birth Time */}
-              <div className="space-y-2">
-                <Label htmlFor="birthTime" className="text-foreground/90 font-raleway text-sm tracking-wide">
-                  {t.birthTimeLabel}
-                </Label>
-                <Input
-                  id="birthTime"
-                  type="time"
-                  value={formData.birthTime}
-                  onChange={(e) => setFormData({ ...formData, birthTime: e.target.value })}
-                  placeholder={t.birthTimePlaceholder}
-                  className="input-mystic h-12 text-base"
-                />
-                <p className="text-xs text-muted-foreground">
-                  {t.birthTimeHint}
-                </p>
-              </div>
-
-              {/* Birth Place */}
-              <div className="space-y-2">
-                <Label htmlFor="birthPlace" className="text-foreground/90 font-raleway text-sm tracking-wide">
-                  {t.birthPlaceLabel}
-                </Label>
-                <Input
-                  id="birthPlace"
-                  type="text"
-                  value={formData.birthPlace}
-                  onChange={(e) => setFormData({ ...formData, birthPlace: e.target.value })}
-                  placeholder={t.birthPlacePlaceholder}
-                  className="input-mystic h-12 text-base"
-                />
-                <p className="text-xs text-muted-foreground">
-                  {t.birthPlaceHint}
-                </p>
-              </div>
+              {/* Ora și locul nașterii nu le folosește niciun calcul; R6: nu cerem ce
+                  nu folosim. Valorile deja salvate trec neatinse prin formData. */}
 
               {/* Actions */}
               <div className="flex gap-4 pt-4">
