@@ -58,7 +58,11 @@ tine** — punți în interiorul unui sistem, dezacorduri între sisteme paralel
 două drumuri. Distanța dintre două căi corecte e informația. Nu se fac medii, acordul e un
 rezultat, o distanță nu e o eroare.
 
-Orice funcție nouă trece întâi prin `02-doctrina.md`. Ce nu o servește, nu se construiește.
+**Decizia din 2026-10-12 (§4 și R9 în `02-doctrina.md`):** aplicația implementează orice
+tehnică găsită în piață sau în literatură. Unde școlile dau valori diferite pentru același
+element, se arată fiecare, cu pașii ei, și distanța dintre ele — prin `src/lib/models/`
+(`compare.ts` pentru distanțe, `elements.ts` pentru cele cincisprezece întrebări). Nicio
+convenție nu se alege în tăcere. Inventarul pieței: `docs/cercetare-functii-piata.md`.
 
 ## Commands
 
@@ -122,6 +126,8 @@ All numerology calculations are pure TypeScript functions:
 - `nameAnalysis.ts` - Name-specific analysis; address analysis lives in
   `numerology-plus/applied.ts`. Phone and plate analysis had no caller and were
   removed on 2026-10-12, as were the duplicate copies under `src/lib/` (2026-08-30).
+- `models/` - Multi-school engine: every contested element computed by each school, with steps and pairwise distance (digits compared on the root; 11 vs 2 is `octave`, not 9)
+- `numerology-plus/psychomatrix.ts`, `numerology-plus/tarot.ts` - Alexandrov square (both post-2000 rules), Greer birth/year cards
 - `calendarDate.ts` - The only place a `YYYY-MM-DD` from the API becomes a Date
 - `translations.ts` - All UI text in RO/EN/RU
 

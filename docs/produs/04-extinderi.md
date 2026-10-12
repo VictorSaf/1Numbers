@@ -58,13 +58,16 @@ dispusă să fie contrazisă de propriul utilizator. Asta e poziția noastră, d
 - **Luna în care voi doi vă dezacordați cel mai tare** — tabelul lunar există, verdictul pe
   lună există, îi lipsește propoziția de sus.
 
-## 5. Ce nu construim, oricât ar fi de ușor
+## 5. Ce nu construim
 
-- **Încă un calculator.** Fiecare unealtă nouă e o cerere să explicăm din nou ce e aplicația.
-- **Scoruri și procente de sinteză.** Încalcă R1.
-- **Streak-uri, clasamente, insigne.** `gamification.ts` există deja și n-are niciun
-  importator — asta e verdictul, dat de codul însuși. Clasamentele demotivează exact
-  utilizatorii pe care vrei să-i reții.
-- **Chat deschis cu un model, fără harta în față.** Aia e o altă aplicație și există deja.
-- **Text mai mult.** Concurența vinde la kilogram de pagini. Dacă ne comparăm pe volum, am
-  pierdut înainte să începem.
+Până la 2026-10-12 lista de aici interzicea „încă un calculator". Decizia de atunci o
+înlocuiește: **orice tehnică din piață sau din literatură intră**, cu toate variantele ei
+(vezi `02-doctrina.md` §4 și R9). Inventarul e în `docs/cercetare-functii-piata.md`.
+
+Rămân interzise, pentru că nu sunt funcții, ci feluri de a minți:
+- **Un procent de sinteză deasupra dezacordurilor.** R1. Se numără acordurile, nu se fac medii.
+- **Tipare înșelătoare de vânzare**: ecran fals de încărcare, numărătoare inversă, paywall
+  după chestionar.
+- **Sfaturi care fac rău în afara numerologiei**: codul financiar ca PIN, harta chakrelor
+  prezentată ca diagnostic. Se calculează, se arată ca simbolice.
+- **Streak-uri și insigne.** Nu răspund la nicio întrebare a omului.

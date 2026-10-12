@@ -41,6 +41,24 @@ Verdictul e `agree` / `near` / `apart`, din distanța redusă la 0–8, ca la pu
 Ce lipsește din nume față de ce lipsește din dată. **Ce lipsește din amândouă e cel mai
 tare semnal din hartă** — nici numele, nici data nu-l susțin.
 
+### 4. Toate școlile — aceeași întrebare, fiecare convenție
+`src/lib/models/`
+
+Decizia din 2026-10-12: **aplicația implementează orice tehnică găsită în piață sau în
+literatură**, iar unde școlile, aplicațiile sau autorii dau valori diferite pentru același
+element, **le arată pe toate, cu calculul fiecăreia, și calculează distanța dintre ele**.
+Judecăm nu după o singură școală, ci după diferențele dintre ele — asta e valoarea unică.
+
+Convențiile contestate care azi se aleg în tăcere în fiecare aplicație: ordinea reducerii,
+unde se păstrează masterii, Y vocală sau nu, alfabetul pitagoreic sau caldeean, anul
+personal de la 1 ianuarie sau de la aniversare, reducerea peste 22 în Matrice, regula de
+după 2000 în psihomatrice, formula Kua, tabelele de compatibilitate. Fiecare devine un
+model, cu nume și sursă.
+
+**Capcana de aritmetică:** rădăcina digitală nu depinde de ordinea reducerii. Două drumuri
+care diferă doar prin păstrarea unui master (2 contra 11) nu sunt la distanța 9; sunt
+aceeași rădăcină în alt registru — verdictul `octave`.
+
 ## Regulile de care nu ne abatem
 
 **R1. Nu facem medii.** O medie între un 1 pitagoreic și un 5 caldeean nu înseamnă nimic:
@@ -74,6 +92,10 @@ Nu numim numerologia „știință" — azi o facem, în primul articol din `/in
 **R8. O singură diagramă per capitol, și numai dacă arată o relație.** O diagramă care
 repetă o listă de cifre e decor.
 
+**R9. Nicio convenție tăcută.** Unde școlile se despart, nu alegem una pentru om: o arătăm
+pe fiecare, cu sursa și pașii ei, și distanța dintre ele. Unde se pun de acord, spunem și
+asta (R2).
+
 ## De ce ține — și ce o poate strica
 
 Ține pentru că **structura e imună la textul generic**: combinația de distanțe diferă de la
@@ -82,5 +104,5 @@ că e greu de copiat: un concurent are nevoie de patru sisteme complete care vor
 ele; toți rulează unul singur.
 
 O strică: procentele de sinteză în capul paginii, textul de dicționar așezat deasupra
-interpretării specifice, vocea de oracol („codul secret al sufletului tău"), și orice
-funcție adăugată pentru că „ar merge și asta".
+interpretării specifice, vocea de oracol („codul secret al sufletului tău"), și o funcție
+nouă care alege în tăcere o singură convenție acolo unde școlile se despart.

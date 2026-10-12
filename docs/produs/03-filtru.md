@@ -1,5 +1,10 @@
 # Filtrul — fiecare ecran prin definiție
 
+> **2026-10-12:** verdictele DISPARE date unor *tehnici* (optimizatorul de nume, matricea
+> de grup, analiza de telefon) sunt înlocuite de decizia din `02-doctrina.md` §4: orice
+> tehnică din piață intră, cu toate variantele ei comparate. Verdictele despre *ecrane*
+> (unde stă ce) rămân valabile.
+
 Trei verdicte: **RĂMÂNE** (servește doctrina), **SE MUTĂ** (are substanță, dar nu locul),
 **DISPARE**. Motivul e scris lângă fiecare; un verdict fără motiv se poate contesta.
 
