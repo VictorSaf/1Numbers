@@ -119,9 +119,9 @@ All numerology calculations are pure TypeScript functions:
 - `personalCycles.ts` - Day/Month/Year cycles
 - `pinnacles.ts` - Life pinnacles and challenges
 - `predictions.ts` - Daily/monthly forecasts
-- `nameAnalysis.ts` - Name-specific analysis; phone, address and plate analysis
-  live in `numerology-plus/applied.ts`. The duplicate copies under `src/lib/`
-  had no importer and were removed on 2026-08-30.
+- `nameAnalysis.ts` - Name-specific analysis; address analysis lives in
+  `numerology-plus/applied.ts`. Phone and plate analysis had no caller and were
+  removed on 2026-10-12, as were the duplicate copies under `src/lib/` (2026-08-30).
 - `calendarDate.ts` - The only place a `YYYY-MM-DD` from the API becomes a Date
 - `translations.ts` - All UI text in RO/EN/RU
 
