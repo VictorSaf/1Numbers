@@ -53,7 +53,7 @@ describe('GET /api/auth/me', () => {
 
     const res = await request(app).get('/api/auth/me').set('Authorization', tokenIssuedAt(acumUnCeas));
 
-    expect(res.status).toBeGreaterThanOrEqual(400);
+    expect(res.status).toBe(403);
     expect(res.body.user).toBeUndefined();
   });
 
