@@ -1,4 +1,4 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { getClient, isAiConfigured } from './anthropic';
 
 /**
  * Cine scrie ziua: motorul spune adevărul, modelul îl spune altfel.
@@ -129,19 +129,15 @@ export const isFaithful = (
   );
 };
 
-let client: Anthropic | null = null;
-
 export async function writeDay(facts: DayFacts): Promise<DayWritten> {
-  const key = process.env.ANTHROPIC_API_KEY || undefined;
   // Fără cheie nu se cheamă nimic. Textul compus nu e o improvizație: spune
   // aceleași fapte calculate, doar în cuvinte fixe.
-  if (!key) return { body: facts.composed, source: 'composed' };
+  if (!isAiConfigured()) return { body: facts.composed, source: 'composed' };
 
   const model = process.env.DAY_WRITER_MODEL || DAY_WRITER_MODEL;
 
   try {
-    if (!client) client = new Anthropic({ apiKey: key });
-    const res = await client.messages.create({
+    const res = await getClient().messages.create({
       model,
       max_tokens: MAX_TOKENS,
       system: SYSTEM(LANGS[facts.language]),

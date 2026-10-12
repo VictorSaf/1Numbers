@@ -1,4 +1,4 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { getClient, isAiConfigured } from './anthropic';
 
 /**
  * Citirea întreagă: harta legată, nu enumerată.
@@ -96,17 +96,13 @@ const asComposed = (facts: ChartFacts): DeepBody => ({
   closing: '',
 });
 
-let client: Anthropic | null = null;
-
 export async function writeDeepReading(facts: ChartFacts): Promise<DeepWritten> {
-  const key = process.env.ANTHROPIC_API_KEY || undefined;
-  if (!key) return { body: asComposed(facts), source: 'composed' };
+  if (!isAiConfigured()) return { body: asComposed(facts), source: 'composed' };
 
   const model = process.env.DEEP_MODEL || DEEP_MODEL;
 
   try {
-    if (!client) client = new Anthropic({ apiKey: key });
-    const res = await client.messages.create({
+    const res = await getClient().messages.create({
       model,
       max_tokens: MAX_TOKENS,
       system: SYSTEM(LANGS[facts.language]),

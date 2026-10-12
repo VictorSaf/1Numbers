@@ -84,6 +84,63 @@ const handleFSError = (error: unknown, resource: string, res: Response): void =>
   }
 };
 
+/**
+ * Fișierele .md dintr-un dosar al repo-ului, citite cu aceleași gărzi (cale în
+ * dosar, fișier obișnuit, nu legătură, sub plafonul de mărime) și cu primul
+ * paragraf de după titlu. Agenții, skill-urile și cercetarea copiau bucla asta
+ * de trei ori; fiecare rută păstrează doar ce face diferit.
+ *
+ * `null` când dosarul nu există -- ruta răspunde atunci cu o listă goală.
+ */
+interface MarkdownDoc {
+  file: string;
+  filePath: string;
+  content: string;
+  firstParagraph: string;
+}
+
+const readMarkdownDir = async (dir: string): Promise<MarkdownDoc[] | null> => {
+  let files: string[];
+  try {
+    files = await fs.readdir(dir);
+  } catch {
+    return null;
+  }
+
+  const docs: MarkdownDoc[] = [];
+  for (const file of files.filter(f => f.endsWith('.md') && !f.startsWith('.'))) {
+    const filePath = path.join(dir, file);
+
+    // Validate file path and check it's a regular file (not symlink)
+    if (!isPathSafe(filePath, dir) || !(await isRegularFile(filePath))) {
+      continue;
+    }
+
+    const content = await safeReadFile(filePath);
+    if (!content) continue;
+
+    // First paragraph after the title
+    let firstParagraph = '';
+    let afterTitle = false;
+    for (const line of content.split('\n')) {
+      if (line.startsWith('# ')) {
+        afterTitle = true;
+        continue;
+      }
+      if (afterTitle && line.trim() && !line.startsWith('#')) {
+        firstParagraph = line.trim();
+        break;
+      }
+    }
+
+    docs.push({ file, filePath, content, firstParagraph });
+  }
+  return docs;
+};
+
+const titleCase = (name: string): string =>
+  name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
 // All admin routes require authentication and admin role
 router.use(authenticateToken);
 router.use(requireAdmin);
@@ -91,32 +148,18 @@ router.use(requireAdmin);
 // GET /api/admin/dashboard - Dashboard statistics
 router.get('/dashboard', async (req: AuthRequest, res: Response) => {
   try {
-    // Get total users
-    const totalUsersResult = await pool.query('SELECT COUNT(*) FROM users');
-    const totalUsers = parseInt(totalUsersResult.rows[0].count, 10);
-
-    // Get active users (created in last 7 days as proxy for active)
-    const activeUsersResult = await pool.query(
-      `SELECT COUNT(*) FROM users WHERE created_at > NOW() - INTERVAL '7 days'`
-    );
-    const activeUsers = parseInt(activeUsersResult.rows[0].count, 10);
-
-    // Get premium users (users with active subscription)
-    let premiumUsers = 0;
-    try {
-      const premiumResult = await pool.query(
-        `SELECT COUNT(*) FROM subscriptions WHERE status = 'active'`
-      );
-      premiumUsers = parseInt(premiumResult.rows[0].count, 10);
-    } catch {
-      // Table might not exist
-    }
-
-    // Get new users this week
-    const newUsersResult = await pool.query(
-      `SELECT COUNT(*) FROM users WHERE created_at > NOW() - INTERVAL '7 days'`
-    );
-    const newUsersThisWeek = parseInt(newUsersResult.rows[0].count, 10);
+    // Trei numărători independente, plecate deodată. „Activi" și „noi săptămâna
+    // asta" erau aceeași interogare pusă de două ori: e una, iar răspunsul
+    // păstrează ambele câmpuri, cu aceeași valoare, ca înainte.
+    const count = async (sql: string) => parseInt((await pool.query(sql)).rows[0].count, 10);
+    const [totalUsers, newUsersThisWeek, premiumUsers] = await Promise.all([
+      count('SELECT COUNT(*) FROM users'),
+      // Created in last 7 days as proxy for active
+      count(`SELECT COUNT(*) FROM users WHERE created_at > NOW() - INTERVAL '7 days'`),
+      // Users with active subscription. Table might not exist.
+      count(`SELECT COUNT(*) FROM subscriptions WHERE status = 'active'`).catch(() => 0),
+    ]);
+    const activeUsers = newUsersThisWeek;
 
     res.json({
       totalUsers,
@@ -143,7 +186,8 @@ router.get('/users', async (req: AuthRequest, res: Response) => {
          LEFT JOIN subscriptions s
            ON s.user_id = u.id AND s.status = 'active'
          LEFT JOIN subscription_plans p ON p.id = s.plan_id
-        ORDER BY u.created_at DESC`
+        ORDER BY u.created_at DESC
+        LIMIT 500`
     );
 
     res.json({ users: result.rows });
@@ -434,58 +478,17 @@ router.get('/analytics', async (req: AuthRequest, res: Response) => {
 // GET /api/admin/agents - List all Claude agents
 router.get('/agents', async (req: AuthRequest, res: Response) => {
   try {
-    const agentsDir = path.join(PROJECT_ROOT, '.claude', 'agents');
+    const docs = await readMarkdownDir(path.join(PROJECT_ROOT, '.claude', 'agents'));
 
-
-    const agents: { name: string; filename: string; description: string; content: string }[] = [];
-
-    let files: string[];
-    try {
-      files = await fs.readdir(agentsDir);
-    } catch (error) {
-      // Directory doesn't exist - return empty list
-      setCacheHeaders(res);
-      return res.json({ agents: [], count: 0 });
-    }
-
-    const mdFiles = files.filter(f => f.endsWith('.md') && !f.startsWith('.'));
-
-    for (const file of mdFiles) {
-      const filePath = path.join(agentsDir, file);
-
-      // Validate file path and check it's a regular file (not symlink)
-      if (!isPathSafe(filePath, agentsDir) || !(await isRegularFile(filePath))) {
-        continue;
-      }
-
-      const content = await safeReadFile(filePath);
-      if (!content) continue;
-
+    const agents = (docs ?? []).map(({ file, content, firstParagraph }) => {
       const name = file.replace('.md', '');
-
-      // Extract description from first paragraph after title
-      const lines = content.split('\n');
-      let description = '';
-      let inDescription = false;
-
-      for (const line of lines) {
-        if (line.startsWith('# ')) {
-          inDescription = true;
-          continue;
-        }
-        if (inDescription && line.trim() && !line.startsWith('#')) {
-          description = line.trim();
-          break;
-        }
-      }
-
-      agents.push({
+      return {
         name: name.charAt(0).toUpperCase() + name.slice(1),
         filename: file,
-        description: description || 'No description available',
+        description: firstParagraph || 'No description available',
         content,
-      });
-    }
+      };
+    });
 
     setCacheHeaders(res);
     res.json({ agents, count: agents.length });
@@ -497,63 +500,20 @@ router.get('/agents', async (req: AuthRequest, res: Response) => {
 // GET /api/admin/skills - List all custom skills
 router.get('/skills', async (req: AuthRequest, res: Response) => {
   try {
-    const skillsDir = path.join(PROJECT_ROOT, '.claude', 'skills');
+    const docs = await readMarkdownDir(path.join(PROJECT_ROOT, '.claude', 'skills'));
 
-
-    const skills: { name: string; command: string; filename: string; description: string; content: string }[] = [];
-
-    let files: string[];
-    try {
-      files = await fs.readdir(skillsDir);
-    } catch (error) {
-      // Directory doesn't exist - return empty list
-      setCacheHeaders(res);
-      return res.json({ skills: [], count: 0 });
-    }
-
-    const mdFiles = files.filter(f => f.endsWith('.md') && !f.startsWith('.'));
-
-    for (const file of mdFiles) {
-      const filePath = path.join(skillsDir, file);
-
-      // Validate file path and check it's a regular file (not symlink)
-      if (!isPathSafe(filePath, skillsDir) || !(await isRegularFile(filePath))) {
-        continue;
-      }
-
-      const content = await safeReadFile(filePath);
-      if (!content) continue;
-
+    const skills = (docs ?? []).map(({ file, content, firstParagraph }) => {
       const name = file.replace('.md', '');
-
       // Extract command name from title (e.g., "# /build-check")
       const titleMatch = content.match(/^#\s+(\/[\w-]+)/m);
-      const command = titleMatch ? titleMatch[1] : `/${name}`;
-
-      // Extract description from first paragraph after title
-      const lines = content.split('\n');
-      let description = '';
-      let inDescription = false;
-
-      for (const line of lines) {
-        if (line.startsWith('# ')) {
-          inDescription = true;
-          continue;
-        }
-        if (inDescription && line.trim() && !line.startsWith('#')) {
-          description = line.trim();
-          break;
-        }
-      }
-
-      skills.push({
-        name: name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
-        command,
+      return {
+        name: titleCase(name),
+        command: titleMatch ? titleMatch[1] : `/${name}`,
         filename: file,
-        description: description || 'No description available',
+        description: firstParagraph || 'No description available',
         content,
-      });
-    }
+      };
+    });
 
     setCacheHeaders(res);
     res.json({ skills, count: skills.length });
@@ -594,61 +554,22 @@ router.get('/mcp', async (req: AuthRequest, res: Response) => {
 // GET /api/admin/research - List research documents
 router.get('/research', async (req: AuthRequest, res: Response) => {
   try {
-    const researchDir = path.join(PROJECT_ROOT, 'docs', 'research');
+    const docs = await readMarkdownDir(path.join(PROJECT_ROOT, 'docs', 'research'));
 
-
-    const documents: { name: string; filename: string; summary: string; content: string; modifiedAt: Date }[] = [];
-
-    let files: string[];
-    try {
-      files = await fs.readdir(researchDir);
-    } catch (error) {
-      // Directory doesn't exist - return empty list
-      setCacheHeaders(res);
-      return res.json({ documents: [], count: 0 });
-    }
-
-    const mdFiles = files.filter(f => f.endsWith('.md') && !f.startsWith('.'));
-
-    for (const file of mdFiles) {
-      const filePath = path.join(researchDir, file);
-
-      // Validate file path and check it's a regular file (not symlink)
-      if (!isPathSafe(filePath, researchDir) || !(await isRegularFile(filePath))) {
-        continue;
-      }
-
-      const content = await safeReadFile(filePath);
-      if (!content) continue;
-
-      const stats = await fs.stat(filePath);
-      const name = file.replace('.md', '').split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-
-      // Extract first paragraph as summary
-      const lines = content.split('\n');
-      let summary = '';
-      let inSummary = false;
-
-      for (const line of lines) {
-        if (line.startsWith('# ')) {
-          inSummary = true;
-          continue;
-        }
-        if (inSummary && line.trim() && !line.startsWith('#')) {
-          summary = line.trim().substring(0, 200);
-          if (line.trim().length > 200) summary += '...';
-          break;
-        }
-      }
-
-      documents.push({
-        name,
-        filename: file,
-        summary: summary || 'No summary available',
-        content,
-        modifiedAt: stats.mtime,
-      });
-    }
+    const documents = await Promise.all(
+      (docs ?? []).map(async ({ file, filePath, content, firstParagraph }) => {
+        const stats = await fs.stat(filePath);
+        // First paragraph as summary, cut at 200 characters
+        const summary = firstParagraph.length > 200 ? firstParagraph.substring(0, 200) + '...' : firstParagraph;
+        return {
+          name: titleCase(file.replace('.md', '')),
+          filename: file,
+          summary: summary || 'No summary available',
+          content,
+          modifiedAt: stats.mtime,
+        };
+      }),
+    );
 
     setCacheHeaders(res);
     res.json({ documents, count: documents.length });

@@ -95,27 +95,47 @@ router.get('/export', authenticateToken, async (req: AuthRequest, res: Response)
     const id = req.userId;
     const one = async (sql: string) => (await pool.query(sql, [id])).rows;
 
-    const payload = {
-      exportedAt: new Date().toISOString(),
-      note: 'Datele tale din Numerologia. Parola, jetoanele și cheile de notificare nu sunt incluse: sunt credențiale, nu date despre tine.',
-      account: (await one('SELECT id, email, name, role, created_at, email_verified_at FROM users WHERE id = $1'))[0],
-      profiles: await one('SELECT * FROM user_profiles WHERE user_id = $1 ORDER BY created_at'),
-      journal: await one('SELECT * FROM journal_entries WHERE user_id = $1 ORDER BY created_at'),
-      dailyReadings: await one(
+    // Douăsprezece citiri independente: plecate deodată, nu una după alta.
+    // Ordinea cheilor din fișier rămâne cea de mai jos, nu cea a sosirii.
+    const [
+      account, profiles, journal, dailyReadings, deepReadings, notificationPreferences,
+      gamification, achievements, activity, friends, subscriptions, purchases,
+    ] = await Promise.all([
+      one('SELECT id, email, name, role, created_at, email_verified_at FROM users WHERE id = $1'),
+      one('SELECT * FROM user_profiles WHERE user_id = $1 ORDER BY created_at'),
+      one('SELECT * FROM journal_entries WHERE user_id = $1 ORDER BY created_at'),
+      one(
         `SELECT d.* FROM daily_readings d
           JOIN user_profiles p ON p.id = d.profile_id WHERE p.user_id = $1 ORDER BY d.on_date`,
       ),
-      deepReadings: await one(
+      one(
         `SELECT d.* FROM deep_readings d
           JOIN user_profiles p ON p.id = d.profile_id WHERE p.user_id = $1`,
       ),
-      notificationPreferences: await one('SELECT * FROM notification_preferences WHERE user_id = $1'),
-      gamification: await one('SELECT * FROM user_gamification WHERE user_id = $1'),
-      achievements: await one('SELECT * FROM user_achievements WHERE user_id = $1'),
-      activity: await one('SELECT * FROM user_activity_log WHERE user_id = $1 ORDER BY created_at'),
-      friends: await one('SELECT * FROM friendships WHERE user_id = $1'),
-      subscriptions: await one('SELECT * FROM subscriptions WHERE user_id = $1'),
-      purchases: await one('SELECT * FROM one_time_purchases WHERE user_id = $1'),
+      one('SELECT * FROM notification_preferences WHERE user_id = $1'),
+      one('SELECT * FROM user_gamification WHERE user_id = $1'),
+      one('SELECT * FROM user_achievements WHERE user_id = $1'),
+      one('SELECT * FROM user_activity_log WHERE user_id = $1 ORDER BY created_at'),
+      one('SELECT * FROM friendships WHERE user_id = $1'),
+      one('SELECT * FROM subscriptions WHERE user_id = $1'),
+      one('SELECT * FROM one_time_purchases WHERE user_id = $1'),
+    ]);
+
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      note: 'Datele tale din Numerologia. Parola, jetoanele și cheile de notificare nu sunt incluse: sunt credențiale, nu date despre tine.',
+      account: account[0],
+      profiles,
+      journal,
+      dailyReadings,
+      deepReadings,
+      notificationPreferences,
+      gamification,
+      achievements,
+      activity,
+      friends,
+      subscriptions,
+      purchases,
     };
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8');

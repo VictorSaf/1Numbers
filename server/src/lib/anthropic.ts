@@ -48,7 +48,15 @@ export const isAiConfigured = (): boolean => Boolean(apiKey());
 
 let client: Anthropic | null = null;
 
-const getClient = (): Anthropic => {
+/**
+ * Clientul, unul pentru tot serverul: consultantul, ziua și citirea întreagă
+ * îl iau de aici. Fiecare își ținea al lui, cu propria citire a cheii -- trei
+ * locuri de schimbat la prima modificare de configurare.
+ *
+ * Fără cheie aruncă `AiUnavailableError`. Cine are un text de rezervă
+ * (ziua, citirea) întreabă întâi `isAiConfigured()` și nu ajunge aici.
+ */
+export const getClient = (): Anthropic => {
   const key = apiKey();
   if (!key) throw new AiUnavailableError();
   if (!client) client = new Anthropic({ apiKey: key });
