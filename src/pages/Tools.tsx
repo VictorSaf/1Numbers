@@ -18,11 +18,10 @@ import { PageLayout } from "@/components/layout/PageLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useProfile } from "@/hooks/use-profile";
-import { compareNameChange, analyzeBusinessName, generateNameSuggestions } from "@/lib/nameAnalysis";
+import { compareNameChange, analyzeBusinessName } from "@/lib/nameAnalysis";
 import { generateYearForecast, type YearForecast } from "@/lib/yearForecast";
-import { getAllCompatibilities, getCompatibilityDetail } from "@/lib/compatibilityMatrix";
-import { calculateLifePathNumber } from "@/lib/numerology";
 import { format } from "date-fns";
+import { parseCalendarDate } from "@/lib/calendarDate";
 import { NumerologyCalendar } from "@/components/NumerologyCalendar";
 import { LoShuGrid } from "@/components/LoShuGrid";
 import { KeepNameButton } from "@/components/people/KeepNameButton";
@@ -33,10 +32,10 @@ const Tools = () => {
   // The tab is in the query string: /unelte?s=angel is where the 301 from
   // /angel-numbers lands, and a link to one tool has to stay a link to that tool.
   const [params, setParams] = useSearchParams();
-  // Fără `s`, pagina e LANSATORUL: opt uși, nu un document deschis la primul
+  // Fără `s`, pagina e LANSATORUL: șase uși, nu un document deschis la primul
   // capitol. `/unelte?s=angel` -- unde aterizează 301-ul de la /angel-numbers --
   // rămâne un link către unealta aceea.
-  const activeTab = params.get("s");
+  const requestedTab = params.get("s");
   const setActiveTab = (next: string | null) =>
     setParams(next ? { s: next } : {}, { replace: true });
   
@@ -55,16 +54,6 @@ const Tools = () => {
   const [yearForecast, setYearForecast] = useState<YearForecast | null>(null);
   const [expandedMonth, setExpandedMonth] = useState<number | null>(null);
   
-  // Compatibility Matrix State
-  const [matrixBirthDate, setMatrixBirthDate] = useState("");
-  const [compatibilities, setCompatibilities] = useState<ReturnType<typeof getAllCompatibilities> | null>(null);
-  const [selectedCompatNumber, setSelectedCompatNumber] = useState<number | null>(null);
-  
-  // Name Optimizer State
-  const [optimizerName, setOptimizerName] = useState("");
-  const [targetNumbers, setTargetNumbers] = useState<number[]>([1, 8, 11, 22]);
-  const [nameSuggestions, setNameSuggestions] = useState<ReturnType<typeof generateNameSuggestions> | null>(null);
-
   // Calendar State
   const [calendarBirthDate, setCalendarBirthDate] = useState("");
   const [calendarName, setCalendarName] = useState("");
@@ -85,14 +74,11 @@ const Tools = () => {
       if (!forecastBirthDate) {
         setForecastBirthDate(formattedDate);
       }
-      if (!matrixBirthDate) {
-        setMatrixBirthDate(formattedDate);
-      }
       if (!loShuBirthDate) {
         setLoShuBirthDate(formattedDate);
       }
     }
-  }, [hasProfile, profileData, calendarBirthDate, forecastBirthDate, matrixBirthDate, loShuBirthDate]);
+  }, [hasProfile, profileData, calendarBirthDate, forecastBirthDate, loShuBirthDate]);
 
   const t = {
     ro: {
@@ -106,13 +92,9 @@ const Tools = () => {
       n_nameChange: "Ce se schimbă dacă îți schimbi numele.",
       n_business: "Cifra unui nume de firmă, înainte s-o înregistrezi.",
       n_forecast: "Anul care vine, lună cu lună.",
-      n_optimizer: "Variante de nume, sortate după cifră.",
-      n_matrix: "Toate perechile dintr-un grup, deodată.",
       nameChange: "Schimbare Nume",
       businessName: "Nume Afacere",
       yearForecast: "Previziune An",
-      nameOptimizer: "Optimizator Nume",
-      compatMatrix: "Matrice Compatibilitate",
       angelNumbers: "Numere Înger",
       calendar: "Calendar",
       showCalendar: "Afișează Calendarul",
@@ -123,13 +105,11 @@ const Tools = () => {
       fullName: "Numele complet",
       analyze: "Analizează",
       calculate: "Calculează",
-      generate: "Generează",
       original: "Nume original",
       newNameLabel: "Nume nou",
       businessNameLabel: "Numele afacerii",
       birthDate: "Data nașterii",
       year: "Anul",
-      yourName: "Numele tău",
       impact: "Impact",
       positive: "Pozitiv",
       negative: "Negativ",
@@ -154,16 +134,6 @@ const Tools = () => {
       focus: "Focus",
       opportunities: "Oportunități",
       advice: "Sfat",
-      yourLifePath: "Drumul tău de viață",
-      compatibilityWith: "Compatibilitate cu",
-      score: "Scor",
-      strengths: "Puncte forte",
-      suggestions: "Sugestii de nume",
-      targetNumbersLabel: "Numere țintă (selectează)",
-      noSuggestions: "Încearcă alte numere țintă",
-      excellent: "Excelentă",
-      good: "Bună",
-      challenging: "Provocatoare"
     },
     en: {
       title: "Numerology Tools",
@@ -176,13 +146,9 @@ const Tools = () => {
       n_nameChange: "What changes if you change your name.",
       n_business: "A company name's number, before you register it.",
       n_forecast: "The year ahead, month by month.",
-      n_optimizer: "Name variants, sorted by number.",
-      n_matrix: "Every pair in a group, at once.",
       nameChange: "Name Change",
       businessName: "Business Name",
       yearForecast: "Year Forecast",
-      nameOptimizer: "Name Optimizer",
-      compatMatrix: "Compatibility Matrix",
       angelNumbers: "Angel Numbers",
       calendar: "Calendar",
       showCalendar: "Show Calendar",
@@ -193,13 +159,11 @@ const Tools = () => {
       fullName: "Full name",
       analyze: "Analyze",
       calculate: "Calculate",
-      generate: "Generate",
       original: "Original name",
       newNameLabel: "New name",
       businessNameLabel: "Business name",
       birthDate: "Birth date",
       year: "Year",
-      yourName: "Your name",
       impact: "Impact",
       positive: "Positive",
       negative: "Negative",
@@ -224,16 +188,6 @@ const Tools = () => {
       focus: "Focus",
       opportunities: "Opportunities",
       advice: "Advice",
-      yourLifePath: "Your Life Path",
-      compatibilityWith: "Compatibility with",
-      score: "Score",
-      strengths: "Strengths",
-      suggestions: "Name suggestions",
-      targetNumbersLabel: "Target numbers (select)",
-      noSuggestions: "Try other target numbers",
-      excellent: "Excellent",
-      good: "Good",
-      challenging: "Challenging"
     },
     ru: {
       title: "Нумерологические инструменты",
@@ -246,13 +200,9 @@ const Tools = () => {
       n_nameChange: "Что изменится, если сменить имя.",
       n_business: "Число названия компании — до регистрации.",
       n_forecast: "Год впереди, месяц за месяцем.",
-      n_optimizer: "Варианты имени, по числу.",
-      n_matrix: "Все пары в группе — сразу.",
       nameChange: "Смена имени",
       businessName: "Название бизнеса",
       yearForecast: "Прогноз на год",
-      nameOptimizer: "Оптимизатор имени",
-      compatMatrix: "Матрица совместимости",
       angelNumbers: "Ангельские числа",
       calendar: "Календарь",
       showCalendar: "Показать Календарь",
@@ -263,13 +213,11 @@ const Tools = () => {
       fullName: "Полное имя",
       analyze: "Анализировать",
       calculate: "Рассчитать",
-      generate: "Сгенерировать",
       original: "Оригинальное имя",
       newNameLabel: "Новое имя",
       businessNameLabel: "Название бизнеса",
       birthDate: "Дата рождения",
       year: "Год",
-      yourName: "Ваше имя",
       impact: "Влияние",
       positive: "Положительное",
       negative: "Отрицательное",
@@ -294,16 +242,6 @@ const Tools = () => {
       focus: "Фокус",
       opportunities: "Возможности",
       advice: "Совет",
-      yourLifePath: "Ваш жизненный путь",
-      compatibilityWith: "Совместимость с",
-      score: "Счёт",
-      strengths: "Сильные стороны",
-      suggestions: "Предложения имён",
-      targetNumbersLabel: "Целевые числа (выберите)",
-      noSuggestions: "Попробуйте другие целевые числа",
-      excellent: "Отличная",
-      good: "Хорошая",
-      challenging: "Сложная"
     }
   }[language];
 
@@ -314,9 +252,10 @@ const Tools = () => {
     { value: "name-change", label: t.nameChange, note: t.n_nameChange },
     { value: "business", label: t.businessName, note: t.n_business },
     { value: "forecast", label: t.yearForecast, note: t.n_forecast },
-    { value: "optimizer", label: t.nameOptimizer, note: t.n_optimizer },
-    { value: "matrix", label: t.compatMatrix, note: t.n_matrix },
   ];
+  // A bookmark to a tool that is gone (?s=optimizer, ?s=matrix) gets the
+  // launcher, not a tab with nothing in it.
+  const activeTab = TOOLS.some((tool) => tool.value === requestedTab) ? requestedTab : null;
 
 
   const handleNameCompare = () => {
@@ -332,23 +271,16 @@ const Tools = () => {
   };
 
   const handleYearForecast = () => {
-    if (forecastBirthDate) {
-      setYearForecast(generateYearForecast(new Date(forecastBirthDate), forecastYear, language));
+    const birthDate = parseCalendarDate(forecastBirthDate);
+    if (birthDate) {
+      setYearForecast(generateYearForecast(birthDate, forecastYear, language));
     }
   };
 
-  const handleCompatibilityMatrix = () => {
-    if (matrixBirthDate) {
-      const lifePath = calculateLifePathNumber(new Date(matrixBirthDate));
-      setCompatibilities(getAllCompatibilities(lifePath));
-    }
-  };
-
-  const handleNameOptimize = () => {
-    if (optimizerName && targetNumbers.length > 0) {
-      setNameSuggestions(generateNameSuggestions(optimizerName, targetNumbers, language));
-    }
-  };
+  // `<input type="date">` gives YYYY-MM-DD; `new Date()` would read it as UTC
+  // midnight, the day before anywhere west of Greenwich.
+  const calendarDate = parseCalendarDate(calendarBirthDate);
+  const loShuDate = parseCalendarDate(loShuBirthDate);
 
   const getImpactColor = (impact: string) => {
     switch (impact) {
@@ -357,13 +289,6 @@ const Tools = () => {
       case 'mixed': return 'text-warn';
       default: return 'bg-muted text-muted-foreground';
     }
-  };
-
-  const getScoreColor = (score: number) => {
-    if (score >= 85) return 'text-ok';
-    if (score >= 70) return 'text-ok';
-    if (score >= 55) return 'text-warn';
-    return 'text-warn';
   };
 
   return (
@@ -385,7 +310,7 @@ const Tools = () => {
           <Tabs value={activeTab} className="w-full">
             {/* Întoarcerea la hol. Banda de file spunea „ești aici, printre
                 altele"; o unealtă e o destinație, deci ce trebuie e drumul
-                înapoi, nu celelalte șapte deschise permanent lângă ea. */}
+                înapoi, nu celelalte cinci deschise permanent lângă ea. */}
             <button
               type="button"
               onClick={() => setActiveTab(null)}
@@ -437,10 +362,10 @@ const Tools = () => {
                     {t.showCalendar}
                   </Button>
                   
-                  {showCalendar && calendarBirthDate && calendarName && (
+                  {showCalendar && calendarDate && calendarName && (
                     <div className="mt-6 animate-fade-in">
                       <NumerologyCalendar 
-                        birthDate={new Date(calendarBirthDate)} 
+                        birthDate={calendarDate} 
                         fullName={calendarName} 
                       />
                     </div>
@@ -474,9 +399,9 @@ const Tools = () => {
                     {t.showLoShuGrid}
                   </Button>
 
-                  {showLoShuGrid && loShuBirthDate && (
+                  {showLoShuGrid && loShuDate && (
                     <div className="mt-6 animate-fade-in">
-                      <LoShuGrid birthDate={new Date(loShuBirthDate)} />
+                      <LoShuGrid birthDate={loShuDate} />
                     </div>
                   )}
                 </CardContent>
@@ -651,121 +576,6 @@ const Tools = () => {
                           </Card>
                         ))}
                       </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Name Optimizer */}
-            <TabsContent value="optimizer">
-              <Card className="border-t-0">
-                <CardHeader>
-                  <CardTitle className="font-heading text-foreground">{t.nameOptimizer}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label>{t.yourName}</Label>
-                    <Input value={optimizerName} onChange={(e) => setOptimizerName(e.target.value)} className="input-mystic" />
-                  </div>
-                  <div>
-                    <Label>{t.targetNumbersLabel}</Label>
-                    <div className="flex gap-2 flex-wrap mt-2">
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 22, 33].map(num => (
-                        <Badge 
-                          key={num}
-                          variant={targetNumbers.includes(num) ? "default" : "outline"}
-                          className="cursor-pointer"
-                          onClick={() => setTargetNumbers(prev => prev.includes(num) ? prev.filter(n => n !== num) : [...prev, num])}
-                        >
-                          {num}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                  <Button onClick={handleNameOptimize} className="w-full sm:w-auto">{t.generate}</Button>
-                  
-                  {nameSuggestions && (
-                    <div className="mt-6 space-y-3 animate-fade-in">
-                      <h4 className="font-heading text-foreground">{t.suggestions}</h4>
-                      {nameSuggestions.length === 0 ? (
-                        <p className="text-muted-foreground text-sm">{t.noSuggestions}</p>
-                      ) : (
-                        nameSuggestions.map((s, i) => (
-                          <Card key={i} className="bg-card/30">
-                            <CardContent className="py-3 flex items-center justify-between">
-                              <div>
-                                <span className="font-medium text-foreground">{s.name}</span>
-                                <span className="text-sm text-muted-foreground ml-2">- {s.reason}</span>
-                              </div>
-                              <Badge className="bg-sunken text-primary">{s.destinyNumber}</Badge>
-                            </CardContent>
-                          </Card>
-                        ))
-                      )}
-
-                      <div className="flex justify-end pt-2">
-                        <KeepNameButton name={optimizerName} defaultCategory="eu" />
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Compatibility Matrix */}
-            <TabsContent value="matrix">
-              <Card className="border-t-0">
-                <CardHeader>
-                  <CardTitle className="font-heading text-foreground">{t.compatMatrix}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label>{t.birthDate}</Label>
-                    <Input type="date" value={matrixBirthDate} onChange={(e) => setMatrixBirthDate(e.target.value)} className="input-mystic" />
-                  </div>
-                  <Button onClick={handleCompatibilityMatrix} className="w-full sm:w-auto">{t.calculate}</Button>
-                  
-                  {compatibilities && (
-                    <div className="mt-6 space-y-4 animate-fade-in">
-                      <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-2">
-                        {compatibilities.map(({ number, detail }) => (
-                          <button
-                            key={number}
-                            onClick={() => setSelectedCompatNumber(selectedCompatNumber === number ? null : number)}
-                            className={`p-3 rounded-lg border transition-all ${selectedCompatNumber === number ? 'border-primary bg-sunken' : 'border-border/30 bg-card/30 hover:bg-card/50'}`}
-                          >
-                            <div className="text-2xl num text-primary">{number}</div>
-                            <div className={`text-sm font-bold ${getScoreColor(detail.score)}`}>{detail.score}%</div>
-                          </button>
-                        ))}
-                      </div>
-                      
-                      {selectedCompatNumber && (
-                        <Card className="bg-card/50 animate-fade-in">
-                          <CardHeader>
-                            <CardTitle className="text-lg">{t.compatibilityWith} {selectedCompatNumber}</CardTitle>
-                          </CardHeader>
-                          <CardContent className="space-y-3">
-                            {(() => {
-                              const detail = getCompatibilityDetail(calculateLifePathNumber(new Date(matrixBirthDate)), selectedCompatNumber);
-                              return (
-                                <>
-                                  <div className="flex gap-2">
-                                    <Badge className={detail.level === 'excellent' ? 'text-ok' : detail.level === 'good' ? 'text-ok' : detail.level === 'moderate' ? 'text-warn' : 'text-warn'}>
-                                      {t[detail.level] || detail.level}
-                                    </Badge>
-                                    <span className={`font-bold ${getScoreColor(detail.score)}`}>{detail.score}%</span>
-                                  </div>
-                                  <div><span className="text-ok">{t.strengths}:</span> {detail.strengths[language].join(', ')}</div>
-                                  <div><span className="text-warn">{t.challenges}:</span> {detail.challenges[language].join(', ')}</div>
-                                  <div><span className="text-primary">{t.advice}:</span> {detail.advice[language]}</div>
-                                </>
-                              );
-                            })()}
-                          </CardContent>
-                        </Card>
-                      )}
                     </div>
                   )}
                 </CardContent>

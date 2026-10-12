@@ -66,15 +66,15 @@
       "meta": {
         "ro": {
           "title": "Instrumente Numerologice — Calendar, Lo Shu, Prognoză Anuală",
-          "description": "Calendar numerologic, grila Lo Shu, schimbarea numelui, nume de firmă, prognoză pe an, optimizator de nume și matrice de compatibilitate, numere înger."
+          "description": "Calendar numerologic, grila Lo Shu, schimbarea numelui, nume de firmă, prognoză pe an, numere înger."
         },
         "en": {
           "title": "Numerology Tools — Calendar, Lo Shu, Year Forecast",
-          "description": "Numerology calendar, Lo Shu grid, name change, business name, year forecast, name optimiser and a compatibility matrix, angel numbers."
+          "description": "Numerology calendar, Lo Shu grid, name change, business name, year forecast, angel numbers."
         },
         "ru": {
           "title": "Нумерологические инструменты — календарь, Ло Шу, прогноз на год",
-          "description": "Нумерологический календарь, сетка Ло Шу, смена имени, название компании, годовой прогноз, оптимизатор имени и матрица совместимости, ангельские числа."
+          "description": "Нумерологический календарь, сетка Ло Шу, смена имени, название компании, годовой прогноз, ангельские числа."
         }
       }
     },
@@ -84,16 +84,16 @@
       "priority": 0.9,
       "meta": {
         "ro": {
-          "title": "Învață Numerologie — Ghid, Tutoriale, Întrebări, Articole",
-          "description": "Semnificația numerelor 1-9 și a masterilor 11, 22, 33, tutoriale pas cu pas, întrebări frecvente și articole."
+          "title": "Învață Numerologie — Ghid, Tutoriale, Întrebări",
+          "description": "Semnificația numerelor 1-9 și a masterilor 11, 22, 33, tutoriale pas cu pas și întrebări frecvente."
         },
         "en": {
-          "title": "Learn Numerology — Guide, Tutorials, Questions, Articles",
-          "description": "What the numbers 1-9 and the master numbers 11, 22 and 33 mean, step-by-step tutorials, frequent questions and articles."
+          "title": "Learn Numerology — Guide, Tutorials, Questions",
+          "description": "What the numbers 1-9 and the master numbers 11, 22 and 33 mean, step-by-step tutorials and frequent questions."
         },
         "ru": {
-          "title": "Изучайте нумерологию — руководство, уроки, вопросы, статьи",
-          "description": "Значения чисел 1-9 и мастер-чисел 11, 22, 33, пошаговые уроки, частые вопросы и статьи."
+          "title": "Изучайте нумерологию — руководство, уроки, вопросы",
+          "description": "Значения чисел 1-9 и мастер-чисел 11, 22, 33, пошаговые уроки и частые вопросы."
         }
       }
     },
@@ -229,10 +229,6 @@
     {
       "from": "/angel-numbers",
       "to": "/unelte?s=angel"
-    },
-    {
-      "from": "/articles",
-      "to": "/invata?s=articole"
     },
     {
       "from": "/compatibility",
