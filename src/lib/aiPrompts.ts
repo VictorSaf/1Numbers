@@ -16,6 +16,7 @@ import {
 import { calculateKarmicDebts, calculateKarmicLessons } from './karmic';
 import { calculatePinnacles, calculateChallenges } from './pinnacles';
 import { generateLoShuGrid, LoShuGridResult } from './loShuGrid';
+import { compareAll } from './models/elements';
 
 // Types
 export interface UserNumerologyProfile {
@@ -203,6 +204,24 @@ ${l.dominantElement}: ${loShuGrid.dominantElement}
 === ${l.pinnacles} ===
 ${l.currentPinnacle}: ${currentPinnacle?.number || 'N/A'}
 ${l.currentChallenge}: ${currentChallenge?.number || 'N/A'}`;
+
+  // R4 și R9: modelul primește și unde școlile se despart, ca să nu aleagă una
+  // în tăcere. Doar întrebarea, școala și cifra -- fără pașii de calcul, care
+  // conțin literele numelui.
+  const SCHOOLS: Record<Language, { title: string; rule: string }> = {
+    ro: { title: 'UNDE ȘCOLILE SE DESPART', rule: 'Când răspunzi despre una dintre aceste întrebări, numește diferența dintre școli. Nu face medii și nu alege o școală în tăcere.' },
+    en: { title: 'WHERE THE SCHOOLS PART', rule: 'When you answer about one of these questions, name the difference between the schools. Do not average and do not silently pick one.' },
+    ru: { title: 'ГДЕ ШКОЛЫ РАСХОДЯТСЯ', rule: 'Отвечая на один из этих вопросов, назовите расхождение между школами. Не усредняйте и не выбирайте одну молча.' },
+  };
+  const splits = compareAll(fullName, birthDate, { lang: language, today: currentDate })
+    .filter((c) => c.verdict !== 'agree');
+  if (splits.length) {
+    contextString += `
+
+=== ${SCHOOLS[language].title} ===
+${SCHOOLS[language].rule}
+${splits.map((c) => `${c.question} ${c.models.map((m) => `${m.school}: ${m.display}`).join('; ')} [${c.verdict}, ${c.spread}]`).join('\n')}`;
+  }
 
   // Add gamification stats if available
   if (profile.gamificationStats) {
