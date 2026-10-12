@@ -12,18 +12,21 @@ import type { PairDistance, Verdict } from "@/lib/tools/shared";
  */
 
 
-const COPY: Record<Lang, { verdict: Record<Verdict, string>; distance: string; spread: string }> = {
+const COPY: Record<Lang, { verdict: Record<Verdict, string>; distance: string; spread: string; same: string }> = {
   ro: {
+    same: "la fel",
     verdict: { agree: "toate la fel", octave: "aceeași rădăcină, alt registru", near: "aproape", apart: "departe" },
     distance: "distanța",
     spread: "cea mai mare distanță",
   },
   en: {
+    same: "the same",
     verdict: { agree: "all the same", octave: "same root, other register", near: "close", apart: "far apart" },
     distance: "distance",
     spread: "largest distance",
   },
   ru: {
+    same: "совпадают",
     verdict: { agree: "все совпадают", octave: "тот же корень, другой регистр", near: "близко", apart: "далеко" },
     distance: "расстояние",
     spread: "наибольшее расстояние",
@@ -84,13 +87,15 @@ export const SchoolsCompare = ({
         <div className={`border-t pt-4 ${TONE[verdict]}`}>
           <p className="text-sm text-foreground">
             {t.verdict[verdict]}
-            {typeof spread === "number" && (
+            {typeof spread === "number" && verdict !== "agree" && verdict !== "octave" && (
               <span className="text-muted-foreground">
                 {" "}
                 · {t.spread} <span className="num">{spread}</span>
               </span>
             )}
           </p>
+          {/* Când toate cad de acord, lista de perechi ar fi numai „distanța 0”. */}
+          {verdict !== "agree" && (
           <ul className="mt-3 space-y-1 text-sm text-foreground/80">
             {pairs.map((p) => (
               <li key={`${p.a}-${p.b}`} className="flex flex-wrap items-baseline gap-x-2">
@@ -98,11 +103,12 @@ export const SchoolsCompare = ({
                 <span className="text-muted-foreground">↔</span>
                 <span>{label(p.b)}</span>
                 <span className="num text-xs text-muted-foreground">
-                  {t.distance} {p.distance} · {t.verdict[p.verdict]}
+                  {t.distance} {p.distance} · {p.verdict === "agree" ? t.same : t.verdict[p.verdict]}
                 </span>
               </li>
             ))}
           </ul>
+          )}
         </div>
       )}
     </div>
