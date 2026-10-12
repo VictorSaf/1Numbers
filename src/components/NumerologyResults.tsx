@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NumberCard } from "./NumberCard";
 import { PinnacleCard } from "./PinnacleCard";
+import { LifeCycleCard } from "./LifeCycleCard";
 import { KarmicDebtCard } from "./KarmicDebtCard";
 import { PersonalCycleCard } from "./PersonalCycleCard";
 import { LuckyDatesCard } from "./LuckyDatesCard";
@@ -16,7 +17,7 @@ import {
   calculatePersonalityNumber,
   calculatePersonalYearNumber,
 } from "@/lib/numerology";
-import { calculatePinnacles, calculateChallenges } from "@/lib/pinnacles";
+import { calculatePinnacles, calculateChallenges, calculateLifeCycles } from "@/lib/pinnacles";
 import { calculateKarmicDebts, calculateKarmicLessons, KARMIC_LESSON_MEANINGS } from "@/lib/karmic";
 import { generateShareableLink } from "@/lib/sharing";
 import { ExportMenu } from "./ExportMenu";
@@ -110,6 +111,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
 
   const pinnacles = useMemo(() => calculatePinnacles(birthDate), [birthDate]);
   const challenges = useMemo(() => calculateChallenges(birthDate), [birthDate]);
+  const lifeCycles = useMemo(() => calculateLifeCycles(birthDate), [birthDate]);
   const karmicDebts = useMemo(() => calculateKarmicDebts(birthDate, fullName), [birthDate, fullName]);
   const karmicLessons = useMemo(() => calculateKarmicLessons(fullName), [fullName]);
 
@@ -184,6 +186,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
 
   const sectionLabels = {
     pinnacles: { ro: "Pinnacle-uri și Provocări", en: "Pinnacles & Challenges", ru: "Пиннакли и Вызовы" },
+    lifeCycles: { ro: "Ciclurile de Viață", en: "Life Cycles", ru: "Циклы Жизни" },
     karmic: { ro: "Datorii Karmice", en: "Karmic Debts", ru: "Кармические Долги" },
     lessons: { ro: "Lecții Karmice", en: "Karmic Lessons", ru: "Кармические Уроки" },
     noDebts: { ro: "Nu ai datorii karmice detectate.", en: "No karmic debts detected.", ru: "Кармических долгов не обнаружено." },
@@ -235,6 +238,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
       ru: "Одни и те же вопросы через разные системы — и что значит, когда ответы расходятся.",
     },
     pinnacles: { ro: "Cele patru etape majore ale vieții tale și provocările fiecăreia.", en: "The four major stages of your life and the challenge of each.", ru: "Четыре главных этапа вашей жизни и вызов каждого." },
+    lifeCycles: { ro: "Trei etape lungi, din luna, ziua și anul nașterii.", en: "Three long stages, from the month, day and year of your birth.", ru: "Три долгих этапа — из месяца, дня и года рождения." },
     karmic: { ro: "Datoriile 13, 14, 16 și 19 și ce înseamnă pentru tine.", en: "Debts 13, 14, 16 and 19 and what they mean for you.", ru: "Долги 13, 14, 16 и 19 и что они значат для вас." },
     lessons: { ro: "Numerele lipsă din numele tău și lecțiile pe care le indică.", en: "The numbers missing from your name and the lessons they point to.", ru: "Числа, отсутствующие в имени, и уроки, на которые они указывают." },
     luckyDates: { ro: "Zilele favorabile pentru decizii importante.", en: "The days that favour important decisions.", ru: "Дни, благоприятные для важных решений." },
@@ -558,6 +562,23 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
                   pinnacle={pinnacle}
                   challenge={challenges[i]}
                   isCurrentPeriod={currentAge >= pinnacle.startAge && currentAge <= pinnacle.endAge}
+                  delay={i * 50}
+                />
+              ))}
+            </div>
+          </Block>
+
+          {/* Trei trepte lungi, nu patru vârfuri: singurul gol rămas față de
+              lista standard a categoriei. Stă lângă Pinnacles, nu în Deeper --
+              capitolul ăsta încă nu are un al doilea strat, iar ciclurile
+              răspund la fel de direct la „ce urmează" ca Pinnacles-urile. */}
+          <Block title={sectionLabels.lifeCycles[language]} note={teasers.lifeCycles[language]}>
+            <div>
+              {lifeCycles.map((cycle, i) => (
+                <LifeCycleCard
+                  key={cycle.stage}
+                  cycle={cycle}
+                  isCurrent={currentAge >= cycle.startAge && currentAge <= cycle.endAge}
                   delay={i * 50}
                 />
               ))}

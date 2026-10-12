@@ -8,7 +8,7 @@ import {
 } from "./numerology";
 // Imported from the module, not the barrel: the barrel re-exports the content
 // layer, which would drag arcana and archetypes into this chunk.
-import { lifePath, pinnacles, challenges } from './numerology-plus/pythagorean';
+import { lifePath, pinnacles, challenges, lifeCycles } from './numerology-plus/pythagorean';
 
 const toBirthDate = (d: Date) => ({ day: d.getDate(), month: d.getMonth() + 1, year: d.getFullYear() });
 
@@ -22,6 +22,13 @@ export interface PinnacleData {
 export interface ChallengeData {
   number: number;
   period: number; // 1-4
+}
+
+export interface LifeCycleData {
+  stage: 'formative' | 'productive' | 'harvest';
+  number: number;
+  startAge: number;
+  endAge: number;
 }
 
 // Calculate the 4 Pinnacle Numbers
@@ -46,6 +53,21 @@ export const calculatePinnacles = (birthDate: Date): PinnacleData[] => {
 export const calculateChallenges = (birthDate: Date): ChallengeData[] => {
   const b = toBirthDate(birthDate);
   return challenges(b, lifePath(b)).map((c) => ({ number: c.value, period: c.index }));
+};
+
+// The three Life Cycles: month, day and year of birth, each reduced on its
+// own and given the same age boundaries the engine already uses for the
+// first Pinnacle -- formative ends there, productive runs 27 years, harvest
+// is open-ended. The engine (`lifeCycles`) has carried this since it was
+// written for Pinnacles' sake; nothing in the app ever called it.
+export const calculateLifeCycles = (birthDate: Date): LifeCycleData[] => {
+  const b = toBirthDate(birthDate);
+  return lifeCycles(b, lifePath(b)).map((c) => ({
+    stage: c.name as LifeCycleData['stage'],
+    number: c.value,
+    startAge: c.fromAge,
+    endAge: c.toAge ?? 99,
+  }));
 };
 
 // Get current pinnacle based on age
@@ -197,6 +219,37 @@ const getAchievementMeaning = (num: number): { ro: string; en: string; ru: strin
     en: "Hidden talent that can be developed.",
     ru: "Скрытый талант, который можно развить."
   };
+};
+
+// What each Life Cycle stage is about, independent of its number -- the
+// number's own flavour comes from PINNACLE_MEANINGS below, keyed the same way
+// a Pinnacle already is: the energy of a 3 doesn't change because it's a
+// cycle instead of a peak.
+export const LIFE_CYCLE_STAGE_LABELS: Record<LifeCycleData['stage'], { title: { ro: string; en: string; ru: string }; description: { ro: string; en: string; ru: string } }> = {
+  formative: {
+    title: { ro: "Formarea", en: "The Formative Cycle", ru: "Формирующий цикл" },
+    description: {
+      ro: "De la naștere până aici, cifra vine din luna în care te-ai născut. E terenul pe care ai crescut, nu o alegere -- felul în care ai învățat, primele obiceiuri, ce ai luat drept normal înainte să poți compara.",
+      en: "From birth to here, the number comes from the month you were born in. It's the ground you grew up on, not a choice -- how you learned, your first habits, what you took as normal before you had anything to compare it to.",
+      ru: "От рождения и до этого возраста число идёт от месяца рождения. Это почва, на которой вы выросли, не выбор — то, как вы учились, первые привычки, что казалось нормой, пока не с чем было сравнить.",
+    },
+  },
+  productive: {
+    title: { ro: "Producția", en: "The Productive Cycle", ru: "Продуктивный цикл" },
+    description: {
+      ro: "Cei douăzeci și șapte de ani în care se construiește cea mai mare parte a unei vieți -- carieră, familie, ce rămâne după. Cifra vine din ziua nașterii: reflexul cu care acționezi când chiar contează.",
+      en: "The twenty-seven years in which most of a life gets built -- career, family, what stays behind. The number comes from the day of birth: the reflex you act on when it actually matters.",
+      ru: "Двадцать семь лет, в которые строится основная часть жизни — карьера, семья, то, что остаётся. Число идёт от дня рождения: рефлекс, которым вы действуете, когда это действительно важно.",
+    },
+  },
+  harvest: {
+    title: { ro: "Recolta", en: "The Harvest Cycle", ru: "Цикл жатвы" },
+    description: {
+      ro: "Ce rămâne, fără termen. Cifra vine din anul nașterii -- cea mai lentă dintre cele trei, și cea care judecă mai puțin cât ai făcut și mai mult ce a rezistat.",
+      en: "What remains, with no end date. The number comes from the year of birth -- the slowest of the three, and the one that judges less how much you did and more what lasted.",
+      ru: "То, что остаётся, без срока. Число идёт от года рождения — самое медленное из трёх, и то, что судит не столько о сделанном, сколько о том, что устояло.",
+    },
+  },
 };
 
 // Pinnacle interpretations

@@ -1,3 +1,44 @@
+# UNIVERSAL MULTI-MASTER ASYNCHRONOUS ARCHITECTURE (ACE-CORE v8 - DEEP RESEARCH)
+
+## 1. AUTOMATIC BOOTSTRAP, PROTOCOL ISOLATION & AUTO-DISCOVERY
+- Upon session boot, the system verifies if the official Superpowers framework is active. If missing, it is authorized to run `/plugin install superpowers@claude-plugins-official`.
+- **Zero-Knowledge Local Discovery:** If `./Agentic/audit.md` does not exist, the system suspends all feature development, sniffs the current workspace directory natively (lockfiles, directory structures), and generates an abstract code reference map `./Agentic/code_map.json`.
+- **Strict Sandbox Containment:** All structural discovery tools are mathematically restricted to the current folder (`./`). Accessing parent directories, neighboring repositories, or global system-wide processes outside this workspace is strictly prohibited.
+
+## 2. PROACTIVE RESEARCH GATE & INTERVIEW ENHANCEMENT
+- **The Strategic Query:** Right after saving the audit, @Lead pauses execution and prints a single prompt in the terminal:
+  *"[ACE-ENGINE]: Local project audited successfully. Victor, what is your primary strategic objective for this workspace?"*
+- **Autonomous Research Engine (The Brainstorming Phase):** The moment the user types their brief (even if informal or brief), @Lead is forbidden from breaking it into tasks immediately. Instead, it must trigger its web search tools to execute deep, concurrent online research tailored specifically to the project's stack (e.g., searching for advanced Next.js 16 memory pooling, Prisma/SQLite high-concurrency configurations, or React 19 render optimization tricks).
+- **The Prompt Augmentation Document:** Based on its online findings and the technical vulnerabilities mapped in `audit.md`, @Lead builds a comprehensive, ultra-detailed engineering specification. It injects edge-case scenarios, performance bottlenecks, and architectural security rules that the user might not be aware of.
+- **The Final Verification Gate:** @Lead presents the complete, hyper-augmented prompt directly on your screen and freezes, prompting you:
+  *"[ARCHITECT]: Based on deep online research and your local audit, I have engineered this augmented technical specification for your objective. Review the final suggested prompt details below. Do you approve initializing the Multi-Master Swarm on this blueprint? (Type 'yes' to execute, 'no' to cancel, or provide changes)."*
+- **Administrative Activation:** Upon typing 'yes', @Lead takes administrative control of the main checkout, commits current untracked files into an automated temporary backup (`git add -A && git commit -m "ACE-WIP-backup"`), creates the local `ace-integration` branch, and launches the execution graph.
+
+## 3. MULTI-LEAD CONCURRENT ORCHESTRATION & DAG DEPENDENCY SCHEDULING
+- **The Central Swarm Coordinator:** Once authorized, the augmented prompt is mapped out as an asynchronous Directed Acyclic Graph (DAG) inside `./Agentic/PLAN.md` where all tasks are broken down into 2-5 minute atomic units.
+- **Concurrent Sub-Masters (Multi-Lead Threading):** If decoupled architectural zones are discovered, the engine spawns separate concurrent orchestrators on disk (`./Agentic/master1.md`, `./Agentic/master2.md`, etc.).
+- **Non-Blocking Context-Switching:** No orchestrator or Sub-Master is allowed to block or idle while waiting for an ephemeral agent loop. If a node is waiting for a `@Worker` or a `@Tester`, the managing `@Lead` instantly suspends that specific branch on disk, scans the DAG for unblocked nodes, spawns a new parallel worker/tester pair, and advances other parts of the plan concurrently.
+
+## 4. INDUSTRIAL SANDBOX FLEET & SPEED OPTIMIZATIONS
+- **Git Worktrees Fleet:** Sub-masters operate inside independent directory sandboxes located at `.claude/worktrees/ace-wf-[task-name]`.
+- **Pre-Cache Symlinking:** Directories like `node_modules`, `.venv`, `.env` setups, and build caches are linked automatically via symlinks into the worktree sandbox during initialization to skip boot latencies.
+- **Chirurgie de Context:** Workers cannot load entire modules into their context windows. They are restricted to pulling targeted 100-line code snippets using structural cross-reference markers from `code_map.json`.
+
+## 5. EXPERT WORKFLOW EXECUTION (Superpowers TDD & Shadow Testing)
+- **Superpowers Inline Batching:** Tasks are processed consecutively within the same active worktree context using automated batching workflows to preserve token windows.
+- **Strict TDD Compliance:** Workers must execute the Superpowers RED-GREEN-REFACTOR protocol. A failing unit test must be written first and proven to fail before any production code mutation is allowed.
+- **Shadow Watcher Pool:** Testers run the framework test suites in a persistent asynchronous background watch mode inside the sandbox. Modifications are validated live in milliseconds.
+- **Automated Lot Review:** Upon batch completion, `@Tester` outputs a cumulative `REVIEW.md` breaking defects down into `[LOW]`, `[MEDIUM]`, and `[CRITICAL]`.
+
+## 6. FULLY DELEGATED AUTONOMOUS MERGE & RECOVERY
+- **Master Merge Decision Engine:** Branch validation and merge confirmations are offloaded entirely to the managing Master agent.
+  * If `REVIEW.md` is `PASS` with zero `CRITICAL` errors, **the Master issues its own merge confirmation string**, integrates the worktree locally into the primary integration branch, prunes the sandbox directory, marks the nodes as complete in `PLAN.md`, and unblocks downstream tasks.
+  * If `CRITICAL` regressions are found, Master blocks the branch and loops back an immediate recovery agent without prompting the user.
+
+## 7. ZERO CHAT NOISE
+- Inter-agent coordination is strictly file-driven via disk updates. The console remains completely silent, displaying only a dynamic task grid via `/tasks`. You are only notified upon total epic success or an unrecoverable framework crash.
+
+
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
@@ -5,6 +46,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Overview
 
 Numerology Compass is a multilingual (Romanian/English/Russian) numerology web application using the Pythagorean system. It calculates Life Path, Destiny, Soul Urge, and Personality numbers, plus compatibility analysis, karmic debt, personal cycles, and predictions.
+
+## Ce e produsul (citește înainte să construiești ceva nou)
+
+`docs/produs/` e baza de produs: `01-definitie.md` (ce e și pentru cine), `02-doctrina.md`
+(mecanismul diferențiator și regulile), `03-filtru.md` (ce rămâne, ce se mută, ce dispare),
+`04-extinderi.md`, `05-glosar.md`.
+
+Pe scurt: aplicația nu e un calculator de numerologie. Arată **unde nu ești de acord cu
+tine** — punți în interiorul unui sistem, dezacorduri între sisteme paralele, absențe pe
+două drumuri. Distanța dintre două căi corecte e informația. Nu se fac medii, acordul e un
+rezultat, o distanță nu e o eroare.
+
+Orice funcție nouă trece întâi prin `02-doctrina.md`. Ce nu o servește, nu se construiește.
 
 ## Commands
 

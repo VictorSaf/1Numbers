@@ -44,7 +44,7 @@ module.exports = {
       max_memory_restart: '200M',
       env: {
         NODE_ENV: 'production',
-        HOST: '0.0.0.0',
+        HOST: '127.0.0.1',
       },
     },
     {
@@ -66,10 +66,27 @@ module.exports = {
       max_memory_restart: '400M',
       env: {
         NODE_ENV: 'production',
-        HOST: '0.0.0.0',
+        HOST: '127.0.0.1',
         // Everything else -- DATABASE_URL, JWT_SECRET, the feature flags -- is
         // read from server/.env by dotenv, which is where the secrets live and
         // where they stay out of this file.
+      },
+    },
+    {
+      name: 'compass-retention',
+      script: 'dist/jobs/retention.js',
+      cwd: require('path').join(__dirname, 'server'),
+      // A job, not a server: it starts, deletes what's past its window, logs
+      // a retention_runs row, and exits 0. autorestart: false means pm2
+      // leaves it stopped there instead of relaunching it in a loop;
+      // cron_restart is what brings it back, once a day, regardless of
+      // autorestart -- that's the standard pm2 shape for a scheduled job.
+      autorestart: false,
+      cron_restart: '17 3 * * *',
+      instances: 1,
+      exec_mode: 'fork',
+      env: {
+        NODE_ENV: 'production',
       },
     },
   ],

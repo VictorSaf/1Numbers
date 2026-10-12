@@ -181,29 +181,60 @@ toate cardurile din capitolele 1–2 arată `raw` acolo unde există.
 
 ---
 
-## Etapa 7 — raportul plătit
+## Etapa 7 — granița plătită
 
-Produsul e **raport unic**, nu abonament. Motivul, pe scurt: abonatul săptămânal din Social & Lifestyle
-are 3,4% șanse să mai fie abonat peste un an, categoria are cele mai slabe reînnoiri din piață, iar
-paywall-ul pe web convertește 6% față de 2% în aplicație nativă, la ~6% comision în loc de 15–30%.
+Structura a fost validată contra a nouă produse din piață. Detaliul complet, cu matricea pe capitole:
+`docs/pachetare.md`. Rezumatul executabil:
 
-- **Gratuit, definitiv:** toate cele cinci capitole, cardul zilnic, o hartă salvată, comparația cu o persoană.
-  Suprafața gratuită e canalul de achiziție. Nu o mutila.
-- **Plătit, trei praguri:** **19 €** raportul de bază · **39 €** + sisteme paralele + prognoză 9 ani ·
-  **69 €** + hărți nelimitate + comparații.
-- Livrare: PDF + pagină permanentă la URL propriu. `pdfExport.ts` există — 752 de linii, orfan de când
-  i s-a șters butonul.
-- Checkout pe domeniul propriu. Garanție 30 de zile. Fără reînnoire.
-- Șterge `premium.ts`, `PricingCards.tsx`, `SubscriptionPlans.tsx` și tabelele de tiere.
+**Principiul de împărțire — confirmat de piață.** Nimeni din categorie nu blochează citirea de bază a
+identității: Co–Star dă harta natală completă *și* compatibilitatea, Sanctuary dă harta interactivă,
+AstroSage dă tot kundli-ul. Stratul plătit e mereu **timpul** și **ceilalți**. Cel mai vândut articol
+din catalogul Co–Star e „Your Year Ahead" la 11,99 $.
 
-**Nu construi, oricât ar converti:** preț săptămânal afișat mai mare decât suma facturată · ofertă mai
-ieftină pentru cine refuză · trial care ascunde reînnoirea · notificări bazate pe frică sau urgență ·
+**Cinci categorii:**
+
+| | Preț | Ce primește în plus |
+|---|---|---|
+| Vizitator | 0 € | Citire completă, nesalvată |
+| Cont | 0 € | 1 hartă salvată + ziua personală de azi |
+| Hartă | **29 €/an** (4,99 €/lună) | Capitolul 4 complet, jurnal, 3 hărți |
+| Atlas | **59 €/an** (8,99 €/lună) | Capitolul 5 complet, sisteme paralele, 10 hărți, export PDF |
+| Profesionist | **349 €/an** | Dreptul de revânzare, brand propriu, 150 rapoarte/an, API |
+
+Prețurile au coborât față de propunerea inițială pentru că foloseam prețuri de astrologie pe un produs
+de numerologie: World Numerology vinde oferta **completă** la 39 $/an, Numerologist produsul de vârf la
+57 $ o singură dată, iar în toată piața nu există abonament de numerologie peste ~80 $/an.
+
+**Plus SKU-uri unice, peste orice nivel** — categoria cumpără majoritar unicat, nu abonament:
+- **Anul care vine, 14 €** — prognoza pe 12 luni, pentru cine are cont gratuit și nu vrea abonament.
+- **Harta completă, 24 €** — tot ce ar vedea un Atlas, într-un PDF permanent.
+- **Sloturi de persoane: +3 / +10 / +20 la 9 / 16 / 19 €** — scara lui The Pattern (3 la 9,99 $,
+  10 la 16,99 $, 20 la 19,99 $), vândute *pe lângă* abonament. De aceea Atlas are 10 hărți, nu nelimitat.
+
+**Tierul Profesionist se construiește în paralel cu B2C, nu după.** Ce se vinde nu sunt funcțiile, ci
+**dreptul de a revinde** — Decoz spune explicit pe versiunea personală „doar cadouri, nu ai voie să vinzi
+lecturile", iar aia e granița. Metrat, ca la GrahAI (150 rapoarte/an). Piața asta e veche și scumpă:
+Astrolabe 225–295 $ per tip de raport, Matrix 675 $, Decoz profesional 249 $, GrahAI ~255 €/an.
+Avertisment: niciun vendor nu publică cifre de tracțiune — produsele și prețurile există, dar nu știm
+cine cumpără.
+
+**Fără trial.** Pentru aplicații Lifestyle — categoria ta, nu Health & Fitness — trial-urile scad LTV-ul
+pe 12 luni cu 21,2%. Recomandarea anterioară de 21 de zile venea din date agregate, nu din categorie.
+
+**Checkout pe domeniul propriu:** 6% conversie față de 2% în aplicație nativă, ~6% comision în loc de
+15–30%.
+
+**Nu construi, oricât ar converti:** preț lunar afișat mai mare decât suma facturată · ofertă mai ieftină
+afișată abia după ce omul refuză · trial care ascunde reînnoirea · notificări bazate pe frică sau urgență ·
 cronometre care se resetează · anulare mai grea decât abonarea. Primele trei sunt motivul pentru care
-Apple a scos Cal AI din App Store în aprilie 2026; restul sunt enumerate explicit în consultarea
-Digital Fairness Act.
+Apple a scos Cal AI din App Store în aprilie 2026.
 
-**Acceptare:** un utilizator poate cumpăra și primi raportul fără cont de magazin · nicăieri în UI un
-preț afișat diferit de cel facturat.
+**Acceptare:** un utilizator poate cumpăra și primi produsul fără cont de magazin · nicăieri în UI un preț
+afișat diferit de cel facturat · tierul Profesionist refuză generarea peste cota metrată, cu mesaj clar.
+
+**De măsurat în primele 90 de zile:** raportul Hartă/Atlas (dacă Atlas ia sub 40%, prețurile sunt prea
+depărtate) · rata de distribuire a capitolului 2 · dacă SKU-urile unice depășesc abonamentele, categoria
+ți-a spus că nu vinde abonamente.
 
 ---
 
