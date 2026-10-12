@@ -26,6 +26,7 @@ import {
 import { destinyMatrix, lifePeriods } from "@/lib/numerology-plus/matrix";
 import { psychomatrix } from "@/lib/numerology-plus/psychomatrix";
 import { birthCards, yearCard } from "@/lib/numerology-plus/tarot";
+import { tropicalSign, siderealSign, chineseAnimalCalendar, chineseAnimalSolar, SIGN_NAMES, ANIMAL_NAMES } from "@/lib/numerology-plus/zodiac";
 import { generateLoShuGrid } from "@/lib/loShuGrid";
 import { getCompatibleNumbers, getFavorableDays } from "@/lib/chaldean";
 import {
@@ -128,6 +129,8 @@ const Q: Record<string, T3> = {
   luckyNumbers: { ro: "Ce numere îți sunt prielnice?", en: "Which numbers favour you?", ru: "Какие числа вам благоприятны?" },
   luckyDays: { ro: "În ce zile ai vânt din spate?", en: "On which days is the wind at your back?", ru: "В какие дни вам сопутствует удача?" },
   kua: { ro: "Ce număr Kua ai?", en: "What is your Kua number?", ru: "Какое у вас число Гуа?" },
+  sunSign: { ro: "Sub ce semn te-ai născut?", en: "Under which sign were you born?", ru: "Под каким знаком вы родились?" },
+  chineseAnimal: { ro: "Ce animal ești în zodiacul chinezesc?", en: "Which animal are you in the Chinese zodiac?", ru: "Какое вы животное по китайскому зодиаку?" },
   key: { ro: "Unde crești?", en: "Where do you grow?", ru: "Где вы растёте?" },
   intensity: { ro: "Ce trăsături ai peste medie?", en: "Which traits are above average?", ru: "Какие черты выше среднего?" },
 };
@@ -824,6 +827,20 @@ function intensityDefs(name: string): Def[] {
   ];
 }
 
+function sunSignDefs(b: BirthDate): Def[] {
+  return [
+    { id: "tropical", school: S("Zodiac tropical (Occident)", "Tropical zodiac (Western)", "Тропический зодиак (Запад)"), method: S("legat de echinocțiul de primăvară", "tied to the spring equinox", "привязан к весеннему равноденствию"), value: tropicalSign(b), steps: [] },
+    { id: "sidereal", school: S("Zodiac sideral (vedic, Lahiri)", "Sidereal zodiac (Vedic, Lahiri)", "Сидерический зодиак (ведич., Лахири)"), method: S("legat de stele; granițe aproximative, ~24 de zile mai târziu", "tied to the stars; approximate borders, ~24 days later", "привязан к звёздам; границы приблизительны, ~24 дня позже"), value: siderealSign(b), steps: [] },
+  ];
+}
+
+function chineseDefs(b: BirthDate): Def[] {
+  return [
+    { id: "calendar", school: S("An calendaristic", "Calendar year", "Календарный год"), method: S("anul începe pe 1 ianuarie", "the year begins on 1 January", "год начинается 1 января"), value: chineseAnimalCalendar(b), steps: [String(b.year)] },
+    { id: "solar", school: S("An solar (Lichun, Ba Zi)", "Solar year (Lichun, Ba Zi)", "Солнечный год (Личунь, Ба Цзы)"), method: S("anul începe pe 4 februarie", "the year begins on 4 February", "год начинается 4 февраля"), value: chineseAnimalSolar(b), steps: [] },
+  ];
+}
+
 // ─────────────────────────────────────────────────────────────
 // Punctul de intrare
 // ─────────────────────────────────────────────────────────────
@@ -878,6 +895,10 @@ export function compareAll(fullName: string, birthDate: Date, opts: CompareOptio
     build("luckyNumbers", "set", luckyNumberDefs(fullName, b), lang, sf),
     build("luckyDays", "set", luckyDayDefs(b), lang, dayFmt),
   ];
+  list.push(
+    build("sunSign", "category", sunSignDefs(b), lang, (v) => SIGN_NAMES[lang][v as keyof (typeof SIGN_NAMES)["ro"]]),
+    build("chineseAnimal", "category", chineseDefs(b), lang, (v) => ANIMAL_NAMES[lang][v as keyof (typeof ANIMAL_NAMES)["ro"]]),
+  );
   if (opts.gender) list.push(build("kua", "digit", kuaDefs(b, opts.gender), lang, num));
   return list;
 }

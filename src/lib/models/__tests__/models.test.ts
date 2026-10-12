@@ -125,3 +125,15 @@ describe("compareAll", () => {
     if (c.verdict === "agree") expect(c.says).toMatch(/acord/);
   });
 });
+
+describe("zodiac", () => {
+  it("tropicalul și sideralul se despart la sfârșitul lui martie", () => {
+    const c = compareAll("Ana Pop", new Date(1990, 2, 30), { today: new Date(2026, 0, 1) }).find((x) => x.key === "sunSign")!;
+    expect(c.models.map((m) => m.value)).toEqual(["aries", "pisces"]);
+    expect(c.verdict).toBe("apart");
+  });
+  it("animalul chinezesc diferă în ianuarie după convenție", () => {
+    const c = compareAll("Ana Pop", new Date(1990, 0, 20), { today: new Date(2026, 0, 1) }).find((x) => x.key === "chineseAnimal")!;
+    expect(c.models.map((m) => m.value)).toEqual(["horse", "snake"]);
+  });
+});
