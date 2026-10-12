@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { compareAll, type Comparison, type Lang } from "@/lib/models/elements";
 import type { Verdict } from "@/lib/models/compare";
+import { renderShareCard, pickSplits } from "@/lib/shareCard";
 
 /**
  * Aceeași întrebare, toate școlile.
@@ -45,6 +46,9 @@ const COPY: Record<Lang, {
   none: string;
   female: string;
   male: string;
+  share: string;
+  cardTitle: string;
+  cardFooter: string;
 }> = {
   ro: {
     lede: "Aceleași întrebări, puse prin fiecare școală care le calculează. Unde școlile dau răspunsuri diferite, le vezi pe toate, cu calculul fiecăreia, și distanța dintre ele. Diferența nu e o greșeală — e informația.",
@@ -62,6 +66,9 @@ const COPY: Record<Lang, {
     none: "—",
     female: "femeie",
     male: "bărbat",
+    share: "Imagine cu diferențele (fără nume, fără dată)",
+    cardTitle: "Unde școlile nu se pun de acord despre mine",
+    cardFooter: "numerology compass · aceeași întrebare, toate școlile",
   },
   en: {
     lede: "The same questions, put through every school that calculates them. Where the schools give different answers, you see all of them, each with its arithmetic, and the distance between them. The difference is not a mistake — it is the information.",
@@ -79,6 +86,9 @@ const COPY: Record<Lang, {
     none: "—",
     female: "female",
     male: "male",
+    share: "Image of the differences (no name, no date)",
+    cardTitle: "Where the schools disagree about me",
+    cardFooter: "numerology compass · the same question, every school",
   },
   ru: {
     lede: "Одни и те же вопросы через каждую школу, которая их считает. Где школы отвечают по-разному, вы видите все ответы, расчёт каждого и расстояние между ними. Разница — не ошибка, а информация.",
@@ -96,6 +106,9 @@ const COPY: Record<Lang, {
     none: "—",
     female: "женщина",
     male: "мужчина",
+    share: "Картинка с расхождениями (без имени и даты)",
+    cardTitle: "Где школы расходятся обо мне",
+    cardFooter: "numerology compass · один вопрос, все школы",
   },
 };
 
@@ -210,6 +223,27 @@ export const AllSchools = ({
   );
   const agree = list.filter((c) => c.verdict === "agree").length;
 
+  const share = async () => {
+    const blob = await renderShareCard(list, {
+      title: t.cardTitle,
+      summary: t.summary(agree, list.length),
+      footer: t.cardFooter,
+    });
+    if (!blob) return;
+    const file = new File([blob], "scoli.png", { type: "image/png" });
+    const nav = navigator as Navigator & { canShare?: (d: { files: File[] }) => boolean };
+    if (nav.canShare?.({ files: [file] })) {
+      await navigator.share({ files: [file] }).catch(() => undefined);
+      return;
+    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "scoli.png";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div data-all-schools className="space-y-5">
       <p className="max-w-prose text-sm leading-relaxed text-muted-foreground">{t.lede}</p>
@@ -246,6 +280,17 @@ export const AllSchools = ({
       <div>
         {list.map((c) => <Row key={c.key} c={c} t={t} />)}
       </div>
+
+      {pickSplits(list).length > 0 && (
+        <button
+          type="button"
+          onClick={share}
+          data-share-card
+          className="num border-b border-gilt pb-0.5 text-[0.7rem] uppercase tracking-[0.14em] text-gilt hover:text-primary"
+        >
+          {t.share}
+        </button>
+      )}
     </div>
   );
 };
