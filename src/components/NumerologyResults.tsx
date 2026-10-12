@@ -32,7 +32,7 @@ import { Dial } from "@/components/numerology/Dial";
 import { LetterMap } from "@/components/numerology/LetterMap";
 import { ChapterNav } from "@/components/numerology/ChapterNav";
 import { Deeper } from "@/components/numerology/Deeper";
-import { TwoAnswers } from "@/components/numerology/TwoAnswers";
+import { AllSchools } from "@/components/numerology/AllSchools";
 import { SaveMapButton } from "@/components/numerology/SaveMapButton";
 import { DeepReading } from "@/components/DeepReading";
 import { VedicNumbers } from "@/components/numerology/VedicNumbers";
@@ -51,6 +51,7 @@ const DestinyMatrix = lazy(() => import("@/components/numerology/DestinyMatrix")
 const NewNumbers = lazy(() => import("@/components/numerology/NewNumbers"));
 const LetterStones = lazy(() => import("@/components/numerology/LetterStones"));
 const Contradictions = lazy(() => import("@/components/numerology/Contradictions"));
+const Psychomatrix = lazy(() => import("@/components/numerology/Psychomatrix"));
 const NumerologyRadarChart = lazy(() => import("./charts/NumerologyRadarChart").then(m => ({ default: m.NumerologyRadarChart })));
 
 // Chart loading skeleton
@@ -217,7 +218,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     vedic: { ro: "Numerologie vedică (Ank Jyotish)", en: "Vedic numerology (Ank Jyotish)", ru: "Ведическая нумерология (Анк Джьотиш)" },
     kua: { ro: "Numărul Kua (Feng Shui)", en: "The Kua number (Feng Shui)", ru: "Число Гуа (фэн-шуй)" },
     kabbalah: { ro: "Kabbalah", en: "Kabbalah", ru: "Каббала" },
-    twoAnswers: { ro: "Unde harta se răspunde de două ori", en: "Where the map answers twice", ru: "Где карта отвечает дважды" },
+    twoAnswers: { ro: "Aceeași întrebare, toate școlile", en: "The same question, every school", ru: "Один вопрос, все школы" },
     deeperSelf: { ro: "Cele trei litere și profilul complet", en: "The three letters and the full profile", ru: "Три буквы и полный профиль" },
     deeperLessons: { ro: "Pătratul Lo Shu, distribuția și planurile", en: "The Lo Shu square, distribution and planes", ru: "Квадрат Ло Шу, распределение и планы" },
     deeperNow: { ro: "Zilele favorabile și bioritmurile", en: "Lucky dates and biorhythms", ru: "Благоприятные дни и биоритмы" },
@@ -227,6 +228,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     core: { ro: "Numerele de bază", en: "The core numbers", ru: "Основные числа" },
     profile: { ro: "Profilul numerologic", en: "Numerology profile", ru: "Нумерологический профиль" },
     distribution: { ro: "Distribuția cifrelor", en: "Number distribution", ru: "Распределение чисел" },
+    psychomatrix: { ro: "Pătratul lui Pitagora (Alexandrov)", en: "Pythagorean square (Alexandrov)", ru: "Квадрат Пифагора (Александров)" },
     cycles: { ro: "Ciclurile personale", en: "Personal cycles", ru: "Личные циклы" },
     tension: { ro: "Punțile și echilibrul", en: "The bridges and the balance", ru: "Мосты и равновесие" },
     contradiction: { ro: "Ce nu se potrivește", en: "What does not fit", ru: "Что не сходится" },
@@ -249,9 +251,9 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
   // One line per section, shown under its title whether it is open or closed.
   const teasers = {
     twoAnswers: {
-      ro: "Aceleași întrebări, puse prin sisteme diferite — și ce înseamnă când răspunsurile nu coincid.",
-      en: "The same questions put through different systems — and what it means when the answers do not match.",
-      ru: "Одни и те же вопросы через разные системы — и что значит, когда ответы расходятся.",
+      ro: "Fiecare școală, cu calculul ei, și distanța dintre răspunsuri — cincisprezece întrebări.",
+      en: "Every school, with its arithmetic, and the distance between the answers — fifteen questions.",
+      ru: "Каждая школа со своим расчётом и расстояние между ответами — пятнадцать вопросов.",
     },
     pinnacles: { ro: "Cele patru etape majore ale vieții tale și provocările fiecăreia.", en: "The four major stages of your life and the challenge of each.", ru: "Четыре главных этапа вашей жизни и вызов каждого." },
     lifeCycles: { ro: "Trei etape lungi, din luna, ziua și anul nașterii.", en: "Three long stages, from the month, day and year of your birth.", ru: "Три долгих этапа — из месяца, дня и года рождения." },
@@ -269,6 +271,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
     parallel: { ro: "Aceleași litere, citite de alt sistem. Numărul compus caldeean spune altceva decât cel pitagoreic.", en: "The same letters, read by another system. The Chaldean compound says something the Pythagorean one does not.", ru: "Те же буквы, прочитанные другой системой. Халдейское составное число говорит не то же, что пифагорейское." },
     transits: { ro: "Ce literă îți guvernează fiecare an și când Esența întâlnește Anul Personal.", en: "Which letter governs each year, and when Essence meets the Personal Year.", ru: "Какая буква управляет каждым годом и когда Сущность встречает Личный год." },
     biorhythms: { ro: "Ciclurile fizic, emoțional și intelectual pe o lună în jurul zilei de azi.", en: "Physical, emotional and intellectual cycles across a month around today.", ru: "Физический, эмоциональный и интеллектуальный циклы за месяц вокруг сегодняшнего дня." },
+    psychomatrix: { ro: "Aceleași cifre ale datei ca Lo Shu, plus patru numere de lucru — și unde cele două grile văd goluri diferite.", en: "The same date digits as Lo Shu, plus four working numbers — and where the two grids see different gaps.", ru: "Те же цифры даты, что и в Ло Шу, плюс четыре рабочих числа — и где две сетки видят разные пробелы." },
     distribution: { ro: "Câte litere din numele tău cad pe fiecare cifră.", en: "How many letters of your name land on each digit.", ru: "Сколько букв вашего имени приходится на каждую цифру." },
     profile: { ro: "Cele cinci numere de bază, pe aceeași scară.", en: "The five core numbers, on one scale.", ru: "Пять основных чисел на одной шкале." },
     tension: { ro: "Distanța dintre cine ești pe dinăuntru și cine pari pe dinafară.", en: "The distance between who you are inside and who you appear to be.", ru: "Расстояние между тем, кто вы внутри, и тем, кем кажетесь." },
@@ -450,7 +453,7 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
               contrazice în tine”. Existau de la început, împrăștiate prin
               raport, și nimic nu le punea față în față. */}
           <Block title={sectionLabels.twoAnswers[language]} note={teasers.twoAnswers[language]}>
-            <TwoAnswers fullName={fullName} birthDate={birthDate} />
+            <AllSchools fullName={fullName} birthDate={birthDate} />
           </Block>
         </Chapter>
 
@@ -508,6 +511,12 @@ export const NumerologyResults = ({ fullName, birthDate, onReset }: NumerologyRe
           {/* Al doilea strat. Ce răspunde la „ce lipsește din harta ta” --
               datoriile și lecțiile karmice -- rămâne deschis; grilele de aici
               arată aceleași absențe din alte unghiuri. */}
+          <Block title={sectionLabels.psychomatrix[language]} note={teasers.psychomatrix[language]}>
+            <Suspense fallback={chartSkeleton}>
+              <Psychomatrix birthDate={birthDate} />
+            </Suspense>
+          </Block>
+
           <Deeper label={sectionLabels.deeperLessons[language]}>
           <Block title={sectionLabels.depth[language]} note={teasers.depth[language]}>
             <Suspense fallback={chartSkeleton}>
