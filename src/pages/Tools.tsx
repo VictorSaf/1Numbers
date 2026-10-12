@@ -7,12 +7,55 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { ToolTiles } from "@/components/tools/ToolTiles";
 import { useSearchParams } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, type ComponentType } from "react";
 
 // Absorbed from /angel-numbers, which was its own destination with a header
 // link and nothing else to it. Lazy, because it carries its own directory of
 // number meanings and most visitors here want the calendar.
 const AngelNumbers = lazy(() => import("@/components/tools/AngelNumbers"));
+
+// Uneltele care pun aceeași întrebare prin mai multe școli și arată distanța
+// dintre răspunsuri. Fiecare e leneșă: cine deschide calendarul nu le descarcă.
+const SCHOOL_TOOLS = {
+  address: lazy(() => import("@/components/tools/AddressTool")),
+  phone: lazy(() => import("@/components/tools/PhoneTool")),
+  "baby-name": lazy(() => import("@/components/tools/BabyNameTool")),
+  "money-code": lazy(() => import("@/components/tools/MoneyCodeTool")),
+  "life-code": lazy(() => import("@/components/tools/LifeCodeTool")),
+  "event-date": lazy(() => import("@/components/tools/EventDateTool")),
+  "turning-years": lazy(() => import("@/components/tools/TurningYearsTool")),
+} as const;
+type SchoolToolId = keyof typeof SCHOOL_TOOLS;
+
+const SCHOOL_TOOL_COPY: Record<"ro" | "en" | "ru", Record<SchoolToolId, { label: string; note: string }>> = {
+  ro: {
+    address: { label: "Numărul casei", note: "Apartamentul, blocul, caldeean și homofonele chinezești, alături." },
+    phone: { label: "Numărul de telefon", note: "Toate cifrele, ultimele patru, ultima — și față de tine." },
+    "baby-name": { label: "Alegerea numelui", note: "Trei școli clasează aceleași nume; vezi unde nu se potrivesc." },
+    "money-code": { label: "Codul banilor", note: "Varianta de o cifră și cea de patru, cu drumul dintre ele." },
+    "life-code": { label: "Codul vieții", note: "Cele patru numere de lucru ale Klarei Kuzdenbaeva." },
+    "event-date": { label: "Data evenimentului", note: "Zilele bune pentru un scop, după două convenții." },
+    "turning-years": { label: "Anii de cotitură", note: "Fiecare metodă cu anii ei, și unde se întâlnesc." },
+  },
+  en: {
+    address: { label: "House number", note: "Apartment, building, Chaldean and Chinese homophones, side by side." },
+    phone: { label: "Phone number", note: "All digits, the last four, the last one — and against you." },
+    "baby-name": { label: "Choosing a name", note: "Three schools rank the same names; see where they disagree." },
+    "money-code": { label: "Money code", note: "The one-digit and the four-digit version, with the way between." },
+    "life-code": { label: "Life code", note: "Klara Kuzdenbaeva's four working numbers." },
+    "event-date": { label: "Event date", note: "Good days for a purpose, by two conventions." },
+    "turning-years": { label: "Turning-point years", note: "Each method with its years, and where they meet." },
+  },
+  ru: {
+    address: { label: "Номер дома", note: "Квартира, дом, халдейская система и китайские омофоны рядом." },
+    phone: { label: "Номер телефона", note: "Все цифры, последние четыре, последняя — и относительно вас." },
+    "baby-name": { label: "Выбор имени", note: "Три школы ранжируют одни имена; видно, где расходятся." },
+    "money-code": { label: "Денежный код", note: "Однозначный и четырёхзначный вариант и путь между ними." },
+    "life-code": { label: "Жизненный код", note: "Четыре рабочих числа Клары Кузденбаевой." },
+    "event-date": { label: "Дата события", note: "Хорошие дни для цели по двум конвенциям." },
+    "turning-years": { label: "Переломные годы", note: "Каждый метод со своими годами и где они совпадают." },
+  },
+};
 import { Badge } from "@/components/ui/badge";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -62,6 +105,8 @@ const Tools = () => {
   // Lo Shu Grid State
   const [loShuBirthDate, setLoShuBirthDate] = useState("");
   const [showLoShuGrid, setShowLoShuGrid] = useState(false);
+
+  const profileBirthDate = hasProfile && profileData ? format(profileData.birthDate, "yyyy-MM-dd") : "";
 
   // Auto-populate profile data
   useEffect(() => {
@@ -252,6 +297,10 @@ const Tools = () => {
     { value: "name-change", label: t.nameChange, note: t.n_nameChange },
     { value: "business", label: t.businessName, note: t.n_business },
     { value: "forecast", label: t.yearForecast, note: t.n_forecast },
+    ...(Object.keys(SCHOOL_TOOLS) as SchoolToolId[]).map((id) => ({
+      value: id,
+      ...SCHOOL_TOOL_COPY[language in SCHOOL_TOOL_COPY ? (language as "ro" | "en" | "ru") : "en"][id],
+    })),
   ];
   // A bookmark to a tool that is gone (?s=optimizer, ?s=matrix) gets the
   // launcher, not a tab with nothing in it.
@@ -319,6 +368,18 @@ const Tools = () => {
               <span aria-hidden="true">←</span>
               {t.allTools}
             </button>
+
+            {(Object.keys(SCHOOL_TOOLS) as SchoolToolId[]).map((id) => {
+              const Tool: ComponentType<{ defaultBirthDate?: string }> = SCHOOL_TOOLS[id];
+              return (
+                <TabsContent key={id} value={id}>
+                  <Suspense fallback={<div className="h-64 animate-pulse border-t border-line" />}>
+                    {/* Data din profil, dacă există, ca punct de plecare. */}
+                    <Tool defaultBirthDate={profileBirthDate} />
+                  </Suspense>
+                </TabsContent>
+              );
+            })}
 
             <TabsContent value="angel">
               <Suspense fallback={<div className="h-64 animate-pulse rounded-lg border border-line bg-sunken" />}>

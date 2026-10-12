@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 
 /**
- * Cele opt unelte, ca lansator.
+ * Uneltele, ca lansator.
  *
  * Erau opt file într-o bandă: la 1280px se înfășurau pe două rânduri, la 390px
  * șase din opt cădeau în afara ecranului. Mai important, o filă spune „ești
@@ -120,6 +120,62 @@ const Forecast = () => (
   </svg>
 );
 
+/**
+ * Uneltele cu mai multe școli au aceeași figură de bază: două sau trei răspunsuri
+ * pe aceeași întrebare, cu distanța dintre ele trasă ca un filet. Ce diferă e
+ * conținutul răspunsurilor — exact ce produce fiecare.
+ */
+const Answers = ({ values, mark }: { values: string[]; mark?: number }) => (
+  <svg viewBox="0 0 168 92" className={FIG} fill="none" aria-hidden="true">
+    <g className="num" fontSize="19" dominantBaseline="central">
+      {values.map((v, i) => (
+        <text key={i} x={i * 58} y="38" className={i === mark ? "fill-gilt" : "fill-current"}>
+          {v}
+        </text>
+      ))}
+    </g>
+    {values.slice(1).map((_, i) => (
+      <path key={i} d={`M${i * 58 + 4} 64h${54}`} className={i === 0 ? "stroke-gilt" : "stroke-current"} strokeWidth="1.25" />
+    ))}
+  </svg>
+);
+
+const House = () => <Answers values={["45C", "3", "9"]} mark={1} />;
+const Phone = () => <Answers values={["168", "9", "8"]} mark={2} />;
+const BabyName = () => <Answers values={["1", "3", "2"]} mark={0} />;
+const Money = () => <Answers values={["2676", "6"]} mark={1} />;
+const LifeCode = () => <Answers values={["35", "8", "25"]} mark={0} />;
+
+/** Un interval de zile, cu cele alese de fiecare convenție. */
+const EventDate = () => (
+  <svg viewBox="0 0 168 92" className={FIG} fill="none" aria-hidden="true">
+    <path d="M0 46h166" className="stroke-current" strokeWidth="1.25" opacity="0.7" />
+    {Array.from({ length: 12 }, (_, i) => (
+      <path key={i} d={`M${4 + i * 14} 40v12`} className="stroke-current" strokeWidth="1.25" opacity="0.5" />
+    ))}
+    {[2, 6, 9].map((i) => (
+      <circle key={`a${i}`} cx={4 + i * 14} cy="26" r="3.5" className="fill-gilt" />
+    ))}
+    {[0, 6, 11].map((i) => (
+      <circle key={`b${i}`} cx={4 + i * 14} cy="66" r="3.5" className="stroke-current" strokeWidth="1.25" />
+    ))}
+  </svg>
+);
+
+/** Anii fiecărei metode, pe o axă; unde cad împreună. */
+const Turning = () => (
+  <svg viewBox="0 0 168 92" className={FIG} fill="none" aria-hidden="true">
+    {[20, 46, 72].map((y, row) => (
+      <g key={y}>
+        <path d={`M0 ${y}h166`} className="stroke-current" strokeWidth="1" opacity="0.4" />
+        {[[30, 80, 130], [52, 80, 140], [40, 80, 120]][row].map((x) => (
+          <path key={x} d={`M${x} ${y - 6}v12`} className={x === 80 ? "stroke-gilt" : "stroke-current"} strokeWidth="1.5" />
+        ))}
+      </g>
+    ))}
+  </svg>
+);
+
 export interface Tool {
   value: string;
   label: string;
@@ -133,6 +189,13 @@ const FIGURI: Record<string, () => ReactNode> = {
   "name-change": NameChange,
   business: Business,
   forecast: Forecast,
+  address: House,
+  phone: Phone,
+  "baby-name": BabyName,
+  "money-code": Money,
+  "life-code": LifeCode,
+  "event-date": EventDate,
+  "turning-years": Turning,
 };
 
 export const ToolTiles = ({
