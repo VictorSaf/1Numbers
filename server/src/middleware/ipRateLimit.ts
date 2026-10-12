@@ -14,9 +14,8 @@ import { Request, Response, NextFunction } from 'express';
  * apără un deployment cu o singură instanță de abuz ocazional, nu de un atac
  * distribuit. Un depozit comun ar fi necesar dacă API-ul e vreodată scalat.
  *
- * Nu există fail-open: middleware-ul din rateLimit.ts cheamă next() la eroare,
- * ceea ce pe o rută care plătește tokeni ar fi decizia greșită. Aici nu e nimic
- * care să poată eșua.
+ * Nu există fail-open: o limită care cheamă next() la eroare ar lăsa să treacă
+ * exact cererile care plătesc tokeni. Aici nu e nimic care să poată eșua.
  */
 interface Options {
   windowMs: number;

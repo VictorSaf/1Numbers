@@ -7,7 +7,8 @@ import pool from '../db';
 vi.mock('../db', () => ({ default: { query: vi.fn(), connect: vi.fn() } }));
 
 /**
- * The four ways the server used to take the client at its word.
+ * The ways the server used to take the client at its word. (A fourth group,
+ * on gamification, went with the gamification routes themselves.)
  *
  * Everything asserted here answers before the route reaches the database, with
  * one exception -- the demoted admin, which is the whole point of the first
@@ -41,36 +42,6 @@ describe('the role comes from the database, not the token', () => {
     const response = await request(app).get('/api/admin/dashboard').set('Authorization', asAdminToken);
 
     expect(response.status).not.toBe(403);
-  });
-});
-
-describe('gamification will not pay what the client asks for', () => {
-  it('rejects an XP reward far above what the achievement is worth', async () => {
-    const response = await request(app)
-      .post('/api/gamification/award-achievement')
-      .set('Authorization', asUser)
-      .send({ achievementId: 'first_steps', xpReward: 999999 });
-
-    expect(response.status).toBe(400);
-  });
-
-  it('accepts nothing for an achievement that is not in the catalogue', async () => {
-    const response = await request(app)
-      .post('/api/gamification/award-achievement')
-      .set('Authorization', asUser)
-      .send({ achievementId: 'invented_by_the_client', xpReward: 10 });
-
-    expect(response.status).toBe(400);
-    expect(response.body.error).toBe('Unknown achievement ID');
-  });
-
-  it('refuses a challenge increment that is not a positive integer', async () => {
-    const response = await request(app)
-      .post('/api/gamification/challenge-progress')
-      .set('Authorization', asUser)
-      .send({ challengeId: 'weekly_readings', incrementBy: 1e9 + 0.5 });
-
-    expect(response.status).toBe(400);
   });
 });
 
