@@ -27,12 +27,14 @@ describe("AllSchools", () => {
     }
   });
 
-  it("pune matricea distanțelor doar unde sunt cel puțin trei școli", () => {
+  it("pune matricea distanțelor doar unde trei sau mai multe școli se despart", () => {
     const { container } = show();
-    const lifePath = container.querySelector('[data-comparison="lifePath"]')!;
-    expect(lifePath.querySelector("[data-distance-matrix]")).not.toBeNull();
-    const balance = container.querySelector('[data-comparison="balance"]')!;
-    expect(balance.querySelector("[data-distance-matrix]")).toBeNull();
+    const data = compareAll(NAME, BIRTH, { today: TODAY, lang: "ro" });
+    for (const c of data) {
+      const row = container.querySelector(`[data-comparison="${c.key}"]`)!;
+      const want = c.models.length > 2 && c.verdict !== "agree";
+      expect(row.querySelector("[data-distance-matrix]") !== null, c.key).toBe(want);
+    }
   });
 
   it("numără acordurile, nu face medii", () => {

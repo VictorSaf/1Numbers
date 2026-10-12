@@ -197,7 +197,8 @@ const Row = ({ c, t }: { c: Comparison; t: (typeof COPY)[Lang] }) => (
       ))}
     </ol>
 
-    {c.models.length > 2 && <DistanceMatrix c={c} title={t.matrix} />}
+    {/* Când toate cad de acord, matricea ar fi numai zerouri. */}
+    {c.models.length > 2 && c.verdict !== "agree" && <DistanceMatrix c={c} title={t.matrix} />}
 
     <p className="mt-4 pb-2 text-sm leading-relaxed text-foreground/85">{c.says}</p>
   </details>

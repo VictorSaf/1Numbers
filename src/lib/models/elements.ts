@@ -18,6 +18,7 @@ import {
 import {
   lifePath, expression, attitude, personalYear, essence, ageAt, balance,
   hiddenPassion, karmicLessons, birthday, soulUrge, personality, detectKarmicDebts,
+  maturity, rationalThought,
 } from "@/lib/numerology-plus/pythagorean";
 import {
   bhagyank, mulank, naamank, popularKabbalah, hebrewGematria, kuaNumber,
@@ -131,6 +132,7 @@ const Q: Record<string, T3> = {
   kua: { ro: "Ce număr Kua ai?", en: "What is your Kua number?", ru: "Какое у вас число Гуа?" },
   sunSign: { ro: "Sub ce semn te-ai născut?", en: "Under which sign were you born?", ru: "Под каким знаком вы родились?" },
   chineseAnimal: { ro: "Ce animal ești în zodiacul chinezesc?", en: "Which animal are you in the Chinese zodiac?", ru: "Какое вы животное по китайскому зодиаку?" },
+  capstone: { ro: "Cum închei ce ai început?", en: "How do you finish what you start?", ru: "Как вы доводите начатое до конца?" },
   key: { ro: "Unde crești?", en: "Where do you grow?", ru: "Где вы растёте?" },
   intensity: { ro: "Ce trăsături ai peste medie?", en: "Which traits are above average?", ru: "Какие черты выше среднего?" },
 };
@@ -676,6 +678,14 @@ function debtDefs(name: string, b: BirthDate): Def[] {
   const chainDebts = [...new Set(detectKarmicDebts(parts).map((d) => d.debt))];
   const totalOnly = [...new Set(Object.values(parts).map((p) => p.raw).filter((r) => [13, 14, 16, 19].includes(r)))];
   const dayOnly = [13, 14, 16, 19].includes(b.day) ? [b.day] : [];
+  // Unele afișaje (și harta noastră, la Maturitate și Echilibru) caută datoria
+  // în ORICE număr al hărții, nu doar în cele cinci de bază.
+  const lp = parts.lifePath, ex = parts.expression;
+  const extra = {
+    maturity: maturity(lp, ex), balance: balance(name), attitude: attitude(b),
+    rationalThought: rationalThought(name, b),
+  };
+  const anywhere = [...new Set(detectKarmicDebts({ ...parts, ...extra }).map((d) => d.debt))];
   return [
     {
       id: "chain",
@@ -690,6 +700,13 @@ function debtDefs(name: string, b: BirthDate): Def[] {
       method: S("convenția calculatoarelor simple", "the convention of simple calculators", "соглашение простых калькуляторов"),
       value: totalOnly,
       steps: [],
+    },
+    {
+      id: "anywhere",
+      school: S("În orice număr al hărții", "In any number of the map", "В любом числе карты"),
+      method: S("și în Maturitate, Echilibru, Atitudine, Gândire", "also in Maturity, Balance, Attitude, Rational Thought", "также в Зрелости, Равновесии, Отношении, Мышлении"),
+      value: anywhere,
+      steps: Object.entries(extra).map(([k, p]) => `${k}: ${chain(p.raw)}`),
     },
     {
       id: "dayOnly",
@@ -762,6 +779,30 @@ function kuaDefs(b: BirthDate, gender: "male" | "female"): Def[] {
     { id: "classic", school: S("Formula clasică", "Classic formula", "Классическая формула"), method: S("10 − / 5 + pentru toți anii", "10 − / 5 + for every year", "10 − / 5 + для всех лет"), value: classic.kua, steps: [String(b.year)] },
     { id: "century", school: S("Formula după 2000", "Post-2000 formula", "Формула после 2000"), method: S("9 − / 6 + pentru născuții după 2000", "9 − / 6 + for births from 2000", "9 − / 6 + для рождённых после 2000"), value: century.kua, steps: [String(b.year)] },
     { id: "solar", school: S("Anul solar chinezesc", "Chinese solar year", "Китайский солнечный год"), method: S("anul începe pe 4 februarie, nu pe 1 ianuarie", "the year begins on 4 February, not 1 January", "год начинается 4 февраля, а не 1 января"), value: solar.kua, steps: [String(solarYear)] },
+  ];
+}
+
+function capstoneDefs(name: string): Def[] {
+  const parts = nameParts(name);
+  const first = parts[0] ?? "";
+  const last = parts[parts.length - 1] ?? "";
+  const lf = letters(first).at(-1) ?? "";
+  const ll = letters(last).at(-1) ?? "";
+  return [
+    {
+      id: "firstName",
+      school: S("Ultima literă a prenumelui (Spiritwalk, Decoz)", "Last letter of the first name (Spiritwalk, Decoz)", "Последняя буква имени (Spiritwalk, Декоз)"),
+      method: S("piatra de vârf a prenumelui", "the capstone of the first name", "замковый камень имени"),
+      value: PYTHAGOREAN[lf] ?? 0,
+      steps: [`${first}: ${lf} = ${PYTHAGOREAN[lf] ?? 0}`],
+    },
+    {
+      id: "lastName",
+      school: S("Ultima literă a numelui de familie", "Last letter of the surname", "Последняя буква фамилии"),
+      method: S("ultima literă a numelui întreg", "the last letter of the whole name", "последняя буква полного имени"),
+      value: PYTHAGOREAN[ll] ?? 0,
+      steps: [`${last}: ${ll} = ${PYTHAGOREAN[ll] ?? 0}`],
+    },
   ];
 }
 
@@ -885,6 +926,7 @@ export function compareAll(fullName: string, birthDate: Date, opts: CompareOptio
     build("gift", "digit", giftDefs(fullName, b), lang, num),
     build("missing", "set", missingDefs(fullName, birthDate, b), lang, sf),
     build("balance", "digit", balanceDefs(fullName), lang, num),
+    build("capstone", "digit", capstoneDefs(fullName), lang, num),
     build("key", "digit", keyDefs(fullName), lang, num),
     build("intensity", "set", intensityDefs(fullName), lang, sf),
     build("passion", "set", passionDefs(fullName, b), lang, sf),

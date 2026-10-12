@@ -115,10 +115,13 @@ export function positionLetters(name: string, table: LetterTable = PYTHAGOREAN) 
 
 /** A2.11–A2.12 Numere-Punte. Diferență absolută, master NU se păstrează. */
 export function bridges(lp: NumResult, exp: NumResult, su: NumResult, pers: NumResult) {
+  // Masterul se reduce înainte de diferență: |3 − 11| = 8 ar fi o distanță între
+  // registre, nu între numere. 3 și 11 au rădăcinile 3 și 2, deci puntea e 1.
+  const r = (x: NumResult) => reduce(x.value, false);
   return {
-    lifePathExpression: Math.abs(exp.value - lp.value),
-    soulUrgePersonality: Math.abs(su.value - pers.value),
-    soulUrgeExpression: Math.abs(su.value - exp.value),
+    lifePathExpression: Math.abs(r(exp) - r(lp)),
+    soulUrgePersonality: Math.abs(r(su) - r(pers)),
+    soulUrgeExpression: Math.abs(r(su) - r(exp)),
   };
 }
 
