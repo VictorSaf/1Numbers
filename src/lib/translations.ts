@@ -120,7 +120,7 @@ export const translations = {
     // Compatibility page
     compatibilityLabel: "Compatibilitate Numerologică",
     compatibilityTitle: "Compatibilitatea Perechii",
-    compatibilitySubtitle: "Descoperă armonia numerologică dintre două suflete și cum se completează energiile voastre",
+    compatibilitySubtitle: "Aceeași pereche, prin fiecare metodă de compatibilitate — unde se pun de acord și unde nu",
     person1: "Prima Persoană",
     person2: "A Doua Persoană",
     calculateCompatibility: "Calculează Compatibilitatea",
@@ -485,7 +485,7 @@ export const translations = {
     // Compatibility page
     compatibilityLabel: "Numerological Compatibility",
     compatibilityTitle: "Couple Compatibility",
-    compatibilitySubtitle: "Discover the numerological harmony between two souls and how your energies complement each other",
+    compatibilitySubtitle: "The same pair, through every compatibility method — where they agree and where they do not",
     person1: "First Person",
     person2: "Second Person",
     calculateCompatibility: "Calculate Compatibility",
@@ -901,7 +901,7 @@ export const translations = {
     // Compatibility page
     compatibilityLabel: "Нумерологическая Совместимость",
     compatibilityTitle: "Совместимость Пары",
-    compatibilitySubtitle: "Откройте нумерологическую гармонию между двумя душами и как ваши энергии дополняют друг друга",
+    compatibilitySubtitle: "Одна пара через каждый метод совместимости — где они согласны и где нет",
     person1: "Первый Человек",
     person2: "Второй Человек",
     calculateCompatibility: "Рассчитать Совместимость",
