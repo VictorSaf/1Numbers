@@ -96,12 +96,22 @@ if (password !== again) {
   process.exit(1);
 }
 
-await db.query('UPDATE users SET password_hash = $1 WHERE id = $2', [
-  await bcrypt.hash(password, 10),
-  found.rows[0].id,
-]);
+// Exact ce face POST /auth/reset. `password_changed_at` pe acum face ca
+// middleware-ul să refuze orice JWT emis înainte, deci sesiunile deschise cu
+// parola veche se închid. Fără el, cine avea contul îl păstra încă o săptămână
+// după ce i-ai schimbat parola de aici.
+await db.query(
+  'UPDATE users SET password_hash = $1, password_changed_at = now(), updated_at = now() WHERE id = $2',
+  [await bcrypt.hash(password, 10), found.rows[0].id],
+);
+// Linkurile de resetare încă nefolosite nu mai au ce debloca.
+await db.query(
+  "UPDATE auth_tokens SET used_at = now() WHERE user_id = $1 AND kind = 'reset_password' AND used_at IS NULL",
+  [found.rows[0].id],
+);
 
 console.log(`\nParola pentru ${found.rows[0].email} (${found.rows[0].role}) a fost schimbată.`);
+console.log('Sesiunile deschise cu parola veche au fost închise.');
 console.log('Nu a fost tipărită nicăieri și nu e în istoricul shell-ului.');
 
 await db.end();

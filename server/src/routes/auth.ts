@@ -158,21 +158,14 @@ router.post('/register', ipRateLimit({ windowMs: 60 * 60 * 1000, max: 5 }), asyn
   }
 });
 
-// Get current user
-router.get('/me', async (req: Request, res: Response) => {
+// Get current user. Prin `authenticateToken`, ca orice altă rută: clientul o
+// cheamă la fiecare reîncărcare, deci dacă ar decoda singură jetonul, un
+// dispozitiv rămas cu un jeton anterior resetării ar trece drept autentificat.
+router.get('/me', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (!token) {
-      return res.status(401).json({ error: 'Access token required' });
-    }
-
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
-    
     const result = await pool.query(
       'SELECT id, email, name, role, created_at FROM users WHERE id = $1',
-      [decoded.userId]
+      [req.userId]
     );
 
     if (result.rows.length === 0) {
@@ -192,7 +185,7 @@ router.get('/me', async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Get user error:', error);
-    res.status(401).json({ error: 'Invalid token' });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
