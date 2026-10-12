@@ -302,23 +302,35 @@ router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response)
 
     const wasActive = verifyResult.rows[0].is_active;
 
-    // Delete profile
-    await pool.query('DELETE FROM user_profiles WHERE id = $1 AND user_id = $2', [profileId, userId]);
+    // Ștergerea și mutarea activării merg împreună sau deloc: o cădere între
+    // ele ar lăsa omul cu hărți, dar fără niciuna activă.
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
 
-    // If deleted profile was active, activate the most recent profile
-    if (wasActive) {
-      const remainingResult = await pool.query(
-        `UPDATE user_profiles
-         SET is_active = true
-         WHERE user_id = $1 AND id = (
-           SELECT id FROM user_profiles
-           WHERE user_id = $1
-           ORDER BY created_at DESC
-           LIMIT 1
-         )
-         RETURNING id`,
-        [userId]
-      );
+      await client.query('DELETE FROM user_profiles WHERE id = $1 AND user_id = $2', [profileId, userId]);
+
+      // If deleted profile was active, activate the most recent profile
+      if (wasActive) {
+        await client.query(
+          `UPDATE user_profiles
+           SET is_active = true
+           WHERE user_id = $1 AND id = (
+             SELECT id FROM user_profiles
+             WHERE user_id = $1
+             ORDER BY created_at DESC
+             LIMIT 1
+           )`,
+          [userId]
+        );
+      }
+
+      await client.query('COMMIT');
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
     }
 
     res.json({ success: true, message: 'Profile deleted successfully' });

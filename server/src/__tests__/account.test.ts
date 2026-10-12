@@ -118,4 +118,32 @@ describe('GET /api/account/export', () => {
   it('cere autentificare', async () => {
     await request(app).get('/api/account/export').expect(401);
   });
+
+  it('pune întrebările deodată și păstrează fiecare răspuns la cheia lui', async () => {
+    // Douăsprezece citiri independente, una după alta, însemnau douăsprezece
+    // drumuri dus-întors până la bază pentru un singur buton.
+    let inFlight = 0;
+    let maxInFlight = 0;
+    vi.mocked(pool.query).mockImplementation((async (sql: string) => {
+      inFlight++;
+      maxInFlight = Math.max(maxInFlight, inFlight);
+      await new Promise((r) => setTimeout(r, 5));
+      inFlight--;
+      const table = /FROM (\w+)/.exec(sql)![1];
+      return { rows: [{ from: table }], rowCount: 1 };
+    }) as never);
+
+    const res = await request(app).get('/api/account/export').set('Authorization', asMe).expect(200);
+
+    expect(maxInFlight).toBe(12);
+    expect(res.body.account).toEqual({ from: 'users' });
+    expect(res.body.profiles).toEqual([{ from: 'user_profiles' }]);
+    expect(res.body.dailyReadings).toEqual([{ from: 'daily_readings' }]);
+    expect(res.body.purchases).toEqual([{ from: 'one_time_purchases' }]);
+    expect(Object.keys(res.body)).toEqual([
+      'exportedAt', 'note', 'account', 'profiles', 'journal', 'dailyReadings', 'deepReadings',
+      'notificationPreferences', 'gamification', 'achievements', 'activity', 'friends',
+      'subscriptions', 'purchases',
+    ]);
+  });
 });
