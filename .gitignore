@@ -41,3 +41,6 @@ server/.env
 # scripts/set-anthropic-key.sh creează una la fiecare rulare.
 .env.bak.*
 */.env.bak.*
+
+# Notițele locale ale pluginului Superpowers.
+.superpowers/

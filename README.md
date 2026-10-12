@@ -9,7 +9,7 @@ A multilingual (Romanian/English/Russian) numerology web application using the P
 - Karmic debt and lessons identification
 - Personal cycles (day/month/year)
 - Daily and monthly predictions
-- Advanced tools: name analysis, year forecast, compatibility matrix
+- Advanced tools: name analysis, year forecast
 
 ## Tech Stack
 
